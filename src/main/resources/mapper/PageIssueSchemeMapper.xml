@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.PageIssueSchemeMapper">
+    <resultMap id="pageIssueSchemeWithConfig" type="io.choerodon.issue.domain.PageIssueScheme">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="creationDate" column="creation_date"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="lastUpdateDate" column="last_update_date"/>
+        <result property="lastUpdatedBy" column="last_updated_by"/>
+        <result property="objectVersionNumber" column="object_version_number"/>
+        <collection property="lines" ofType="io.choerodon.issue.domain.PageIssueSchemeLine">
+            <id property="id" column="c_id"/>
+            <result property="schemeId" column="c_scheme_id"/>
+            <result property="issueTypeId" column="c_issue_type_id"/>
+            <result property="pageSchemeId" column="c_page_scheme_id"/>
+            <result property="creationDate" column="c_creation_date"/>
+            <result property="createdBy" column="c_created_by"/>
+            <result property="lastUpdateDate" column="c_last_update_date"/>
+            <result property="lastUpdatedBy" column="c_last_updated_by"/>
+            <result property="objectVersionNumber" column="c_object_version_number"/>
+            <result property="issueTypeName" column="c_it_name"/>
+            <result property="issueTypeIcon" column="c_it_icon"/>
+            <result property="pageSchemeName" column="c_ps_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="getSchemeWithConfigById" resultMap="pageIssueSchemeWithConfig">
+        SELECT PIS.*,
+        PISL.id as c_id,
+        PISL.scheme_id as c_scheme_id,
+        PISL.issue_type_id as c_issue_type_id,
+        PISL.page_scheme_id as c_page_scheme_id,
+        PISL.creation_date as c_creation_date,
+        PISL.created_by as c_created_by,
+        PISL.last_update_date as c_last_update_date,
+        PISL.last_updated_by as c_last_updated_by,
+        PISL.object_version_number as c_object_version_number,
+        IT.name as c_it_name,
+        IT.icon as c_it_icon,
+        PS.name as c_ps_name
+        FROM page_issue_scheme PIS
+        LEFT JOIN page_issue_scheme_line PISL on PIS.id = PISL.scheme_id
+        LEFT JOIN issue_type IT on IT.id = PISL.issue_type_id
+        LEFT JOIN page_scheme PS on PS.id = PISL.page_scheme_id
+        WHERE PIS.id = #{schemeId}
+    </select>
+
+    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.PageIssueScheme">
+        SELECT PIS.*
+        FROM page_issue_scheme PIS
+        WHERE 1=1
+        <if test="scheme.organizationId != null">
+            AND PIS.organization_id = #{scheme.organizationId}
+        </if>
+        <if test="scheme.name != null">
+            AND PIS.name LIKE concat('%',#{scheme.name},'%')
+        </if>
+        <if test="scheme.description != null">
+            AND PIS.description LIKE concat('%',#{scheme.description},'%')
+        </if>
+        <if test="param != null">
+            AND ( PIS.name LIKE concat('%',#{param},'%')
+            OR PIS.description LIKE concat('%',#{param},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queryIssueType" resultType="io.choerodon.issue.domain.IssueType">
+        SELECT
+        IT.*
+        FROM
+        issue_type IT
+        WHERE
+        IT.organization_id = #{organizationId}
+        AND NOT EXISTS ( SELECT 1 FROM page_issue_scheme_line PISL WHERE PISL.scheme_id = #{schemeId} AND IT.id = PISL.issue_type_id )
+    </select>
+
+    <select id="queryByPageSchemeId" resultType="io.choerodon.issue.domain.PageIssueScheme">
+        SELECT
+        pis.*
+        FROM page_issue_scheme pis
+        LEFT JOIN page_issue_scheme_line pisl on pis.id = pisl.scheme_id
+        WHERE 1=1
+        <if test="organizationId != null">
+            AND pis.organization_id = #{organizationId}
+        </if>
+        <if test="pageSchemeId != null">
+            AND pisl.page_scheme_id = #{pageSchemeId}
+        </if>
+    </select>
+
+</mapper>

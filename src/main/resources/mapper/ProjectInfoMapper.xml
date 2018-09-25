@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.ProjectInfoMapper">
+    <select id="queryByProjectId" resultType="io.choerodon.issue.domain.ProjectInfo">
+        SELECT *
+        FROM project_info
+        WHERE project_id = #{projectId}
+    </select>
+
+    <update id="updateIssueMaxNum">
+        UPDATE project_info pi
+        SET pi.issue_max_num = pi.issue_max_num + '1'
+        WHERE
+            pi.project_id = #{projectId}
+    </update>
+
+</mapper>

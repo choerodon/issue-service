@@ -1,0 +1,96 @@
+package io.choerodon.issue.api.service;
+
+import io.choerodon.issue.api.dto.StateMachineConfigDTO;
+import io.choerodon.issue.infra.feign.dto.ExecuteResult;
+import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.core.domain.Page;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * @author peng.jiang@hand-china.com
+ */
+public interface StateMachineService {
+
+    /**
+     * 分页查询状态机
+     *
+     * @param organizationId 组织id
+     * @param page           分页数
+     * @param size           分页大小
+     * @param sort           排序字段
+     * @param name           名称
+     * @param description    描述
+     * @param param          模糊查询参数
+     * @return 状态机列表
+     */
+    ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param);
+
+    /**
+     * 删除状态机
+     *
+     * @param organizationId 组织id
+     * @param stateMachineId 状态机id
+     * @return
+     */
+    ResponseEntity<Boolean> delete(Long organizationId, Long stateMachineId);
+
+    /**
+     * 删除校验
+     *
+     * @param organizationId 组织id
+     * @param stateMachineId 状态机id
+     * @return
+     */
+    Map<String, Object> checkDelete(Long organizationId, Long stateMachineId);
+
+    /**
+     * 显示事件单转换
+     *
+     * @param organizationId
+     * @param currentStateId
+     * @return
+     */
+    ResponseEntity<List<StateMachineTransfDTO>> transfList(Long organizationId, Long projectId, Long issueId);
+
+    /**
+     * 状态机执行转换
+     *
+     * @param organizationId 组织id
+     * @param stateMachineId 状态机Id
+     * @param transfId       转换Id
+     * @param currentStateId 当前状态Id
+     * @param issueId        事件单id
+     * @return
+     */
+    ResponseEntity<ExecuteResult> doTransf(Long organizationId, Long projectId, Long issueId, Long transfId);
+
+    /**
+     * 条件,验证过滤
+     *
+     * @param organizationId 组织id
+     * @param instanceId     实例id:事件单id
+     * @param transfDTOS
+     * @return
+     */
+    List<StateMachineTransfDTO> conditionFilter(Long organizationId, Long instanceId,
+                                                List<StateMachineTransfDTO> transfDTOS);
+
+    /**
+     * 执行条件，验证，后置处理
+     *
+     * @param organizationId
+     * @param instanceId
+     * @param targetStateId
+     * @param type
+     * @param configDTOS
+     * @return
+     */
+    ExecuteResult configExecute(Long organizationId, Long instanceId, Long targetStateId, String type,
+                                String conditionStrategy, List<StateMachineConfigDTO> configDTOS);
+
+}

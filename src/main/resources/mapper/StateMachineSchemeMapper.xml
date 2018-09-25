@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.StateMachineSchemeMapper">
+    <resultMap id="stateMachineSchemeWithConfig" type="io.choerodon.issue.domain.StateMachineScheme">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="defaultStateMachineId" column="default_state_machine_id"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="creationDate" column="creation_date"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="lastUpdateDate" column="last_update_date"/>
+        <result property="lastUpdatedBy" column="last_updated_by"/>
+        <result property="objectVersionNumber" column="object_version_number"/>
+
+        <collection property="schemeConfigs"  ofType="io.choerodon.issue.domain.StateMachineSchemeConfig">
+            <id property="id" column="c_id"/>
+            <result property="schemeId" column="c_scheme_id"/>
+            <result property="issueTypeId" column="c_issue_type_id"/>
+            <result property="stateMachineId" column="c_state_machine_id"/>
+            <result property="sequence" column="c_sequence"/>
+            <result property="creationDate" column="c_creation_date"/>
+            <result property="createdBy" column="c_created_by"/>
+            <result property="lastUpdateDate" column="c_last_update_date"/>
+            <result property="lastUpdatedBy" column="c_last_updated_by"/>
+            <result property="objectVersionNumber" column="c_object_version_number"/>
+        </collection>
+    </resultMap>
+
+    <select id="getSchemeWithConfigById" resultMap="stateMachineSchemeWithConfig">
+        SELECT SMS.*,
+          SMSC.id as c_id,
+          SMSC.scheme_id as c_scheme_id,
+          SMSC.issue_type_id as c_issue_type_id,
+          SMSC.state_machine_id as c_state_machine_id,
+          SMSC.sequence as c_sequence,
+          SMSC.creation_date as c_creation_date,
+          SMSC.created_by as c_created_by,
+          SMSC.last_update_date as c_last_update_date,
+          SMSC.last_updated_by as c_last_updated_by,
+          SMSC.object_version_number as c_object_version_number
+        FROM state_machine_scheme SMS
+        LEFT JOIN state_machine_scheme_config SMSC on SMS.id = SMSC.scheme_id
+        WHERE SMS.id = #{schemeId}
+    </select>
+
+    <select id="fulltextSearch" resultMap="stateMachineSchemeWithConfig">
+        SELECT SMS.*,
+        SMSC.id as c_id,
+        SMSC.scheme_id as c_scheme_id,
+        SMSC.issue_type_id as c_issue_type_id,
+        SMSC.state_machine_id as c_state_machine_id,
+        SMSC.sequence as c_sequence,
+        SMSC.creation_date as c_creation_date,
+        SMSC.created_by as c_created_by,
+        SMSC.last_update_date as c_last_update_date,
+        SMSC.last_updated_by as c_last_updated_by,
+        SMSC.object_version_number as c_object_version_number
+        FROM state_machine_scheme SMS
+        LEFT JOIN state_machine_scheme_config SMSC on SMS.id = SMSC.scheme_id
+        WHERE 1=1
+        <if test="scheme.organizationId != null">
+            AND SMS.organization_id = #{scheme.organizationId}
+        </if>
+        <if test="scheme.name != null">
+            AND SMS.name LIKE concat('%',#{scheme.name},'%')
+        </if>
+        <if test="scheme.description != null">
+            AND SMS.description LIKE concat('%',#{scheme.description},'%')
+        </if>
+        <if test="param != null">
+            AND ( SMS.name LIKE concat('%',#{param},'%')
+            OR SMS.description LIKE concat('%',#{param},'%')
+            )
+        </if>
+    </select>
+
+    <select id="querySchemeByStateMachineId" resultType="io.choerodon.issue.domain.StateMachineScheme">
+        SELECT
+        SMS.*
+        FROM
+        state_machine_scheme_config SMSC
+        LEFT JOIN state_machine_scheme SMS ON SMSC.scheme_id = SMS.id
+        WHERE
+        SMSC.state_machine_id = #{stateMachineId}
+        AND SMS.organization_id = #{organizationId}
+    </select>
+
+</mapper>
