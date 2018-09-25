@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.issue.infra.mapper.AttachmentMapper">
+    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.Attachment">
+        SELECT * FROM attachment
+        WHERE 1=1
+        <if test="param != null">
+            AND ( resource_type LIKE concat('%',#{param},'%')
+            OR resource_id LIKE concat('%',#{param},'%')
+            OR file_name LIKE concat('%',#{param},'%')
+            OR file_url LIKE concat('%',#{param},'%')
+            OR file_size LIKE concat('%',#{param},'%')
+            OR user_id LIKE concat('%',#{param},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queryByIssue" resultType="io.choerodon.issue.domain.Attachment">
+        SELECT * FROM attachment att
+        LEFT JOIN issue_reply ir on (att.resource_type = 'reply' AND att.resource_id = ir.id)
+        WHERE ir.issue_id = #{issueId} OR (att.resource_type = 'issue' AND att.resource_id = #{issueId})
+    </select>
+</mapper>

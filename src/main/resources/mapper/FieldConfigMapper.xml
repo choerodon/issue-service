@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.issue.infra.mapper.FieldConfigMapper">
+    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.FieldConfig">
+        SELECT * FROM field_config
+        WHERE 1=1
+        <if test="fieldConfig.organizationId != null">
+            AND organization_id = #{fieldConfig.organizationId}
+        </if>
+        <if test="fieldConfig.name != null">
+            AND name LIKE concat('%',#{fieldConfig.name},'%')
+        </if>
+        <if test="fieldConfig.description != null">
+            AND description LIKE concat('%',#{fieldConfig.description},'%')
+        </if>
+        <if test="param != null">
+            AND ( name LIKE concat('%',#{param},'%')
+            OR description LIKE concat('%',#{param},'%')
+            )
+        </if>
+    </select>
+
+
+</mapper>

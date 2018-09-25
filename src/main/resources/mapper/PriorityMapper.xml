@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.PriorityMapper">
+
+
+    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.Priority">
+        SELECT P.*
+        FROM priority P
+        WHERE 1=1
+        <if test="priority.organizationId != null">
+            AND P.organization_id = #{priority.organizationId}
+        </if>
+        <if test="priority.name != null">
+            AND P.name LIKE concat('%',#{priority.name},'%')
+        </if>
+        <if test="priority.description != null">
+            AND P.description LIKE concat('%',#{priority.description},'%')
+        </if>
+        <if test="priority.colour != null">
+            AND P.colour LIKE concat('%',#{priority.colour},'%')
+        </if>
+        <if test="param != null">
+            AND ( P.name LIKE concat('%',#{param},'%')
+            OR P.description LIKE concat('%',#{param},'%')
+            OR P.colour LIKE concat('%',#{param},'%')
+            )
+        </if>
+        ORDER BY P.sequence
+    </select>
+
+    <select id="getNextSequence" resultType="decimal">
+      SELECT IFNULL(MAX(P.sequence),0) FROM priority P WHERE P.organization_id = #{organizationId}
+    </select>
+
+    <update id="updateSequenceById" parameterType="io.choerodon.issue.domain.Priority">
+        UPDATE priority SET sequence = #{priority.sequence}
+        WHERE id= #{priority.id}
+    </update>
+
+    <update id="updateDefaultPriority">
+        UPDATE priority SET is_default = 0
+        WHERE organization_id=#{organizationId} AND is_default = 1
+    </update>
+</mapper>

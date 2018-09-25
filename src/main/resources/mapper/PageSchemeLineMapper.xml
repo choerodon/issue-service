@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.PageSchemeLineMapper">
+
+    <delete id="deleteBySchemeId" >
+        delete from page_scheme_line
+        where scheme_id = #{schemeId}
+        and organization_id = #{organizationId}
+    </delete>
+
+    <select id="queryBySchemeId" resultType="io.choerodon.issue.domain.PageSchemeLine">
+        SELECT
+        psl.*,
+        p.name pageName
+        FROM page_scheme_line psl
+        LEFT JOIN page p on p.id = psl.page_id
+        WHERE 1=1
+        <if test="organizationId != null">
+            AND psl.organization_id = #{organizationId}
+        </if>
+        <if test="schemeId != null">
+            AND psl.scheme_id = #{schemeId}
+        </if>
+    </select>
+
+</mapper>

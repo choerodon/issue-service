@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.FieldMapper">
+
+    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.Field">
+        SELECT * FROM field
+        WHERE 1=1
+        <if test="field.organizationId != null">
+            AND organization_id = #{field.organizationId}
+        </if>
+        <if test="field.name != null">
+            AND name LIKE concat('%',#{field.name},'%')
+        </if>
+        <if test="field.description != null">
+            AND description LIKE concat('%',#{field.description},'%')
+        </if>
+        <if test="param != null">
+            AND ( name LIKE concat('%',#{param},'%')
+            OR description LIKE concat('%',#{param},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queryPageByFieldId" resultType="io.choerodon.issue.domain.Page">
+        SELECT * FROM page p
+        LEFT JOIN page_field_ref r on  r.page_id = p.id
+        LEFT JOIN field f on  r.field_id = f.id
+        WHERE f.id=#{fieldId};
+    </select>
+    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.Field">
+        SELECT
+        f.*
+        FROM field f
+        WHERE f.organization_id = #{organizationId}
+    </select>
+    <select id="queryByPageId" resultType="io.choerodon.issue.domain.Field">
+        SELECT
+        f.*,
+        r.sequence
+        FROM field f
+        LEFT JOIN page_field_ref r on r.field_id = f.id
+        WHERE 1=1
+        <if test="organizationId != null">
+            AND f.organization_id = #{organizationId}
+        </if>
+        <if test="pageId != null">
+            AND r.page_id = #{pageId}
+        </if>
+        order by r.sequence
+    </select>
+
+    <select id="queryByIssueTypeIdAndPageTypeAndProjectId" resultType="io.choerodon.issue.domain.Field">
+        SELECT
+        f.*,
+        r.sequence
+        FROM field f
+        LEFT JOIN page_field_ref r on r.field_id = f.id
+        LEFT JOIN page_scheme_line psl on psl.page_id = r.page_id
+        LEFT JOIN page_issue_scheme_line pisl on pisl.page_scheme_id = psl.scheme_id
+        LEFT JOIN project_config pc on pc.issue_type_page_scheme_id = pisl.scheme_id
+        WHERE 1=1
+        <if test="projectId != null">
+            AND pc.project_id = #{projectId}
+        </if>
+        <if test="issueTypeId != null">
+            AND pisl.issue_type_id = #{issueTypeId}
+        </if>
+        <if test="pageType != null">
+            AND psl.type = #{pageType}
+        </if>
+        order by r.sequence
+    </select>
+</mapper>
