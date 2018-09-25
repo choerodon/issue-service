@@ -201,7 +201,7 @@
     </dependencies>
 
     <build>
-        <finalName>issue-service</finalName>
+        <finalName>app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
