@@ -1,4 +1,3 @@
-// demo.groovy
 package script.db
 
 databaseChangeLog(logicalFilePath: 'demo.groovy') {
