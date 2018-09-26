@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueDTO;
 import io.choerodon.issue.api.dto.IssueFieldValueDTO;
 import io.choerodon.issue.api.dto.SearchDTO;
@@ -15,8 +17,6 @@ import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
@@ -121,7 +121,7 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
         Long stateMachineId = getStateMachineId(projectId, issue.getId());
         ResponseEntity<ExecuteResult> executeResult = stateMachineFeignClient.startInstance(organizationId, serverCode, stateMachineId, issue.getId());
         //feign调用执行失败，抛出异常回滚
-        if (!executeResult.getBody().getIsSuccess()) {
+        if (!executeResult.getBody().getSuccess()) {
             // todo 手动回滚数据时，注意后置处理等操作中，是否有需要回滚的数据
             issueMapper.deleteByPrimaryKey(issue.getId());
             throw new CommonException(executeResult.getBody().getErrorMessage());

@@ -1,7 +1,5 @@
 package io.choerodon.issue.api.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Pattern;
@@ -11,8 +9,6 @@ import javax.validation.constraints.Size;
  * @author shinan.chen
  * @date 2018/9/7
  */
-@Setter
-@Getter
 public class ProjectDTO {
     private static final String CODE_REGULAR_EXPRESSION =
             "[a-zA-Z0-9_\\.][a-zA-Z0-9_\\-\\.]*[a-zA-Z0-9_\\-]|[a-zA-Z0-9_]";
@@ -52,5 +48,13 @@ public class ProjectDTO {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
