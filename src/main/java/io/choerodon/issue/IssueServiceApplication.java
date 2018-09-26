@@ -11,7 +11,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
  * Email: fuqianghuang01@gmail.com
  */
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients("io.choerodon")
 @EnableEurekaClient
 @EnableChoerodonResourceServer
 public class IssueServiceApplication {
