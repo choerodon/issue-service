@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.IssueService;
@@ -14,8 +16,6 @@ import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
 import io.choerodon.issue.infra.mapper.IssueMapper;
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,7 +151,7 @@ public class StateMachineServiceImpl implements StateMachineService {
                 isSuccess = service.configExecute(instanceId, targetStateId, configDTOS);
             }
         }
-        executeResult.setIsSuccess(isSuccess);
+        executeResult.setSuccess(isSuccess);
         return executeResult;
     }
 }
