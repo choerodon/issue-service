@@ -26,6 +26,7 @@ public class IssueType extends AuditDomain {
     private String name;
     private String description;
     private Long organizationId;
+    private String colour;
 
     @Transient
     private BigDecimal sequence;
@@ -88,5 +89,13 @@ public class IssueType extends AuditDomain {
 
     public void setStateMachineSchemeConfig(StateMachineSchemeConfig stateMachineSchemeConfig) {
         this.stateMachineSchemeConfig = stateMachineSchemeConfig;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
     }
 }

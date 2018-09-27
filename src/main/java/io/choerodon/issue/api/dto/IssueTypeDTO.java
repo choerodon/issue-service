@@ -14,6 +14,7 @@ public class IssueTypeDTO {
     private String icon;
     private String description;
     private Long organizationId;
+    private String colour;
 
     private Long objectVersionNumber;
 
@@ -73,5 +74,13 @@ public class IssueTypeDTO {
 
     public void setStateMachineSchemeConfigDTO(StateMachineSchemeConfigDTO stateMachineSchemeConfigDTO) {
         this.stateMachineSchemeConfigDTO = stateMachineSchemeConfigDTO;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
     }
 }
