@@ -40,6 +40,10 @@ databaseChangeLog(logicalFilePath: 'issue.groovy') {
 
             column(name: 'icon', type: 'VARCHAR(64)', remarks: '图标')
 
+            column(name: 'colour', type: 'VARCHAR(20)', remarks: '颜色'){
+                constraints(nullable: 'false')
+            }
+
             column(name: 'organization_id', type: 'BIGINT UNSIGNED', remarks: '组织id') {
                 constraints(nullable: 'false')
             }
