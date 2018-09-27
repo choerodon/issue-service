@@ -72,24 +72,25 @@ public class CloopmEventHandler {
         OrganizationEvent organizationEvent = JSONObject.parseObject(data, OrganizationEvent.class);
         loggerInfo(organizationEvent);
 
-        for (PriorityE priority : PriorityE.values()) {
-            PriorityDTO priorityDTO = new PriorityDTO();
-            priorityDTO.setName(priority.value());
-            priorityService.create(organizationEvent.getOrganizationId(), priorityDTO);
-        }
-
-        for (IssueTypeE issueType : IssueTypeE.values()) {
-            IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
-            issueTypeDTO.setName(issueType.value());
-            issueTypeService.create(organizationEvent.getOrganizationId(), issueTypeDTO);
-        }
-
-        for (FieldNameE fieldNameE : FieldNameE.values()) {
-            FieldDTO fieldDTO = new FieldDTO();
-            fieldDTO.setName(fieldNameE.value());
-            fieldDTO.setType(fieldNameE.type());
-            fieldService.create(organizationEvent.getOrganizationId(), fieldDTO);
-        }
+        //此处有空指针异常，记得处理
+//        for (PriorityE priority : PriorityE.values()) {
+//            PriorityDTO priorityDTO = new PriorityDTO();
+//            priorityDTO.setName(priority.value());
+//            priorityService.create(organizationEvent.getOrganizationId(), priorityDTO);
+//        }
+//
+//        for (IssueTypeE issueType : IssueTypeE.values()) {
+//            IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
+//            issueTypeDTO.setName(issueType.value());
+//            issueTypeService.create(organizationEvent.getOrganizationId(), issueTypeDTO);
+//        }
+//
+//        for (FieldNameE fieldNameE : FieldNameE.values()) {
+//            FieldDTO fieldDTO = new FieldDTO();
+//            fieldDTO.setName(fieldNameE.value());
+//            fieldDTO.setType(fieldNameE.type());
+//            fieldService.create(organizationEvent.getOrganizationId(), fieldDTO);
+//        }
         return data;
     }
 
