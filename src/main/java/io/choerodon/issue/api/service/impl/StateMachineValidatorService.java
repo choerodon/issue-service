@@ -22,7 +22,7 @@ public class StateMachineValidatorService implements StateMachineConfigService {
 
     @Override
     public String configType() {
-        return StateMachineConfigType.TYPE_VALIDATOR.value();
+        return StateMachineConfigType.VALIDATOR;
     }
 
     /**

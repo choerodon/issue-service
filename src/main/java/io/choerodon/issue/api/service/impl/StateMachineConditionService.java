@@ -7,7 +7,7 @@ import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.enums.StateMachineConfigEnums;
 import io.choerodon.issue.infra.enums.StateMachineConfigType;
 import io.choerodon.issue.infra.enums.StateMachineTransfStatus;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class StateMachineConditionService implements StateMachineConfigService {
 
     @Override
     public String configType() {
-        return StateMachineConfigType.TYPE_CONDITION.value();
+        return StateMachineConfigType.CONDITION;
     }
 
     /**
@@ -39,13 +39,13 @@ public class StateMachineConditionService implements StateMachineConfigService {
      * @return
      */
     @Override
-    public List<StateMachineTransfDTO> conditionFilter(Long instanceId, List<StateMachineTransfDTO> transfDTOS) {
+    public List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transfDTOS) {
         if (transfDTOS == null || transfDTOS.isEmpty()) {
             return Collections.emptyList();
         }
-        List<StateMachineTransfDTO> resultTransf = new ArrayList<>();
+        List<TransformInfo> resultTransf = new ArrayList<>();
         Issue issue = issueService.selectByPrimaryKey(instanceId);
-        for (StateMachineTransfDTO transfDTO:transfDTOS) {
+        for (TransformInfo transfDTO:transfDTOS) {
             if (transfDTO.getConditions() == null || transfDTO.getConditions().isEmpty()){
                 resultTransf.add(transfDTO);    //没有配置条件，直接跳过，视为满足条件
                 continue;

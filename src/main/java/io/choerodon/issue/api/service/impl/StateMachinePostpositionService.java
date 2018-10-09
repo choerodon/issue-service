@@ -25,7 +25,7 @@ public class StateMachinePostpositionService implements StateMachineConfigServic
 
     @Override
     public String configType() {
-        return StateMachineConfigType.TYPE_POSTPOSITION.value();
+        return StateMachineConfigType.POSTPOSITION;
     }
 
     /**

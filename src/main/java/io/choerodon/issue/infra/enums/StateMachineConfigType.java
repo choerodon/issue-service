@@ -1,22 +1,24 @@
 package io.choerodon.issue.infra.enums;
 
 /**
- * @author peng.jiang@hand-china.com
+ * @author shinan.chen
+ * @date 2018/9/27
  */
-public enum StateMachineConfigType {
-
-    TYPE_CONDITION("condition"),  //条件
-    TYPE_VALIDATOR("validator"),  //验证器
-    TYPE_TRIGGER("trigger"),  //触发器
-    TYPE_POSTPOSITION("postposition"); //后置功能
-
-    private String value;
-
-    StateMachineConfigType(String value) {
-        this.value = value;
-    }
-
-    public String value() {
-        return this.value;
-    }
+public class StateMachineConfigType {
+    /**
+     * 条件
+     */
+    public static final String CONDITION = "config_condition";
+    /**
+     * 验证
+     */
+    public static final String VALIDATOR = "config_validator";
+    /**
+     * 触发器
+     */
+    public static final String TRIGGER = "config_trigger";
+    /**
+     * 后置处理
+     */
+    public static final String POSTPOSITION = "config_postposition";
 }

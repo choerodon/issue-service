@@ -3,7 +3,7 @@ package io.choerodon.issue.api.service;
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.core.domain.Page;
 import org.springframework.http.ResponseEntity;
 
@@ -55,7 +55,7 @@ public interface StateMachineService {
      * @param currentStateId
      * @return
      */
-    ResponseEntity<List<StateMachineTransfDTO>> transfList(Long organizationId, Long projectId, Long issueId);
+    ResponseEntity<List<TransformInfo>> transfList(Long organizationId, Long projectId, Long issueId);
 
     /**
      * 状态机执行转换
@@ -77,8 +77,8 @@ public interface StateMachineService {
      * @param transfDTOS
      * @return
      */
-    List<StateMachineTransfDTO> conditionFilter(Long organizationId, Long instanceId,
-                                                List<StateMachineTransfDTO> transfDTOS);
+    List<TransformInfo> conditionFilter(Long organizationId, Long instanceId,
+                                        List<TransformInfo> transfDTOS);
 
     /**
      * 执行条件，验证，后置处理

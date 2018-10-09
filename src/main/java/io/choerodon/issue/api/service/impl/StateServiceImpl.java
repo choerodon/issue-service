@@ -22,7 +22,7 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public void handleState(Long organizationId, List<IssueDTO> issueDTOS) {
-        List<StateDTO> stateDTOS = stateMachineClient.selectAllStates(organizationId).getBody();
+        List<StateDTO> stateDTOS = stateMachineClient.queryAllStatus(organizationId).getBody();
         Map<Long, String> map = stateDTOS.stream().collect(Collectors.toMap(StateDTO::getId, StateDTO::getName));
         for (IssueDTO issueDTO : issueDTOS) {
             Long stateId = issueDTO.getStatusId();

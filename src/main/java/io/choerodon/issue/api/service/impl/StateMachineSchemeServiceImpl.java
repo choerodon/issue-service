@@ -64,7 +64,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                             configDTO.setIssueTypeName(issueType.getName());
                             configDTO.setIssueTypeIcon(issueType.getIcon());
                         }
-                        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.getStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
+                        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
                         configDTO.setStateMachineName(stateMachineDTO.getName());
                     }
                 }
@@ -148,7 +148,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         for (Map.Entry<Long, List<IssueType>> entry : map.entrySet()) {
             Long stateMachineId = entry.getKey();
             List<IssueType> issueTypes = entry.getValue();
-            StateMachineDTO stateMachineDTO = stateMachineServiceFeign.getStateMachineById(organizationId, stateMachineId).getBody();
+            StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, stateMachineId).getBody();
             StateMachineSchemeConfigViewDTO viewDTO = new StateMachineSchemeConfigViewDTO();
             viewDTO.setStateMachineDTO(stateMachineDTO);
 

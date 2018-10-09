@@ -4,7 +4,7 @@ import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.CustomPageRequest;
@@ -58,9 +58,9 @@ public class StateMachineController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "显示转换")
     @GetMapping(value = "/transf_list")
-    public ResponseEntity<List<StateMachineTransfDTO>> transfList(@PathVariable("organization_id") Long organizationId,
-                                                                  @RequestParam(value = "project_id") Long projectId,
-                                                                  @RequestParam(value = "issue_id") Long issueId) {
+    public ResponseEntity<List<TransformInfo>> transfList(@PathVariable("organization_id") Long organizationId,
+                                                          @RequestParam(value = "project_id") Long projectId,
+                                                          @RequestParam(value = "issue_id") Long issueId) {
         return stateMachineService.transfList(organizationId, projectId, issueId);
     }
 
@@ -68,9 +68,9 @@ public class StateMachineController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "条件过滤")
     @PostMapping(value = "/config_filter")
-    public ResponseEntity<List<StateMachineTransfDTO>> configFilter(@PathVariable("organization_id") Long organizationId,
-                                                                    @RequestParam(value = "instance_id") Long instanceId,
-                                                                    @RequestBody List<StateMachineTransfDTO> transfDTOS) {
+    public ResponseEntity<List<TransformInfo>> configFilter(@PathVariable("organization_id") Long organizationId,
+                                                            @RequestParam(value = "instance_id") Long instanceId,
+                                                            @RequestBody List<TransformInfo> transfDTOS) {
         return new ResponseEntity<>(stateMachineService.conditionFilter(organizationId, instanceId, transfDTOS), HttpStatus.OK);
     }
 

@@ -14,7 +14,7 @@ import io.choerodon.issue.infra.enums.StateMachineConfigType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.infra.mapper.IssueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class StateMachineServiceImpl implements StateMachineService {
         if (list != null && !list.isEmpty()) {
             throw new CommonException("error.stateMachine.delete");
         }
-        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.getStateMachineById(organizationId, stateMachineId);
+        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             throw new CommonException("error.stateMachine.delete.noFound");
         }
@@ -83,7 +83,7 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Override
     public Map<String, Object> checkDelete(Long organizationId, Long stateMachineId) {
         Map<String, Object> map = new HashMap<>();
-        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.getStateMachineById(organizationId, stateMachineId);
+        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             map.put(CloopmCommonString.CAN_DELETE, false);
             map.put("reason", "noFound");
@@ -100,10 +100,10 @@ public class StateMachineServiceImpl implements StateMachineService {
     }
 
     @Override
-    public ResponseEntity<List<StateMachineTransfDTO>> transfList(Long organizationId, Long projectId, Long issueId) {
+    public ResponseEntity<List<TransformInfo>> transfList(Long organizationId, Long projectId, Long issueId) {
         Long stateMachineId = issueService.getStateMachineId(projectId, issueId);
         Long currentStateId = issueMapper.selectByPrimaryKey(issueId).getStatusId();
-        return stateMachineClient.transfList(organizationId, serverCode,
+        return stateMachineClient.transformList(organizationId, serverCode,
                 stateMachineId, issueId, currentStateId);
     }
 
@@ -114,16 +114,16 @@ public class StateMachineServiceImpl implements StateMachineService {
         if (issue == null) {
             throw new CommonException("error.issue.noFound");
         }
-        return stateMachineClient.doTransf(organizationId, serverCode, stateMachineId, issueId,
+        return stateMachineClient.executeTransform(organizationId, serverCode, stateMachineId, issueId,
                 issue.getStatusId(), transfId);
     }
 
     @Override
-    public List<StateMachineTransfDTO> conditionFilter(Long organizationId, Long instanceId, List<StateMachineTransfDTO> transfDTOS) {
+    public List<TransformInfo> conditionFilter(Long organizationId, Long instanceId, List<TransformInfo> transfDTOS) {
         logger.info("状态机回调执行：conditionFilter,issueId:{},transfDTOS:{}", instanceId, transfDTOS);
         List<StateMachineConfigService> configServices = analyzeServiceManager.getConfigServices();
         for (StateMachineConfigService service : configServices) {
-            if (service.matchConfigType(StateMachineConfigType.TYPE_CONDITION.value())) {
+            if (service.matchConfigType(StateMachineConfigType.CONDITION)) {
                 return service.conditionFilter(instanceId, transfDTOS);
             }
         }
@@ -145,9 +145,9 @@ public class StateMachineServiceImpl implements StateMachineService {
         Boolean isSuccess = false;
         List<StateMachineConfigService> configServices = analyzeServiceManager.getConfigServices();
         for (StateMachineConfigService service : configServices) {
-            if (!StateMachineConfigType.TYPE_POSTPOSITION.value().equals(type) && service.matchConfigType(type)) {
+            if (!StateMachineConfigType.POSTPOSITION.equals(type) && service.matchConfigType(type)) {
                 isSuccess = service.configExecute(instanceId, conditionStrategy, configDTOS);
-            } else if (StateMachineConfigType.TYPE_POSTPOSITION.value().equals(type) && service.matchConfigType(type)) {
+            } else if (StateMachineConfigType.POSTPOSITION.equals(type) && service.matchConfigType(type)) {
                 isSuccess = service.configExecute(instanceId, targetStateId, configDTOS);
             }
         }

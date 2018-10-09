@@ -66,11 +66,11 @@ public class AnalyzeSystemServiceImpl implements AnalyzeIssueRecordService {
             case Issue.FIELD_STATUS_ID:
                 viewDTO.setAction(IssueRecordEnums.IssueSystemAction.UPDATE_STATUS_ID.value());
                 Long organizationId = projectUtil.getOrganizationId(projectId);
-                ResponseEntity<StateDTO> newState = stateMachineFeignClient.getByStateId(organizationId,Long.valueOf(issueRecord.getNewValue()));
+                ResponseEntity<StateDTO> newState = stateMachineFeignClient.queryStatusById(organizationId,Long.valueOf(issueRecord.getNewValue()));
                 if (newState != null && newState.getBody() != null){
                     viewDTO.setNewValue(newState.getBody().getName());
                 }
-                ResponseEntity<StateDTO> oldState = stateMachineFeignClient.getByStateId(organizationId,Long.valueOf(issueRecord.getOldValue()));
+                ResponseEntity<StateDTO> oldState = stateMachineFeignClient.queryStatusById(organizationId,Long.valueOf(issueRecord.getOldValue()));
                 if (oldState != null && oldState.getBody() != null){
                     viewDTO.setOldValue(oldState.getBody().getName());
                 }

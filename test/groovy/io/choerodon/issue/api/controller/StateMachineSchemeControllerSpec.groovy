@@ -56,7 +56,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         stateMachineDTO.setName("状态机名称")
         stateMachineDTO.setDescription("状态机描述")
         ResponseEntity<StateMachineDTO> responseEntity = new ResponseEntity<>(stateMachineDTO, HttpStatus.OK)
-        stateMachineServiceFeign.getStateMachineById(*_) >> responseEntity
+        stateMachineServiceFeign.queryStateMachineById(*_) >> responseEntity
 
         def name = 'name'
         def description = 'description'

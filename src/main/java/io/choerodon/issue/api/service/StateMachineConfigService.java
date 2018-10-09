@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public interface StateMachineConfigService {
      * @param configDTOS
      * @return
      */
-    public default List<StateMachineTransfDTO> conditionFilter(Long instanceId, List<StateMachineTransfDTO> transfDTOS) {
+    default List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transfDTOS) {
         return transfDTOS;
     }
 
@@ -46,7 +46,7 @@ public interface StateMachineConfigService {
      * @param configDTOS
      * @return
      */
-    public default Boolean configExecute(Long instanceId, String conditionStrategy, List<StateMachineConfigDTO> configDTOS){
+    default Boolean configExecute(Long instanceId, String conditionStrategy, List<StateMachineConfigDTO> configDTOS){
         return true;
     }
 
@@ -58,7 +58,7 @@ public interface StateMachineConfigService {
      * @param configDTOS
      * @return
      */
-    public default Boolean configExecute(Long instanceId, Long targetStateId, List<StateMachineConfigDTO> configDTOS){
+    default Boolean configExecute(Long instanceId, Long targetStateId, List<StateMachineConfigDTO> configDTOS){
         return true;
     }
 }
