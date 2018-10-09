@@ -6,7 +6,7 @@ import io.choerodon.issue.api.service.StateMachineConfigService;
 import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.enums.StateMachineConfigEnums;
 import io.choerodon.issue.infra.enums.StateMachineConfigType;
-import io.choerodon.issue.infra.enums.StateMachineTransfStatus;
+import io.choerodon.issue.infra.enums.TransformConditionStrategy;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
@@ -51,7 +51,7 @@ public class StateMachineConditionService implements StateMachineConfigService {
                 continue;
             }
             Boolean transfConditionValidator = false;   //满足所有条件
-            if (StateMachineTransfStatus.CONDITION_STRATEGY_ONE.equalsIgnoreCase(transfDTO.getConditionStrategy())){
+            if (TransformConditionStrategy.ONE.equalsIgnoreCase(transfDTO.getConditionStrategy())){
                 transfConditionValidator = true;    //满足条件之一
             }
             for (StateMachineConfigDTO configDTO : transfDTO.getConditions()) {
@@ -74,7 +74,7 @@ public class StateMachineConditionService implements StateMachineConfigService {
                     default:
                         throw new CommonException("error.configDTO.condition.noMatch");
                 }
-                if(StateMachineTransfStatus.CONDITION_STRATEGY_ONE.equalsIgnoreCase(transfDTO.getConditionStrategy()) && transfConditionValidator){
+                if(TransformConditionStrategy.ONE.equalsIgnoreCase(transfDTO.getConditionStrategy()) && transfConditionValidator){
                     break;  //满足条件之一  有一个验证成功后，后续验证不再需要执行
                 }
             }
@@ -97,7 +97,7 @@ public class StateMachineConditionService implements StateMachineConfigService {
     public Boolean configExecute(Long instanceId, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
         Issue issue = issueService.selectByPrimaryKey(instanceId);
         Boolean transfConditionValidator = false;   //满足所有条件
-        if (StateMachineTransfStatus.CONDITION_STRATEGY_ONE.equalsIgnoreCase(conditionStrategy)){
+        if (TransformConditionStrategy.ONE.equalsIgnoreCase(conditionStrategy)){
             transfConditionValidator = true;    //满足条件之一
         }
         for (StateMachineConfigDTO configDTO : configDTOS) {
@@ -120,7 +120,7 @@ public class StateMachineConditionService implements StateMachineConfigService {
                 default:
                     throw new CommonException("error.configDTO.condition.noMatch");
             }
-            if(StateMachineTransfStatus.CONDITION_STRATEGY_ONE.equalsIgnoreCase(conditionStrategy) && transfConditionValidator){
+            if(TransformConditionStrategy.ONE.equalsIgnoreCase(conditionStrategy) && transfConditionValidator){
                 return true;  //满足条件之一  有一个验证成功后，后续验证不再需要执行
             }
         }
