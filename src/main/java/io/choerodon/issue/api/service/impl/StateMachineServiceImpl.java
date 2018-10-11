@@ -10,12 +10,15 @@ import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
-import io.choerodon.issue.infra.enums.StateMachineConfigType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.infra.mapper.IssueMapper;
+import io.choerodon.issue.statemachine.StateMachineConfigMonitor;
+import io.choerodon.issue.statemachine.annotation.Condition;
+import io.choerodon.issue.statemachine.bean.InvokeBean;
+import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static java.util.Comparator.comparingLong;
@@ -130,28 +135,67 @@ public class StateMachineServiceImpl implements StateMachineService {
         return Collections.emptyList();
     }
 
+//    @Override
+//    public ExecuteResult configExecute(Long organizationId, Long instanceId, Long targetStateId, String type, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
+//        logger.info("状态机回调执行：configExecute,type:{},issueId:{},configDTOS:{}", type, instanceId, configDTOS);
+//        //测试两种异常：
+////        ExecuteResult xx=null;
+////        if (true) {
+////            //获取值时空指针异常
+//////            xx.getIsSuccess();
+////            //手动抛出的异常
+////            throw new RuntimeException("test");
+////        }
+//        ExecuteResult executeResult = new ExecuteResult();
+//        Boolean isSuccess = false;
+//        List<StateMachineConfigService> configServices = analyzeServiceManager.getConfigServices();
+//        for (StateMachineConfigService service : configServices) {
+//            if (!StateMachineConfigType.POSTPOSITION.equals(type) && service.matchConfigType(type)) {
+//                isSuccess = service.configExecute(instanceId, conditionStrategy, configDTOS);
+//            } else if (StateMachineConfigType.POSTPOSITION.equals(type) && service.matchConfigType(type)) {
+//                isSuccess = service.configExecute(instanceId, targetStateId, configDTOS);
+//            }
+//        }
+//        executeResult.setSuccess(isSuccess);
+//        return executeResult;
+//    }
+
     @Override
     public ExecuteResult configExecute(Long organizationId, Long instanceId, Long targetStateId, String type, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
         logger.info("状态机回调执行：configExecute,type:{},issueId:{},configDTOS:{}", type, instanceId, configDTOS);
-        //测试两种异常：
-//        ExecuteResult xx=null;
-//        if (true) {
-//            //获取值时空指针异常
-////            xx.getIsSuccess();
-//            //手动抛出的异常
-//            throw new RuntimeException("test");
-//        }
         ExecuteResult executeResult = new ExecuteResult();
         Boolean isSuccess = false;
-        List<StateMachineConfigService> configServices = analyzeServiceManager.getConfigServices();
-        for (StateMachineConfigService service : configServices) {
-            if (!StateMachineConfigType.POSTPOSITION.equals(type) && service.matchConfigType(type)) {
-                isSuccess = service.configExecute(instanceId, conditionStrategy, configDTOS);
-            } else if (StateMachineConfigType.POSTPOSITION.equals(type) && service.matchConfigType(type)) {
-                isSuccess = service.configExecute(instanceId, targetStateId, configDTOS);
+        for (StateMachineConfigDTO configDTO : configDTOS) {
+            InvokeBean invokeBean = StateMachineConfigMonitor.invokeBeanMap.get(configDTO.getCode());
+            if (invokeBean != null) {
+                Object object = invokeBean.getObject();
+                Method method = invokeBean.getMethod();
+                try {
+                    isSuccess = (Boolean) method.invoke(object, instanceId, configDTO);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    isSuccess = false;
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    isSuccess = false;
+                }
+            } else {
+                isSuccess = false;
+            }
+            if (!isSuccess) {
+                break;
             }
         }
         executeResult.setSuccess(isSuccess);
         return executeResult;
+    }
+
+    @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
+    private Boolean justReporter(Long instanceId, StateMachineConfigDTO configDTO) {
+        logger.info("执行条件：justReporter, instanceId:{},configDTO:{}", instanceId, configDTO);
+//        Issue issue = issueService.selectByPrimaryKey(instanceId);
+//        Long reporterId = DetailsHelper.getUserDetails().getUserId();
+//        return issue != null && issue.getReporterId() != null && issue.getReporterId().equals(reporterId);
+        return true;
     }
 }

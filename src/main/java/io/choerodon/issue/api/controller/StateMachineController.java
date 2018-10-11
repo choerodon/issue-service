@@ -74,17 +74,6 @@ public class StateMachineController {
         return new ResponseEntity<>(stateMachineService.conditionFilter(organizationId, instanceId, transfDTOS), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "执行条件，验证，后置处理")
-    @PostMapping(value = "/execute_config")
-    public ResponseEntity<ExecuteResult> executeConfig(@PathVariable("organization_id") Long organizationId,
-                                                       @RequestParam(value = "instance_id") Long instanceId,
-                                                       @RequestParam(value = "target_state_id", required = false) Long targetStateId,
-                                                       @RequestParam(value = "type") String type,
-                                                       @RequestParam(value = "condition_strategy", required = false) String conditionStrategy,
-                                                       @RequestBody List<StateMachineConfigDTO> configDTOS) {
-        return new ResponseEntity<>(stateMachineService.configExecute(organizationId, instanceId, targetStateId, type,
-                conditionStrategy, configDTOS), HttpStatus.OK);
-    }
+
 
 }

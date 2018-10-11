@@ -4,7 +4,7 @@ import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineConfigService;
 import io.choerodon.issue.infra.enums.StateMachineConfigEnums;
-import io.choerodon.issue.infra.enums.StateMachineConfigType;
+import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

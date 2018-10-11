@@ -1,8 +1,8 @@
-package io.choerodon.issue.infra.enums;
+package io.choerodon.issue.statemachine.enums;
 
 /**
  * @author shinan.chen
- * @date 2018/9/27
+ * @date 2018/10/9
  */
 public class StateMachineConfigType {
     /**

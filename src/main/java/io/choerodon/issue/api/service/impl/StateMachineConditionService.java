@@ -5,7 +5,7 @@ import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineConfigService;
 import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.enums.StateMachineConfigEnums;
-import io.choerodon.issue.infra.enums.StateMachineConfigType;
+import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import io.choerodon.issue.infra.enums.TransformConditionStrategy;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.core.exception.CommonException;
