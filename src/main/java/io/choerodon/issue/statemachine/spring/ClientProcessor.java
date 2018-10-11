@@ -1,10 +1,8 @@
 package io.choerodon.issue.statemachine.spring;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.statemachine.StateMachineConfigMonitor;
-import io.choerodon.issue.statemachine.annotation.Condition;
-import io.choerodon.issue.statemachine.annotation.Postpostition;
-import io.choerodon.issue.statemachine.annotation.Trigger;
-import io.choerodon.issue.statemachine.annotation.Validator;
+import io.choerodon.issue.statemachine.annotation.*;
 import io.choerodon.issue.statemachine.bean.ConfigCodeDTO;
 import io.choerodon.issue.statemachine.bean.InvokeBean;
 import io.choerodon.issue.statemachine.bean.PropertyData;
@@ -59,7 +57,7 @@ public class ClientProcessor implements BeanPostProcessor {
             Postpostition postpostition = AnnotationUtils.getAnnotation(method, Postpostition.class);
             if (postpostition != null) {
                 LOGGER.info("state-machine client annotation postpostition:{}", postpostition);
-                ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(postpostition.code(), postpostition.name(), postpostition.description(), StateMachineConfigType.CONDITION);
+                ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(postpostition.code(), postpostition.name(), postpostition.description(), StateMachineConfigType.POSTPOSITION);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
                 StateMachineConfigMonitor.checkUniqueCode(configCodeDTO);
@@ -68,7 +66,7 @@ public class ClientProcessor implements BeanPostProcessor {
             Validator validator = AnnotationUtils.getAnnotation(method, Validator.class);
             if (validator != null) {
                 LOGGER.info("state-machine client annotation validator:{}", validator);
-                ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(validator.code(), validator.name(), validator.description(), StateMachineConfigType.CONDITION);
+                ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(validator.code(), validator.name(), validator.description(), StateMachineConfigType.VALIDATOR);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
                 StateMachineConfigMonitor.checkUniqueCode(configCodeDTO);
@@ -77,11 +75,18 @@ public class ClientProcessor implements BeanPostProcessor {
             Trigger trigger = AnnotationUtils.getAnnotation(method, Trigger.class);
             if (trigger != null) {
                 LOGGER.info("state-machine client annotation trigger:{}", trigger);
-                ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(trigger.code(), trigger.name(), trigger.description(), StateMachineConfigType.CONDITION);
+                ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(trigger.code(), trigger.name(), trigger.description(), StateMachineConfigType.TRIGGER);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
                 StateMachineConfigMonitor.checkUniqueCode(configCodeDTO);
                 StateMachineConfigMonitor.invokeBeanMap.put(trigger.code(), new InvokeBean(method, object, configCodeDTO));
+            }
+            //扫描UpdateStatus注解的方法
+            UpdateStatus updateStatus = AnnotationUtils.getAnnotation(method, UpdateStatus.class);
+            if (updateStatus != null) {
+                StateMachineConfigMonitor.checkUniqueUpdateStatus();
+                Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
+                StateMachineConfigMonitor.setUpdateStatusBean(new InvokeBean(method, object, null));
             }
         }
         return bean;

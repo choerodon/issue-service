@@ -17,14 +17,34 @@ import java.util.Set;
 public class StateMachineConfigMonitor {
     public static final Logger logger = LoggerFactory.getLogger(StateMachineConfigMonitor.class);
     public static final Map<String, InvokeBean> invokeBeanMap = new HashMap<>();
+    public static InvokeBean updateStatusBean = null;
+
+    public static void setUpdateStatusBean(InvokeBean updateStatusBean) {
+        StateMachineConfigMonitor.updateStatusBean = updateStatusBean;
+    }
+
+    /**
+     * 校验code不能重复
+     * @param codeDTO
+     */
     public static void checkUniqueCode(ConfigCodeDTO codeDTO){
         Set<Map.Entry<String, InvokeBean>> invokes = invokeBeanMap.entrySet();
         invokes.forEach(x->{
             ConfigCodeDTO configCodeDTO = x.getValue().getConfigCodeDTO();
-            if(configCodeDTO.getCode().equals(codeDTO.getCode())&&configCodeDTO.getType().equals(codeDTO.getType())){
+            if(configCodeDTO.getCode().equals(codeDTO.getCode())){
                 logger.error("StateMachineConfigMonitor annotation code duplication: {}",codeDTO);
                 throw new CommonException("error.checkUniqueCode.duplication");
             }
         });
+    }
+
+    /**
+     * 校验updateStatus注解不能注解多个方法
+     */
+    public static void checkUniqueUpdateStatus(){
+        if(updateStatusBean!=null){
+            logger.error("StateMachineConfigMonitor annotation updateStatus duplication");
+            throw new CommonException("error.checkUniqueUpdateStatus.duplication");
+        }
     }
 }

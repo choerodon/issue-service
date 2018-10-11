@@ -1,7 +1,7 @@
 package io.choerodon.issue.statemachine.config;
 
 import io.choerodon.issue.statemachine.bean.PropertyData;
-import io.choerodon.issue.statemachine.endpoint.ConfigEndpoint;
+import io.choerodon.issue.statemachine.endpoint.ClientEndpoint;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ public class StateMachineClientConfig {
     }
 
     @Bean
-    public ConfigEndpoint configEndpoint() {
-        return new ConfigEndpoint(stateMachinePropertyData());
+    public ClientEndpoint clientEndpoint() {
+        return new ClientEndpoint(stateMachinePropertyData());
     }
 }

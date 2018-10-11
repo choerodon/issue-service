@@ -69,28 +69,15 @@ public interface StateMachineService {
      */
     ResponseEntity<ExecuteResult> doTransf(Long organizationId, Long projectId, Long issueId, Long transfId);
 
-    /**
-     * 条件,验证过滤
-     *
-     * @param organizationId 组织id
-     * @param instanceId     实例id:事件单id
-     * @param transfDTOS
-     * @return
-     */
-    List<TransformInfo> conditionFilter(Long organizationId, Long instanceId,
-                                        List<TransformInfo> transfDTOS);
-
-    /**
-     * 执行条件，验证，后置处理
-     *
-     * @param organizationId
-     * @param instanceId
-     * @param targetStateId
-     * @param type
-     * @param configDTOS
-     * @return
-     */
-    ExecuteResult configExecute(Long organizationId, Long instanceId, Long targetStateId, String type,
-                                String conditionStrategy, List<StateMachineConfigDTO> configDTOS);
+//    /**
+//     * 条件,验证过滤
+//     *
+//     * @param organizationId 组织id
+//     * @param instanceId     实例id:事件单id
+//     * @param transfDTOS
+//     * @return
+//     */
+//    List<TransformInfo> conditionFilter(Long organizationId, Long instanceId,
+//                                        List<TransformInfo> transfDTOS);
 
 }

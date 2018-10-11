@@ -9,13 +9,10 @@ import java.lang.annotation.Target;
 
 /**
  * @author shinan.chen
- * @date 2018/10/9
+ * @date 2018/10/11
  */
 @Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Transactional
-public @interface Condition {
-    String code();
-    String name();
-    String description();
+public @interface UpdateStatus {
 }
