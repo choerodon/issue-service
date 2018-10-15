@@ -102,6 +102,7 @@ public class IssueRecordServiceImpl extends BaseServiceImpl<IssueRecord> impleme
     }
 
     @Override
+    @Transactional
     public List<IssueRecord> create(Long projectId, Long issueId, IssueRecord issueRecord) {
         return create(projectId, issueId, Arrays.asList(issueRecord));
     }

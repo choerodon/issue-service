@@ -1,6 +1,5 @@
 package io.choerodon.issue.statemachine.spring;
 
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.statemachine.StateMachineConfigMonitor;
 import io.choerodon.issue.statemachine.annotation.*;
 import io.choerodon.issue.statemachine.bean.ConfigCodeDTO;
