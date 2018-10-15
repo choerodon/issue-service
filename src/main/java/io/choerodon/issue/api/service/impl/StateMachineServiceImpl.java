@@ -146,24 +146,20 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Postpostition(code = "assign_current_user", name = "分派给当前用户", description = "分派给当前用户")
     public Boolean assignCurrentUser(Long instanceId, StateMachineConfigDTO configDTO) {
         logger.info("执行后置动作：assignCurrentUser, instanceId:{},configDTO:{}", instanceId, configDTO);
-        Issue issue = new Issue();
-        issue.setStatusId(1L);
-        issue.setCode("sasa");
-        issueMapper.insert(issue);
         return true;
     }
 
     @UpdateStatus
     public void updateStatus(Long instanceId, Long targetStatusId) {
         logger.info("执行状态更新：updateStatus, instanceId:{},targetStatusId:{}", instanceId, targetStatusId);
-        Issue issue = issueService.selectByPrimaryKey(instanceId);
-        if (targetStatusId == null) {
-            throw new CommonException("error.updateStatus.targetStateId.null");
-        }
-        issue.setStatusId(targetStatusId);
-        int isUpdate = issueService.updateOptional(issue, "statusId");
-        if (isUpdate != 1) {
-            throw new CommonException("error.updateStatus.updateIssueState");
-        }
+//        Issue issue = issueService.selectByPrimaryKey(instanceId);
+//        if (targetStatusId == null) {
+//            throw new CommonException("error.updateStatus.targetStateId.null");
+//        }
+//        issue.setStatusId(targetStatusId);
+//        int isUpdate = issueService.updateOptional(issue, "statusId");
+//        if (isUpdate != 1) {
+//            throw new CommonException("error.updateStatus.updateIssueState");
+//        }
     }
 }

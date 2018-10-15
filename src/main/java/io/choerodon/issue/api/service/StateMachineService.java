@@ -1,10 +1,9 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.issue.api.dto.StateMachineConfigDTO;
+import io.choerodon.core.domain.Page;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
-import io.choerodon.core.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -68,16 +67,4 @@ public interface StateMachineService {
      * @return
      */
     ResponseEntity<ExecuteResult> doTransf(Long organizationId, Long projectId, Long issueId, Long transfId);
-
-//    /**
-//     * 条件,验证过滤
-//     *
-//     * @param organizationId 组织id
-//     * @param instanceId     实例id:事件单id
-//     * @param transfDTOS
-//     * @return
-//     */
-//    List<TransformInfo> conditionFilter(Long organizationId, Long instanceId,
-//                                        List<TransformInfo> transfDTOS);
-
 }
