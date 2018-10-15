@@ -1,11 +1,11 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.api.service.ProjectUserService;
 import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.dataobject.UserDO;
 import io.choerodon.issue.infra.feign.dto.CreateUserWithRolesDTO;
-import io.choerodon.core.iam.ResourceLevel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class ProjectUserServiceImpl implements ProjectUserService {
     @Override
     public ResponseEntity<UserDTO> createUser(Long organizationId, Long projectId, UserDTO userDTO) {
 
-        UserDO userDO  = modelMapper.map(userDTO, UserDO.class);
+        UserDO userDO = modelMapper.map(userDTO, UserDO.class);
         CreateUserWithRolesDTO createUserWithRolesDTO = new CreateUserWithRolesDTO();
         createUserWithRolesDTO.setUser(userDO);
         createUserWithRolesDTO.setMemberType(ResourceLevel.USER.value());

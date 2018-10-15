@@ -2,18 +2,12 @@ package io.choerodon.issue.api.eventhandler;
 
 import com.alibaba.fastjson.JSONObject;
 import io.choerodon.asgard.saga.annotation.SagaTask;
-import io.choerodon.issue.api.dto.FieldDTO;
-import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.dto.PriorityDTO;
 import io.choerodon.issue.api.dto.payload.OrganizationEvent;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.FieldService;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.api.service.ProjectInfoService;
-import io.choerodon.issue.infra.enums.FieldNameE;
-import io.choerodon.issue.infra.enums.IssueTypeE;
-import io.choerodon.issue.infra.enums.PriorityE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

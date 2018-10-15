@@ -114,7 +114,7 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
-            throw new CommonException("error.issue.create");
+            e.printStackTrace();
         }
         //创建状态机实例
         Long organizationId = projectUtil.getOrganizationId(projectId);

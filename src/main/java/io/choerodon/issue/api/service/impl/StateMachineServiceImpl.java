@@ -5,17 +5,19 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.IssueService;
-import io.choerodon.issue.api.service.StateMachineConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
-import io.choerodon.issue.infra.enums.StateMachineConfigType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.infra.mapper.IssueMapper;
+import io.choerodon.issue.statemachine.annotation.Condition;
+import io.choerodon.issue.statemachine.annotation.Postpostition;
+import io.choerodon.issue.statemachine.annotation.UpdateStatus;
+import io.choerodon.issue.statemachine.annotation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +75,7 @@ public class StateMachineServiceImpl implements StateMachineService {
         if (list != null && !list.isEmpty()) {
             throw new CommonException("error.stateMachine.delete");
         }
-        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.getStateMachineById(organizationId, stateMachineId);
+        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             throw new CommonException("error.stateMachine.delete.noFound");
         }
@@ -83,7 +85,7 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Override
     public Map<String, Object> checkDelete(Long organizationId, Long stateMachineId) {
         Map<String, Object> map = new HashMap<>();
-        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.getStateMachineById(organizationId, stateMachineId);
+        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             map.put(CloopmCommonString.CAN_DELETE, false);
             map.put("reason", "noFound");
@@ -100,10 +102,10 @@ public class StateMachineServiceImpl implements StateMachineService {
     }
 
     @Override
-    public ResponseEntity<List<StateMachineTransfDTO>> transfList(Long organizationId, Long projectId, Long issueId) {
+    public ResponseEntity<List<TransformInfo>> transfList(Long organizationId, Long projectId, Long issueId) {
         Long stateMachineId = issueService.getStateMachineId(projectId, issueId);
         Long currentStateId = issueMapper.selectByPrimaryKey(issueId).getStatusId();
-        return stateMachineClient.transfList(organizationId, serverCode,
+        return stateMachineClient.transformList(organizationId, serverCode,
                 stateMachineId, issueId, currentStateId);
     }
 
@@ -114,25 +116,13 @@ public class StateMachineServiceImpl implements StateMachineService {
         if (issue == null) {
             throw new CommonException("error.issue.noFound");
         }
-        return stateMachineClient.doTransf(organizationId, serverCode, stateMachineId, issueId,
+        return stateMachineClient.executeTransform(organizationId, serverCode, stateMachineId, issueId,
                 issue.getStatusId(), transfId);
     }
 
-    @Override
-    public List<StateMachineTransfDTO> conditionFilter(Long organizationId, Long instanceId, List<StateMachineTransfDTO> transfDTOS) {
-        logger.info("状态机回调执行：conditionFilter,issueId:{},transfDTOS:{}", instanceId, transfDTOS);
-        List<StateMachineConfigService> configServices = analyzeServiceManager.getConfigServices();
-        for (StateMachineConfigService service : configServices) {
-            if (service.matchConfigType(StateMachineConfigType.TYPE_CONDITION.value())) {
-                return service.conditionFilter(instanceId, transfDTOS);
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public ExecuteResult configExecute(Long organizationId, Long instanceId, Long targetStateId, String type, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
-        logger.info("状态机回调执行：configExecute,type:{},issueId:{},configDTOS:{}", type, instanceId, configDTOS);
+    @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
+    public Boolean justReporter(Long instanceId, StateMachineConfigDTO configDTO) {
+        logger.info("执行条件：justReporter, instanceId:{},configDTO:{}", instanceId, configDTO);
         //测试两种异常：
 //        ExecuteResult xx=null;
 //        if (true) {
@@ -141,17 +131,35 @@ public class StateMachineServiceImpl implements StateMachineService {
 //            //手动抛出的异常
 //            throw new RuntimeException("test");
 //        }
-        ExecuteResult executeResult = new ExecuteResult();
-        Boolean isSuccess = false;
-        List<StateMachineConfigService> configServices = analyzeServiceManager.getConfigServices();
-        for (StateMachineConfigService service : configServices) {
-            if (!StateMachineConfigType.TYPE_POSTPOSITION.value().equals(type) && service.matchConfigType(type)) {
-                isSuccess = service.configExecute(instanceId, conditionStrategy, configDTOS);
-            } else if (StateMachineConfigType.TYPE_POSTPOSITION.value().equals(type) && service.matchConfigType(type)) {
-                isSuccess = service.configExecute(instanceId, targetStateId, configDTOS);
-            }
-        }
-        executeResult.setSuccess(isSuccess);
-        return executeResult;
+//        Issue issue = issueService.selectByPrimaryKey(instanceId);
+//        Long reporterId = DetailsHelper.getUserDetails().getUserId();
+//        return issue != null && issue.getReporterId() != null && issue.getReporterId().equals(reporterId);
+        return true;
+    }
+
+    @Validator(code = "permission_validator", name = "权限校验", description = "校验操作的用户权限")
+    public Boolean permissionValidator(Long instanceId, StateMachineConfigDTO configDTO) {
+        logger.info("执行验证：permissionValidator, instanceId:{},configDTO:{}", instanceId, configDTO);
+        return true;
+    }
+
+    @Postpostition(code = "assign_current_user", name = "分派给当前用户", description = "分派给当前用户")
+    public Boolean assignCurrentUser(Long instanceId, StateMachineConfigDTO configDTO) {
+        logger.info("执行后置动作：assignCurrentUser, instanceId:{},configDTO:{}", instanceId, configDTO);
+        return true;
+    }
+
+    @UpdateStatus
+    public void updateStatus(Long instanceId, Long targetStatusId) {
+        logger.info("执行状态更新：updateStatus, instanceId:{},targetStatusId:{}", instanceId, targetStatusId);
+//        Issue issue = issueService.selectByPrimaryKey(instanceId);
+//        if (targetStatusId == null) {
+//            throw new CommonException("error.updateStatus.targetStateId.null");
+//        }
+//        issue.setStatusId(targetStatusId);
+//        int isUpdate = issueService.updateOptional(issue, "statusId");
+//        if (isUpdate != 1) {
+//            throw new CommonException("error.updateStatus.updateIssueState");
+//        }
     }
 }

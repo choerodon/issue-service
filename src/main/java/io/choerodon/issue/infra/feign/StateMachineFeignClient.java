@@ -1,11 +1,11 @@
 package io.choerodon.issue.infra.feign;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineTransfDTO;
+import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
-import io.choerodon.core.domain.Page;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -31,9 +31,9 @@ public interface StateMachineFeignClient {
      * @param stateMachineId 状态机Id
      * @return 状态机
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machine/get_stateMachine/{state_machine_id}", method = RequestMethod.GET)
-    ResponseEntity<StateMachineDTO> getStateMachineById(@RequestParam(value = "organization_id") Long organizationId,
-                                                        @RequestParam(value = "state_machine_id") Long stateMachineId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}", method = RequestMethod.GET)
+    ResponseEntity<StateMachineDTO> queryStateMachineById(@RequestParam(value = "organization_id") Long organizationId,
+                                                          @RequestParam(value = "state_machine_id") Long stateMachineId);
 
     /**
      * 分页查询状态机列表
@@ -44,14 +44,14 @@ public interface StateMachineFeignClient {
      * @param param
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machine", method = RequestMethod.GET)
-    public ResponseEntity<Page<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
-                                                             @RequestParam(value = "page", required = false) Integer page,
-                                                             @RequestParam(value = "size", required = false) Integer size,
-                                                             @RequestParam(value = "sort", required = false) String[] sort,
-                                                             @RequestParam(value = "name", required = false) String name,
-                                                             @RequestParam(value = "description", required = false) String description,
-                                                             @RequestParam(value = "param", required = false) String[] param);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines", method = RequestMethod.GET)
+    ResponseEntity<Page<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
+                                                      @RequestParam(value = "page", required = false) Integer page,
+                                                      @RequestParam(value = "size", required = false) Integer size,
+                                                      @RequestParam(value = "sort", required = false) String[] sort,
+                                                      @RequestParam(value = "name", required = false) String name,
+                                                      @RequestParam(value = "description", required = false) String description,
+                                                      @RequestParam(value = "param", required = false) String[] param);
 
     /**
      * 删除状态机
@@ -60,9 +60,9 @@ public interface StateMachineFeignClient {
      * @param stateMachineId 状态机Id
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machine/{state_machine_id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId,
-                                          @PathVariable("state_machine_id") Long stateMachineId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}", method = RequestMethod.DELETE)
+    ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId,
+                                   @PathVariable("state_machine_id") Long stateMachineId);
 
 
     /**
@@ -71,53 +71,57 @@ public interface StateMachineFeignClient {
      * @param organizationId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instance/start_instance", method = RequestMethod.GET)
-    public ResponseEntity<ExecuteResult> startInstance(@PathVariable("organization_id") Long organizationId,
-                                                       @RequestParam("service_code") String serviceCode,
-                                                       @RequestParam("state_machine_id") Long stateMachineId,
-                                                       @RequestParam("instance_id") Long instanceId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/start_instance", method = RequestMethod.GET)
+    ResponseEntity<ExecuteResult> startInstance(@PathVariable("organization_id") Long organizationId,
+                                                @RequestParam("service_code") String serviceCode,
+                                                @RequestParam("state_machine_id") Long stateMachineId,
+                                                @RequestParam("instance_id") Long instanceId);
 
     /**
      * 显示事件单的转换
      *
      * @param organizationId
-     * @param currentStateId
+     * @param serviceCode
+     * @param stateMachineId
+     * @param instanceId
+     * @param currentStatusId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instance/transf_list", method = RequestMethod.GET)
-    public ResponseEntity<List<StateMachineTransfDTO>> transfList(@PathVariable("organization_id") Long organizationId,
-                                                                  @RequestParam("service_code") String serviceCode,
-                                                                  @RequestParam("state_machine_id") Long stateMachineId,
-                                                                  @RequestParam("instance_id") Long instanceId,
-                                                                  @RequestParam("current_state_id") Long currentStateId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/transform_list", method = RequestMethod.GET)
+    ResponseEntity<List<TransformInfo>> transformList(@PathVariable("organization_id") Long organizationId,
+                                                      @RequestParam("service_code") String serviceCode,
+                                                      @RequestParam("state_machine_id") Long stateMachineId,
+                                                      @RequestParam("instance_id") Long instanceId,
+                                                      @RequestParam("current_status_id") Long currentStatusId);
 
     /**
      * 执行转换
      *
-     * @param service_code   请求服务code
-     * @param stateMachineId 状态机Id
-     * @param instanceId     实例对象Id(cloopm-service: issueId)
-     * @param currentStateId 当前状态Id
-     * @param transfId       转换Id
+     * @param organizationId
+     * @param serviceCode
+     * @param stateMachineId
+     * @param instanceId
+     * @param currentStatusId
+     * @param transformId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instance/execute_transf", method = RequestMethod.GET)
-    public ResponseEntity<ExecuteResult> doTransf(@PathVariable("organization_id") Long organizationId,
-                                                  @RequestParam("service_code") String serviceCode,
-                                                  @RequestParam("state_machine_id") Long stateMachineId,
-                                                  @RequestParam("instance_id") Long instanceId,
-                                                  @RequestParam("current_state_id") Long currentStateId,
-                                                  @RequestParam("transf_id") Long transfId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/execute_transform", method = RequestMethod.GET)
+    ResponseEntity<ExecuteResult> executeTransform(@PathVariable("organization_id") Long organizationId,
+                                                   @RequestParam("service_code") String serviceCode,
+                                                   @RequestParam("state_machine_id") Long stateMachineId,
+                                                   @RequestParam("instance_id") Long instanceId,
+                                                   @RequestParam("current_status_id") Long currentStatusId,
+                                                   @RequestParam("transform_id") Long transformId);
 
     /**
      * 根据id获取状态
      *
      * @param organizationId
-     * @param stateId
+     * @param statusId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state/{state_id}", method = RequestMethod.GET)
-    public ResponseEntity<StateDTO> getByStateId(@PathVariable("organization_id") Long organizationId, @PathVariable("state_id") Long stateId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/status/{status_id}", method = RequestMethod.GET)
+    ResponseEntity<StateDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
 
     /**
      * 根据id获取状态
@@ -125,7 +129,7 @@ public interface StateMachineFeignClient {
      * @param organizationId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state/selectAll", method = RequestMethod.GET)
-    public ResponseEntity<List<StateDTO>> selectAllStates(@PathVariable("organization_id") Long organizationId);
+    @RequestMapping(value = "/v1/organizations/{organization_id}/status/query_all", method = RequestMethod.GET)
+    ResponseEntity<List<StateDTO>> queryAllStatus(@PathVariable("organization_id") Long organizationId);
 
 }
