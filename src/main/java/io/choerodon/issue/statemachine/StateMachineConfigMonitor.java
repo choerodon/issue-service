@@ -25,14 +25,15 @@ public class StateMachineConfigMonitor {
 
     /**
      * 校验code不能重复
+     *
      * @param codeDTO
      */
-    public static void checkUniqueCode(ConfigCodeDTO codeDTO){
+    public static void checkUniqueCode(ConfigCodeDTO codeDTO) {
         Set<Map.Entry<String, InvokeBean>> invokes = invokeBeanMap.entrySet();
-        invokes.forEach(x->{
+        invokes.forEach(x -> {
             ConfigCodeDTO configCodeDTO = x.getValue().getConfigCodeDTO();
-            if(configCodeDTO.getCode().equals(codeDTO.getCode())){
-                logger.error("StateMachineConfigMonitor annotation code duplication: {}",codeDTO);
+            if (configCodeDTO.getCode().equals(codeDTO.getCode())) {
+                logger.error("StateMachineConfigMonitor annotation code duplication: {}", codeDTO);
                 throw new CommonException("error.checkUniqueCode.duplication");
             }
         });
@@ -41,8 +42,8 @@ public class StateMachineConfigMonitor {
     /**
      * 校验updateStatus注解不能注解多个方法
      */
-    public static void checkUniqueUpdateStatus(){
-        if(updateStatusBean!=null){
+    public static void checkUniqueUpdateStatus() {
+        if (updateStatusBean != null) {
             logger.error("StateMachineConfigMonitor annotation updateStatus duplication");
             throw new CommonException("error.checkUniqueUpdateStatus.duplication");
         }
