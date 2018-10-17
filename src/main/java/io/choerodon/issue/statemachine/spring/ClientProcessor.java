@@ -8,7 +8,6 @@ import io.choerodon.issue.statemachine.bean.PropertyData;
 import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -36,17 +35,17 @@ public class ClientProcessor implements BeanPostProcessor {
     private PropertyData stateMachinePropertyData;
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
         return bean;
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
         Method[] methods = ReflectionUtils.getAllDeclaredMethods(bean.getClass());
         for (Method method : methods) {
             Condition condition = AnnotationUtils.getAnnotation(method, Condition.class);
             if (condition != null) {
-                LOGGER.info("state-machine client annotation condition:{}", condition);
+                LOGGER.info("stateMachine client annotation condition:{}", condition);
                 ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(condition.code(), condition.name(), condition.description(), StateMachineConfigType.CONDITION);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
@@ -55,7 +54,7 @@ public class ClientProcessor implements BeanPostProcessor {
             }
             Postpostition postpostition = AnnotationUtils.getAnnotation(method, Postpostition.class);
             if (postpostition != null) {
-                LOGGER.info("state-machine client annotation postpostition:{}", postpostition);
+                LOGGER.info("stateMachine client annotation postpostition:{}", postpostition);
                 ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(postpostition.code(), postpostition.name(), postpostition.description(), StateMachineConfigType.POSTPOSITION);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
@@ -64,7 +63,7 @@ public class ClientProcessor implements BeanPostProcessor {
             }
             Validator validator = AnnotationUtils.getAnnotation(method, Validator.class);
             if (validator != null) {
-                LOGGER.info("state-machine client annotation validator:{}", validator);
+                LOGGER.info("stateMachine client annotation validator:{}", validator);
                 ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(validator.code(), validator.name(), validator.description(), StateMachineConfigType.VALIDATOR);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
@@ -73,7 +72,7 @@ public class ClientProcessor implements BeanPostProcessor {
             }
             Trigger trigger = AnnotationUtils.getAnnotation(method, Trigger.class);
             if (trigger != null) {
-                LOGGER.info("state-machine client annotation trigger:{}", trigger);
+                LOGGER.info("stateMachine client annotation trigger:{}", trigger);
                 ConfigCodeDTO configCodeDTO = new ConfigCodeDTO(trigger.code(), trigger.name(), trigger.description(), StateMachineConfigType.TRIGGER);
                 stateMachinePropertyData.getList().add(configCodeDTO);
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
@@ -83,6 +82,7 @@ public class ClientProcessor implements BeanPostProcessor {
             //扫描UpdateStatus注解的方法
             UpdateStatus updateStatus = AnnotationUtils.getAnnotation(method, UpdateStatus.class);
             if (updateStatus != null) {
+                LOGGER.info("stateMachine client annotation updateStatus:{}", updateStatus);
                 StateMachineConfigMonitor.checkUniqueUpdateStatus();
                 Object object = applicationContextHelper.getContext().getBean(method.getDeclaringClass());
                 StateMachineConfigMonitor.setUpdateStatusBean(new InvokeBean(method, object, null));

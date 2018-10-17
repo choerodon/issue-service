@@ -15,6 +15,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
+ * 状态机客户端回调端点
  * @author shinan.chen
  * @date 2018/10/9
  */

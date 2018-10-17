@@ -7,6 +7,7 @@ import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import java.util.List;
 
 /**
+ * 状态机客户端回调service
  * @author shinan.chen
  * @date 2018/10/11
  */

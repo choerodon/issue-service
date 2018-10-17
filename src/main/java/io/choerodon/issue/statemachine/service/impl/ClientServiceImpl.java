@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,10 +30,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ExecuteResult configExecute(Long instanceId, Long targetStatusId, String type, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
-        logger.info("状态机回调执行：configExecute,type:{},instanceId:{},configDTOS:{}", type, instanceId, configDTOS);
+        logger.info("stateMachine client configExecute start: type:{}, instanceId:{}, configDTOS:{}", type, instanceId, configDTOS);
         ExecuteResult executeResult = new ExecuteResult();
         Boolean isSuccess = true;
-        //若是执行后置动作，要更新状态
+        //若是执行后置动作，要先调用状态更新
         if (type.equals(StateMachineConfigType.POSTPOSITION)) {
             InvokeBean invokeBean = StateMachineConfigMonitor.updateStatusBean;
             if (invokeBean != null) {
@@ -42,15 +41,17 @@ public class ClientServiceImpl implements ClientService {
                 Method method = invokeBean.getMethod();
                 try {
                     method.invoke(object, instanceId, targetStatusId);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    isSuccess = false;
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    logger.info("stateMachine client configExecute updateStatus with method {}: instanceId:{}, targetStatusId:{}", method.getName(), instanceId, targetStatusId);
+                } catch (Exception e) {
+                    logger.error("stateMachine client configExecute updateStatus invoke error {}", e.getMessage());
                     isSuccess = false;
                 }
+            }else{
+                logger.error("stateMachine client configExecute updateStatus invokeBean not found");
+                isSuccess = false;
             }
         }
+        //执行代码中配置的条件、校验、后置动作
         if (isSuccess) {
             for (StateMachineConfigDTO configDTO : configDTOS) {
                 InvokeBean invokeBean = StateMachineConfigMonitor.invokeBeanMap.get(configDTO.getCode());
@@ -59,14 +60,13 @@ public class ClientServiceImpl implements ClientService {
                     Method method = invokeBean.getMethod();
                     try {
                         isSuccess = (Boolean) method.invoke(object, instanceId, configDTO);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        isSuccess = false;
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
+                        logger.info("stateMachine client configExecute {} with method {}: instanceId:{}", configDTO.getCode(), method.getName(), instanceId);
+                    } catch (Exception e) {
+                        logger.error("stateMachine client configExecute {} with method {} invoke error {}", configDTO.getCode(), method.getName(), e.getMessage());
                         isSuccess = false;
                     }
                 } else {
+                    logger.error("stateMachine client configExecute {} invokeBean not found", configDTO.getCode());
                     isSuccess = false;
                 }
                 if (!isSuccess) {
@@ -80,18 +80,21 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformInfos) {
-        logger.info("状态机回调执行：conditionFilter,instanceId:{},transformInfos:{}", instanceId, transformInfos);
+        logger.info("stateMachine client conditionFilter start: instanceId:{}, transformInfos:{}", instanceId, transformInfos);
         if (transformInfos == null || transformInfos.isEmpty()) {
             return Collections.emptyList();
         }
-        List<TransformInfo> resultTransf = new ArrayList<>();
+        List<TransformInfo> resultTransforms = new ArrayList<>();
         transformInfos.forEach(transformInfo -> {
             List<StateMachineConfigDTO> configDTOS = transformInfo.getConditions();
             ExecuteResult executeResult = configExecute(instanceId, transformInfo.getEndStatusId(), StateMachineConfigType.CONDITION, transformInfo.getConditionStrategy(), configDTOS);
             if (executeResult.getSuccess()) {
-                resultTransf.add(transformInfo);
+                logger.info("stateMachine client conditionFilter transform match condition: instanceId:{}, transformId:{}", instanceId, transformInfo.getId());
+                resultTransforms.add(transformInfo);
+            }else{
+                logger.info("stateMachine client conditionFilter transform not match condition: instanceId:{}, transformId:{}", instanceId, transformInfo.getId());
             }
         });
-        return resultTransf;
+        return resultTransforms;
     }
 }

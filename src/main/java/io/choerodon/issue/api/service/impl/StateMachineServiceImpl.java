@@ -18,8 +18,6 @@ import io.choerodon.issue.statemachine.annotation.Condition;
 import io.choerodon.issue.statemachine.annotation.Postpostition;
 import io.choerodon.issue.statemachine.annotation.UpdateStatus;
 import io.choerodon.issue.statemachine.annotation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +34,6 @@ import static java.util.stream.Collectors.toCollection;
  */
 @Component
 public class StateMachineServiceImpl implements StateMachineService {
-
-    private static final Logger logger = LoggerFactory.getLogger(StateMachineServiceImpl.class);
 
     @Value("${spring.application.name:default}")
     private String serverCode;
@@ -122,7 +118,6 @@ public class StateMachineServiceImpl implements StateMachineService {
 
     @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
     public Boolean justReporter(Long instanceId, StateMachineConfigDTO configDTO) {
-        logger.info("执行条件：justReporter, instanceId:{},configDTO:{}", instanceId, configDTO);
         //测试两种异常：
 //        ExecuteResult xx=null;
 //        if (true) {
@@ -139,19 +134,16 @@ public class StateMachineServiceImpl implements StateMachineService {
 
     @Validator(code = "permission_validator", name = "权限校验", description = "校验操作的用户权限")
     public Boolean permissionValidator(Long instanceId, StateMachineConfigDTO configDTO) {
-        logger.info("执行验证：permissionValidator, instanceId:{},configDTO:{}", instanceId, configDTO);
         return true;
     }
 
     @Postpostition(code = "assign_current_user", name = "分派给当前用户", description = "分派给当前用户")
     public Boolean assignCurrentUser(Long instanceId, StateMachineConfigDTO configDTO) {
-        logger.info("执行后置动作：assignCurrentUser, instanceId:{},configDTO:{}", instanceId, configDTO);
         return true;
     }
 
     @UpdateStatus
     public void updateStatus(Long instanceId, Long targetStatusId) {
-        logger.info("执行状态更新：updateStatus, instanceId:{},targetStatusId:{}", instanceId, targetStatusId);
 //        Issue issue = issueService.selectByPrimaryKey(instanceId);
 //        if (targetStatusId == null) {
 //            throw new CommonException("error.updateStatus.targetStateId.null");
