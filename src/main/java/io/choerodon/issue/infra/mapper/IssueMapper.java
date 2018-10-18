@@ -17,4 +17,6 @@ public interface IssueMapper extends BaseMapper<Issue> {
     List<Issue> queryIssuesByArgs(@Param("projectId") Long projectId, @Param("searchArgs") Map<String, Object> searchArgs, @Param("searchArgsIds") Map<String, Object> searchArgsIds, @Param("param") String param, @Param("paramIds") Map<String, Object> paramIds);
 
     Issue queryById(@Param("projectId") Long projectId, @Param("issueId") Long issueId);
+
+    void updatexx(@Param("issueId") Long issueId);
 }

@@ -127,4 +127,9 @@
         WHERE i.id = #{issueId}
         AND i.project_id = #{projectId}
     </select>
+
+    <update id="updatexx" >
+        UPDATE issue SET status_id = '1'
+        WHERE id= #{issueId}
+    </update>
 </mapper>

@@ -1,5 +1,6 @@
 package io.choerodon.issue.statemachine.service.impl;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
@@ -11,6 +12,7 @@ import io.choerodon.issue.statemachine.spring.ClientProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Method;
@@ -23,12 +25,13 @@ import java.util.List;
  * @date 2018/10/11
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
+//@Transactional(rollbackFor = Exception.class)
 public class ClientServiceImpl implements ClientService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientProcessor.class);
 
     @Override
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public ExecuteResult configExecute(Long instanceId, Long targetStatusId, String type, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
         logger.info("stateMachine client configExecute start: type:{}, instanceId:{}, configDTOS:{}", type, instanceId, configDTOS);
         ExecuteResult executeResult = new ExecuteResult();
@@ -44,6 +47,7 @@ public class ClientServiceImpl implements ClientService {
                     logger.info("stateMachine client configExecute updateStatus with method {}: instanceId:{}, targetStatusId:{}", method.getName(), instanceId, targetStatusId);
                 } catch (Exception e) {
                     logger.error("stateMachine client configExecute updateStatus invoke error {}", e.getMessage());
+                    e.printStackTrace();
                     isSuccess = false;
                 }
             }else{
@@ -63,6 +67,7 @@ public class ClientServiceImpl implements ClientService {
                         logger.info("stateMachine client configExecute {} with method {}: instanceId:{}", configDTO.getCode(), method.getName(), instanceId);
                     } catch (Exception e) {
                         logger.error("stateMachine client configExecute {} with method {} invoke error {}", configDTO.getCode(), method.getName(), e.getMessage());
+                        e.printStackTrace();
                         isSuccess = false;
                     }
                 } else {

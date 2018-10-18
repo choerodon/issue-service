@@ -1,6 +1,8 @@
 package io.choerodon.issue.api.service;
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.issue.api.dto.IssueDTO;
+import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
@@ -67,4 +69,12 @@ public interface StateMachineService {
      * @return
      */
     ResponseEntity<ExecuteResult> doTransf(Long organizationId, Long projectId, Long issueId, Long transfId);
+
+    /**
+     * 创建问题和状态机实例
+     * @param organizationId
+     * @param stateMachineId
+     * @return
+     */
+    Issue createIssue(Long organizationId, Long stateMachineId);
 }
