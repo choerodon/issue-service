@@ -2,28 +2,30 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.Issue;
+import io.choerodon.issue.domain.IssueRecord;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.infra.mapper.IssueMapper;
+import io.choerodon.issue.infra.mapper.IssueRecordMapper;
 import io.choerodon.issue.statemachine.annotation.Condition;
 import io.choerodon.issue.statemachine.annotation.Postpostition;
 import io.choerodon.issue.statemachine.annotation.UpdateStatus;
 import io.choerodon.issue.statemachine.annotation.Validator;
+import io.choerodon.issue.statemachine.feign.InstanceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -32,7 +34,8 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
 /**
- * @author peng.jiang@hand-china.com
+ * @author shinan.chen
+ * @date 2018/9/25
  */
 @Component
 public class StateMachineServiceImpl implements StateMachineService {
@@ -48,9 +51,11 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Autowired
     private IssueMapper issueMapper;
     @Autowired
+    private IssueRecordMapper issueRecordMapper;
+    @Autowired
     private AnalyzeServiceManager analyzeServiceManager;
     @Autowired
-    private StateMachineFeignClient stateMachineFeignClient;
+    private InstanceFeignClient instanceFeignClient;
 
     @Override
     public ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
@@ -105,7 +110,7 @@ public class StateMachineServiceImpl implements StateMachineService {
     public ResponseEntity<List<TransformInfo>> transfList(Long organizationId, Long projectId, Long issueId) {
         Long stateMachineId = issueService.getStateMachineId(projectId, issueId);
         Long currentStateId = issueMapper.selectByPrimaryKey(issueId).getStatusId();
-        return stateMachineClient.transformList(organizationId, serverCode,
+        return instanceFeignClient.transformList(organizationId, serverCode,
                 stateMachineId, issueId, currentStateId);
     }
 
@@ -116,23 +121,19 @@ public class StateMachineServiceImpl implements StateMachineService {
         if (issue == null) {
             throw new CommonException("error.issue.noFound");
         }
-        return stateMachineClient.executeTransform(organizationId, serverCode, stateMachineId, issueId,
+        return instanceFeignClient.executeTransform(organizationId, serverCode, stateMachineId, issueId,
                 issue.getStatusId(), transfId);
     }
 
     @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
     public Boolean justReporter(Long instanceId, StateMachineConfigDTO configDTO) {
-        //测试两种异常：
-//        ExecuteResult xx=null;
-//        if (true) {
-//            //获取值时空指针异常
-////            xx.getIsSuccess();
-//            //手动抛出的异常
-//            throw new RuntimeException("test");
-//        }
-//        Issue issue = issueService.selectByPrimaryKey(instanceId);
-//        Long reporterId = DetailsHelper.getUserDetails().getUserId();
-//        return issue != null && issue.getReporterId() != null && issue.getReporterId().equals(reporterId);
+        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
+        Long currentUserId = DetailsHelper.getUserDetails().getUserId();
+        return issue != null && issue.getReporterId() != null && issue.getReporterId().equals(currentUserId);
+    }
+
+    @Condition(code = "just_admin", name = "仅允许管理员", description = "只有该管理员才能执行转换")
+    public Boolean justAdmin(Long instanceId, StateMachineConfigDTO configDTO) {
         return true;
     }
 
@@ -141,9 +142,40 @@ public class StateMachineServiceImpl implements StateMachineService {
         return true;
     }
 
-    @Postpostition(code = "assign_current_user", name = "分派给当前用户", description = "分派给当前用户")
-    public Boolean assignCurrentUser(Long instanceId, StateMachineConfigDTO configDTO) {
+    @Validator(code = "time_validator", name = "时间校验", description = "根据时间校验权限")
+    public Boolean timeValidator(Long instanceId, StateMachineConfigDTO configDTO) {
+//        throw new CommonException("xx");
         return true;
+    }
+
+    @Postpostition(code = "assign_current_user", name = "分派给当前用户", description = "分派给当前用户")
+    public void assignCurrentUser(Long instanceId, StateMachineConfigDTO configDTO) {
+//        //测试两种异常：
+//        ExecuteResult xx=null;
+//        if (true) {
+//            //获取值时空指针异常
+////            xx.getSuccess();
+//            //手动抛出的异常
+//            throw new RuntimeException("test11");
+//        }
+        Long currentUserId = DetailsHelper.getUserDetails().getUserId();
+        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
+        issue.setHandlerId(currentUserId);
+        int update = issueService.updateOptional(issue, "handlerId");
+        if (update != 1) {
+            throw new CommonException("error.assignCurrentUser.updateOptional");
+        }
+    }
+
+    @Postpostition(code = "create_change_log", name = "创建日志", description = "创建日志")
+    public void createChangeLog(Long instanceId, StateMachineConfigDTO configDTO) {
+//        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
+//        issue.setDescription(issue.getDescription()+"1");
+//        issueService.updateOptional(issue,"description");
+
+        IssueRecord issueRecord = new IssueRecord();
+        issueRecord.setIssueId(instanceId);
+        issueRecordMapper.insert(issueRecord);
     }
 
     @UpdateStatus
@@ -152,35 +184,28 @@ public class StateMachineServiceImpl implements StateMachineService {
         if (targetStatusId == null) {
             throw new CommonException("error.updateStatus.targetStateId.null");
         }
-//        issue.setStatusId(targetStatusId);
-//        issue.setId(null);
-//        issue.setDescription("10.19测试问题");
-//        issueMapper.insert(issue);
-//        issueMapper.updatexx(instanceId);
-//        int isUpdate = issueService.updateOptional(issue, "statusId");
-//        if (isUpdate != 1) {
-//            throw new CommonException("error.updateStatus.updateIssueState");
-//        }
+        issue.setStatusId(targetStatusId);
+        int update = issueService.updateOptional(issue, "statusId");
+        if (update != 1) {
+            throw new CommonException("error.updateStatus.updateOptional");
+        }
+        issue = issueMapper.selectByPrimaryKey(instanceId);
+        issue.setDescription(issue.getDescription() + "1");
+        issueService.updateOptional(issue, "description");
+//        throw new CommonException("error.updateStatus.updateOptional");
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public Issue createIssue(Long organizationId, Long stateMachineId) {
         Issue issue = new Issue();
         issue.setDescription("10.18测试问题");
         issueMapper.insert(issue);
 
-        issue = issueMapper.selectByPrimaryKey(issue.getId());
-        issue.setStatusId(9999L);
-        int isUpdate = issueService.updateOptional(issue, "statusId");
-        if (isUpdate != 1) {
-            throw new CommonException("error.updateStatus.updateIssueState");
-        }
-        ResponseEntity<ExecuteResult> executeResult = stateMachineFeignClient.startInstance(organizationId, serverCode, stateMachineId, issue.getId());
+        ResponseEntity<ExecuteResult> executeResult = instanceFeignClient.startInstance(organizationId, serverCode, stateMachineId, issue.getId());
         //feign调用执行失败，抛出异常回滚
         if (!executeResult.getBody().getSuccess()) {
-//            // todo 手动回滚数据时，注意后置处理等操作中，是否有需要回滚的数据
-//            issueMapper.deleteByPrimaryKey(issue.getId());
+            //手动回滚数据
+            issueMapper.deleteByPrimaryKey(issue.getId());
             throw new CommonException(executeResult.getBody().getErrorMessage());
         }
         return issueMapper.selectByPrimaryKey(issue.getId());

@@ -4,6 +4,7 @@ import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.statemachine.bean.PropertyData;
+import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import io.choerodon.issue.statemachine.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * 状态机客户端回调端点
+ *
  * @author shinan.chen
  * @date 2018/10/9
  */
@@ -53,8 +55,16 @@ public class ClientEndpoint {
                                                        @RequestParam(value = "type") String type,
                                                        @RequestParam(value = "condition_strategy", required = false) String conditionStrategy,
                                                        @RequestBody List<StateMachineConfigDTO> configDTOS) {
-        return new ResponseEntity<>(clientService.configExecute(instanceId, targetStatusId, type,
-                conditionStrategy, configDTOS), HttpStatus.OK);
+
+        ExecuteResult executeResult;
+        if (type.equals(StateMachineConfigType.CONDITION)) {
+            executeResult = clientService.configExecuteCondition(instanceId, targetStatusId, conditionStrategy, configDTOS);
+        } else if (type.equals(StateMachineConfigType.VALIDATOR)) {
+            executeResult = clientService.configExecuteValidator(instanceId, targetStatusId, configDTOS);
+        } else {
+            executeResult = clientService.configExecutePostposition(instanceId, targetStatusId, configDTOS);
+        }
+        return new ResponseEntity<>(executeResult, HttpStatus.OK);
     }
 
     /**

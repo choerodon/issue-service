@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * @author peng.jiang@hand-china.com
+ * @author shinan.chen
+ * @date 2018/9/25
  */
 @Component
 public class StateMachineFeignClientFallback implements StateMachineFeignClient {
@@ -34,21 +35,6 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     }
 
     @Override
-    public ResponseEntity<ExecuteResult> startInstance(Long organizationId, String serviceCode, Long stateMachineId, Long instanceId) {
-        throw new CommonException("error.stateMachineFeignClient.startInstance");
-    }
-
-    @Override
-    public ResponseEntity<List<TransformInfo>> transformList(Long organizationId, String serviceCode, Long stateMachineId, Long instanceId, Long currentStatusId) {
-        throw new CommonException("error.stateMachineFeignClient.transformList");
-    }
-
-    @Override
-    public ResponseEntity<ExecuteResult> executeTransform(Long organizationId, String serviceCode, Long stateMachineId, Long instanceId, Long currentStatusId, Long transformId) {
-        throw new CommonException("error.stateMachineFeignClient.executeTransform");
-    }
-
-    @Override
     public ResponseEntity<StateDTO> queryStatusById(Long organizationId, Long statusId) {
         throw new CommonException("error.stateMachineFeignClient.queryStatusById");
     }
@@ -57,4 +43,5 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     public ResponseEntity<List<StateDTO>> queryAllStatus(Long organizationId) {
         throw new CommonException("error.stateMachineFeignClient.queryAllStatus");
     }
+
 }

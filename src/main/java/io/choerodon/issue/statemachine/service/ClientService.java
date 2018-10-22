@@ -8,21 +8,11 @@ import java.util.List;
 
 /**
  * 状态机客户端回调service
+ *
  * @author shinan.chen
  * @date 2018/10/11
  */
 public interface ClientService {
-    /**
-     * 执行条件，验证，后置处理
-     *
-     * @param instanceId
-     * @param targetStatusId
-     * @param type
-     * @param configDTOS
-     * @return
-     */
-    ExecuteResult configExecute(Long instanceId, Long targetStatusId, String type,
-                                String conditionStrategy, List<StateMachineConfigDTO> configDTOS);
 
     /**
      * 根据条件过滤转换
@@ -32,4 +22,36 @@ public interface ClientService {
      * @return
      */
     List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformInfos);
+
+
+    /**
+     * 执行条件
+     *
+     * @param instanceId
+     * @param targetStatusId
+     * @param conditionStrategy
+     * @param configDTOS
+     * @return
+     */
+    ExecuteResult configExecuteCondition(Long instanceId, Long targetStatusId, String conditionStrategy, List<StateMachineConfigDTO> configDTOS);
+
+    /**
+     * 执行验证
+     *
+     * @param instanceId
+     * @param targetStatusId
+     * @param configDTOS
+     * @return
+     */
+    ExecuteResult configExecuteValidator(Long instanceId, Long targetStatusId, List<StateMachineConfigDTO> configDTOS);
+
+    /**
+     * 执行后置动作，单独出来，才能生效回归
+     *
+     * @param instanceId
+     * @param targetStatusId
+     * @param configDTOS
+     * @return
+     */
+    ExecuteResult configExecutePostposition(Long instanceId, Long targetStatusId, List<StateMachineConfigDTO> configDTOS);
 }

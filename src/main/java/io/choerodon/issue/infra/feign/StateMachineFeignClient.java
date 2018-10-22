@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 /**
- * @author peng.jiang
+ * @author shinan.chen
+ * @date 2018/9/25
  */
-@FeignClient(value = "state-machine-service",
-        fallback = StateMachineFeignClientFallback.class)
+@FeignClient(value = "state-machine-service", fallback = StateMachineFeignClientFallback.class)
 @Component
 public interface StateMachineFeignClient {
 
@@ -64,55 +64,6 @@ public interface StateMachineFeignClient {
     ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId,
                                    @PathVariable("state_machine_id") Long stateMachineId);
 
-
-    /**
-     * 创建状态机实例
-     *
-     * @param organizationId
-     * @return
-     */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/start_instance", method = RequestMethod.GET)
-    ResponseEntity<ExecuteResult> startInstance(@PathVariable("organization_id") Long organizationId,
-                                                @RequestParam("service_code") String serviceCode,
-                                                @RequestParam("state_machine_id") Long stateMachineId,
-                                                @RequestParam("instance_id") Long instanceId);
-
-    /**
-     * 显示事件单的转换
-     *
-     * @param organizationId
-     * @param serviceCode
-     * @param stateMachineId
-     * @param instanceId
-     * @param currentStatusId
-     * @return
-     */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/transform_list", method = RequestMethod.GET)
-    ResponseEntity<List<TransformInfo>> transformList(@PathVariable("organization_id") Long organizationId,
-                                                      @RequestParam("service_code") String serviceCode,
-                                                      @RequestParam("state_machine_id") Long stateMachineId,
-                                                      @RequestParam("instance_id") Long instanceId,
-                                                      @RequestParam("current_status_id") Long currentStatusId);
-
-    /**
-     * 执行转换
-     *
-     * @param organizationId
-     * @param serviceCode
-     * @param stateMachineId
-     * @param instanceId
-     * @param currentStatusId
-     * @param transformId
-     * @return
-     */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/execute_transform", method = RequestMethod.GET)
-    ResponseEntity<ExecuteResult> executeTransform(@PathVariable("organization_id") Long organizationId,
-                                                   @RequestParam("service_code") String serviceCode,
-                                                   @RequestParam("state_machine_id") Long stateMachineId,
-                                                   @RequestParam("instance_id") Long instanceId,
-                                                   @RequestParam("current_status_id") Long currentStatusId,
-                                                   @RequestParam("transform_id") Long transformId);
-
     /**
      * 根据id获取状态
      *
@@ -131,5 +82,4 @@ public interface StateMachineFeignClient {
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/status/query_all", method = RequestMethod.GET)
     ResponseEntity<List<StateDTO>> queryAllStatus(@PathVariable("organization_id") Long organizationId);
-
 }
