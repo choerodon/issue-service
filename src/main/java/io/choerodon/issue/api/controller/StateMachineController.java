@@ -2,7 +2,9 @@ package io.choerodon.issue.api.controller;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.issue.api.dto.IssueDTO;
 import io.choerodon.issue.api.service.StateMachineService;
+import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.TransformInfo;
@@ -60,5 +62,13 @@ public class StateMachineController {
                                                           @RequestParam(value = "project_id") Long projectId,
                                                           @RequestParam(value = "issue_id") Long issueId) {
         return stateMachineService.transfList(organizationId, projectId, issueId);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "创建issue和状态机实例")
+    @GetMapping(value = "/create_issue")
+    public Issue createIssue(@PathVariable("organization_id") Long organizationId,
+                                             @RequestParam(value = "state_machine_id") Long stateMachineId) {
+        return stateMachineService.createIssue(organizationId, stateMachineId);
     }
 }
