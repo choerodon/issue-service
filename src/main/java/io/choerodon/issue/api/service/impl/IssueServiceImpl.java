@@ -17,7 +17,7 @@ import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.issue.statemachine.feign.InstanceFeignClient;
+import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
@@ -45,7 +45,6 @@ import java.util.List;
 @Component
 @RefreshScope
 public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IssueServiceImpl.class);
     @Value("${spring.application.name:default}")
     private String serverCode;
     @Autowired

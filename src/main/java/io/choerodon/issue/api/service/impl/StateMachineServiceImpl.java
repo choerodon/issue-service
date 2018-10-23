@@ -21,7 +21,7 @@ import io.choerodon.issue.statemachine.annotation.Condition;
 import io.choerodon.issue.statemachine.annotation.Postpostition;
 import io.choerodon.issue.statemachine.annotation.UpdateStatus;
 import io.choerodon.issue.statemachine.annotation.Validator;
-import io.choerodon.issue.statemachine.feign.InstanceFeignClient;
+import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
