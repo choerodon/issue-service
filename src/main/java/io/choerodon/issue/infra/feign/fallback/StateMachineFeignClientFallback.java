@@ -44,4 +44,8 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
         throw new CommonException("error.stateMachineFeignClient.queryAllStatus");
     }
 
+    @Override
+    public ResponseEntity<Long> createStateMachineWithCreateProject(Long organizationId, String projectCode) {
+        throw new CommonException("error.stateMachineFeignClient.createStateMachineWithCreateProject");
+    }
 }

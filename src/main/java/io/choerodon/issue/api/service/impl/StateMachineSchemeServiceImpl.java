@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
@@ -14,8 +16,7 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
@@ -45,6 +46,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign;
+    @Autowired
+    private ProjectUtil projectUtil;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -60,7 +63,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 if (machineSchemeDTO.getConfigDTOs() != null) {
                     for (StateMachineSchemeConfigDTO configDTO : machineSchemeDTO.getConfigDTOs()) {
                         IssueType issueType = issueTypeMapper.selectByPrimaryKey(configDTO.getIssueTypeId());
-                        if (issueType != null){
+                        if (issueType != null) {
                             configDTO.setIssueTypeName(issueType.getName());
                             configDTO.setIssueTypeIcon(issueType.getIcon());
                         }
@@ -192,10 +195,29 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId) {
-        List<StateMachineScheme> stateMachineSchemes = schemeMapper.querySchemeByStateMachineId(organizationId,stateMachineId);
-        if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()){
-            return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {}.getType());
+        List<StateMachineScheme> stateMachineSchemes = schemeMapper.querySchemeByStateMachineId(organizationId, stateMachineId);
+        if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
+            return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
+            }.getType());
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public StateMachineScheme createSchemeWithCreateProject(Long projectId, String projectCode) {
+
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectCode).getBody();
+
+        StateMachineScheme scheme = new StateMachineScheme();
+        scheme.setName(projectCode + "默认状态机方案");
+        scheme.setDescription(projectCode + "默认状态机方案");
+        scheme.setDefaultStateMachineId(stateMachineId);
+        scheme.setOrganizationId(organizationId);
+        int isInsert = schemeMapper.insert(scheme);
+        if (isInsert != 1) {
+            throw new CommonException("error.stateMachineScheme.create");
+        }
+        return scheme;
     }
 }

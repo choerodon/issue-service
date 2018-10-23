@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.issue.api.dto.payload.OrganizationEvent;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
-import io.choerodon.issue.api.service.FieldService;
-import io.choerodon.issue.api.service.IssueTypeService;
-import io.choerodon.issue.api.service.PriorityService;
-import io.choerodon.issue.api.service.ProjectInfoService;
+import io.choerodon.issue.api.service.*;
+import io.choerodon.issue.domain.StateMachineScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,8 @@ public class CloopmEventHandler {
     private PriorityService priorityService;
     @Autowired
     private IssueTypeService issueTypeService;
+    @Autowired
+    private StateMachineSchemeService stateMachineSchemeService;
 
     @Autowired
     private FieldService fieldService;
@@ -50,6 +50,9 @@ public class CloopmEventHandler {
     public String handleProjectInitByConsumeSagaTask(String data) {
         ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
         loggerInfo(projectEvent);
+
+        //创建项目时创建初始化状态机方案
+        stateMachineSchemeService.createSchemeWithCreateProject(projectEvent.getProjectId(),projectEvent.getProjectCode());
 
         projectInfoService.createProject(projectEvent);
         //初始化项目数据【todo】
@@ -87,6 +90,5 @@ public class CloopmEventHandler {
 //        }
         return data;
     }
-
 
 }

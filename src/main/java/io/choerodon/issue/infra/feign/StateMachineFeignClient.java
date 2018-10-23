@@ -1,10 +1,8 @@
 package io.choerodon.issue.infra.feign;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.TransformInfo;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -82,4 +80,14 @@ public interface StateMachineFeignClient {
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/status/query_all", method = RequestMethod.GET)
     ResponseEntity<List<StateDTO>> queryAllStatus(@PathVariable("organization_id") Long organizationId);
+
+    /**
+     * 【初始化项目】创建项目时创建该项目的状态机，返回状态机id
+     *
+     * @param organizationId
+     * @return
+     */
+    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project", method = RequestMethod.GET)
+    ResponseEntity<Long> createStateMachineWithCreateProject(@PathVariable("organization_id") Long organizationId,
+                                                             @RequestParam(value = "project_code") String projectCode);
 }
