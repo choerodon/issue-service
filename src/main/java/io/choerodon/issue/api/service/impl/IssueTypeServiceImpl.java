@@ -181,21 +181,9 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
     @Override
     public void initIssueTypeByConsumeCreateOrganization(Long organizationId) {
-        //创建默认问题类型方案
-        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
-        issueTypeScheme.setName("默认类型方案");
-        issueTypeScheme.setOrganizationId(organizationId);
-        issueTypeScheme.setDescription("默认类型方案");
-        if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
-            throw new CommonException("error.issueType.create");
-        }
-        int sequence = 0;
         for (IssueTypeE issueTypeE : IssueTypeE.values()) {
-            sequence++;
             //创建默认问题类型
-            IssueType issueType = createIssueType(new IssueType(issueTypeE.getIcon(), issueTypeE.getName(), issueTypeE.getDescription(), organizationId, issueTypeE.getColour(), issueTypeE.getTypeCode(), true));
-            //关联默认问题类型方案
-            createIssueTypeSchemeConfig(new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence)));
+            createIssueType(new IssueType(issueTypeE.getIcon(), issueTypeE.getName(), issueTypeE.getDescription(), organizationId, issueTypeE.getColour(), issueTypeE.getTypeCode(), true));
         }
     }
 
@@ -204,12 +192,6 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         if (issueTypeMapper.insert(issueType) != 1) {
             throw new CommonException("error.issueType.create");
         }
-        return issueTypeMapper.selectByPrimaryKey(issueType.getId());
-    }
-
-    private void createIssueTypeSchemeConfig(IssueTypeSchemeConfig issueTypeSchemeConfig) {
-        if (issueTypeSchemeConfigMapper.insert(issueTypeSchemeConfig) != 1) {
-            throw new CommonException("error.issueTypeSchemeConfig.create");
-        }
+        return issueTypeMapper.selectByPrimaryKey(issueType);
     }
 }

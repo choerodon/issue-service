@@ -2,14 +2,24 @@ package io.choerodon.issue.api.eventhandler;
 
 import com.alibaba.fastjson.JSONObject;
 import io.choerodon.asgard.saga.annotation.SagaTask;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.payload.OrganizationEvent;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.*;
+import io.choerodon.issue.domain.IssueType;
+import io.choerodon.issue.domain.IssueTypeScheme;
+import io.choerodon.issue.domain.IssueTypeSchemeConfig;
 import io.choerodon.issue.domain.StateMachineScheme;
+import io.choerodon.issue.infra.mapper.IssueTypeMapper;
+import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author shinan.chen
@@ -29,9 +39,13 @@ public class IssueEventHandler {
     private IssueTypeService issueTypeService;
     @Autowired
     private StateMachineSchemeService stateMachineSchemeService;
+    @Autowired
+    private ProjectUtil projectUtil;
 
     @Autowired
     private FieldService fieldService;
+    @Autowired
+    private IssueTypeSchemeService issueTypeSchemeService;
 
 
     private void loggerInfo(Object o) {
@@ -58,9 +72,8 @@ public class IssueEventHandler {
 
         //创建项目信息及配置默认方案
         projectInfoService.createProject(projectEvent);
-        projectConfigService.create(projectEvent.getProjectId(), stateMachineScheme.getId(), null);
-        //初始化项目数据【todo】
-
+        //创建默认问题类型方案
+        issueTypeSchemeService.initByConsumeCreateProject(projectEvent, stateMachineScheme.getId());
         return data;
     }
 
