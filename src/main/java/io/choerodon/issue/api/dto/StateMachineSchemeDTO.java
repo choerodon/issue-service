@@ -10,6 +10,7 @@ public class StateMachineSchemeDTO {
     private Long id;
     private String name;
     private String description;
+    private String type;
     private Long defaultStateMachineId;
     private Long organizationId;
     private Long objectVersionNumber;
@@ -80,5 +81,13 @@ public class StateMachineSchemeDTO {
 
     public void setConfigDTOs(List<StateMachineSchemeConfigDTO> configDTOs) {
         this.configDTOs = configDTOs;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

@@ -82,6 +82,19 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
+    public ProjectConfig create(Long projectId, Long stateMachineSchemeId, Long issueTypeSchemeId) {
+        ProjectConfig projectConfig = new ProjectConfig();
+        projectConfig.setProjectId(projectId);
+        projectConfig.setStateMachineSchemeId(stateMachineSchemeId);
+        projectConfig.setIssueTypeSchemeId(issueTypeSchemeId);
+        int result = projectConfigMapper.insert(projectConfig);
+        if(result!=1){
+            throw new CommonException("error.projectConfig.create");
+        }
+        return projectConfig;
+    }
+
+    @Override
     public List<Field> queryFieldByIssueTypeAndPageType(Long organizationId, Long projectId, Long issueTypeId, String pageType) {
 
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);

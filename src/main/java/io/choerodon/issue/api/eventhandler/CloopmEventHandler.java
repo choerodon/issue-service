@@ -22,6 +22,8 @@ public class CloopmEventHandler {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
+    private ProjectConfigService projectConfigService;
+    @Autowired
     private PriorityService priorityService;
     @Autowired
     private IssueTypeService issueTypeService;
@@ -52,9 +54,11 @@ public class CloopmEventHandler {
         loggerInfo(projectEvent);
 
         //创建项目时创建初始化状态机方案
-        stateMachineSchemeService.createSchemeWithCreateProject(projectEvent.getProjectId(),projectEvent.getProjectCode());
+        StateMachineScheme stateMachineScheme = stateMachineSchemeService.createSchemeWithCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
 
+        //创建项目信息及配置默认方案
         projectInfoService.createProject(projectEvent);
+        projectConfigService.create(projectEvent.getProjectId(), stateMachineScheme.getId(), null);
         //初始化项目数据【todo】
 
         return data;

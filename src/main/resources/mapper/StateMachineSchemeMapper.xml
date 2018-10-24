@@ -7,6 +7,7 @@
         <result property="name" column="name"/>
         <result property="description" column="description"/>
         <result property="defaultStateMachineId" column="default_state_machine_id"/>
+        <result property="type" column="type"/>
         <result property="organizationId" column="organization_id"/>
         <result property="creationDate" column="creation_date"/>
         <result property="createdBy" column="created_by"/>

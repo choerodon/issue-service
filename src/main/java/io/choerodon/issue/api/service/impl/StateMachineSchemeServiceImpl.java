@@ -10,12 +10,14 @@ import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -86,6 +88,11 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
+
+        if (!EnumUtil.contain(SchemeType.class, schemeDTO.getType())) {
+            throw new CommonException("error.schemeDTO.type.illegal");
+        }
+
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         scheme.setOrganizationId(organizationId);
         int isInsert = schemeMapper.insert(scheme);
@@ -98,6 +105,10 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
+        if (!EnumUtil.contain(SchemeType.class, schemeDTO.getType())) {
+            throw new CommonException("error.schemeDTO.type.illegal");
+        }
+
         schemeDTO.setId(schemeId);
         schemeDTO.setOrganizationId(organizationId);
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
@@ -206,10 +217,12 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public StateMachineScheme createSchemeWithCreateProject(Long projectId, String projectCode) {
 
+        //创建敏捷状态机方案
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectCode).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
+        scheme.setType(SchemeType.AGILE);
         scheme.setName(projectCode + "默认状态机方案");
         scheme.setDescription(projectCode + "默认状态机方案");
         scheme.setDefaultStateMachineId(stateMachineId);

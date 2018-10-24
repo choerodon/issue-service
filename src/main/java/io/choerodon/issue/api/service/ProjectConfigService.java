@@ -3,6 +3,7 @@ package io.choerodon.issue.api.service;
 import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
 import io.choerodon.issue.domain.Field;
 import io.choerodon.issue.domain.FieldConfigLine;
+import io.choerodon.issue.domain.ProjectConfig;
 
 import java.util.List;
 
@@ -11,6 +12,14 @@ import java.util.List;
  * @Date 2018/9/4
  */
 public interface ProjectConfigService {
+
+    /**
+     * 创建项目方案配置
+     * @param projectId
+     * @param stateMachineSchemeId
+     * @return
+     */
+    ProjectConfig create(Long projectId, Long stateMachineSchemeId, Long issueTypeSchemeId);
     /**
      * 根据问题类型和页面类型获取页面字段
      *
