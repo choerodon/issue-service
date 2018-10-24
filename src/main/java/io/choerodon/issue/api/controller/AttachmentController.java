@@ -73,7 +73,7 @@ public class AttachmentController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation("上传附件，直接返回地址")
     @PostMapping(value = "/upload_for_address")
-    public ResponseEntity<List<String>> uploadForAddress(@ApiParam(value = "project id", required = true)
+    public ResponseEntity<List<String>> uploadForAddress(@ApiParam(value = "project_id", required = true)
                                                          @PathVariable(name = "project_id") Long projectId,
                                                          HttpServletRequest request) {
         return Optional.ofNullable(attachmentService.uploadForAddress(projectId, request))

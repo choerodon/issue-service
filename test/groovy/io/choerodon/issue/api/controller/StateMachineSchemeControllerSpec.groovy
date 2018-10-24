@@ -1,5 +1,6 @@
 package io.choerodon.issue.api.controller
 
+import io.choerodon.core.domain.Page
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO
@@ -7,7 +8,6 @@ import io.choerodon.issue.api.service.StateMachineSchemeService
 import io.choerodon.issue.domain.StateMachineScheme
 import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO
-import io.choerodon.core.domain.Page
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -113,6 +113,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         given: '创建状态机方案'
         StateMachineSchemeDTO schemeDTO = new StateMachineSchemeDTO();
         schemeDTO.setName(name)
+        schemeDTO.setType(type)
         schemeDTO.setDescription(description)
 
         when: '状态机方案写入数据库'
@@ -124,10 +125,11 @@ class StateMachineSchemeControllerSpec extends Specification {
         (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
 
         where: '测试用例：'
-        name         | description         || isSuccess | reponseResult
-        'test-name1' | 'test-description1' || true      | true
-        null         | 'test-description1' || true      | false
-        null         | null                || true      | false
+        name         | description         | type     || isSuccess | reponseResult
+        'test-name1' | 'test-description1' | 'agile'  || true      | true
+        null         | 'test-description1' | 'agile'  || true      | false
+        'test-name1' | 'test-description1' | 'agile1' || true      | false
+        null         | null                | 'agile'  || true      | false
     }
 
     def "update"() {
@@ -173,7 +175,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         99       || true      | true
     }
 
-    def "getSchemeWithConfigById"() {
+    def "querySchemeWithConfigById"() {
         when: '根据id查询状态机方案对象'
         def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.GET, null, StateMachineSchemeDTO, orginzationId, schemeId)
 

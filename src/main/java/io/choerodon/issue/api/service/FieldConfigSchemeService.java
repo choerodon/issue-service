@@ -39,7 +39,7 @@ public interface FieldConfigSchemeService extends BaseService<FieldConfigScheme>
 
     void createConfig(Long organizationId, Long fieldConfigSchemeId, List<FieldConfigSchemeLineDTO> fieldConfigSchemeLineDTOList);
 
-    FieldConfigSchemeDetailDTO queryById(Long organizationId, Long schemeId);
+    FieldConfigSchemeDetailDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
 
     FieldConfigSchemeDetailDTO update(Long organizationId, FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO);
 

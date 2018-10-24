@@ -29,7 +29,7 @@ public interface PageIssueSchemeMapper extends BaseMapper<PageIssueScheme> {
      * @param schemeId 问题类型页面方案id
      * @return 问题类型页面方案及配置
      */
-    PageIssueScheme getSchemeWithConfigById(Long schemeId);
+    PageIssueScheme querySchemeWithConfigById(Long schemeId);
 
     /**
      * 查询未使用到的问题类型

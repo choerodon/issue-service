@@ -58,7 +58,7 @@ public class FieldConfigSchemeController {
     @ApiOperation(value = "根据id查询字段配置方案")
     @GetMapping(value = "/{id}")
     public ResponseEntity<FieldConfigSchemeDetailDTO> queryById(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long schemeId) {
-        return new ResponseEntity<>(fieldConfigSchemeService.queryById(organizationId, schemeId), HttpStatus.OK);
+        return new ResponseEntity<>(fieldConfigSchemeService.querySchemeWithConfigById(organizationId, schemeId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

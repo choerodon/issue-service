@@ -158,7 +158,7 @@ class PageIssueSchemeControllerSpec extends Specification {
         99       || true      | false
     }
 
-    def "getSchemeWithConfigById"() {
+    def "querySchemeWithConfigById"() {
         when: '根据id查询状态机方案对象'
         def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.GET, null, PageIssueSchemeDTO, orginzationId, schemeId)
 

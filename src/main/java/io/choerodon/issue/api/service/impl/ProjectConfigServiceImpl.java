@@ -4,26 +4,25 @@ package io.choerodon.issue.api.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.service.*;
-import io.choerodon.issue.domain.*;
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.choerodon.issue.domain.Field;
+import io.choerodon.issue.domain.FieldConfigLine;
+import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 /**
  * @author shinan.chen
- * @Date 2018/9/4
+ * @Date 2018/10/24
  */
 @Component
 @RefreshScope
@@ -88,10 +87,38 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         projectConfig.setStateMachineSchemeId(stateMachineSchemeId);
         projectConfig.setIssueTypeSchemeId(issueTypeSchemeId);
         int result = projectConfigMapper.insert(projectConfig);
-        if(result!=1){
+        if (result != 1) {
             throw new CommonException("error.projectConfig.create");
         }
         return projectConfig;
+    }
+
+    @Override
+    public ProjectConfigDetailDTO queryById(Long projectId) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        ProjectConfigDetailDTO projectConfigDetailDTO = modelMapper.map(projectConfig, ProjectConfigDetailDTO.class);
+        //获取问题类型方案
+        if (projectConfig.getIssueTypeSchemeId() != null) {
+            IssueTypeSchemeDTO issueTypeSchemeDTO = issueTypeSchemeService.queryById(organizationId, projectConfig.getIssueTypeSchemeId());
+            projectConfigDetailDTO.setIssueTypeScheme(issueTypeSchemeDTO);
+        }
+        //获取状态机方案
+        if (projectConfig.getStateMachineSchemeId() != null) {
+            StateMachineSchemeDTO stateMachineSchemeDTO = stateMachineSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getStateMachineSchemeId());
+            projectConfigDetailDTO.setStateMachineScheme(stateMachineSchemeDTO);
+        }
+        //获取问题类型页面方案
+        if (projectConfig.getPageIssueTypeSchemeId() != null) {
+            PageIssueSchemeDTO pageIssueSchemeDTO = pageIssueSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getPageIssueTypeSchemeId());
+            projectConfigDetailDTO.setPageIssueSchemeDTO(pageIssueSchemeDTO);
+        }
+        //获取字段配置方案
+        if (projectConfig.getFieldConfigSchemeId() != null) {
+            FieldConfigSchemeDetailDTO fieldConfigSchemeDTO = fieldConfigSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getFieldConfigSchemeId());
+            projectConfigDetailDTO.setFieldConfigSchemeDetailDTO(fieldConfigSchemeDTO);
+        }
+        return projectConfigDetailDTO;
     }
 
     @Override
@@ -126,177 +153,5 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
         //过滤掉隐藏字段
         return fieldConfigLines.stream().filter(x -> x.getIsDisplay().equals(YES)).collect(Collectors.toList());
-    }
-
-    @Override
-    public ProjectConfigDetailDTO queryIssueTypeByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectConfigDetailDTO.getProjectId());
-        if (projectConfig.getIssueTypeSchemeId() == null) {
-            throw new CommonException("error.projectConfig.issueTypeSchemeId.null");
-        }
-
-        IssueTypeScheme issueTypeScheme = issueTypeSchemeService.selectByPrimaryKey(projectConfig.getIssueTypeSchemeId());
-        projectConfigDetailDTO.setIssueTypeSchemeName(issueTypeScheme.getName());
-        projectConfigDetailDTO.setIssueTypeSchemeId(issueTypeScheme.getId());
-
-        IssueTypeSchemeConfig issueTypeSchemeConfig = new IssueTypeSchemeConfig();
-        issueTypeSchemeConfig.setSchemeId(issueTypeScheme.getId());
-        List<IssueTypeSchemeConfig> issueTypeSchemeConfigList = issueTypeSchemeConfigMapper.select(issueTypeSchemeConfig);
-        List<IssueType> issueTypeList = new ArrayList<>();
-        for (IssueTypeSchemeConfig record : issueTypeSchemeConfigList) {
-            IssueType issueType = issueTypeMapper.selectByPrimaryKey(record.getIssueTypeId());
-            issueTypeList.add(issueType);
-        }
-
-        List<IssueTypeDTO> issueTypeDTOList = modelMapper.map(issueTypeList, new TypeToken<List<IssueTypeDTO>>() {
-        }.getType());
-        projectConfigDetailDTO.setIssueTypeDTOList(issueTypeDTOList);
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO queryStateMachineByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectConfigDetailDTO.getProjectId());
-        if (projectConfig.getStateMachineSchemeId() == null) {
-            throw new CommonException("error.projectConfig.stateMachineSchemeId.null");
-        }
-
-        StateMachineScheme stateMachineScheme = stateMachineSchemeService.selectByPrimaryKey(projectConfig.getStateMachineSchemeId());
-        projectConfigDetailDTO.setStateMachineSchemeName(stateMachineScheme.getName());
-        projectConfigDetailDTO.setStateMachineSchemeId(stateMachineScheme.getId());
-
-        StateMachineSchemeConfig stateMachineSchemeConfig = new StateMachineSchemeConfig();
-        stateMachineSchemeConfig.setSchemeId(stateMachineScheme.getId());
-        List<StateMachineSchemeConfig> stateMachineSchemeConfigList = stateMachineSchemeConfigMapper.select(stateMachineSchemeConfig);
-//        List<StateMachine> stateMachineList = new ArrayList<>();
-//        for (StateMachineSchemeConfig record : stateMachineSchemeConfigList) {
-//            StateMachine stateMachine = stateMachineMapper.selectByPrimaryKey(record.getStateMachineId());
-//            stateMachineList.add(stateMachine);
-//        }     需要后续添加StateMachine
-//
-//        List<StateMachineDTO> stateMachineDTOList = modelMapper.map(stateMachineList, new TypeToken<List<StateMachineDTO>>() {
-//        }.getType());
-//        projectConfigDetailDTO.setStateMachineDTOList(stateMachineDTOList);
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO queryPageIssueByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectConfigDetailDTO.getProjectId());
-        if (projectConfig.getPageIssueTypeSchemeId() == null) {
-            throw new CommonException("error.projectConfig.pageIssueSchemeId.null");
-        }
-
-        PageIssueScheme pageIssueScheme = pageIssueSchemeService.selectByPrimaryKey(projectConfig.getPageIssueTypeSchemeId());
-        projectConfigDetailDTO.setPageIssueTypeSchemeName(pageIssueScheme.getName());
-        projectConfigDetailDTO.setPageIssueTypeSchemeId(pageIssueScheme.getId());
-
-        PageIssueSchemeLine pageIssueSchemeLine = new PageIssueSchemeLine();
-        pageIssueSchemeLine.setSchemeId(pageIssueScheme.getId());
-        List<PageIssueSchemeLine> pageIssueSchemeLineList = pageIssueSchemeLineMapper.select(pageIssueSchemeLine);
-        List<PageScheme> pageSchemeList = new ArrayList<>();
-        for (PageIssueSchemeLine record : pageIssueSchemeLineList) {
-            PageScheme pageScheme = pageSchemeMapper.selectByPrimaryKey(record.getPageSchemeId());
-            pageSchemeList.add(pageScheme);
-        }
-
-        List<PageSchemeDetailDTO> pageSchemeDTOList = modelMapper.map(pageSchemeList, new TypeToken<List<PageSchemeDetailDTO>>() {
-        }.getType());
-        projectConfigDetailDTO.setPageSchemeDTOList(pageSchemeDTOList);
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO queryFieldConfigByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectConfigDetailDTO.getProjectId());
-        if (projectConfig.getFieldConfigSchemeId() == null) {
-            throw new CommonException("error.projectConfig.fieldConfigSchemeId.null");
-        }
-
-        FieldConfigScheme fieldConfigScheme = fieldConfigSchemeService.selectByPrimaryKey(projectConfig.getFieldConfigSchemeId());
-        projectConfigDetailDTO.setFieldConfigSchemeName(fieldConfigScheme.getName());
-        projectConfigDetailDTO.setFieldConfigSchemeId(fieldConfigScheme.getId());
-
-        FieldConfigSchemeLine fieldConfigSchemeLine = new FieldConfigSchemeLine();
-        fieldConfigSchemeLine.setSchemeId(fieldConfigScheme.getId());
-        List<FieldConfigSchemeLine> fieldConfigSchemeLineList = fieldConfigSchemeLineMapper.select(fieldConfigSchemeLine);
-        List<FieldConfig> fieldConfigList = new ArrayList<>();
-        for (FieldConfigSchemeLine record : fieldConfigSchemeLineList) {
-            FieldConfig fieldConfig = fieldConfigMapper.selectByPrimaryKey(record.getFieldConfigId());
-            fieldConfigList.add(fieldConfig);
-        }
-
-
-        List<FieldConfigDetailDTO> fieldConfigDTOList = modelMapper.map(fieldConfigList, new TypeToken<List<FieldConfigDetailDTO>>() {
-        }.getType());
-        projectConfigDetailDTO.setFieldConfigDTOList(fieldConfigDTOList);
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO updateFieldConfigByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO = new FieldConfigSchemeDetailDTO();
-        fieldConfigSchemeDetailDTO.setId(projectConfigDetailDTO.getFieldConfigSchemeId());
-        fieldConfigSchemeDetailDTO.setName(projectConfigDetailDTO.getFieldConfigSchemeName());
-        Long organizationId = projectUtil.getOrganizationId(projectConfigDetailDTO.getProjectId());
-        fieldConfigSchemeService.update(organizationId, fieldConfigSchemeDetailDTO);
-
-        FieldConfigDetailDTO fieldConfigDetailDTO = new FieldConfigDetailDTO();
-        fieldConfigDetailDTO.setOrganizationId(organizationId);
-        fieldConfigDetailDTO = projectConfigDetailDTO.getFieldConfigDTOList().get(0);
-        fieldConfigService.update(fieldConfigDetailDTO);
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO updateIssueTypeByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        IssueTypeSchemeDTO issueTypeSchemeDTO = new IssueTypeSchemeDTO();
-        issueTypeSchemeDTO.setId(projectConfigDetailDTO.getIssueTypeSchemeId());
-        issueTypeSchemeDTO.setName(projectConfigDetailDTO.getIssueTypeSchemeName());
-        Long organizationId = projectUtil.getOrganizationId(projectConfigDetailDTO.getProjectId());
-        issueTypeSchemeService.update(organizationId, issueTypeSchemeDTO);
-
-        IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
-        issueTypeDTO.setOrganizationId(organizationId);
-        List<IssueTypeDTO> issueTypeDTOList = projectConfigDetailDTO.getIssueTypeDTOList();
-        for (IssueTypeDTO record : issueTypeDTOList) {
-            issueTypeService.update(record);
-        }
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO updateStateMachineByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-        StateMachineSchemeDTO stateMachineSchemeDTO = new StateMachineSchemeDTO();
-        stateMachineSchemeDTO.setId(projectConfigDetailDTO.getStateMachineSchemeId());
-        stateMachineSchemeDTO.setName(projectConfigDetailDTO.getStateMachineSchemeName());
-        Long organizationId = projectUtil.getOrganizationId(projectConfigDetailDTO.getProjectId());
-        stateMachineSchemeService.update(organizationId, stateMachineSchemeDTO.getId(), stateMachineSchemeDTO);
-
-        StateMachineDTO stateMachineDTO = new StateMachineDTO();
-        stateMachineDTO.setOrganizationId(organizationId);
-        List<StateMachineDTO> stateMachineDTOList = projectConfigDetailDTO.getStateMachineDTOList();
-        for (StateMachineDTO record : stateMachineDTOList) {
-            //          stateMachineService.update(record);
-        }
-        return projectConfigDetailDTO;
-    }
-
-    @Override
-    public ProjectConfigDetailDTO updatePageIssueByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO) {
-
-        PageIssueSchemeDTO pageIssueSchemeDTO = new PageIssueSchemeDTO();
-        pageIssueSchemeDTO.setId(projectConfigDetailDTO.getPageIssueTypeSchemeId());
-        pageIssueSchemeDTO.setName(projectConfigDetailDTO.getIssueTypeSchemeName());
-        Long organizationId = projectUtil.getOrganizationId(projectConfigDetailDTO.getProjectId());
-        pageIssueSchemeService.update(organizationId, pageIssueSchemeDTO.getId(), pageIssueSchemeDTO);
-
-        PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO();
-        pageSchemeDetailDTO.setOrganizationId(organizationId);
-        List<PageSchemeDetailDTO> pageSchemeDTOList = projectConfigDetailDTO.getPageSchemeDTOList();
-        for (PageSchemeDetailDTO record : pageSchemeDTOList) {
-            pageSchemeService.update(organizationId, record);
-        }
-        return projectConfigDetailDTO;
     }
 }
