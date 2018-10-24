@@ -1,5 +1,7 @@
 package io.choerodon.issue.domain;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
@@ -12,7 +14,7 @@ import java.util.Date;
 
 /**
  * @author shinan.chen
- * @Date 2018/8/2
+ * @since 2018/8/2
  */
 
 @ModifyAudit
@@ -227,5 +229,32 @@ public class Issue extends AuditDomain {
 
     public void setIssueTypeIcon(String issueTypeIcon) {
         this.issueTypeIcon = issueTypeIcon;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("code", code)
+                .add("issueTypeId", issueTypeId)
+                .add(FIELD_SUBJECT, subject)
+                .add(FIELD_DESCRIPTION, description)
+                .add("reporterId", reporterId)
+                .add(FIELD_HANDLER_ID, handlerId)
+                .add(FIELD_PRIORITY_ID, priorityId)
+                .add(FIELD_STATUS_ID, statusId)
+                .add("issueTag", issueTag)
+                .add("handleDate", handleDate)
+                .add("solveDate", solveDate)
+                .add("projectId", projectId)
+                .add("issueTypeName", issueTypeName)
+                .add("issueTypeIcon", issueTypeIcon)
+                .add("reporterName", reporterName)
+                .add("reporterImageUrl", reporterImageUrl)
+                .add("handlerName", handlerName)
+                .add("handlerImageUrl", handlerImageUrl)
+                .add("priorityName", priorityName)
+                .add("statusName", statusName)
+                .toString();
     }
 }

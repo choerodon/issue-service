@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
  * @date 2018/9/10
  */
 @Component
-public class CloopmEventHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CloopmEventHandler.class);
+public class IssueEventHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssueEventHandler.class);
 
     @Autowired
     private ProjectInfoService projectInfoService;
@@ -45,8 +45,8 @@ public class CloopmEventHandler {
      *
      * @param data data
      */
-    @SagaTask(code = "cloopm-init-project",
-            description = "cloopm消费创建项目事件初始化项目数据",
+    @SagaTask(code = "issue-init-project",
+            description = "issue消费创建项目事件初始化项目数据",
             sagaCode = "iam-create-project",
             seq = 3)
     public String handleProjectInitByConsumeSagaTask(String data) {
@@ -65,33 +65,15 @@ public class CloopmEventHandler {
     }
 
 
-    @SagaTask(code = "cloopm-init-organization",
-            description = "cloopm消费创建组织初始化数据",
+    @SagaTask(code = "issue-init-organization",
+            description = "issue消费创建组织初始化数据",
             sagaCode = "org-create-organization",
             seq = 3)
     public String handleOrgaizationInitByConsumeSagaTask(String data) {
         OrganizationEvent organizationEvent = JSONObject.parseObject(data, OrganizationEvent.class);
         loggerInfo(organizationEvent);
-
-        //此处有空指针异常，记得处理
-//        for (PriorityE priority : PriorityE.values()) {
-//            PriorityDTO priorityDTO = new PriorityDTO();
-//            priorityDTO.setName(priority.value());
-//            priorityService.create(organizationEvent.getOrganizationId(), priorityDTO);
-//        }
-//
-//        for (IssueTypeE issueType : IssueTypeE.values()) {
-//            IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
-//            issueTypeDTO.setName(issueType.value());
-//            issueTypeService.create(organizationEvent.getOrganizationId(), issueTypeDTO);
-//        }
-//
-//        for (FieldNameE fieldNameE : FieldNameE.values()) {
-//            FieldDTO fieldDTO = new FieldDTO();
-//            fieldDTO.setName(fieldNameE.value());
-//            fieldDTO.setType(fieldNameE.type());
-//            fieldService.create(organizationEvent.getOrganizationId(), fieldDTO);
-//        }
+        //组织层初始化五种问题类型及其关联方案
+        issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationEvent.getOrganizationId());
         return data;
     }
 

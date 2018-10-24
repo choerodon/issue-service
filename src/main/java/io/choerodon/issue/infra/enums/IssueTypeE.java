@@ -1,37 +1,63 @@
 package io.choerodon.issue.infra.enums;
 
 /**
- * @author jiameng.cao
- * @date 2018/9/11
+ * @author dinghuang123@gmail.com
+ * @since 2018/10/24
  */
 public enum IssueTypeE {
-    EPIC("epic"),
-    STORY("story"),
-    BUG("bug"),
-    TASK("task"),
-    SUBTASK("subtask"),
-    EVENT("event"),
-    CHANGE("change"),
-    SERVICE_REQUEST("service_request"),
-    ITHELP("it_help"),
-    Issue("issue");
+    /**
+     * 史诗
+     */
+    EPIC("icon", "史诗", "史诗", "colour", "epic"),
+    /**
+     * 故事
+     */
+    STORY("icon", "故事", "故事", "colour", "story"),
+    /**
+     * 缺陷
+     */
+    BUG("icon", "缺陷", "缺陷", "colour", "bug"),
+    /**
+     * 任务
+     */
+    TASK("icon", "任务", "任务", "colour", "task"),
+    /**
+     * 子任务
+     */
+    SUB_TASK("icon", "子任务", "子任务", "colour", "sub_task");
 
-    private String typeName;
+    private String icon;
+    private String name;
+    private String description;
+    private String colour;
+    private String typeCode;
 
-    IssueTypeE(String typeName) {
-        this.typeName = typeName;
+    public String getIcon() {
+        return icon;
     }
 
-    public String value() {
-        return this.typeName;
+    public String getName() {
+        return name;
     }
 
-    public static Boolean contain(String typeName) {
-        for (IssueTypeE issueType : IssueTypeE.values()) {
-            if (issueType.value().equals(typeName)) {
-                return true;
-            }
-        }
-        return false;
+    public String getDescription() {
+        return description;
     }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    IssueTypeE(String icon, String name, String description, String colour, String typeCode) {
+        this.icon = icon;
+        this.name = name;
+        this.description = description;
+        this.colour = colour;
+        this.typeCode = typeCode;
+    }
+
 }

@@ -1,5 +1,8 @@
 package io.choerodon.issue.api.dto;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
+
 import javax.validation.constraints.NotNull;
 
 /**
@@ -15,6 +18,10 @@ public class IssueTypeDTO {
     private String description;
     private Long organizationId;
     private String colour;
+
+    private String typeCode;
+
+    private Boolean initialize;
 
     private Long objectVersionNumber;
 
@@ -82,5 +89,37 @@ public class IssueTypeDTO {
 
     public void setColour(String colour) {
         this.colour = colour;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public void setTypeCode(String typeCode) {
+        this.typeCode = typeCode;
+    }
+
+    public Boolean getInitialize() {
+        return initialize;
+    }
+
+    public void setInitialize(Boolean initialize) {
+        this.initialize = initialize;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("icon", icon)
+                .add("description", description)
+                .add("organizationId", organizationId)
+                .add("colour", colour)
+                .add("typeCode", typeCode)
+                .add("initialize", initialize)
+                .add("objectVersionNumber", objectVersionNumber)
+                .add("stateMachineSchemeConfigDTO", stateMachineSchemeConfigDTO)
+                .toString();
     }
 }
