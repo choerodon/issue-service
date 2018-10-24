@@ -1,17 +1,14 @@
 package io.choerodon.issue
 
-import com.alibaba.fastjson.JSON
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.choerodon.issue.api.dto.payload.OrganizationEvent
-import io.choerodon.issue.api.dto.payload.ProjectEvent
 import io.choerodon.issue.api.eventhandler.IssueEventHandler
 import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.core.oauth.CustomUserDetails
 import io.choerodon.issue.infra.utils.ProjectUtil
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -68,11 +65,11 @@ class IntegrationTestConfiguration {
     @Bean("projectUtil")
     @Primary
     ProjectUtil projectUtil() {
-        detachedMockFactory.Mock(ProjectUtil)
+        Mockito.mock(ProjectUtil.class)
     }
 
     @Bean
-    StateMachineFeignClient stateMachineServiceFeign() {
+    StateMachineFeignClient stateMachineFeignClient() {
         detachedMockFactory.Mock(StateMachineFeignClient)
     }
 
@@ -80,15 +77,6 @@ class IntegrationTestConfiguration {
     void init() {
         liquibaseExecutor.execute()
         setTestRestTemplateJWT()
-        projectUtil.getOrganizationId(1) >> 1L
-        OrganizationEvent organizationEvent = new OrganizationEvent()
-        organizationEvent.organizationId = 1
-        issueEventHandler.handleOrgaizationInitByConsumeSagaTask(JSON.toJSONString(organizationEvent))
-        ProjectEvent projectEvent = new ProjectEvent()
-        projectEvent.projectId = 1
-        projectEvent.projectCode = "test"
-        issueEventHandler.handleProjectInitByConsumeSagaTask(JSON.toJSONString(projectEvent))
-
     }
 
     private void setTestRestTemplateJWT() {
@@ -135,5 +123,4 @@ class IntegrationTestConfiguration {
 //                    .antMatchers("/h2-console/**").permitAll();
         }
     }
-
 }

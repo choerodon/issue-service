@@ -54,6 +54,11 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
+    public void setFeign(StateMachineFeignClient stateMachineServiceFeign){
+        this.stateMachineServiceFeign = stateMachineServiceFeign;
+    }
+
+    @Override
     public Page<StateMachineSchemeDTO> pageQuery(PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         Page<StateMachineScheme> page = PageHelper.doPageAndSort(pageRequest,

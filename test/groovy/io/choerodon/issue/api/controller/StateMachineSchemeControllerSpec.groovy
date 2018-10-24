@@ -63,7 +63,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         def name = 'name'
         def description = 'description'
         def testType = '1'
-        for (int i = 1; i <= 40; i++) {
+        for (int i = 2; i <= 40; i++) {
             StateMachineScheme scheme = new StateMachineScheme();
             scheme.setId(i);
             scheme.setName(name + i)

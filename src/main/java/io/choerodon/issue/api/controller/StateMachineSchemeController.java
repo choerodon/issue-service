@@ -115,14 +115,4 @@ public class StateMachineSchemeController {
         return new ResponseEntity<>(schemeService.querySchemeByStateMachineId(organizationId, stateMachineId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "创建项目时创建初始化状态机方案")
-    @GetMapping(value = "/createSchemeWithCreateProject")
-    public void createSchemeWithCreateProject(@PathVariable("organization_id") Long organizationId,
-                                              @RequestParam(value = "projectId") Long projectId,
-                                              @RequestParam(value = "projectCode") String projectCode) {
-        //创建项目时创建初始化状态机方案
-        schemeService.createSchemeWithCreateProject(projectId, projectCode);
-    }
-
 }
