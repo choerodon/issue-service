@@ -2,7 +2,9 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
+import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.IssueTypeSchemeService;
+import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.IssueTypeSchemeConfig;
@@ -49,6 +51,8 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
     private ProjectUtil projectUtil;
+    @Autowired
+    private ProjectConfigService projectConfigService;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -227,5 +231,34 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
             throw new CommonException("error.projectConfig.issueTypeSchemeId,null");
         }
         return queryById(projectUtil.getOrganizationId(projectId), projectConfig.getIssueTypeSchemeId());
+    }
+
+    @Override
+    public void initByConsumeCreateProject(ProjectEvent projectEvent,Long stateMachineSchemeId) {
+        Long organizationId = projectUtil.getOrganizationId(projectEvent.getProjectId());
+        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
+        issueTypeScheme.setName(projectEvent.getProjectCode()+"默认类型方案");
+        issueTypeScheme.setOrganizationId(organizationId);
+        issueTypeScheme.setDescription(projectEvent.getProjectCode()+"默认类型方案");
+        if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
+            throw new CommonException("error.issueType.create");
+        }
+        IssueType query = new IssueType();
+        query.setOrganizationId(organizationId);
+        query.setInitialize(true);
+        List<IssueType> issueTypes = issueTypeMapper.select(query);
+        Integer sequence = 0;
+        for(IssueType issueType: issueTypes){
+            sequence++;
+            createIssueTypeSchemeConfig(new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence)));
+        }
+                //关联默认问题类型方案
+        projectConfigService.create(projectEvent.getProjectId(), stateMachineSchemeId, issueTypeScheme.getId());
+    }
+
+    private void createIssueTypeSchemeConfig(IssueTypeSchemeConfig issueTypeSchemeConfig) {
+        if (issueTypeSchemeConfigMapper.insert(issueTypeSchemeConfig) != 1) {
+            throw new CommonException("error.issueTypeSchemeConfig.create");
+        }
     }
 }

@@ -1,13 +1,11 @@
 package io.choerodon.issue.domain;
 
+import com.google.common.base.MoreObjects;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 /**
@@ -27,6 +25,22 @@ public class IssueType extends AuditDomain {
     private String description;
     private Long organizationId;
     private String colour;
+    private String typeCode;
+    @Column(name = "is_initialize")
+    private Boolean initialize;
+
+    public IssueType(String icon, String name, String description, Long organizationId, String colour, String typeCode, Boolean initialize) {
+        this.icon = icon;
+        this.name = name;
+        this.description = description;
+        this.organizationId = organizationId;
+        this.colour = colour;
+        this.typeCode = typeCode;
+        this.initialize = initialize;
+    }
+
+    public IssueType() {
+    }
 
     @Transient
     private BigDecimal sequence;
@@ -97,5 +111,37 @@ public class IssueType extends AuditDomain {
 
     public void setColour(String colour) {
         this.colour = colour;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public void setTypeCode(String typeCode) {
+        this.typeCode = typeCode;
+    }
+
+    public Boolean getInitialize() {
+        return initialize;
+    }
+
+    public void setInitialize(Boolean initialize) {
+        this.initialize = initialize;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("icon", icon)
+                .add("name", name)
+                .add("description", description)
+                .add("organizationId", organizationId)
+                .add("colour", colour)
+                .add("typeCode", typeCode)
+                .add("initialize", initialize)
+                .add("sequence", sequence)
+                .add("stateMachineSchemeConfig", stateMachineSchemeConfig)
+                .toString();
     }
 }

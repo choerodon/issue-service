@@ -26,6 +26,16 @@ public class IssueTypeSchemeConfig extends AuditDomain {
     private Long organizationId;
     private BigDecimal sequence;
 
+    public IssueTypeSchemeConfig(Long schemeId, Long issueTypeId, Long organizationId, BigDecimal sequence) {
+        this.schemeId = schemeId;
+        this.issueTypeId = issueTypeId;
+        this.organizationId = organizationId;
+        this.sequence = sequence;
+    }
+
+    public IssueTypeSchemeConfig() {
+    }
+
     public Long getId() {
         return id;
     }

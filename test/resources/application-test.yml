@@ -22,7 +22,7 @@ hystrix:
     queue:
       enabled: false # 关闭hystrix stream，否则kafka报错
 data:
-  dir: src/main/resources
+  dir: src/main/resources/script/db
 eureka:
   client:
     enabled: false # 关闭eureka

@@ -20,17 +20,19 @@ import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
+import org.springframework.test.context.ActiveProfiles
 import spock.lang.Shared
 import spock.lang.Specification
-
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import spock.lang.Stepwise
 
 /**
  * @author shinan.chen
  * @date 2018/8/30
  */
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
+@ActiveProfiles("test")
+@Stepwise
 class FiledControllerSpec extends Specification {
 
     @Autowired

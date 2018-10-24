@@ -2,6 +2,7 @@ package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
+import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -91,8 +92,17 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
 
     /**
      * 查询该项目下的问题类型方案
+     *
      * @param projectId
      * @return
      */
     IssueTypeSchemeDTO queryByProjectId(Long projectId);
+
+    /**
+     * 创建项目初始化问题类型方案
+     *
+     * @param projectEvent   projectEvent
+     * @param stateMachineId stateMachineId
+     */
+    void initByConsumeCreateProject(ProjectEvent projectEvent, Long stateMachineId);
 }

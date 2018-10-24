@@ -1,11 +1,17 @@
 package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
+import io.choerodon.issue.api.service.IssueTypeSchemeService;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.domain.IssueType;
+import io.choerodon.issue.domain.IssueTypeScheme;
+import io.choerodon.issue.domain.IssueTypeSchemeConfig;
+import io.choerodon.issue.infra.enums.IssueTypeE;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
+import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
+import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
 import io.choerodon.core.domain.Page;
@@ -21,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +48,12 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign;
+
+    @Autowired
+    private IssueTypeSchemeMapper issueTypeSchemeMapper;
+
+    @Autowired
+    private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -65,11 +78,7 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         }
         issueTypeDTO.setOrganizationId(organizationId);
         IssueType issueType = modelMapper.map(issueTypeDTO, IssueType.class);
-        if (issueTypeMapper.insert(issueType) != 1) {
-            throw new CommonException("error.issueType.create");
-        }
-        issueType = issueTypeMapper.selectByPrimaryKey(issueType.getId());
-        return modelMapper.map(issueType, IssueTypeDTO.class);
+        return modelMapper.map(createIssueType(issueType), IssueTypeDTO.class);
     }
 
     @Override
@@ -168,5 +177,21 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
             }
         }
         return dtos;
+    }
+
+    @Override
+    public void initIssueTypeByConsumeCreateOrganization(Long organizationId) {
+        for (IssueTypeE issueTypeE : IssueTypeE.values()) {
+            //创建默认问题类型
+            createIssueType(new IssueType(issueTypeE.getIcon(), issueTypeE.getName(), issueTypeE.getDescription(), organizationId, issueTypeE.getColour(), issueTypeE.getTypeCode(), true));
+        }
+    }
+
+
+    private IssueType createIssueType(IssueType issueType) {
+        if (issueTypeMapper.insert(issueType) != 1) {
+            throw new CommonException("error.issueType.create");
+        }
+        return issueTypeMapper.selectByPrimaryKey(issueType);
     }
 }

@@ -1,16 +1,24 @@
 package io.choerodon.issue
 
+import com.alibaba.fastjson.JSON
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.choerodon.issue.api.dto.payload.OrganizationEvent
+import io.choerodon.issue.api.dto.payload.ProjectEvent
+import io.choerodon.issue.api.eventhandler.IssueEventHandler
 import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.core.oauth.CustomUserDetails
+import io.choerodon.issue.infra.utils.ProjectUtil
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
@@ -27,10 +35,13 @@ import spock.mock.DetachedMockFactory
 
 import javax.annotation.PostConstruct
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+
 /**
  * Created by hailuoliu@choerodon.io on 2018/7/13.
  */
 @TestConfiguration
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(LiquibaseConfig)
 class IntegrationTestConfiguration {
 
@@ -41,6 +52,8 @@ class IntegrationTestConfiguration {
 
     @Autowired
     TestRestTemplate testRestTemplate
+    @Autowired
+    IssueEventHandler issueEventHandler
 
     @Autowired
     LiquibaseExecutor liquibaseExecutor
@@ -52,6 +65,12 @@ class IntegrationTestConfiguration {
         detachedMockFactory.Mock(KafkaTemplate)
     }
 
+    @Bean("projectUtil")
+    @Primary
+    ProjectUtil projectUtil() {
+        detachedMockFactory.Mock(ProjectUtil)
+    }
+
     @Bean
     StateMachineFeignClient stateMachineServiceFeign() {
         detachedMockFactory.Mock(StateMachineFeignClient)
@@ -61,6 +80,15 @@ class IntegrationTestConfiguration {
     void init() {
         liquibaseExecutor.execute()
         setTestRestTemplateJWT()
+        projectUtil.getOrganizationId(1) >> 1L
+        OrganizationEvent organizationEvent = new OrganizationEvent()
+        organizationEvent.organizationId = 1
+        issueEventHandler.handleOrgaizationInitByConsumeSagaTask(JSON.toJSONString(organizationEvent))
+        ProjectEvent projectEvent = new ProjectEvent()
+        projectEvent.projectId = 1
+        projectEvent.projectCode = "test"
+        issueEventHandler.handleProjectInitByConsumeSagaTask(JSON.toJSONString(projectEvent))
+
     }
 
     private void setTestRestTemplateJWT() {
