@@ -5,6 +5,7 @@ import io.choerodon.issue.domain.Priority;
 import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author cong.cheng
@@ -60,4 +61,10 @@ public interface PriorityService extends BaseService<Priority> {
      * @return 更新是否成功
      */
     List<PriorityDTO> updateByList(List<PriorityDTO> list, Long organizationId);
+
+    List<PriorityDTO> queryByOrganizationId(Long organizationId);
+
+    PriorityDTO queryById(Long organizationId, Long id);
+
+    Map<Long, Map<String, Long>> initProrityByOrganization(List<Long> organizationIds);
 }

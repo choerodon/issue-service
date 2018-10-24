@@ -25,7 +25,7 @@ public class Priority extends AuditDomain {
     private String description;
     private String colour;
     private Long organizationId;
-    private String isDefault;
+    private Boolean isDefault;
     private BigDecimal sequence;
 
     public BigDecimal getSequence() {
@@ -76,13 +76,11 @@ public class Priority extends AuditDomain {
         this.organizationId = organizationId;
     }
 
-    public String getIsDefault() {
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
+    }
+
+    public Boolean getDefault() {
         return isDefault;
     }
-
-    public void setIsDefault(String isDefault) {
-        this.isDefault = isDefault;
-    }
-
-
 }
