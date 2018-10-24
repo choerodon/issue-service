@@ -32,18 +32,9 @@ public class IssueEventHandler {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
-    private ProjectConfigService projectConfigService;
-    @Autowired
-    private PriorityService priorityService;
-    @Autowired
     private IssueTypeService issueTypeService;
     @Autowired
     private StateMachineSchemeService stateMachineSchemeService;
-    @Autowired
-    private ProjectUtil projectUtil;
-
-    @Autowired
-    private FieldService fieldService;
     @Autowired
     private IssueTypeSchemeService issueTypeSchemeService;
 
