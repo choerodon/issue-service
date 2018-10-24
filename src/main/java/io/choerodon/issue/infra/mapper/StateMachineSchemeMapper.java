@@ -18,7 +18,7 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
      * @param schemeId 状态机方案id
      * @return 状态机方案及配置
      */
-    StateMachineScheme getSchemeWithConfigById(Long schemeId);
+    StateMachineScheme querySchemeWithConfigById(Long schemeId);
 
     /**
      * 分页查询状态方案

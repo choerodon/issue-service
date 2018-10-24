@@ -29,7 +29,7 @@
         </collection>
     </resultMap>
 
-    <select id="getSchemeWithConfigById" resultMap="stateMachineSchemeWithConfig">
+    <select id="querySchemeWithConfigById" resultMap="stateMachineSchemeWithConfig">
         SELECT SMS.*,
           SMSC.id as c_id,
           SMSC.scheme_id as c_scheme_id,

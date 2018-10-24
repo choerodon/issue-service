@@ -138,10 +138,10 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public StateMachineSchemeDTO getSchemeWithConfigById(Long organizationId, Long schemeId) {
-        StateMachineScheme scheme = schemeMapper.getSchemeWithConfigById(schemeId);
+    public StateMachineSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
+        StateMachineScheme scheme = schemeMapper.querySchemeWithConfigById(schemeId);
         if (scheme == null) {
-            throw new CommonException("error.stateMachineScheme.getSchemeWithConfigById.notFound");
+            throw new CommonException("error.stateMachineScheme.querySchemeWithConfigById.notFound");
         }
         StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
 

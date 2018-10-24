@@ -20,6 +20,13 @@ public interface ProjectConfigService {
      * @return
      */
     ProjectConfig create(Long projectId, Long stateMachineSchemeId, Long issueTypeSchemeId);
+
+    /**
+     * 获取项目配置方案信息
+     * @param projectId
+     * @return
+     */
+    ProjectConfigDetailDTO queryById(Long projectId);
     /**
      * 根据问题类型和页面类型获取页面字段
      *
@@ -41,45 +48,4 @@ public interface ProjectConfigService {
      */
 
     List<FieldConfigLine> queryFieldConfigLinesByIssueType(Long organizationId, Long projectId, Long issueTypeId);
-
-
-    /**
-     * 根据项目ID获取问题类型
-     *
-     * @param projectConfigDetailDTO
-     * @return
-     */
-    ProjectConfigDetailDTO queryIssueTypeByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    /**
-     * 根据项目ID获取状态机
-     *
-     * @param projectConfigDetailDTO
-     * @return
-     */
-    ProjectConfigDetailDTO queryStateMachineByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    /**
-     * 根据项目ID获取问题类型页面方案
-     *
-     * @param projectConfigDetailDTO
-     * @return
-     */
-    ProjectConfigDetailDTO queryPageIssueByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    /**
-     * 根据项目ID获取字段配置方案
-     *
-     * @param projectConfigDetailDTO
-     * @return
-     */
-    ProjectConfigDetailDTO queryFieldConfigByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    ProjectConfigDetailDTO updateFieldConfigByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    ProjectConfigDetailDTO updateIssueTypeByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    ProjectConfigDetailDTO updateStateMachineByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
-
-    ProjectConfigDetailDTO updatePageIssueByProjectId(ProjectConfigDetailDTO projectConfigDetailDTO);
 }

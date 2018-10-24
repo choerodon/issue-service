@@ -82,13 +82,13 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
                 throw new CommonException("error.pageIssueSchemeLine.create");
             }
         }
-        return getSchemeWithConfigById(organizationId, scheme.getId());
+        return querySchemeWithConfigById(organizationId, scheme.getId());
     }
 
     @Override
     @Transient
     public PageIssueSchemeDTO update(Long organizationId, Long schemeId, PageIssueSchemeDTO schemeDTO) {
-        PageIssueScheme pageIssueScheme = schemeMapper.getSchemeWithConfigById(schemeId);
+        PageIssueScheme pageIssueScheme = schemeMapper.querySchemeWithConfigById(schemeId);
         if (pageIssueScheme == null){
             throw new CommonException("error.pageIssueScheme.update.noFound");
         }
@@ -141,7 +141,7 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
                 }
             }
         }
-        return getSchemeWithConfigById(organizationId, scheme.getId());
+        return querySchemeWithConfigById(organizationId, scheme.getId());
     }
 
     @Override
@@ -175,10 +175,10 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
     }
 
     @Override
-    public PageIssueSchemeDTO getSchemeWithConfigById(Long organizationId, Long schemeId) {
-        PageIssueScheme scheme = schemeMapper.getSchemeWithConfigById(schemeId);
+    public PageIssueSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
+        PageIssueScheme scheme = schemeMapper.querySchemeWithConfigById(schemeId);
         if (scheme == null) {
-            throw new CommonException("error.stateMachineScheme.getSchemeWithConfigById.notFound");
+            throw new CommonException("error.stateMachineScheme.querySchemeWithConfigById.notFound");
         }
         PageIssueSchemeDTO schemeDTO = modelMapper.map(scheme, PageIssueSchemeDTO.class);
         if (scheme.getLines() != null){

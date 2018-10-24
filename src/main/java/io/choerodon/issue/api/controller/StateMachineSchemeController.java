@@ -80,7 +80,7 @@ public class StateMachineSchemeController {
     @ApiOperation(value = "根据id查询状态机方案对象")
     @GetMapping(value = "/{scheme_id}")
     public ResponseEntity<StateMachineSchemeDTO> getByStateId(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
-        return new ResponseEntity<>(schemeService.getSchemeWithConfigById(organizationId, schemeId), HttpStatus.OK);
+        return new ResponseEntity<>(schemeService.querySchemeWithConfigById(organizationId, schemeId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

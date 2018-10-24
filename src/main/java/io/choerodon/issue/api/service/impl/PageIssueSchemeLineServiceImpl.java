@@ -37,7 +37,7 @@ public class PageIssueSchemeLineServiceImpl extends BaseServiceImpl<PageIssueSch
         if (isInsert != 1) {
             throw new CommonException("error.pageIssueSchemeLine.create");
         }
-        return schemeService.getSchemeWithConfigById(organizationId, schemeId);
+        return schemeService.querySchemeWithConfigById(organizationId, schemeId);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class PageIssueSchemeLineServiceImpl extends BaseServiceImpl<PageIssueSch
         if (isUpdate != 1) {
             throw new CommonException("error.pageIssueSchemeLine.update");
         }
-        return schemeService.getSchemeWithConfigById(organizationId, schemeId);
+        return schemeService.querySchemeWithConfigById(organizationId, schemeId);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PageIssueSchemeLineServiceImpl extends BaseServiceImpl<PageIssueSch
         if (isDelete != 1) {
             throw new CommonException("error.pageIssueSchemeLine.delete");
         }
-        return schemeService.getSchemeWithConfigById(organizationId, line.getSchemeId());
+        return schemeService.querySchemeWithConfigById(organizationId, line.getSchemeId());
     }
 
     @Override

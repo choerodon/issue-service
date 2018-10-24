@@ -73,7 +73,7 @@ public class FieldConfigSchemeServiceImpl extends BaseServiceImpl<FieldConfigSch
         //创建方案配置
         createConfig(organizationId, fieldConfigScheme.getId(), fieldConfigSchemeDetailDTO.getFieldConfigSchemeLineDTOList());
 
-        return queryById(organizationId, fieldConfigScheme.getId());
+        return querySchemeWithConfigById(organizationId, fieldConfigScheme.getId());
     }
 
     @Override
@@ -102,7 +102,7 @@ public class FieldConfigSchemeServiceImpl extends BaseServiceImpl<FieldConfigSch
     }
 
     @Override
-    public FieldConfigSchemeDetailDTO queryById(Long organizationId, Long schemeId) {
+    public FieldConfigSchemeDetailDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
         FieldConfigScheme fieldConfigScheme = fieldConfigSchemeMapper.selectByPrimaryKey(schemeId);
         if (fieldConfigScheme != null) {
             FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO = modelMapper.map(fieldConfigScheme, FieldConfigSchemeDetailDTO.class);
@@ -131,7 +131,7 @@ public class FieldConfigSchemeServiceImpl extends BaseServiceImpl<FieldConfigSch
         fieldConfigSchemeLineMapper.deleteBySchemeId(organizationId, fieldConfigSchemeDetailDTO.getId());
         createConfig(organizationId, fieldConfigScheme.getId(), fieldConfigSchemeDetailDTO.getFieldConfigSchemeLineDTOList());
 
-        return queryById(organizationId, fieldConfigScheme.getId());
+        return querySchemeWithConfigById(organizationId, fieldConfigScheme.getId());
     }
 
     @Override

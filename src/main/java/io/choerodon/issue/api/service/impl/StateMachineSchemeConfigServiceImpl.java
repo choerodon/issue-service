@@ -39,7 +39,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         if (isDelete < 1) {
             throw new CommonException("error.stateMachineSchemeConfig.delete");
         }
-        return stateMachineSchemeService.getSchemeWithConfigById(organizationId, schemeId);
+        return stateMachineSchemeService.querySchemeWithConfigById(organizationId, schemeId);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         if (isInsert < 1) {
             throw new CommonException("error.stateMachineSchemeConfig.insert");
         }
-        return stateMachineSchemeService.getSchemeWithConfigById(organizationId, schemeId);
+        return stateMachineSchemeService.querySchemeWithConfigById(organizationId, schemeId);
     }
 
 

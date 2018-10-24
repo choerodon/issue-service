@@ -1,12 +1,8 @@
 package io.choerodon.issue.api.dto;
 
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-
-import java.util.List;
-
 /**
- * @author jiameng.cao
- * @date 2018/9/10
+ * @author shinan.chen
+ * @date 2018/10/24
  */
 public class ProjectConfigDetailDTO {
     private Long id;
@@ -14,21 +10,17 @@ public class ProjectConfigDetailDTO {
     private Long projectId;
 
     private Long issueTypeSchemeId;
-    private String issueTypeSchemeName;
 
     private Long fieldConfigSchemeId;
-    private String fieldConfigSchemeName;
 
     private Long pageIssueTypeSchemeId;
-    private String pageIssueTypeSchemeName;
 
     private Long stateMachineSchemeId;
-    private String stateMachineSchemeName;
 
-    private List<IssueTypeDTO> issueTypeDTOList;
-    private List<StateMachineDTO> stateMachineDTOList;
-    private List<PageSchemeDetailDTO> pageSchemeDTOList;
-    private List<FieldConfigDetailDTO> fieldConfigDTOList;
+    private IssueTypeSchemeDTO issueTypeScheme;
+    private StateMachineSchemeDTO stateMachineScheme;
+    private PageIssueSchemeDTO pageIssueSchemeDTO;
+    private FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO;
 
     public Long getId() {
         return id;
@@ -78,71 +70,35 @@ public class ProjectConfigDetailDTO {
         this.stateMachineSchemeId = stateMachineSchemeId;
     }
 
-
-    public List<IssueTypeDTO> getIssueTypeDTOList() {
-        return issueTypeDTOList;
+    public IssueTypeSchemeDTO getIssueTypeScheme() {
+        return issueTypeScheme;
     }
 
-    public void setIssueTypeDTOList(List<IssueTypeDTO> issueTypeDTOList) {
-        this.issueTypeDTOList = issueTypeDTOList;
+    public void setIssueTypeScheme(IssueTypeSchemeDTO issueTypeScheme) {
+        this.issueTypeScheme = issueTypeScheme;
     }
 
-    public String getIssueTypeSchemeName() {
-        return issueTypeSchemeName;
+    public StateMachineSchemeDTO getStateMachineScheme() {
+        return stateMachineScheme;
     }
 
-    public void setIssueTypeSchemeName(String issueTypeSchemeName) {
-        this.issueTypeSchemeName = issueTypeSchemeName;
+    public void setStateMachineScheme(StateMachineSchemeDTO stateMachineScheme) {
+        this.stateMachineScheme = stateMachineScheme;
     }
 
-    public String getStateMachineSchemeName() {
-        return stateMachineSchemeName;
+    public PageIssueSchemeDTO getPageIssueSchemeDTO() {
+        return pageIssueSchemeDTO;
     }
 
-    public void setStateMachineSchemeName(String stateMachineSchemeName) {
-        this.stateMachineSchemeName = stateMachineSchemeName;
+    public void setPageIssueSchemeDTO(PageIssueSchemeDTO pageIssueSchemeDTO) {
+        this.pageIssueSchemeDTO = pageIssueSchemeDTO;
     }
 
-    public List<StateMachineDTO> getStateMachineDTOList() {
-        return stateMachineDTOList;
+    public FieldConfigSchemeDetailDTO getFieldConfigSchemeDetailDTO() {
+        return fieldConfigSchemeDetailDTO;
     }
 
-    public void setStateMachineDTOList(List<StateMachineDTO> stateMachineDTOList) {
-        this.stateMachineDTOList = stateMachineDTOList;
-    }
-
-    public String getPageIssueTypeSchemeName() {
-        return pageIssueTypeSchemeName;
-    }
-
-    public void setPageIssueTypeSchemeName(String pageIssueTypeSchemeName) {
-        this.pageIssueTypeSchemeName = pageIssueTypeSchemeName;
-    }
-
-
-
-    public String getFieldConfigSchemeName() {
-        return fieldConfigSchemeName;
-    }
-
-    public void setFieldConfigSchemeName(String fieldConfigSchemeName) {
-        this.fieldConfigSchemeName = fieldConfigSchemeName;
-    }
-
-
-    public List<FieldConfigDetailDTO> getFieldConfigDTOList() {
-        return fieldConfigDTOList;
-    }
-
-    public void setFieldConfigDTOList(List<FieldConfigDetailDTO> fieldConfigDTOList) {
-        this.fieldConfigDTOList = fieldConfigDTOList;
-    }
-
-    public List<PageSchemeDetailDTO> getPageSchemeDTOList() {
-        return pageSchemeDTOList;
-    }
-
-    public void setPageSchemeDTOList(List<PageSchemeDetailDTO> pageSchemeDTOList) {
-        this.pageSchemeDTOList = pageSchemeDTOList;
+    public void setFieldConfigSchemeDetailDTO(FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO) {
+        this.fieldConfigSchemeDetailDTO = fieldConfigSchemeDetailDTO;
     }
 }

@@ -28,7 +28,7 @@
         </collection>
     </resultMap>
 
-    <select id="getSchemeWithConfigById" resultMap="pageIssueSchemeWithConfig">
+    <select id="querySchemeWithConfigById" resultMap="pageIssueSchemeWithConfig">
         SELECT PIS.*,
         PISL.id as c_id,
         PISL.scheme_id as c_scheme_id,

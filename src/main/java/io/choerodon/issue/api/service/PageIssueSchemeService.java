@@ -61,6 +61,6 @@ public interface PageIssueSchemeService extends BaseService<PageIssueScheme> {
      * @param schemeId 方案id
      * @return 状态机方案及配置
      */
-    PageIssueSchemeDTO getSchemeWithConfigById(Long organizationId, Long schemeId);
+    PageIssueSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
 
 }
