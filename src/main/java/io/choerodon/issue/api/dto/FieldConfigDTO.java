@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * @author jiameng.cao
- * @Date 2018/8/23
+ * @date 2018/8/23
  */
 public class FieldConfigDTO {
     private Long id;

@@ -59,4 +59,10 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme.groovy') {
             column(name: "state_machine_id", type: "BIGINT UNSIGNED")
         }
     }
+
+    changeSet(author: 'shinan.chenX@gmail.com', id: '2018-10-24-add-state-machine-scheme-type') {
+        addColumn(tableName: 'state_machine_scheme') {
+            column(name: 'type', type: 'VARCHAR(30)', remarks: '状态机方案类型')
+        }
+    }
 }
