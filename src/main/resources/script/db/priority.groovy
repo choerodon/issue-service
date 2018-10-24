@@ -17,7 +17,7 @@ databaseChangeLog(logicalFilePath: 'priority.groovy') {
             column(name: 'organization_id', type: 'BIGINT UNSIGNED', remarks: '组织id') {
                 constraints(nullable: 'false')
             }
-            column(name: 'is_default', type: 'CHAR(1)', defaultValue: "0", remarks: '是否默认'){
+            column(name: 'is_default', type: 'TINYINT UNSIGNED', defaultValue: "0", remarks: '是否默认'){
                 constraints(nullable: 'false')
             }
             column(name: 'sequence', type: 'DECIMAL', defaultValue: "0", remarks: '排序'){

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author cong.cheng
@@ -44,7 +44,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priorityDTO.setSequence((priorityMapper.getNextSequence(organizationId)).add(new BigDecimal(1)));
         priorityDTO.setOrganizationId(organizationId);
         //若设置为默认值，则清空其他默认值
-        if (priorityDTO.getIsDefault().equals(PriorityType.STATUS_DEFAULT.value())) {
+        if (priorityDTO.getDefault()) {
             priorityMapper.updateDefaultPriority(organizationId);
         }
         Priority priority = modelMapper.map(priorityDTO, Priority.class);
@@ -76,7 +76,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             throw new CommonException("error.priority.update.name.same");
         }
         //若设置为默认值，则清空其他默认值
-        if (priorityDTO.getIsDefault().equals(PriorityType.STATUS_DEFAULT.value())) {
+        if (priorityDTO.getDefault()) {
             priorityMapper.updateDefaultPriority(priorityDTO.getOrganizationId());
         }
         int isUpdate = priorityMapper.updateByPrimaryKeySelective(priority);
@@ -116,5 +116,57 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         List<Priority> priorities = priorityMapper.fulltextSearch(new Priority(), null);
         return modelMapper.map(priorities, new TypeToken<List<PriorityDTO>>() {
         }.getType());
+    }
+
+    @Override
+    public List<PriorityDTO> queryByOrganizationId(Long organizationId) {
+        Priority priority = new Priority();
+        priority.setOrganizationId(organizationId);
+        List<Priority> priorities = priorityMapper.select(priority);
+        Collections.sort(priorities, Comparator.comparing(Priority::getId));
+        return modelMapper.map(priorities, new TypeToken<List<PriorityDTO>>(){}.getType());
+    }
+
+    @Override
+    public PriorityDTO queryById(Long organizationId, Long id) {
+        Priority result = priorityMapper.selectByPrimaryKey(id);
+        if (result == null) {
+            throw new CommonException("error.priority.get");
+        }
+        return modelMapper.map(result, new TypeToken<PriorityDTO>(){}.getType());
+    }
+
+    private Priority savePrority(Long organizationId, String name, BigDecimal sequence, String colour, Boolean isDefault) {
+        Priority priority = new Priority();
+        priority.setOrganizationId(organizationId);
+        priority.setName(name);
+        priority.setSequence(sequence);
+        priority.setColour(colour);
+        priority.setDescription(name);
+        priority.setDefault(isDefault);
+        if (priorityMapper.insert(priority) != 1) {
+            throw new CommonException("error.prority.insert");
+        }
+        return priority;
+    }
+
+    private Map<String, Long> initPrority(Long organizationId) {
+        Map<String, Long> map = new HashMap<>();
+        Priority high = savePrority(organizationId, "高", new BigDecimal(0), "#FEBA3D", false);
+        Priority medium = savePrority(organizationId, "中", new BigDecimal(1), "#3B79E0", true);
+        Priority low = savePrority(organizationId, "低", new BigDecimal(2), "#969696", false);
+        map.put("high", high.getId());
+        map.put("medium", medium.getId());
+        map.put("low", low.getId());
+        return map;
+    }
+
+    @Override
+    public Map<Long, Map<String, Long>> initProrityByOrganization(List<Long> organizationIds) {
+        Map<Long, Map<String, Long>> result = new HashMap<>();
+        for (Long organizationId : organizationIds) {
+            result.put(organizationId, initPrority(organizationId));
+        }
+        return result;
     }
 }

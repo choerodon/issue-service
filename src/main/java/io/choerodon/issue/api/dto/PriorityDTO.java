@@ -18,7 +18,7 @@ public class PriorityDTO {
     private String description;
     private String colour;
     private Long organizationId;
-    private String isDefault;
+    private Boolean isDefault;
     private Long objectVersionNumber;
     private BigDecimal sequence;
 
@@ -92,11 +92,11 @@ public class PriorityDTO {
         this.organizationId = organizationId;
     }
 
-    public String getIsDefault() {
-        return isDefault;
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
     }
 
-    public void setIsDefault(String isDefault) {
-        this.isDefault = isDefault;
+    public Boolean getDefault() {
+        return isDefault;
     }
 }
