@@ -3,10 +3,9 @@ package io.choerodon.issue.infra.feign.fallback;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
-import io.choerodon.issue.infra.feign.dto.StateDTO;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.TransformInfo;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -35,17 +34,22 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     }
 
     @Override
-    public ResponseEntity<StateDTO> queryStatusById(Long organizationId, Long statusId) {
+    public ResponseEntity<StatusDTO> queryStatusById(Long organizationId, Long statusId) {
         throw new CommonException("error.stateMachineFeignClient.queryStatusById");
     }
 
     @Override
-    public ResponseEntity<List<StateDTO>> queryAllStatus(Long organizationId) {
+    public ResponseEntity<List<StatusDTO>> queryAllStatus(Long organizationId) {
         throw new CommonException("error.stateMachineFeignClient.queryAllStatus");
     }
 
     @Override
     public ResponseEntity<Long> createStateMachineWithCreateProject(Long organizationId, String projectCode) {
         throw new CommonException("error.stateMachineFeignClient.createStateMachineWithCreateProject");
+    }
+
+    @Override
+    public ResponseEntity<List<TransformDTO>> transformList(Long organizationId, String serviceCode, Long stateMachineId, Long instanceId, Long currentStatusId) {
+        throw new CommonException("error.stateMachineFeignClient.transformList");
     }
 }

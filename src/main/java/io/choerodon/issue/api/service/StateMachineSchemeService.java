@@ -99,7 +99,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param projectCode
      * @return
      */
-    StateMachineScheme createSchemeWithCreateProject(Long projectId, String projectCode);
+    StateMachineScheme initByConsumeCreateProject(Long projectId, String projectCode);
 
     /**
      * 单元测试mock feign用

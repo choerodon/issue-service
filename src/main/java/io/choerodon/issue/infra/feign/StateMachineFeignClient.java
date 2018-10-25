@@ -1,8 +1,9 @@
 package io.choerodon.issue.infra.feign;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.issue.infra.feign.dto.StateDTO;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +71,7 @@ public interface StateMachineFeignClient {
      * @return
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/status/{status_id}", method = RequestMethod.GET)
-    ResponseEntity<StateDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
+    ResponseEntity<StatusDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
 
     /**
      * 根据id获取状态
@@ -79,7 +80,7 @@ public interface StateMachineFeignClient {
      * @return
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/status/query_all", method = RequestMethod.GET)
-    ResponseEntity<List<StateDTO>> queryAllStatus(@PathVariable("organization_id") Long organizationId);
+    ResponseEntity<List<StatusDTO>> queryAllStatus(@PathVariable("organization_id") Long organizationId);
 
     /**
      * 【初始化项目】创建项目时创建该项目的状态机，返回状态机id
@@ -90,4 +91,21 @@ public interface StateMachineFeignClient {
     @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project", method = RequestMethod.GET)
     ResponseEntity<Long> createStateMachineWithCreateProject(@PathVariable("organization_id") Long organizationId,
                                                              @RequestParam(value = "project_code") String projectCode);
+
+    /**
+     * 显示事件单的转换
+     *
+     * @param organizationId
+     * @param serviceCode
+     * @param stateMachineId
+     * @param instanceId
+     * @param currentStatusId
+     * @return
+     */
+    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/transform_list", method = RequestMethod.GET)
+    ResponseEntity<List<TransformDTO>> transformList(@PathVariable("organization_id") Long organizationId,
+                                                     @RequestParam("service_code") String serviceCode,
+                                                     @RequestParam("state_machine_id") Long stateMachineId,
+                                                     @RequestParam("instance_id") Long instanceId,
+                                                     @RequestParam("current_status_id") Long currentStatusId);
 }

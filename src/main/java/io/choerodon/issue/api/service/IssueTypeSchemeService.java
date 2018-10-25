@@ -104,5 +104,5 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      * @param projectEvent   projectEvent
      * @param stateMachineId stateMachineId
      */
-    void initByConsumeCreateProject(ProjectEvent projectEvent, Long stateMachineId);
+    IssueTypeScheme initByConsumeCreateProject(ProjectEvent projectEvent, Long stateMachineId);
 }

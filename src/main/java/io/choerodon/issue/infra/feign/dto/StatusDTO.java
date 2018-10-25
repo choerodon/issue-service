@@ -1,17 +1,30 @@
 package io.choerodon.issue.infra.feign.dto;
 
 /**
- * @author peng.jiang@hand-china.com
+ * @author shinan.chen
+ * @date 2018/10/24
  */
-public class StateDTO {
+public class StatusDTO {
 
     private Long id;
     private String name;
+    /**
+     * code是用来识别是否是初始化状态
+     */
+    private String code;
     private String description;
     private String type;
     private Long organizationId;
     private Long objectVersionNumber;
-    private Long associationMachine;
+
+    public StatusDTO(){}
+
+    public StatusDTO(String name, String description, String type, Long organizationId) {
+        this.name = name;
+        this.description = description;
+        this.type = type;
+        this.organizationId = organizationId;
+    }
 
     private Boolean canDelete;
 
@@ -63,19 +76,19 @@ public class StateDTO {
         this.organizationId = organizationId;
     }
 
-    public Long getAssociationMachine() {
-        return associationMachine;
-    }
-
-    public void setAssociationMachine(Long associationMachine) {
-        this.associationMachine = associationMachine;
-    }
-
     public Boolean getCanDelete() {
         return canDelete;
     }
 
     public void setCanDelete(Boolean canDelete) {
         this.canDelete = canDelete;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

@@ -1,4 +1,4 @@
-package io.choerodon.issue.infra.feign.dto;
+package io.choerodon.issue.statemachine.bean;
 
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 

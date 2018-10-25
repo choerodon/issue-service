@@ -13,10 +13,14 @@ public class IssueTypeSchemeDTO {
     @NotNull(message = "error.name.null")
     private String name;
     private String description;
-    @NotNull(message = "error.defaultIssueTypeId.null")
-    private Long defaultIssueTypeId;//若无默认问题类型，传0L
-    private Long organizationId;
 
+    @NotNull(message = "error.defaultIssueTypeId.null")
+    /**
+     * 若无默认问题类型，传0L
+     */
+    private Long defaultIssueTypeId;
+    private Long organizationId;
+    private String type;
     private Long objectVersionNumber;
 
     private List<IssueTypeDTO> issueTypes;
@@ -75,5 +79,13 @@ public class IssueTypeSchemeDTO {
 
     public void setIssueTypes(List<IssueTypeDTO> issueTypes) {
         this.issueTypes = issueTypes;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

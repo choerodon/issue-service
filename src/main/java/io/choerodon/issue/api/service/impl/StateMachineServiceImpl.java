@@ -10,13 +10,17 @@ import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.domain.IssueRecord;
+import io.choerodon.issue.domain.StateMachineScheme;
+import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.TransformInfo;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.mapper.IssueMapper;
 import io.choerodon.issue.infra.mapper.IssueRecordMapper;
+import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
+import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.statemachine.annotation.Condition;
 import io.choerodon.issue.statemachine.annotation.Postpostition;
 import io.choerodon.issue.statemachine.annotation.UpdateStatus;
@@ -52,6 +56,10 @@ public class StateMachineServiceImpl implements StateMachineService {
     private IssueMapper issueMapper;
     @Autowired
     private IssueRecordMapper issueRecordMapper;
+    @Autowired
+    private StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper;
+    @Autowired
+    private StateMachineSchemeMapper stateMachineSchemeMapper;
     @Autowired
     private AnalyzeServiceManager analyzeServiceManager;
     @Autowired
@@ -107,10 +115,10 @@ public class StateMachineServiceImpl implements StateMachineService {
     }
 
     @Override
-    public ResponseEntity<List<TransformInfo>> transfList(Long organizationId, Long projectId, Long issueId) {
+    public ResponseEntity<List<TransformDTO>> transfList(Long organizationId, Long projectId, Long issueId) {
         Long stateMachineId = issueService.getStateMachineId(projectId, issueId);
         Long currentStateId = issueMapper.selectByPrimaryKey(issueId).getStatusId();
-        return instanceFeignClient.transformList(organizationId, serverCode,
+        return stateMachineClient.transformList(organizationId, serverCode,
                 stateMachineId, issueId, currentStateId);
     }
 
@@ -123,6 +131,29 @@ public class StateMachineServiceImpl implements StateMachineService {
         }
         return instanceFeignClient.executeTransform(organizationId, serverCode, stateMachineId, issueId,
                 issue.getStatusId(), transfId);
+    }
+
+    @Override
+    public Long queryBySchemeIdAndIssueTypeId(Long stateMachineSchemeId, Long issueTypeId) {
+        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+        config.setSchemeId(stateMachineSchemeId);
+        config.setIssueTypeId(issueTypeId);
+        Long stateMachineId;
+        List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(config);
+        if (configs.isEmpty()) {
+            StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
+            if (stateMachineScheme == null) {
+                throw new CommonException("error.queryBySchemeIdAndIssueTypeId.stateMachineScheme.notFound");
+            }
+            if (stateMachineScheme.getDefaultStateMachineId() != null) {
+                stateMachineId = stateMachineScheme.getDefaultStateMachineId();
+            } else {
+                throw new CommonException("error.queryBySchemeIdAndIssueTypeId.defaultStateMachineId.null");
+            }
+        } else {
+            stateMachineId = configs.get(0).getStateMachineId();
+        }
+        return stateMachineId;
     }
 
     @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
