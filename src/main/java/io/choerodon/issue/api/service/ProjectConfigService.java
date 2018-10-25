@@ -5,7 +5,6 @@ import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
 import io.choerodon.issue.domain.Field;
 import io.choerodon.issue.domain.FieldConfigLine;
 import io.choerodon.issue.domain.ProjectConfig;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 
 import java.util.List;
@@ -59,15 +58,21 @@ public interface ProjectConfigService {
      * 根据项目id找到方案返回问题类型列表
      *
      * @param projectId
+     * @param schemeType
      * @return
      */
-    List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId);
+    List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId, String schemeType);
 
     /**
      * 根据项目id找到方案返回当前状态可以转换的列表
      *
      * @param projectId
+     * @param currentStatusId
+     * @param issueId
+     * @param issueTypeId
+     * @param serviceCode
+     * @param schemeType
      * @return
      */
-    List<TransformDTO> queryTransformsByProjectId(Long projectId,Long currentStatusId,Long issueId, Long issueTypeId, String serviceCode);
+    List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String serviceCode, String schemeType);
 }

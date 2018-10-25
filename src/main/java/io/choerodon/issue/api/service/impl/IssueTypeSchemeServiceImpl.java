@@ -12,10 +12,12 @@ import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.IssueTypeSchemeConfig;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.enums.IssueTypeE;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ListChangeUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -84,6 +86,10 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Transactional
     public IssueTypeSchemeDTO create(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
 
+        if (!EnumUtil.contain(SchemeType.class, issueTypeSchemeDTO.getType())) {
+            throw new CommonException("error.schemeDTO.type.illegal");
+        }
+
         if (!checkName(organizationId, issueTypeSchemeDTO.getName(), null)) {
             throw new CommonException("error.issueTypeScheme.name.exist");
         }
@@ -101,6 +107,10 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
 
     @Override
     public IssueTypeSchemeDTO update(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
+
+        if (!EnumUtil.contain(SchemeType.class, issueTypeSchemeDTO.getType())) {
+            throw new CommonException("error.schemeDTO.type.illegal");
+        }
 
         if (issueTypeSchemeDTO.getName() != null && !checkName(organizationId, issueTypeSchemeDTO.getName(), issueTypeSchemeDTO.getId())) {
             throw new CommonException("error.issueTypeScheme.name.exist");
@@ -244,9 +254,11 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         List<IssueType> issueTypes = issueTypeMapper.select(query);
         Map<String, IssueType> issueTypeMap = issueTypes.stream().filter(x -> x.getInitialize()).collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
 
+        //初始化敏捷问题类型方案
         IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
         issueTypeScheme.setName(projectEvent.getProjectCode() + "默认类型方案");
         issueTypeScheme.setDefaultIssueTypeId(issueTypeMap.get(IssueTypeE.STORY.getTypeCode()).getId());
+        issueTypeScheme.setType(SchemeType.AGILE);
         issueTypeScheme.setOrganizationId(organizationId);
         issueTypeScheme.setDescription(projectEvent.getProjectCode() + "默认类型方案");
         if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {

@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * 根据项目id获取对应数据
+ *
  * @author shinan.chen
  * @date 2018/10/24
  */
@@ -30,8 +31,8 @@ public class SchemeController extends BaseController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询项目的问题类型列表")
     @GetMapping(value = "/query_issue_types")
-    public ResponseEntity<List<IssueTypeDTO>> queryIssueTypesByProjectId(@PathVariable("project_id") Long projectId) {
-        return new ResponseEntity<>(projectConfigService.queryIssueTypesByProjectId(projectId), HttpStatus.OK);
+    public ResponseEntity<List<IssueTypeDTO>> queryIssueTypesByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("scheme_type") String schemeType) {
+        return new ResponseEntity<>(projectConfigService.queryIssueTypesByProjectId(projectId, schemeType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)
@@ -41,8 +42,9 @@ public class SchemeController extends BaseController {
                                                                          @RequestParam("current_status_id") Long currentStatusId,
                                                                          @RequestParam("issue_id") Long issueId,
                                                                          @RequestParam("issue_type_id") Long issueTypeId,
-                                                                         @RequestParam("service_code") String serviceCode) {
-        return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, serviceCode), HttpStatus.OK);
+                                                                         @RequestParam("service_code") String serviceCode,
+                                                                         @RequestParam("scheme_type") String schemeType) {
+        return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, serviceCode, schemeType), HttpStatus.OK);
     }
 
 }

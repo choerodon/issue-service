@@ -9,7 +9,7 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme.groovy') {
             }
             column(name: 'name', type: 'VARCHAR(64)', remarks: '名称')
             column(name: 'description', type: 'VARCHAR(255)', remarks: '描述')
-            column(name: 'default_state_machine_id', type: 'BIGINT UNSIGNED', remarks: '默认状态机')
+            column(name: 'default_state_machine_id', type: 'BIGINT UNSIGNED', remarks: '默认状态机id')
             column(name: 'type', type: 'VARCHAR(30)', remarks: '状态机方案类型')
             column(name: 'organization_id', type: 'BIGINT UNSIGNED', remarks: '组织id')
 

@@ -8,6 +8,7 @@ import io.choerodon.issue.domain.Field;
 import io.choerodon.issue.domain.FieldConfigLine;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
@@ -166,40 +167,48 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId) {
+    public List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId, String schemeType) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
-        //获取问题类型方案
-        if (projectConfig.getIssueTypeSchemeId() != null) {
-            //根据方案配置表获取 问题类型
-            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, projectConfig.getIssueTypeSchemeId());
-            return modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
-            }.getType());
-        } else {
-            throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+        //敏捷信息
+        if(schemeType.equals(SchemeType.AGILE)){
+            //获取问题类型方案
+            if (projectConfig.getIssueTypeSchemeId() != null) {
+                //根据方案配置表获取 问题类型
+                List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, projectConfig.getIssueTypeSchemeId());
+                return modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
+                }.getType());
+            } else {
+                throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            }
         }
+        return null;
     }
 
     @Override
-    public List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String serviceCode) {
+    public List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String serviceCode, String schemeType) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
-        //获取状态机方案
-        if (projectConfig.getStateMachineSchemeId() != null) {
-            //获取状态机
-            Long stateMachineId = stateMachineService.queryBySchemeIdAndIssueTypeId(projectConfig.getStateMachineSchemeId(), issueTypeId);
-            //获取当前状态拥有的转换
-            List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, serviceCode, stateMachineId, issueId, currentStatusId).getBody();
-            //获取组织中所有状态
-            List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
-            Map<Long, StatusDTO> statusMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
-            transformDTOS.forEach(transformDTO -> {
-                StatusDTO statusDTO = statusMap.get(transformDTO.getEndStatusId());
-                transformDTO.setStatusDTO(statusDTO);
-            });
-            return transformDTOS;
-        } else {
-            throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+        //敏捷信息
+        if(schemeType.equals(SchemeType.AGILE)){
+            //获取状态机方案
+            if (projectConfig.getStateMachineSchemeId() != null) {
+                //获取状态机
+                Long stateMachineId = stateMachineService.queryBySchemeIdAndIssueTypeId(projectConfig.getStateMachineSchemeId(), issueTypeId);
+                //获取当前状态拥有的转换
+                List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, serviceCode, stateMachineId, issueId, currentStatusId).getBody();
+                //获取组织中所有状态
+                List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+                Map<Long, StatusDTO> statusMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
+                transformDTOS.forEach(transformDTO -> {
+                    StatusDTO statusDTO = statusMap.get(transformDTO.getEndStatusId());
+                    transformDTO.setStatusDTO(statusDTO);
+                });
+                return transformDTOS;
+            } else {
+                throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            }
         }
+        return null;
     }
 }
