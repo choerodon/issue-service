@@ -112,12 +112,23 @@ public class PriorityController {
 //    }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "根据组织id查询优先级")
+    @ApiOperation(value = "根据组织id查询优先级,map")
     @GetMapping("/organizations/{organization_id}/priority/list")
-    public ResponseEntity<List<PriorityDTO>> queryByOrganizationId(@ApiParam(value = "组织id", required = true)
+    public ResponseEntity<Map<Long, PriorityDTO>> queryByOrganizationId(@ApiParam(value = "组织id", required = true)
                                                                 @PathVariable("organization_id") Long organizationId) {
         return Optional.ofNullable(priorityService.queryByOrganizationId(organizationId))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.CREATED))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.priorityList.get"));
+
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "根据组织id查询优先级,list")
+    @GetMapping("/organizations/{organization_id}/priority/list_by_org")
+    public ResponseEntity<List<PriorityDTO>> queryByOrganizationIdList(@ApiParam(value = "组织id", required = true)
+                                                                        @PathVariable("organization_id") Long organizationId) {
+        return Optional.ofNullable(priorityService.queryByOrganizationIdList(organizationId))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
 
     }

@@ -119,13 +119,27 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     }
 
     @Override
-    public List<PriorityDTO> queryByOrganizationId(Long organizationId) {
+    public Map<Long, PriorityDTO> queryByOrganizationId(Long organizationId) {
         Priority priority = new Priority();
         priority.setOrganizationId(organizationId);
         List<Priority> priorities = priorityMapper.select(priority);
-        Collections.sort(priorities, Comparator.comparing(Priority::getId));
+        Map<Long, PriorityDTO> result = new HashMap<>();
+        for (Priority pri : priorities) {
+            PriorityDTO priorityDTO = modelMapper.map(pri, new TypeToken<PriorityDTO>(){}.getType());
+            result.put(priorityDTO.getId(), priorityDTO);
+        }
+        return result;
+    }
+
+    @Override
+    public List<PriorityDTO> queryByOrganizationIdList(Long organizationId) {
+        Priority priority = new Priority();
+        priority.setOrganizationId(organizationId);
+        List<Priority> priorities = priorityMapper.select(priority);
+        Collections.sort(priorities, Comparator.comparing(Priority::getSequence));
         return modelMapper.map(priorities, new TypeToken<List<PriorityDTO>>(){}.getType());
     }
+
 
     @Override
     public PriorityDTO queryById(Long organizationId, Long id) {

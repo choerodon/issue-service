@@ -62,7 +62,9 @@ public interface PriorityService extends BaseService<Priority> {
      */
     List<PriorityDTO> updateByList(List<PriorityDTO> list, Long organizationId);
 
-    List<PriorityDTO> queryByOrganizationId(Long organizationId);
+    Map<Long, PriorityDTO> queryByOrganizationId(Long organizationId);
+
+    List<PriorityDTO> queryByOrganizationIdList(Long organizationId);
 
     PriorityDTO queryById(Long organizationId, Long id);
 
