@@ -93,6 +93,15 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
     List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId);
 
     /**
+     * 创建项目时创建初始化状态机方案
+     *
+     * @param projectId
+     * @param projectCode
+     * @return
+     */
+    StateMachineScheme initByConsumeCreateProject(Long projectId, String projectCode);
+
+    /**
      * 单元测试mock feign用
      *
      * @param stateMachineServiceFeign stateMachineServiceFeign

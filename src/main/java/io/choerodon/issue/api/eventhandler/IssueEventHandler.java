@@ -33,6 +33,8 @@ public class IssueEventHandler {
     private StateMachineSchemeService stateMachineSchemeService;
     @Autowired
     private IssueTypeSchemeService issueTypeSchemeService;
+    @Autowired
+    private ProjectConfigService projectConfigService;
 
 
     private void loggerInfo(Object o) {
