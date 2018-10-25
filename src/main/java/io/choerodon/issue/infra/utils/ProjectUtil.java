@@ -1,5 +1,6 @@
 package io.choerodon.issue.infra.utils;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.infra.feign.UserFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,25 @@ public class ProjectUtil {
     public static final Map<Long, ProjectDTO> map = new HashMap<>();
 
     public Long getOrganizationId(Long projectId) {
+        return queryProject(projectId).getOrganizationId();
+    }
+
+    public String getCode(Long projectId) {
+        return queryProject(projectId).getCode();
+    }
+
+    private ProjectDTO queryProject(Long projectId) {
         ProjectDTO projectDTO = map.get(projectId);
         if (projectDTO != null) {
-            return projectDTO.getOrganizationId();
+            return projectDTO;
         } else {
             projectDTO = iamServiceFeign.queryProject(projectId).getBody();
             if (projectDTO != null) {
                 map.put(projectId, projectDTO);
-                return projectDTO.getOrganizationId();
+                return projectDTO;
+            }else{
+                throw new CommonException("error.queryProject.notFound");
             }
         }
-        return null;
     }
 }
