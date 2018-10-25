@@ -114,4 +114,6 @@ public class IssueTypeController extends BaseController {
     public ResponseEntity<List<IssueTypeDTO>> queryIssueType(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
         return new ResponseEntity<>(issueTypeService.queryIssueType(organizationId, schemeId), HttpStatus.OK);
     }
+
+
 }
