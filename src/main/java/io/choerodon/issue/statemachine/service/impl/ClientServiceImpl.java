@@ -1,11 +1,11 @@
 package io.choerodon.issue.statemachine.service.impl;
 
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
-import io.choerodon.issue.infra.feign.dto.TransformInfo;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.statemachine.StateMachineConfigMonitor;
 import io.choerodon.issue.statemachine.bean.InvokeBean;
+import io.choerodon.issue.statemachine.bean.TransformInfo;
 import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import io.choerodon.issue.statemachine.enums.TransformConditionStrategy;
 import io.choerodon.issue.statemachine.service.ClientService;
@@ -30,13 +30,13 @@ public class ClientServiceImpl implements ClientService {
     private static final Logger logger = LoggerFactory.getLogger(ClientProcessor.class);
 
     @Override
-    public List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformInfos) {
-        logger.info("stateMachine client conditionFilter start: instanceId:{}, transformInfos:{}", instanceId, transformInfos);
-        if (transformInfos == null || transformInfos.isEmpty()) {
+    public List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformDTOS) {
+        logger.info("stateMachine client conditionFilter start: instanceId:{}, transformInfos:{}", instanceId, transformDTOS);
+        if (transformDTOS == null || transformDTOS.isEmpty()) {
             return Collections.emptyList();
         }
         List<TransformInfo> resultTransforms = new ArrayList<>();
-        transformInfos.forEach(transformInfo -> {
+        transformDTOS.forEach(transformInfo -> {
             List<StateMachineConfigDTO> configDTOS = transformInfo.getConditions();
             ExecuteResult result = configExecuteCondition(instanceId, transformInfo.getEndStatusId(), transformInfo.getConditionStrategy(), configDTOS);
             if (result.getSuccess()) {
@@ -81,11 +81,6 @@ public class ClientServiceImpl implements ClientService {
                 } else {
                     executeResult.setErrorMessage("配置类型【条件】:没有符合的条件类型");
                 }
-            }
-
-            if (!isSuccess) {
-                executeResult.setErrorMessage("配置类型【条件】:" + configDTO.getCode() + "执行不通过");
-                break;
             }
         }
         executeResult.setSuccess(isSuccess);

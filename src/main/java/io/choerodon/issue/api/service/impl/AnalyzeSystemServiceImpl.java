@@ -10,7 +10,7 @@ import io.choerodon.issue.domain.Priority;
 import io.choerodon.issue.infra.enums.IssueRecordEnums;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
-import io.choerodon.issue.infra.feign.dto.StateDTO;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,11 +66,11 @@ public class AnalyzeSystemServiceImpl implements AnalyzeIssueRecordService {
             case Issue.FIELD_STATUS_ID:
                 viewDTO.setAction(IssueRecordEnums.IssueSystemAction.UPDATE_STATUS_ID.value());
                 Long organizationId = projectUtil.getOrganizationId(projectId);
-                ResponseEntity<StateDTO> newState = stateMachineFeignClient.queryStatusById(organizationId,Long.valueOf(issueRecord.getNewValue()));
+                ResponseEntity<StatusDTO> newState = stateMachineFeignClient.queryStatusById(organizationId,Long.valueOf(issueRecord.getNewValue()));
                 if (newState != null && newState.getBody() != null){
                     viewDTO.setNewValue(newState.getBody().getName());
                 }
-                ResponseEntity<StateDTO> oldState = stateMachineFeignClient.queryStatusById(organizationId,Long.valueOf(issueRecord.getOldValue()));
+                ResponseEntity<StatusDTO> oldState = stateMachineFeignClient.queryStatusById(organizationId,Long.valueOf(issueRecord.getOldValue()));
                 if (oldState != null && oldState.getBody() != null){
                     viewDTO.setOldValue(oldState.getBody().getName());
                 }

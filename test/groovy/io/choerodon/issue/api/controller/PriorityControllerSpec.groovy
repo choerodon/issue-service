@@ -61,7 +61,7 @@ class PriorityControllerSpec extends Specification {
             priorityDTO.setColour("init_colour" + i)
             priorityDTO.setDescription("init_description" + i)
             priorityDTO.setOrganizationId(testOrginzationId)
-            priorityDTO.setIsDefault("1")
+            priorityDTO.setDefault(true)
             priorityDTO.setSequence(new BigDecimal(i))
             priorityDTO = priorityService.create(testOrginzationId, priorityDTO)
             list.add(priorityDTO)
@@ -80,7 +80,7 @@ class PriorityControllerSpec extends Specification {
         priorityDTO.setName(name);
         priorityDTO.setDescription(description);
         priorityDTO.setColour(colour);
-        priorityDTO.setIsDefault(isDefault)
+        priorityDTO.setDefault(isDefault)
         priorityDTO.setOrganizationId(testOrginzationId);
 
         when: '创建优先级类型'
@@ -105,13 +105,13 @@ class PriorityControllerSpec extends Specification {
 
         where: '测试用例：'
         name         | isDefault | colour         | description    || expRequest | expResponse
-        'name1'      | '0'       | 'aa'           | 'description1' || true       | true         //正常操作
-        null         | '0'       | 'aa'           | 'description1' || true       | false         //name null
-        'name2'      | '0'       | null           | 'description1' || true       | false          //color null
-        'name3'      | '0'       | 'aa'           | null           || true       | true           //描述可以为空 通过
+        'name1'      | false       | 'aa'           | 'description1' || true       | true         //正常操作
+        null         | false       | 'aa'           | 'description1' || true       | false         //name null
+        'name2'      | false       | null           | 'description1' || true       | false          //color null
+        'name3'      | false      | 'aa'           | null           || true       | true           //描述可以为空 通过
         'name4'      | null      | 'aa'           | 'description1' || false      | false       //isdefault null
-        'init_name1' | '0'       | 'aa'           | 'description1' || true       | false        //name 重复
-        'name6'      | '1'       | 'aa'           | 'description1' || true       | true         // 正常操作
+        'init_name1' | false      | 'aa'           | 'description1' || true       | false        //name 重复
+        'name6'      | true      | 'aa'           | 'description1' || true       | true         // 正常操作
 
     }
 
@@ -121,7 +121,7 @@ class PriorityControllerSpec extends Specification {
         priorityDTO.setName(name);
         priorityDTO.setDescription(description);
         priorityDTO.setColour(colour);
-        priorityDTO.setIsDefault(isDefault)
+        priorityDTO.setDefault(isDefault)
         priorityDTO.setOrganizationId(testOrginzationId);
 
         when: '更新优先级类型'
@@ -146,13 +146,13 @@ class PriorityControllerSpec extends Specification {
 
         where: '测试用例：'
         name         | isDefault | colour         | description    || expRequest | expResponse
-        'name1'      | '0'       | 'aa'           | 'description1' || true       | true        //正常操作
-        null         | '0'       | 'aa'           | 'description1' || true       | true        //name null即不修改原有值 通过
-        'name2'      | '0'       | null           | 'description1' || true       | true        //color null即不修改原有值 通过
-        'name3'      | '0'       | 'aa'           | null           || true       | true        //描述可以为空 通过
+        'name1'      | false      | 'aa'           | 'description1' || true       | true        //正常操作
+        null         | false       | 'aa'           | 'description1' || true       | true        //name null即不修改原有值 通过
+        'name2'      | false       | null           | 'description1' || true       | true        //color null即不修改原有值 通过
+        'name3'      | false       | 'aa'           | null           || true       | true        //描述可以为空 通过
         'name4'      | null      | 'aa'           | 'description1' || false      | false      //isdefault null 默认值将会影响到其他字段的更新 不能为空
-        'init_name2' | '0'       | 'aa'           | 'description1' || true       | false       //name 重复
-        'name6'      | '1'       | 'aa'           | 'description1' || true       | true        // 正常操作
+        'init_name2' | false       | 'aa'           | 'description1' || true       | false       //name 重复
+        'name6'      | true       | 'aa'           | 'description1' || true       | true        // 正常操作
     }
 
 

@@ -2,8 +2,9 @@ package io.choerodon.issue.statemachine.endpoint;
 
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
-import io.choerodon.issue.infra.feign.dto.TransformInfo;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.statemachine.bean.PropertyData;
+import io.choerodon.issue.statemachine.bean.TransformInfo;
 import io.choerodon.issue.statemachine.enums.StateMachineConfigType;
 import io.choerodon.issue.statemachine.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +72,13 @@ public class ClientEndpoint {
      * 根据条件过滤转换
      *
      * @param instanceId
-     * @param transformInfos
+     * @param transformDTOS
      * @return
      */
     @PostMapping(value = "v1/statemachine/filter_transform")
     public ResponseEntity<List<TransformInfo>> filterTransform(@RequestParam(value = "instance_id") Long instanceId,
-                                                               @RequestBody List<TransformInfo> transformInfos) {
-        return new ResponseEntity<>(clientService.conditionFilter(instanceId, transformInfos), HttpStatus.OK);
+                                                              @RequestBody List<TransformInfo> transformDTOS) {
+        return new ResponseEntity<>(clientService.conditionFilter(instanceId, transformDTOS), HttpStatus.OK);
     }
 
 }

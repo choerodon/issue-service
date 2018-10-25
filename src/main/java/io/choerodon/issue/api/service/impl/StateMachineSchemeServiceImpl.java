@@ -220,7 +220,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public StateMachineScheme createSchemeWithCreateProject(Long projectId, String projectCode) {
+    public StateMachineScheme initByConsumeCreateProject(Long projectId, String projectCode) {
 
         //创建敏捷状态机方案
         Long organizationId = projectUtil.getOrganizationId(projectId);

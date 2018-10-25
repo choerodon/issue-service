@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
@@ -9,14 +11,13 @@ import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.IssueTypeSchemeConfig;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.infra.enums.IssueTypeE;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.utils.ListChangeUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 /**
  * @author shinan.chen
@@ -234,26 +236,29 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     }
 
     @Override
-    public void initByConsumeCreateProject(ProjectEvent projectEvent,Long stateMachineSchemeId) {
+    public IssueTypeScheme initByConsumeCreateProject(ProjectEvent projectEvent, Long stateMachineSchemeId) {
         Long organizationId = projectUtil.getOrganizationId(projectEvent.getProjectId());
-        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
-        issueTypeScheme.setName(projectEvent.getProjectCode()+"默认类型方案");
-        issueTypeScheme.setOrganizationId(organizationId);
-        issueTypeScheme.setDescription(projectEvent.getProjectCode()+"默认类型方案");
-        if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
-            throw new CommonException("error.issueType.create");
-        }
         IssueType query = new IssueType();
         query.setOrganizationId(organizationId);
         query.setInitialize(true);
         List<IssueType> issueTypes = issueTypeMapper.select(query);
+        Map<String, IssueType> issueTypeMap = issueTypes.stream().filter(x -> x.getInitialize()).collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
+
+        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
+        issueTypeScheme.setName(projectEvent.getProjectCode() + "默认类型方案");
+        issueTypeScheme.setDefaultIssueTypeId(issueTypeMap.get(IssueTypeE.STORY.getTypeCode()).getId());
+        issueTypeScheme.setOrganizationId(organizationId);
+        issueTypeScheme.setDescription(projectEvent.getProjectCode() + "默认类型方案");
+        if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
+            throw new CommonException("error.issueType.create");
+        }
+
         Integer sequence = 0;
-        for(IssueType issueType: issueTypes){
+        for (IssueType issueType : issueTypes) {
             sequence++;
             createIssueTypeSchemeConfig(new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence)));
         }
-                //关联默认问题类型方案
-        projectConfigService.create(projectEvent.getProjectId(), stateMachineSchemeId, issueTypeScheme.getId());
+        return issueTypeScheme;
     }
 
     private void createIssueTypeSchemeConfig(IssueTypeSchemeConfig issueTypeSchemeConfig) {

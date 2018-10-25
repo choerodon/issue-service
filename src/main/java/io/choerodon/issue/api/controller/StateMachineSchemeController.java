@@ -114,5 +114,4 @@ public class StateMachineSchemeController {
     public ResponseEntity<List<StateMachineSchemeDTO>> querySchemeByStateMachineId(@PathVariable("organization_id") Long organizationId, @PathVariable(value = "state_machine_id") Long stateMachineId) {
         return new ResponseEntity<>(schemeService.querySchemeByStateMachineId(organizationId, stateMachineId), HttpStatus.OK);
     }
-
 }

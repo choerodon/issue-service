@@ -2,7 +2,8 @@ package io.choerodon.issue.statemachine.service;
 
 import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
-import io.choerodon.issue.infra.feign.dto.TransformInfo;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
+import io.choerodon.issue.statemachine.bean.TransformInfo;
 
 import java.util.List;
 
@@ -18,10 +19,10 @@ public interface ClientService {
      * 根据条件过滤转换
      *
      * @param instanceId
-     * @param transformInfos
+     * @param transformDTOS
      * @return
      */
-    List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformInfos);
+    List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformDTOS);
 
 
     /**

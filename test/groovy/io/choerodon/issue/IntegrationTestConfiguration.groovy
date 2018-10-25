@@ -1,6 +1,8 @@
 package io.choerodon.issue
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
+import io.choerodon.issue.api.dto.payload.ProjectEvent
 import io.choerodon.issue.api.eventhandler.IssueEventHandler
 import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.core.oauth.CustomUserDetails
@@ -77,6 +79,15 @@ class IntegrationTestConfiguration {
     void init() {
         liquibaseExecutor.execute()
         setTestRestTemplateJWT()
+        projectUtil.getOrganizationId(1) >> 1L
+        OrganizationCreateEventPayload organizationEvent = new OrganizationCreateEventPayload()
+        organizationEvent.id = 1
+        issueEventHandler.handleOrgaizationInitByConsumeSagaTask(JSON.toJSONString(organizationEvent))
+        ProjectEvent projectEvent = new ProjectEvent()
+        projectEvent.projectId = 1
+        projectEvent.projectCode = "test"
+        issueEventHandler.handleProjectInitByConsumeSagaTask(JSON.toJSONString(projectEvent))
+
     }
 
     private void setTestRestTemplateJWT() {

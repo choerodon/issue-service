@@ -6,10 +6,15 @@ import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.Field;
 import io.choerodon.issue.domain.FieldConfigLine;
+import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.infra.feign.StateMachineFeignClient;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
+import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -75,6 +81,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private IssueTypeService issueTypeService;
     @Autowired
     private PageSchemeService pageSchemeService;
+    @Autowired
+    private StateMachineService stateMachineService;
+    @Autowired
+    private StateMachineFeignClient stateMachineFeignClient;
     @Autowired
     private ProjectUtil projectUtil;
 
@@ -153,5 +163,43 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
         //过滤掉隐藏字段
         return fieldConfigLines.stream().filter(x -> x.getIsDisplay().equals(YES)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        //获取问题类型方案
+        if (projectConfig.getIssueTypeSchemeId() != null) {
+            //根据方案配置表获取 问题类型
+            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, projectConfig.getIssueTypeSchemeId());
+            return modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
+            }.getType());
+        } else {
+            throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+        }
+    }
+
+    @Override
+    public List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String serviceCode) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        //获取状态机方案
+        if (projectConfig.getStateMachineSchemeId() != null) {
+            //获取状态机
+            Long stateMachineId = stateMachineService.queryBySchemeIdAndIssueTypeId(projectConfig.getStateMachineSchemeId(), issueTypeId);
+            //获取当前状态拥有的转换
+            List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, serviceCode, stateMachineId, issueId, currentStatusId).getBody();
+            //获取组织中所有状态
+            List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+            Map<Long, StatusDTO> statusMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
+            transformDTOS.forEach(transformDTO -> {
+                StatusDTO statusDTO = statusMap.get(transformDTO.getEndStatusId());
+                transformDTO.setStatusDTO(statusDTO);
+            });
+            return transformDTOS;
+        } else {
+            throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+        }
     }
 }
