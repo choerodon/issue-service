@@ -7,7 +7,6 @@ import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +61,9 @@ public class IssueEventHandler {
         IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectEvent, stateMachineScheme.getId());
 
         //创建项目信息及配置默认方案
-        projectInfoService.createProject(projectEvent);
+        projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
 
-        //关联默认问题类型方案
+        //关联默认方案
         projectConfigService.create(projectEvent.getProjectId(), stateMachineScheme.getId(), issueTypeScheme.getId());
         return data;
     }

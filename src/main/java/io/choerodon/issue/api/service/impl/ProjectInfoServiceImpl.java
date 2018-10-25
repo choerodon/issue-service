@@ -1,7 +1,6 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.issue.api.dto.payload.ProjectEvent;
-import io.choerodon.issue.api.service.*;
+import io.choerodon.issue.api.service.ProjectInfoService;
 import io.choerodon.issue.domain.ProjectInfo;
 import io.choerodon.issue.infra.mapper.ProjectInfoMapper;
 import org.slf4j.Logger;
@@ -24,11 +23,11 @@ public class ProjectInfoServiceImpl implements ProjectInfoService {
     private ProjectInfoMapper projectInfoMapper;
 
     @Override
-    public void createProject(ProjectEvent projectEvent) {
+    public void createProject(Long projectId, String projectCode) {
         ProjectInfo info = new ProjectInfo();
         info.setIssueMaxNum(0L);
-        info.setProjectCode(projectEvent.getProjectCode());
-        info.setProjectId(projectEvent.getProjectId());
+        info.setProjectCode(projectCode);
+        info.setProjectId(projectId);
         projectInfoMapper.insert(info);
     }
 }
