@@ -24,7 +24,9 @@ public enum IssueTypeE {
     /**
      * 子任务
      */
-    SUB_TASK("icon", "子任务", "子任务", "colour", "sub_task");
+    SUB_TASK("icon", "子任务", "子任务", "colour", "sub_task"),
+
+    ISSUE_TEST("icon", "测试", "测试", "colour", "issue_test");
 
     private String icon;
     private String name;

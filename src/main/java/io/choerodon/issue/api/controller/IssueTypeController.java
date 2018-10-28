@@ -38,7 +38,7 @@ public class IssueTypeController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据id查询问题类型")
     @GetMapping(value = "/{id}")
-    public ResponseEntity<IssueTypeDTO> queryById(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId) {
+    public ResponseEntity<IssueTypeDTO> queryIssueTypeById(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId) {
         return new ResponseEntity<>(issueTypeService.queryById(organizationId, issueTypeId), HttpStatus.OK);
     }
 
@@ -115,5 +115,19 @@ public class IssueTypeController extends BaseController {
         return new ResponseEntity<>(issueTypeService.queryIssueType(organizationId, schemeId), HttpStatus.OK);
     }
 
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "根据组织id查询类型，map")
+    @GetMapping(value = "/type_map")
+    public ResponseEntity<Map<Long, IssueTypeDTO>> listIssueTypeMap(@PathVariable("organization_id") Long organizationId) {
+        return new ResponseEntity<>(issueTypeService.listIssueTypeMap(organizationId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "迁移组织层问题类型数据")
+    @GetMapping(value = "/init_data")
+    public ResponseEntity<Map<Long, Map<String, Long>>> initIssueTypeData(@PathVariable("organization_id") Long organizationId,
+                                                                @RequestBody List<Long> orgIds) {
+        return new ResponseEntity<>(issueTypeService.initIssueTypeData(organizationId, orgIds), HttpStatus.OK);
+    }
 
 }
