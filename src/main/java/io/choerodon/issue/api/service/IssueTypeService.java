@@ -46,4 +46,8 @@ public interface IssueTypeService extends BaseService<IssueType> {
      * @param organizationId organizationId
      */
     void initIssueTypeByConsumeCreateOrganization(Long organizationId);
+
+    Map<Long, IssueTypeDTO> listIssueTypeMap(Long organizationId);
+
+    Map<Long, Map<String, Long>> initIssueTypeData(Long organizationId, List<Long> orgIds);
 }

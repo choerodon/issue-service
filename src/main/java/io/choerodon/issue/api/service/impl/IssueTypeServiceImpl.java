@@ -194,4 +194,30 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         }
         return issueTypeMapper.selectByPrimaryKey(issueType);
     }
+
+    @Override
+    public Map<Long, IssueTypeDTO> listIssueTypeMap(Long organizationId) {
+        IssueType issueType = new IssueType();
+        issueType.setOrganizationId(organizationId);
+        List<IssueType> issueTypes = issueTypeMapper.select(issueType);
+        Map<Long, IssueTypeDTO> issueTypeDTOMap = new HashMap<>();
+        for (IssueType iType : issueTypes) {
+            issueTypeDTOMap.put(issueType.getId(), modelMapper.map(iType, new TypeToken<IssueTypeDTO>() {}.getType()));
+        }
+        return issueTypeDTOMap;
+    }
+
+    @Override
+    public Map<Long, Map<String, Long>> initIssueTypeData(Long organizationId, List<Long> orgIds) {
+        Map<Long, Map<String, Long>> result = new HashMap<>();
+        for (Long orgId : orgIds) {
+            Map<String, Long> temp = new HashMap<>();
+            for (IssueTypeE issueTypeE : IssueTypeE.values()) {
+                IssueType issueType = createIssueType(new IssueType(issueTypeE.getIcon(), issueTypeE.getName(), issueTypeE.getDescription(), orgId, issueTypeE.getColour(), issueTypeE.getTypeCode(), true));
+                temp.put(issueTypeE.getTypeCode(), issueType.getId());
+            }
+            result.put(orgId, temp);
+        }
+        return result;
+    }
 }
