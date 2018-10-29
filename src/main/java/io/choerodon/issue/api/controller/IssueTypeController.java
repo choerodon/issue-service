@@ -124,7 +124,7 @@ public class IssueTypeController extends BaseController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "迁移组织层问题类型数据")
-    @GetMapping(value = "/init_data")
+    @PostMapping(value = "/init_data")
     public ResponseEntity<Map<Long, Map<String, Long>>> initIssueTypeData(@PathVariable("organization_id") Long organizationId,
                                                                 @RequestBody List<Long> orgIds) {
         return new ResponseEntity<>(issueTypeService.initIssueTypeData(organizationId, orgIds), HttpStatus.OK);

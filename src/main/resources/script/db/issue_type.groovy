@@ -52,6 +52,7 @@ databaseChangeLog(logicalFilePath: 'issue_type.groovy') {
         }
         createIndex(indexName: 'uk_type_code', tableName: 'issue_type', unique: true) {
             column(name: 'type_code')
+            column(name: 'organization_id')
         }
     }
 }
