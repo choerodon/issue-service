@@ -202,7 +202,7 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         List<IssueType> issueTypes = issueTypeMapper.select(issueType);
         Map<Long, IssueTypeDTO> issueTypeDTOMap = new HashMap<>();
         for (IssueType iType : issueTypes) {
-            issueTypeDTOMap.put(issueType.getId(), modelMapper.map(iType, new TypeToken<IssueTypeDTO>() {}.getType()));
+            issueTypeDTOMap.put(iType.getId(), modelMapper.map(iType, new TypeToken<IssueTypeDTO>() {}.getType()));
         }
         return issueTypeDTOMap;
     }

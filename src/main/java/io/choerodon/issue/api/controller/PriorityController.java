@@ -123,6 +123,17 @@ public class PriorityController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "根据组织id查询默认优先级")
+    @GetMapping("/organizations/{organization_id}/priority/default")
+    public ResponseEntity<PriorityDTO> queryDefaultByOrganizationId(@ApiParam(value = "组织id", required = true)
+                                                                    @PathVariable("organization_id") Long organizationId) {
+        return Optional.ofNullable(priorityService.queryDefaultByOrganizationId(organizationId))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.priority.get"));
+
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据组织id查询优先级,list")
     @GetMapping("/organizations/{organization_id}/priority/list_by_org")
     public ResponseEntity<List<PriorityDTO>> queryByOrganizationIdList(@ApiParam(value = "组织id", required = true)
