@@ -23,7 +23,7 @@ public class FixStateMachineFeignClientFallback implements FixStateMachineFeignC
     }
 
     @Override
-    public ResponseEntity<Map<Long, List<Status>>> createStatus(List<StatusForMoveDataDO> statusForMoveDataDOList) {
+    public void createStatus(List<StatusForMoveDataDO> statusForMoveDataDOList) {
         throw new CommonException("error.fixStateMachineFeignClient.createStatus");
     }
 }
