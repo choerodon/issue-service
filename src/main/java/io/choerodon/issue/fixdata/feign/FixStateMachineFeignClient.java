@@ -1,5 +1,6 @@
 package io.choerodon.issue.fixdata.feign;
 
+import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
@@ -41,6 +42,6 @@ public interface FixStateMachineFeignClient {
      * @return
      */
     @RequestMapping(value = "/v1/organizations/fix_data/create_status", method = RequestMethod.POST)
-    ResponseEntity<Map<Long, List<StatusDTO>>> createStatus(@RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList);
+    ResponseEntity<Map<Long, List<Status>>> createStatus(@RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList);
 
 }

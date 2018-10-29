@@ -1,6 +1,7 @@
 package io.choerodon.issue.fixdata.feign;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
@@ -22,7 +23,7 @@ public class FixStateMachineFeignClientFallback implements FixStateMachineFeignC
     }
 
     @Override
-    public ResponseEntity<Map<Long, List<StatusDTO>>> createStatus(List<StatusForMoveDataDO> statusForMoveDataDOList) {
+    public ResponseEntity<Map<Long, List<Status>>> createStatus(List<StatusForMoveDataDO> statusForMoveDataDOList) {
         throw new CommonException("error.fixStateMachineFeignClient.createStatus");
     }
 }

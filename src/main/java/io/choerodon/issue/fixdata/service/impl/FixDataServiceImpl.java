@@ -1,6 +1,7 @@
 package io.choerodon.issue.fixdata.service.impl;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.api.service.FixDataService;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.ProjectInfoService;
@@ -38,10 +39,10 @@ public class FixDataServiceImpl implements FixDataService {
     private StateMachineSchemeMapper stateMachineSchemeMapper;
 
     @Override
-    public Map<Long, List<StatusDTO>> fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
+    public Map<Long, List<Status>> fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
 
         //创建状态
-        Map<Long, List<StatusDTO>> statusOrgMap = fixStateMachineFeignClient.createStatus(statuses).getBody();
+        Map<Long, List<Status>> statusOrgMap = fixStateMachineFeignClient.createStatus(statuses).getBody();
 
         //根据组织id分组
         Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
