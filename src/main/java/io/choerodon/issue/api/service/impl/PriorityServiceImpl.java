@@ -1,11 +1,10 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.PriorityDTO;
 import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.domain.Priority;
-import io.choerodon.issue.infra.enums.PriorityType;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -125,7 +124,8 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         List<Priority> priorities = priorityMapper.select(priority);
         Map<Long, PriorityDTO> result = new HashMap<>();
         for (Priority pri : priorities) {
-            PriorityDTO priorityDTO = modelMapper.map(pri, new TypeToken<PriorityDTO>(){}.getType());
+            PriorityDTO priorityDTO = modelMapper.map(pri, new TypeToken<PriorityDTO>() {
+            }.getType());
             result.put(priorityDTO.getId(), priorityDTO);
         }
         return result;
@@ -140,7 +140,8 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         if (result == null) {
             throw new CommonException("error.priority.get");
         }
-        return modelMapper.map(result, new TypeToken<PriorityDTO>(){}.getType());
+        return modelMapper.map(result, new TypeToken<PriorityDTO>() {
+        }.getType());
     }
 
     @Override
@@ -149,7 +150,8 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priority.setOrganizationId(organizationId);
         List<Priority> priorities = priorityMapper.select(priority);
         Collections.sort(priorities, Comparator.comparing(Priority::getSequence));
-        return modelMapper.map(priorities, new TypeToken<List<PriorityDTO>>(){}.getType());
+        return modelMapper.map(priorities, new TypeToken<List<PriorityDTO>>() {
+        }.getType());
     }
 
 
@@ -159,7 +161,8 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         if (result == null) {
             throw new CommonException("error.priority.get");
         }
-        return modelMapper.map(result, new TypeToken<PriorityDTO>(){}.getType());
+        return modelMapper.map(result, new TypeToken<PriorityDTO>() {
+        }.getType());
     }
 
     private Priority savePrority(Long organizationId, String name, BigDecimal sequence, String colour, Boolean isDefault) {
@@ -170,9 +173,16 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priority.setColour(colour);
         priority.setDescription(name);
         priority.setDefault(isDefault);
-        if (priorityMapper.insert(priority) != 1) {
-            throw new CommonException("error.prority.insert");
+        //保证幂等性
+        List<Priority> list = priorityMapper.select(priority);
+        if (list.isEmpty()) {
+            if (priorityMapper.insert(priority) != 1) {
+                throw new CommonException("error.prority.insert");
+            }
+        } else {
+            priority = list.get(0);
         }
+
         return priority;
     }
 

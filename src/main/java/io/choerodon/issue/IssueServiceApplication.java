@@ -13,7 +13,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 @SpringBootApplication
 @EnableFeignClients("io.choerodon")
 @EnableEurekaClient
-@EnableChoerodonResourceServer
+//@EnableChoerodonResourceServer
 public class IssueServiceApplication {
 
     public static void main(String[] args){

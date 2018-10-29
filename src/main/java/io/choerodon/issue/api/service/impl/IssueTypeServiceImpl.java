@@ -185,6 +185,12 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
 
     private IssueType createIssueType(IssueType issueType) {
+        //保证幂等性
+        List<IssueType> issueTypes = issueTypeMapper.select(issueType);
+        if (!issueTypes.isEmpty()) {
+            return issueTypes.get(0);
+        }
+
         if (issueTypeMapper.insert(issueType) != 1) {
             throw new CommonException("error.issueType.create");
         }
