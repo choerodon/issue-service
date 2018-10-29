@@ -132,6 +132,18 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     }
 
     @Override
+    public PriorityDTO queryDefaultByOrganizationId(Long organizationId) {
+        Priority priority = new Priority();
+        priority.setOrganizationId(organizationId);
+        priority.setDefault(true);
+        Priority result = priorityMapper.selectOne(priority);
+        if (result == null) {
+            throw new CommonException("error.priority.get");
+        }
+        return modelMapper.map(result, new TypeToken<PriorityDTO>(){}.getType());
+    }
+
+    @Override
     public List<PriorityDTO> queryByOrganizationIdList(Long organizationId) {
         Priority priority = new Priority();
         priority.setOrganizationId(organizationId);

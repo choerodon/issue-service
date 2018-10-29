@@ -8,25 +8,25 @@ public enum IssueTypeE {
     /**
      * 史诗
      */
-    EPIC("icon", "史诗", "史诗", "colour", "epic"),
+    EPIC("priority", "史诗", "史诗", "#743be7", "epic"),
     /**
      * 故事
      */
-    STORY("icon", "故事", "故事", "colour", "story"),
+    STORY("book", "故事", "故事", "#00bfa5", "story"),
     /**
      * 缺陷
      */
-    BUG("icon", "缺陷", "缺陷", "colour", "bug"),
+    BUG("bug_report", "缺陷", "缺陷", "#f44336", "bug"),
     /**
      * 任务
      */
-    TASK("icon", "任务", "任务", "colour", "task"),
+    TASK("check", "任务", "任务", "#4d90fe", "task"),
     /**
      * 子任务
      */
-    SUB_TASK("icon", "子任务", "子任务", "colour", "sub_task"),
+    SUB_TASK("relation", "子任务", "子任务", "#4d90fe", "sub_task"),
 
-    ISSUE_TEST("icon", "测试", "测试", "colour", "issue_test");
+    ISSUE_TEST("test", "测试", "测试", "FFB103", "issue_test");
 
     private String icon;
     private String name;
