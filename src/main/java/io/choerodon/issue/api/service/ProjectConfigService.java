@@ -1,6 +1,7 @@
 package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
+import io.choerodon.issue.api.dto.IssueTypeWithStateMachineIdDTO;
 import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
 import io.choerodon.issue.domain.Field;
 import io.choerodon.issue.domain.FieldConfigLine;
@@ -64,15 +65,23 @@ public interface ProjectConfigService {
     List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId, String schemeType);
 
     /**
+     * 根据项目id找到方案返回问题类型列表，带问题类型对应的状态机id
+     *
+     * @param projectId
+     * @param schemeType
+     * @return
+     */
+    List<IssueTypeWithStateMachineIdDTO> queryIssueTypesWithStateMachineIdByProjectId(Long projectId, String schemeType);
+
+    /**
      * 根据项目id找到方案返回当前状态可以转换的列表
      *
      * @param projectId
      * @param currentStatusId
      * @param issueId
      * @param issueTypeId
-     * @param serviceCode
      * @param schemeType
      * @return
      */
-    List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String serviceCode, String schemeType);
+    List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String schemeType);
 }
