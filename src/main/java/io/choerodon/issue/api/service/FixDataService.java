@@ -2,7 +2,6 @@ package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -19,4 +18,18 @@ public interface FixDataService {
      * @return
      */
     Map<Long, List<Status>> fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList);
+
+    /**
+     * 获取所有组织的优先级
+     *
+     * @return
+     */
+    Map<Long, Map<String, Long>> queryPriorities();
+
+    /**
+     * 获取所有组织的问题类型
+     *
+     * @return
+     */
+    Map<Long, Map<String, Long>> queryIssueTypes();
 }

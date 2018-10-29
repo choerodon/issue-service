@@ -1,11 +1,10 @@
 package io.choerodon.issue.api.service.impl;
 
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.service.IssueTypeSchemeService;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.domain.IssueType;
-import io.choerodon.issue.domain.IssueTypeScheme;
-import io.choerodon.issue.domain.IssueTypeSchemeConfig;
 import io.choerodon.issue.infra.enums.IssueTypeE;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
@@ -14,8 +13,6 @@ import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
@@ -27,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,6 +185,12 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
 
     private IssueType createIssueType(IssueType issueType) {
+        //保证幂等性
+        List<IssueType> issueTypes = issueTypeMapper.select(issueType);
+        if (!issueTypes.isEmpty()) {
+            return issueTypes.get(0);
+        }
+
         if (issueTypeMapper.insert(issueType) != 1) {
             throw new CommonException("error.issueType.create");
         }
@@ -202,7 +204,8 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         List<IssueType> issueTypes = issueTypeMapper.select(issueType);
         Map<Long, IssueTypeDTO> issueTypeDTOMap = new HashMap<>();
         for (IssueType iType : issueTypes) {
-            issueTypeDTOMap.put(iType.getId(), modelMapper.map(iType, new TypeToken<IssueTypeDTO>() {}.getType()));
+            issueTypeDTOMap.put(iType.getId(), modelMapper.map(iType, new TypeToken<IssueTypeDTO>() {
+            }.getType()));
         }
         return issueTypeDTOMap;
     }

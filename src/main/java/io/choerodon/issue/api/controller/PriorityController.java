@@ -157,14 +157,5 @@ public class PriorityController {
 
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "根据组织id初始化优先级,勿调用")
-    @PostMapping("/init_prority")
-    public ResponseEntity<Map<Long, Map<String, Long>>> initProrityByOrganization(@ApiParam(value = "组织ids", required = true)
-                                                                                  @RequestBody List<Long> organizationIds) {
-        return Optional.ofNullable(priorityService.initProrityByOrganization(organizationIds))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.CREATED))
-                .orElseThrow(() -> new CommonException("error.priority.init"));
 
-    }
 }
