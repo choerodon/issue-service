@@ -59,7 +59,6 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private FieldConfigMapper fieldConfigMapper;
     @Autowired
     private FieldConfigSchemeMapper fieldConfigSchemeMapper;
-
     @Autowired
     private PageIssueSchemeLineService pageIssueSchemeLineService;
     @Autowired
@@ -93,6 +92,11 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     public ProjectConfig create(Long projectId, Long stateMachineSchemeId, Long issueTypeSchemeId) {
         ProjectConfig projectConfig = new ProjectConfig();
         projectConfig.setProjectId(projectId);
+        //保证幂等性
+        List<ProjectConfig> configs = projectConfigMapper.select(projectConfig);
+        if (!configs.isEmpty()) {
+            return configs.get(0);
+        }
         projectConfig.setStateMachineSchemeId(stateMachineSchemeId);
         projectConfig.setIssueTypeSchemeId(issueTypeSchemeId);
         int result = projectConfigMapper.insert(projectConfig);

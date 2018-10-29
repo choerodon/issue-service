@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 import static io.choerodon.issue.infra.utils.SagaTopic.Organization.*;
 import static io.choerodon.issue.infra.utils.SagaTopic.Project.PROJECT_CREATE;
 import static io.choerodon.issue.infra.utils.SagaTopic.Project.TASK_PROJECT_UPDATE;
@@ -34,6 +36,8 @@ public class IssueEventHandler {
     private IssueTypeSchemeService issueTypeSchemeService;
     @Autowired
     private ProjectConfigService projectConfigService;
+    @Autowired
+    private PriorityService priorityService;
 
 
     private void loggerInfo(Object o) {
@@ -58,7 +62,7 @@ public class IssueEventHandler {
         //创建项目时创建初始化状态机方案
         StateMachineScheme stateMachineScheme = stateMachineSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
         //创建默认问题类型方案
-        IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectEvent, stateMachineScheme.getId());
+        IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
 
         //创建项目信息及配置默认方案
         projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
@@ -76,8 +80,10 @@ public class IssueEventHandler {
     public String handleOrgaizationCreateByConsumeSagaTask(String data) {
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
         Long orgId = organizationEventPayload.getId();
-        //组织层初始化五种问题类型及其关联方案
+        //创建组织初始化五种问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
+        //创建组织初始化优先级
+        priorityService.initProrityByOrganization(Arrays.asList(orgId));
         return data;
     }
 
@@ -88,8 +94,10 @@ public class IssueEventHandler {
     public String handleOrgaizationRegisterByConsumeSagaTask(String data) {
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
         Long orgId = organizationEventPayload.getId();
-        //组织层初始化五种问题类型及其关联方案
+        //注册组织初始化五种问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
+        //注册组织初始化优先级
+        priorityService.initProrityByOrganization(Arrays.asList(orgId));
         return data;
     }
 

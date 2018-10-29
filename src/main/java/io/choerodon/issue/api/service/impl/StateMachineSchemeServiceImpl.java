@@ -54,7 +54,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public void setFeign(StateMachineFeignClient stateMachineServiceFeign){
+    public void setFeign(StateMachineFeignClient stateMachineServiceFeign) {
         this.stateMachineServiceFeign = stateMachineServiceFeign;
     }
 
@@ -232,6 +232,11 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         scheme.setDescription(projectCode + "默认状态机方案");
         scheme.setDefaultStateMachineId(stateMachineId);
         scheme.setOrganizationId(organizationId);
+        //保证幂等性
+        List<StateMachineScheme> stateMachines = schemeMapper.select(scheme);
+        if (!stateMachines.isEmpty()) {
+            return stateMachines.get(0);
+        }
         int isInsert = schemeMapper.insert(scheme);
         if (isInsert != 1) {
             throw new CommonException("error.stateMachineScheme.create");

@@ -101,8 +101,9 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
     /**
      * 创建项目初始化问题类型方案
      *
-     * @param projectEvent   projectEvent
-     * @param stateMachineId stateMachineId
+     * @param projectId
+     * @param projectCode
+     * @return
      */
-    IssueTypeScheme initByConsumeCreateProject(ProjectEvent projectEvent, Long stateMachineId);
+    IssueTypeScheme initByConsumeCreateProject(Long projectId, String projectCode);
 }

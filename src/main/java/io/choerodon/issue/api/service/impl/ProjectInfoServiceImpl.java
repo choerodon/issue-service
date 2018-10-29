@@ -25,9 +25,12 @@ public class ProjectInfoServiceImpl implements ProjectInfoService {
     @Override
     public void createProject(Long projectId, String projectCode) {
         ProjectInfo info = new ProjectInfo();
-        info.setIssueMaxNum(0L);
         info.setProjectCode(projectCode);
         info.setProjectId(projectId);
-        projectInfoMapper.insert(info);
+        //保证幂等性
+        if (projectInfoMapper.select(info).isEmpty()) {
+            info.setIssueMaxNum(0L);
+            projectInfoMapper.insert(info);
+        }
     }
 }

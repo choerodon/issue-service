@@ -2,9 +2,8 @@ package io.choerodon.issue.fixdata.service.impl;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.Status;
-import io.choerodon.issue.api.service.FixDataService;
-import io.choerodon.issue.api.service.ProjectConfigService;
-import io.choerodon.issue.api.service.ProjectInfoService;
+import io.choerodon.issue.api.service.*;
+import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.fixdata.feign.FixStateMachineFeignClient;
@@ -36,6 +35,10 @@ public class FixDataServiceImpl implements FixDataService {
     @Autowired
     private FixStateMachineFeignClient fixStateMachineFeignClient;
     @Autowired
+    private IssueTypeService issueTypeService;
+    @Autowired
+    private IssueTypeSchemeService issueTypeSchemeService;
+    @Autowired
     private ProjectUtil projectUtil;
     @Autowired
     private StateMachineSchemeMapper stateMachineSchemeMapper;
@@ -52,6 +55,9 @@ public class FixDataServiceImpl implements FixDataService {
         for (Map.Entry<Long, List<StatusForMoveDataDO>> statusDOs : orgStatusMap.entrySet()) {
             Long organizationId = statusDOs.getKey();
             logger.info("开始修复组织{}", organizationId);
+            //创建问题类型
+            issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
+
             //根据项目id分组
             Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
             for (Map.Entry<Long, List<StatusForMoveDataDO>> listEntry : proStatusMap.entrySet()) {
@@ -62,25 +68,28 @@ public class FixDataServiceImpl implements FixDataService {
                 //创建状态机
                 Long stateMachineId = fixStateMachineFeignClient.createStateMachine(organizationId, projectCode, statusNames).getBody();
                 //创建状态机方案
-                StateMachineScheme scheme = new StateMachineScheme();
-                scheme.setType(SchemeType.AGILE);
-                scheme.setName(projectCode + "默认状态机方案");
-                scheme.setDescription(projectCode + "默认状态机方案");
-                scheme.setDefaultStateMachineId(stateMachineId);
-                scheme.setOrganizationId(organizationId);
+                StateMachineScheme stateMachineScheme = new StateMachineScheme();
+                stateMachineScheme.setType(SchemeType.AGILE);
+                stateMachineScheme.setName(projectCode + "默认状态机方案");
+                stateMachineScheme.setDescription(projectCode + "默认状态机方案");
+                stateMachineScheme.setDefaultStateMachineId(stateMachineId);
+                stateMachineScheme.setOrganizationId(organizationId);
                 //保证幂等性
-                List<StateMachineScheme> stateMachines = stateMachineSchemeMapper.select(scheme);
-                if (!stateMachines.isEmpty()) {
-                    continue;
+                List<StateMachineScheme> schemes = stateMachineSchemeMapper.select(stateMachineScheme);
+                if (!schemes.isEmpty()) {
+                    stateMachineScheme = schemes.get(0);
                 }
-                int isInsert = stateMachineSchemeMapper.insert(scheme);
+                int isInsert = stateMachineSchemeMapper.insert(stateMachineScheme);
                 if (isInsert != 1) {
                     throw new CommonException("error.stateMachineScheme.create");
                 }
-//                //创建项目信息及配置默认方案
-//                projectInfoService.createProject(projectId, projectCode);
-//                //关联默认方案
-//                projectConfigService.create(projectId, scheme.getId(), null);
+                //创建问题类型方案
+                IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectId, projectCode);
+                //创建项目信息及配置默认方案
+                projectInfoService.createProject(projectId, projectCode);
+                //关联默认方案
+                projectConfigService.create(projectId, stateMachineScheme.getId(), issueTypeScheme.getId());
+                logger.info("完成修复项目{}", projectId);
             }
             logger.info("完成修复组织{}", organizationId);
         }
