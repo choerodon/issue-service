@@ -6,7 +6,7 @@ package io.choerodon.issue.infra.feign.dto;
  */
 public class ExecuteResult {
     Boolean isSuccess;
-    Long resultStateId;
+    Long resultStatusId;
     String errorMessage;
 
     public Boolean getSuccess() {
@@ -17,12 +17,12 @@ public class ExecuteResult {
         isSuccess = success;
     }
 
-    public Long getResultStateId() {
-        return resultStateId;
+    public Long getResultStatusId() {
+        return resultStatusId;
     }
 
-    public void setResultStateId(Long resultStateId) {
-        this.resultStateId = resultStateId;
+    public void setResultStatusId(Long resultStatusId) {
+        this.resultStatusId = resultStatusId;
     }
 
     public String getErrorMessage() {

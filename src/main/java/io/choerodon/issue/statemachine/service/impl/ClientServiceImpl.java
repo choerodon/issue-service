@@ -156,6 +156,7 @@ public class ClientServiceImpl implements ClientService {
             executeResult.setErrorMessage("状态更新失败");
         }
         executeResult.setSuccess(isSuccess);
+        executeResult.setResultStatusId(targetStatusId);
         return executeResult;
     }
 

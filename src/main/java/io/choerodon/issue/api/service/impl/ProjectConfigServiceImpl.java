@@ -4,10 +4,7 @@ package io.choerodon.issue.api.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.service.*;
-import io.choerodon.issue.domain.Field;
-import io.choerodon.issue.domain.FieldConfigLine;
-import io.choerodon.issue.domain.IssueType;
-import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.domain.*;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
@@ -37,6 +34,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectConfigServiceImpl.class);
     private static final String YES = "1";
+    private static final String AGILE_SERVICE = "agile-service";
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
@@ -171,7 +169,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
         //敏捷信息
-        if(schemeType.equals(SchemeType.AGILE)){
+        if (schemeType.equals(SchemeType.AGILE)) {
             //获取问题类型方案
             if (projectConfig.getIssueTypeSchemeId() != null) {
                 //根据方案配置表获取 问题类型
@@ -186,17 +184,50 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String serviceCode, String schemeType) {
+    public List<IssueTypeWithStateMachineIdDTO> queryIssueTypesWithStateMachineIdByProjectId(Long projectId, String schemeType) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
         //敏捷信息
-        if(schemeType.equals(SchemeType.AGILE)){
+        if (schemeType.equals(SchemeType.AGILE)) {
+            Long issueTypeSchemeId = projectConfig.getIssueTypeSchemeId();
+            Long stateMachineSchemeId = projectConfig.getStateMachineSchemeId();
+
+            if (issueTypeSchemeId == null) {
+                throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            }
+            if (stateMachineSchemeId == null) {
+                throw new CommonException("error.queryIssueTypesByProjectId.getStateMachineSchemeId.null");
+            }
+            //根据方案配置表获取 问题类型
+            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
+            //根据方案配置表获取 状态机与问题类型的对应关系
+            StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+            config.setSchemeId(stateMachineSchemeId);
+            List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(config);
+            Map<Long, Long> map = configs.stream().collect(Collectors.toMap(StateMachineSchemeConfig::getIssueTypeId, StateMachineSchemeConfig::getStateMachineId));
+
+            List<IssueTypeWithStateMachineIdDTO> issueTypeWithStateMachineIds = modelMapper.map(issueTypes, new TypeToken<List<IssueTypeWithStateMachineIdDTO>>() {
+            }.getType());
+            issueTypeWithStateMachineIds.forEach(x -> {
+                x.setStateMachineId(map.get(x.getId()));
+            });
+            return issueTypeWithStateMachineIds;
+        }
+        return null;
+    }
+
+    @Override
+    public List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String schemeType) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        //敏捷信息
+        if (schemeType.equals(SchemeType.AGILE)) {
             //获取状态机方案
             if (projectConfig.getStateMachineSchemeId() != null) {
                 //获取状态机
                 Long stateMachineId = stateMachineService.queryBySchemeIdAndIssueTypeId(projectConfig.getStateMachineSchemeId(), issueTypeId);
                 //获取当前状态拥有的转换
-                List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, serviceCode, stateMachineId, issueId, currentStatusId).getBody();
+                List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, AGILE_SERVICE, stateMachineId, issueId, currentStatusId).getBody();
                 //获取组织中所有状态
                 List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
                 Map<Long, StatusDTO> statusMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
