@@ -38,7 +38,7 @@ public class SchemeController extends BaseController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询项目的问题类型列表，带对应的状态机id")
-    @GetMapping(value = "/query_issue_types")
+    @GetMapping(value = "/query_issue_types_with_sm_id")
     public ResponseEntity<List<IssueTypeWithStateMachineIdDTO>> queryIssueTypesWithStateMachineIdByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("scheme_type") String schemeType) {
         return new ResponseEntity<>(projectConfigService.queryIssueTypesWithStateMachineIdByProjectId(projectId, schemeType), HttpStatus.OK);
     }
