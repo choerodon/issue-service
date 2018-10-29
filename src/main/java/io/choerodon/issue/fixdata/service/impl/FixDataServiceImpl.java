@@ -45,34 +45,34 @@ public class FixDataServiceImpl implements FixDataService {
         Map<Long, List<Status>> statusOrgMap = fixStateMachineFeignClient.createStatus(statuses).getBody();
 
         //根据组织id分组
-        Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
-        for (Map.Entry<Long, List<StatusForMoveDataDO>> statusDOs : orgStatusMap.entrySet()) {
-            Long organizationId = statusDOs.getKey();
-            //根据项目id分组
-            Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
-            for (Map.Entry<Long, List<StatusForMoveDataDO>> listEntry : proStatusMap.entrySet()) {
-                Long projectId = listEntry.getKey();
-                String projectCode = projectUtil.getCode(projectId);
-                List<String> statusNames = listEntry.getValue().stream().map(StatusForMoveDataDO::getName).collect(Collectors.toList());
-                //创建状态机
-                Long stateMachineId = fixStateMachineFeignClient.createStateMachine(organizationId, projectCode, statusNames).getBody();
-                //创建状态机方案
-                StateMachineScheme scheme = new StateMachineScheme();
-                scheme.setType(SchemeType.AGILE);
-                scheme.setName(projectCode + "默认状态机方案");
-                scheme.setDescription(projectCode + "默认状态机方案");
-                scheme.setDefaultStateMachineId(stateMachineId);
-                scheme.setOrganizationId(organizationId);
-                int isInsert = stateMachineSchemeMapper.insert(scheme);
-                if (isInsert != 1) {
-                    throw new CommonException("error.stateMachineScheme.create");
-                }
-//                //创建项目信息及配置默认方案
-//                projectInfoService.createProject(projectId, projectCode);
-//                //关联默认方案
-//                projectConfigService.create(projectId, scheme.getId(), null);
-            }
-        }
+//        Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
+//        for (Map.Entry<Long, List<StatusForMoveDataDO>> statusDOs : orgStatusMap.entrySet()) {
+//            Long organizationId = statusDOs.getKey();
+//            //根据项目id分组
+//            Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
+//            for (Map.Entry<Long, List<StatusForMoveDataDO>> listEntry : proStatusMap.entrySet()) {
+//                Long projectId = listEntry.getKey();
+//                String projectCode = projectUtil.getCode(projectId);
+//                List<String> statusNames = listEntry.getValue().stream().map(StatusForMoveDataDO::getName).collect(Collectors.toList());
+//                //创建状态机
+//                Long stateMachineId = fixStateMachineFeignClient.createStateMachine(organizationId, projectCode, statusNames).getBody();
+//                //创建状态机方案
+//                StateMachineScheme scheme = new StateMachineScheme();
+//                scheme.setType(SchemeType.AGILE);
+//                scheme.setName(projectCode + "默认状态机方案");
+//                scheme.setDescription(projectCode + "默认状态机方案");
+//                scheme.setDefaultStateMachineId(stateMachineId);
+//                scheme.setOrganizationId(organizationId);
+//                int isInsert = stateMachineSchemeMapper.insert(scheme);
+//                if (isInsert != 1) {
+//                    throw new CommonException("error.stateMachineScheme.create");
+//                }
+////                //创建项目信息及配置默认方案
+////                projectInfoService.createProject(projectId, projectCode);
+////                //关联默认方案
+////                projectConfigService.create(projectId, scheme.getId(), null);
+//            }
+//        }
         return statusOrgMap;
     }
 }
