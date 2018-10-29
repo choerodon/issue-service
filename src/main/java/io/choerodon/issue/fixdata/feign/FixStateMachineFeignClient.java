@@ -31,7 +31,7 @@ public interface FixStateMachineFeignClient {
      * @param statuses
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/fix_data/create_state_machine", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/fix_data/create_state_machine", method = RequestMethod.POST)
     ResponseEntity<Long> createStateMachine(@RequestParam(value = "organization_id") Long organizationId,
                                                        @RequestParam(value = "project_code") String projectCode,
                                                        @RequestBody List<String> statuses);
@@ -41,7 +41,7 @@ public interface FixStateMachineFeignClient {
      * @param statusForMoveDataDOList
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/fix_data/create_status", method = RequestMethod.POST)
-    ResponseEntity<Map<Long, List<Status>>> createStatus(@RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList);
+    @RequestMapping(value = "/v1/fix_data/create_status", method = RequestMethod.POST)
+    void createStatus(@RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList);
 
 }

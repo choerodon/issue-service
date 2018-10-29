@@ -56,11 +56,11 @@ public class FixDataServiceImpl implements FixDataService {
     private PriorityMapper priorityMapper;
 
     @Override
-    public Map<Long, List<Status>> fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
+    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
 
         logger.info("开始修复状态");
         //创建状态
-        Map<Long, List<Status>> statusOrgMap = fixStateMachineFeignClient.createStatus(statuses).getBody();
+        fixStateMachineFeignClient.createStatus(statuses);
         logger.info("完成修复状态");
         //根据组织id分组
         Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
@@ -110,7 +110,7 @@ public class FixDataServiceImpl implements FixDataService {
             }
             logger.info("完成修复组织{}", organizationId);
         }
-        return statusOrgMap;
+        logger.info("修复成功");
     }
 
 
