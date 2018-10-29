@@ -1,5 +1,6 @@
 package io.choerodon.issue.api.service;
 
+import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 
@@ -17,5 +18,5 @@ public interface FixDataService {
      * @param statusForMoveDataDOList
      * @return
      */
-    Map<Long, List<StatusDTO>> fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList);
+    Map<Long, List<Status>> fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList);
 }
