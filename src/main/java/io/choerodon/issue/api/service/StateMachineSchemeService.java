@@ -2,6 +2,7 @@ package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.core.domain.Page;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
@@ -92,14 +93,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      */
     List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId);
 
-    /**
-     * 创建项目时创建初始化状态机方案
-     *
-     * @param projectId
-     * @param projectCode
-     * @return
-     */
-    StateMachineScheme initByConsumeCreateProject(Long projectId, String projectCode);
+    StateMachineScheme initByConsumeCreateProject(ProjectEvent projectEvent);
 
     /**
      * 单元测试mock feign用
