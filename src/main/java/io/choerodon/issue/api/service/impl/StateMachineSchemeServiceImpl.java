@@ -6,6 +6,7 @@ import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
@@ -220,11 +221,12 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public StateMachineScheme initByConsumeCreateProject(Long projectId, String projectCode) {
-
+    public StateMachineScheme initByConsumeCreateProject(ProjectEvent projectEvent) {
+        Long projectId = projectEvent.getProjectId();
+        String projectCode = projectEvent.getProjectCode();
         //创建敏捷状态机方案
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectCode).getBody();
+        Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
         scheme.setType(SchemeType.AGILE);

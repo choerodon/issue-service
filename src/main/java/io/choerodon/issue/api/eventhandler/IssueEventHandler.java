@@ -60,7 +60,7 @@ public class IssueEventHandler {
         loggerInfo(projectEvent);
 
         //创建项目时创建初始化状态机方案
-        StateMachineScheme stateMachineScheme = stateMachineSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        StateMachineScheme stateMachineScheme = stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
         //创建默认问题类型方案
         IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
 

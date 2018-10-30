@@ -2,6 +2,7 @@ package io.choerodon.issue.infra.feign.fallback;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
@@ -44,7 +45,7 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     }
 
     @Override
-    public ResponseEntity<Long> createStateMachineWithCreateProject(Long organizationId, String projectCode) {
+    public ResponseEntity<Long> createStateMachineWithCreateProject(Long organizationId, ProjectEvent projectEvent) {
         throw new CommonException("error.stateMachineFeignClient.createStateMachineWithCreateProject");
     }
 

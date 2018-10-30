@@ -1,6 +1,7 @@
 package io.choerodon.issue.infra.feign;
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
@@ -8,10 +9,7 @@ import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -88,9 +86,9 @@ public interface StateMachineFeignClient {
      * @param organizationId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project", method = RequestMethod.POST)
     ResponseEntity<Long> createStateMachineWithCreateProject(@PathVariable("organization_id") Long organizationId,
-                                                             @RequestParam(value = "project_code") String projectCode);
+                                                             @RequestBody ProjectEvent projectEvent);
 
     /**
      * 显示事件单的转换
