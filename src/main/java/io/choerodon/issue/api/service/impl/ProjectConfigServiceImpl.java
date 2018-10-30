@@ -217,9 +217,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             }.getType());
             issueTypeWithStateMachineIds.forEach(x -> {
                 Long stateMachineId = map.get(x.getId());
-                if(stateMachineId!=null){
+                if (stateMachineId != null) {
                     x.setStateMachineId(stateMachineId);
-                }else{
+                } else {
                     x.setStateMachineId(stateMachineScheme.getDefaultStateMachineId());
                 }
             });
@@ -250,6 +250,34 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
                 return transformDTOS;
             } else {
                 throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Long queryStateMachineId(Long projectId, String schemeType, Long issueTypeId) {
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        //敏捷信息
+        if (schemeType.equals(SchemeType.AGILE)) {
+            Long issueTypeSchemeId = projectConfig.getIssueTypeSchemeId();
+            Long stateMachineSchemeId = projectConfig.getStateMachineSchemeId();
+
+            if (issueTypeSchemeId == null) {
+                throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            }
+            if (stateMachineSchemeId == null) {
+                throw new CommonException("error.queryIssueTypesByProjectId.getStateMachineSchemeId.null");
+            }
+            StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+            config.setSchemeId(stateMachineSchemeId);
+            config.setIssueTypeId(issueTypeId);
+            List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(config);
+            if (!configs.isEmpty()) {
+                return configs.get(0).getStateMachineId();
+            } else {
+                StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
+                return stateMachineScheme.getDefaultStateMachineId();
             }
         }
         return null;

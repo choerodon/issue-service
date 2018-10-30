@@ -54,4 +54,12 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, schemeType), HttpStatus.OK);
     }
 
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "查询项目的问题类型对应的状态机id")
+    @GetMapping(value = "/query_state_machine_id")
+    public ResponseEntity<Long> queryStateMachineId(@PathVariable("project_id") Long projectId,
+                                                    @RequestParam("scheme_type") String schemeType,
+                                                    @RequestParam("issue_type_id") Long issueTypeId) {
+        return new ResponseEntity<>(projectConfigService.queryStateMachineId(projectId, schemeType, issueTypeId), HttpStatus.OK);
+    }
 }
