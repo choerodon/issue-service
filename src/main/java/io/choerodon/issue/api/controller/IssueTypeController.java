@@ -1,12 +1,12 @@
 package io.choerodon.issue.api.controller;
 
-import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.service.IssueTypeService;
-import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.core.base.BaseController;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.issue.api.dto.IssueTypeDTO;
+import io.choerodon.issue.api.service.IssueTypeService;
+import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -126,7 +126,7 @@ public class IssueTypeController extends BaseController {
     @ApiOperation(value = "迁移组织层问题类型数据")
     @PostMapping(value = "/init_data")
     public ResponseEntity<Map<Long, Map<String, Long>>> initIssueTypeData(@PathVariable("organization_id") Long organizationId,
-                                                                @RequestBody List<Long> orgIds) {
+                                                                          @RequestBody List<Long> orgIds) {
         return new ResponseEntity<>(issueTypeService.initIssueTypeData(organizationId, orgIds), HttpStatus.OK);
     }
 

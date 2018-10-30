@@ -85,6 +85,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private StateMachineFeignClient stateMachineFeignClient;
     @Autowired
     private ProjectUtil projectUtil;
+    @Autowired
+    private StateMachineSchemeMapper stateMachineSchemeMapper;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -205,6 +207,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             //根据方案配置表获取 问题类型
             List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
             //根据方案配置表获取 状态机与问题类型的对应关系
+            StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
             StateMachineSchemeConfig config = new StateMachineSchemeConfig();
             config.setSchemeId(stateMachineSchemeId);
             List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(config);
@@ -213,7 +216,12 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             List<IssueTypeWithStateMachineIdDTO> issueTypeWithStateMachineIds = modelMapper.map(issueTypes, new TypeToken<List<IssueTypeWithStateMachineIdDTO>>() {
             }.getType());
             issueTypeWithStateMachineIds.forEach(x -> {
-                x.setStateMachineId(map.get(x.getId()));
+                Long stateMachineId = map.get(x.getId());
+                if(stateMachineId!=null){
+                    x.setStateMachineId(stateMachineId);
+                }else{
+                    x.setStateMachineId(stateMachineScheme.getDefaultStateMachineId());
+                }
             });
             return issueTypeWithStateMachineIds;
         }
