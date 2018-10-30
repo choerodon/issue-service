@@ -84,4 +84,14 @@ public interface ProjectConfigService {
      * @return
      */
     List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String schemeType);
+
+    /**
+     * 根据项目id找到方案返回问题类型对应的状态机
+     *
+     * @param projectId
+     * @param schemeType
+     * @param issueTypeId
+     * @return
+     */
+    Long queryStateMachineId(Long projectId, String schemeType, Long issueTypeId);
 }
