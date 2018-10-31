@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -298,7 +299,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //校验状态机方案是否只有一个状态机
         StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
         StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
-        schemeConfig.setStateMachineId(stateMachineSchemeId);
+        schemeConfig.setSchemeId(stateMachineSchemeId);
         if (!stateMachineSchemeConfigMapper.select(schemeConfig).isEmpty()) {
             throw new CommonException("error.createStatusForAgile.multiScheme");
         }
@@ -307,5 +308,24 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
         statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
         return statusDTO;
+    }
+
+    @Override
+    public List<Long> queryProjectIds(Long organizationId, Long stateMachineId) {
+        //查询出默认状态机的状态机方案
+        StateMachineScheme stateMachineScheme = new StateMachineScheme();
+        stateMachineScheme.setDefaultStateMachineId(stateMachineId);
+        stateMachineScheme.setOrganizationId(organizationId);
+        List<Long> schemeIds = stateMachineSchemeMapper.select(stateMachineScheme).stream().map(StateMachineScheme::getId).collect(Collectors.toList());
+
+        //查询状态机方案中的配置
+        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
+        schemeConfig.setStateMachineId(stateMachineId);
+        schemeIds.addAll(stateMachineSchemeConfigMapper.select(schemeConfig).stream().map(StateMachineSchemeConfig::getSchemeId).collect(Collectors.toList()));
+
+        if (!schemeIds.isEmpty()) {
+            return projectConfigMapper.queryProjectIdsBySchemeIds(schemeIds);
+        }
+        return Collections.emptyList();
     }
 }

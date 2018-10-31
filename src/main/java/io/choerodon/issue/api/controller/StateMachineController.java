@@ -1,7 +1,9 @@
 package io.choerodon.issue.api.controller;
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
@@ -11,10 +13,12 @@ import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/v1/organizations/{organization_id}/state_machine")
@@ -22,6 +26,8 @@ public class StateMachineController {
 
     @Autowired
     private StateMachineService stateMachineService;
+    @Autowired
+    private ProjectConfigService projectConfigService;
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "分页查询状态机列表")
@@ -69,5 +75,16 @@ public class StateMachineController {
     public Issue createIssue(@PathVariable("organization_id") Long organizationId,
                              @RequestParam(value = "state_machine_id") Long stateMachineId) {
         return stateMachineService.createIssue(organizationId, stateMachineId);
+    }
+
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "查询状态机关联的项目id列表")
+    @GetMapping(value = "/query_project_ids")
+    public ResponseEntity<List<Long>> queryProjectIds(@PathVariable("organization_id") Long organizationId,
+                                                      @RequestParam("state_machine_id") Long stateMachineId) {
+        return Optional.ofNullable(projectConfigService.queryProjectIds(organizationId, stateMachineId))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.queryProjectIds.get"));
     }
 }
