@@ -53,4 +53,9 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     public ResponseEntity<List<TransformDTO>> transformList(Long organizationId, String serviceCode, Long stateMachineId, Long instanceId, Long currentStatusId) {
         throw new CommonException("error.stateMachineFeignClient.transformList");
     }
+
+    @Override
+    public ResponseEntity<StatusDTO> createStatusForAgile(Long organizationId, Long stateMachineId, StatusDTO statusDTO) {
+        throw new CommonException("error.stateMachineFeignClient.createStatusForAgile");
+    }
 }

@@ -1,10 +1,12 @@
 package io.choerodon.issue.api.controller;
 
 import io.choerodon.core.base.BaseController;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithStateMachineIdDTO;
 import io.choerodon.issue.api.service.ProjectConfigService;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 根据项目id获取对应数据
@@ -61,5 +64,15 @@ public class SchemeController extends BaseController {
                                                     @RequestParam("scheme_type") String schemeType,
                                                     @RequestParam("issue_type_id") Long issueTypeId) {
         return new ResponseEntity<>(projectConfigService.queryStateMachineId(projectId, schemeType, issueTypeId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "【敏捷】新增状态")
+    @PostMapping(value = "/create_status_for_agile")
+    public ResponseEntity<StatusDTO> createStatusForAgile(@PathVariable("project_id") Long projectId,
+                                                          @RequestBody StatusDTO statusDTO) {
+        return Optional.ofNullable(projectConfigService.createStatusForAgile(projectId, statusDTO))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.status.get"));
     }
 }

@@ -264,10 +264,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             Long stateMachineSchemeId = projectConfig.getStateMachineSchemeId();
 
             if (issueTypeSchemeId == null) {
-                throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+                throw new CommonException("error.queryStateMachineId.issueTypeSchemeId.null");
             }
             if (stateMachineSchemeId == null) {
-                throw new CommonException("error.queryIssueTypesByProjectId.getStateMachineSchemeId.null");
+                throw new CommonException("error.queryStateMachineId.getStateMachineSchemeId.null");
             }
             StateMachineSchemeConfig config = new StateMachineSchemeConfig();
             config.setSchemeId(stateMachineSchemeId);
@@ -281,5 +281,31 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             }
         }
         return null;
+    }
+
+    @Override
+    public StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        statusDTO.setOrganizationId(organizationId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        Long stateMachineSchemeId = projectConfig.getStateMachineSchemeId();
+        //校验状态机方案是否只关联一个项目
+        ProjectConfig select = new ProjectConfig();
+        select.setStateMachineSchemeId(stateMachineSchemeId);
+        if (projectConfigMapper.select(select).size() > 1) {
+            throw new CommonException("error.createStatusForAgile.multiScheme");
+        }
+        //校验状态机方案是否只有一个状态机
+        StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
+        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
+        schemeConfig.setStateMachineId(stateMachineSchemeId);
+        if (!stateMachineSchemeConfigMapper.select(schemeConfig).isEmpty()) {
+            throw new CommonException("error.createStatusForAgile.multiScheme");
+        }
+
+        Long stateMachineId = stateMachineScheme.getDefaultStateMachineId();
+
+        statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
+        return statusDTO;
     }
 }
