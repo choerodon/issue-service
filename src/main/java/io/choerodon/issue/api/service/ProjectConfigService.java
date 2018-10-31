@@ -6,6 +6,7 @@ import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
 import io.choerodon.issue.domain.Field;
 import io.choerodon.issue.domain.FieldConfigLine;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 
 import java.util.List;
@@ -94,4 +95,12 @@ public interface ProjectConfigService {
      * @return
      */
     Long queryStateMachineId(Long projectId, String schemeType, Long issueTypeId);
+
+    /**
+     * 敏捷添加状态
+     * @param projectId
+     * @param statusDTO
+     * @return
+     */
+    StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO);
 }

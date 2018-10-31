@@ -2,8 +2,8 @@ package io.choerodon.issue.infra.feign;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -106,4 +106,17 @@ public interface StateMachineFeignClient {
                                                      @RequestParam("state_machine_id") Long stateMachineId,
                                                      @RequestParam("instance_id") Long instanceId,
                                                      @RequestParam("current_status_id") Long currentStatusId);
+
+    /**
+     * 敏捷新增状态
+     *
+     * @param organizationId
+     * @param stateMachineId
+     * @param statusDTO
+     * @return
+     */
+    @PostMapping(value = "/v1/organizations/{organization_id}/status/create_status_for_agile")
+    ResponseEntity<StatusDTO> createStatusForAgile(@PathVariable("organization_id") Long organizationId,
+                                                   @RequestParam("state_machine_id") Long stateMachineId,
+                                                   @RequestBody StatusDTO statusDTO);
 }
