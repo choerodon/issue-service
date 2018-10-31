@@ -82,7 +82,7 @@ public class StateMachineController {
     @ApiOperation(value = "查询状态机关联的项目id列表")
     @GetMapping(value = "/query_project_ids")
     public ResponseEntity<List<Long>> queryProjectIds(@PathVariable("organization_id") Long organizationId,
-                                                      @RequestParam Long stateMachineId) {
+                                                      @RequestParam("state_machine_id") Long stateMachineId) {
         return Optional.ofNullable(projectConfigService.queryProjectIds(organizationId, stateMachineId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.queryProjectIds.get"));
