@@ -8,7 +8,7 @@ public enum IssueTypeE {
     /**
      * 史诗
      */
-    EPIC("priority", "史诗", "史诗", "#743be7", "epic", SchemeType.AGILE),
+    EPIC("priority", "史诗", "史诗", "#743be7", "issue_epic", SchemeType.AGILE),
     /**
      * 故事
      */
