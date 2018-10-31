@@ -207,6 +207,8 @@ public class StateMachineServiceImpl implements StateMachineService {
         IssueRecord issueRecord = new IssueRecord();
         issueRecord.setIssueId(instanceId);
         issueRecordMapper.insert(issueRecord);
+
+        throw new CommonException("xa");
     }
 
     @UpdateStatus

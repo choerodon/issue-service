@@ -98,9 +98,19 @@ public interface ProjectConfigService {
 
     /**
      * 敏捷添加状态
+     *
      * @param projectId
      * @param statusDTO
      * @return
      */
     StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO);
+
+    /**
+     * 查询状态机关联的项目id列表
+     *
+     * @param organizationId
+     * @param stateMachineId
+     * @return
+     */
+    List<Long> queryProjectIds(Long organizationId, Long stateMachineId);
 }
