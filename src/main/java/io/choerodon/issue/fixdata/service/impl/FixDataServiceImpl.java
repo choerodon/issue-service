@@ -1,7 +1,6 @@
 package io.choerodon.issue.fixdata.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeScheme;
@@ -56,11 +55,13 @@ public class FixDataServiceImpl implements FixDataService {
     private PriorityMapper priorityMapper;
 
     @Override
-    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
+    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses, Boolean isFixStatus) {
 
         logger.info("开始修复状态");
         //创建状态
-        fixStateMachineFeignClient.createStatus(statuses);
+        if (isFixStatus) {
+            fixStateMachineFeignClient.createStatus(statuses);
+        }
         logger.info("完成修复状态");
         //根据组织id分组
         Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
@@ -96,7 +97,7 @@ public class FixDataServiceImpl implements FixDataService {
                     if (isInsert != 1) {
                         throw new CommonException("error.stateMachineScheme.create");
                     }
-                }else{
+                } else {
                     stateMachineScheme = schemes.get(0);
                 }
 
