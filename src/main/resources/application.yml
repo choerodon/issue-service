@@ -55,9 +55,6 @@ hystrix:
   stream:
     queue:
       enabled: false
-ribbon:
-  ReadTimeout: 5000
-  ConnectTimeout: 5000
 mybatis:
   mapperLocations: classpath*:/mapper/*.xml
   configuration: # 数据库下划线转驼峰配置
