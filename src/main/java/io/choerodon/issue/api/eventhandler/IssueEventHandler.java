@@ -78,13 +78,7 @@ public class IssueEventHandler {
             sagaCode = ORG_CREATE,
             seq = 3)
     public String handleOrgaizationCreateByConsumeSagaTask(String data) {
-        OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
-        Long orgId = organizationEventPayload.getId();
-        //创建组织初始化五种问题类型
-        issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
-        //创建组织初始化优先级
-        priorityService.initProrityByOrganization(Arrays.asList(orgId));
-        return data;
+        return handleOrganizationByConsumeSagaTask(data);
     }
 
     @SagaTask(code = TASK_ORG_REGISTER,
@@ -92,13 +86,16 @@ public class IssueEventHandler {
             sagaCode = ORG_REGISTER,
             seq = 3)
     public String handleOrgaizationRegisterByConsumeSagaTask(String data) {
+        return handleOrganizationByConsumeSagaTask(data);
+    }
+
+    private String handleOrganizationByConsumeSagaTask(String data) {
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
         Long orgId = organizationEventPayload.getId();
-        //注册组织初始化五种问题类型
+        //注册组织初始化六种问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));
         return data;
     }
-
 }
