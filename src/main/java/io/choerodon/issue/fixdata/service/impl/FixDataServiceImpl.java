@@ -1,7 +1,6 @@
 package io.choerodon.issue.fixdata.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeScheme;
@@ -9,7 +8,7 @@ import io.choerodon.issue.domain.Priority;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.fixdata.feign.FixStateMachineFeignClient;
-import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
@@ -84,7 +83,7 @@ public class FixDataServiceImpl implements FixDataService {
                 Long stateMachineId = fixStateMachineFeignClient.createStateMachine(organizationId, projectCode, statusNames).getBody();
                 //创建状态机方案
                 StateMachineScheme stateMachineScheme = new StateMachineScheme();
-                stateMachineScheme.setType(SchemeType.AGILE);
+                stateMachineScheme.setType(SchemeApplyType.AGILE);
                 stateMachineScheme.setName(projectCode + "默认状态机方案");
                 stateMachineScheme.setDescription(projectCode + "默认状态机方案");
                 stateMachineScheme.setDefaultStateMachineId(stateMachineId);

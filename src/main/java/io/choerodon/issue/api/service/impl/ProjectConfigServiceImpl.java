@@ -5,11 +5,13 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.*;
+import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.mapper.*;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -92,16 +94,19 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public ProjectConfig create(Long projectId, Long stateMachineSchemeId, Long issueTypeSchemeId) {
-        ProjectConfig projectConfig = new ProjectConfig();
-        projectConfig.setProjectId(projectId);
+    public ProjectConfig create(Long projectId, Long schemeId, String schemeType, String applyType) {
+        if (!EnumUtil.contain(SchemeType.class, schemeType)) {
+            throw new CommonException("error.schemeType.illegal");
+        }
+        if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
+            throw new CommonException("error.applyType.illegal");
+        }
+        ProjectConfig projectConfig = new ProjectConfig(projectId, schemeId, schemeType, applyType);
         //保证幂等性
         List<ProjectConfig> configs = projectConfigMapper.select(projectConfig);
         if (!configs.isEmpty()) {
             return configs.get(0);
         }
-        projectConfig.setStateMachineSchemeId(stateMachineSchemeId);
-        projectConfig.setIssueTypeSchemeId(issueTypeSchemeId);
         int result = projectConfigMapper.insert(projectConfig);
         if (result != 1) {
             throw new CommonException("error.projectConfig.create");
@@ -112,9 +117,15 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public ProjectConfigDetailDTO queryById(Long projectId) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
-        ProjectConfigDetailDTO projectConfigDetailDTO = modelMapper.map(projectConfig, ProjectConfigDetailDTO.class);
+        List<ProjectConfig> projectConfigs = projectConfigMapper.queryByProjectId(projectId);
+        Map<String, List<ProjectConfig>> configMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getSchemeType));
+        ProjectConfigDetailDTO projectConfigDetailDTO = new ProjectConfigDetailDTO();
         //获取问题类型方案
+        List<ProjectConfig> issueTypeSchemes = configMap.get(SchemeType.ISSUE_TYPE);
+        issueTypeSchemes
+        for (ProjectConfig projectConfig : issueTypeSchemes) {
+
+        }
         if (projectConfig.getIssueTypeSchemeId() != null) {
             IssueTypeSchemeDTO issueTypeSchemeDTO = issueTypeSchemeService.queryById(organizationId, projectConfig.getIssueTypeSchemeId());
             projectConfigDetailDTO.setIssueTypeScheme(issueTypeSchemeDTO);
@@ -176,7 +187,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
         //敏捷信息
-        if (schemeType.equals(SchemeType.AGILE)) {
+        if (schemeType.equals(SchemeApplyType.AGILE)) {
             //获取问题类型方案
             if (projectConfig.getIssueTypeSchemeId() != null) {
                 //根据方案配置表获取 问题类型
@@ -195,7 +206,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
         //敏捷信息
-        if (schemeType.equals(SchemeType.AGILE)) {
+        if (schemeType.equals(SchemeApplyType.AGILE)) {
             Long issueTypeSchemeId = projectConfig.getIssueTypeSchemeId();
             Long stateMachineSchemeId = projectConfig.getStateMachineSchemeId();
 
@@ -234,7 +245,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
         //敏捷信息
-        if (schemeType.equals(SchemeType.AGILE)) {
+        if (schemeType.equals(SchemeApplyType.AGILE)) {
             //获取状态机方案
             if (projectConfig.getStateMachineSchemeId() != null) {
                 //获取状态机
@@ -260,7 +271,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     public Long queryStateMachineId(Long projectId, String schemeType, Long issueTypeId) {
         ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
         //敏捷信息
-        if (schemeType.equals(SchemeType.AGILE)) {
+        if (schemeType.equals(SchemeApplyType.AGILE)) {
             Long issueTypeSchemeId = projectConfig.getIssueTypeSchemeId();
             Long stateMachineSchemeId = projectConfig.getStateMachineSchemeId();
 

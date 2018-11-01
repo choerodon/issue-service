@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Component
 public interface ProjectConfigMapper extends BaseMapper<ProjectConfig> {
-    ProjectConfig queryByProjectId(@Param("projectId") Long projectId);
+    List<ProjectConfig> queryByProjectId(@Param("projectId") Long projectId);
 
     List<Long> queryProjectIdsBySchemeIds(@Param("stateMachineSchemeIds") List<Long> stateMachineSchemeIds);
 }

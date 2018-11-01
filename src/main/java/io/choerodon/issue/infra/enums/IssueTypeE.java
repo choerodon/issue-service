@@ -8,27 +8,27 @@ public enum IssueTypeE {
     /**
      * 史诗
      */
-    EPIC("agile_epic", "史诗", "史诗", "#743be7", "issue_epic", SchemeType.AGILE),
+    EPIC("agile_epic", "史诗", "史诗", "#743be7", "issue_epic", SchemeApplyType.AGILE),
     /**
      * 故事
      */
-    STORY("agile_story", "故事", "故事", "#00bfa5", "story", SchemeType.AGILE),
+    STORY("agile_story", "故事", "故事", "#00bfa5", "story", SchemeApplyType.AGILE),
     /**
      * 缺陷
      */
-    BUG("agile_fault", "缺陷", "缺陷", "#f44336", "bug", SchemeType.AGILE),
+    BUG("agile_fault", "缺陷", "缺陷", "#f44336", "bug", SchemeApplyType.AGILE),
     /**
      * 任务
      */
-    TASK("agile_task", "任务", "任务", "#4d90fe", "task", SchemeType.AGILE),
+    TASK("agile_task", "任务", "任务", "#4d90fe", "task", SchemeApplyType.AGILE),
     /**
      * 子任务
      */
-    SUB_TASK("agile_subtask", "子任务", "子任务", "#4d90fe", "sub_task", SchemeType.AGILE),
+    SUB_TASK("agile_subtask", "子任务", "子任务", "#4d90fe", "sub_task", SchemeApplyType.AGILE),
     /**
      * 测试
      */
-    ISSUE_TEST("test", "测试", "测试", "FFB103", "issue_test", SchemeType.TEST);
+    ISSUE_TEST("test", "测试", "测试", "FFB103", "issue_test", SchemeApplyType.TEST);
 
     private String icon;
     private String name;

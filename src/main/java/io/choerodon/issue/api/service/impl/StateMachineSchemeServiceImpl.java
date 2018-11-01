@@ -11,7 +11,7 @@ import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
-import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
@@ -95,7 +95,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
 
-        if (!EnumUtil.contain(SchemeType.class, schemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -111,7 +111,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
-        if (!EnumUtil.contain(SchemeType.class, schemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -229,7 +229,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setType(SchemeType.AGILE);
+        scheme.setType(SchemeApplyType.AGILE);
         scheme.setName(projectCode + "默认状态机方案");
         scheme.setDescription(projectCode + "默认状态机方案");
         scheme.setDefaultStateMachineId(stateMachineId);

@@ -4,12 +4,11 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
-import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.IssueTypeSchemeService;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.domain.*;
 import io.choerodon.issue.infra.enums.IssueTypeE;
-import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
@@ -83,7 +82,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Transactional
     public IssueTypeSchemeDTO create(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
 
-        if (!EnumUtil.contain(SchemeType.class, issueTypeSchemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -105,7 +104,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Override
     public IssueTypeSchemeDTO update(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
 
-        if (!EnumUtil.contain(SchemeType.class, issueTypeSchemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -255,7 +254,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
         issueTypeScheme.setName(projectCode + "默认类型方案");
         issueTypeScheme.setDefaultIssueTypeId(issueTypeMap.get(IssueTypeE.STORY.getTypeCode()).getId());
-        issueTypeScheme.setType(SchemeType.AGILE);
+        issueTypeScheme.setType(SchemeApplyType.AGILE);
         issueTypeScheme.setOrganizationId(organizationId);
         issueTypeScheme.setDescription(projectCode + "默认类型方案");
         //保证幂等性
@@ -268,7 +267,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         }
         Integer sequence = 0;
         for (IssueTypeE issueTypeE : IssueTypeE.values()) {
-            if(!issueTypeE.getSchemeType().equals(SchemeType.AGILE)){
+            if(!issueTypeE.getSchemeType().equals(SchemeApplyType.AGILE)){
                 continue;
             }
             sequence++;

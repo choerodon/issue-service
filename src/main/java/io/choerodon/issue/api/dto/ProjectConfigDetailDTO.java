@@ -1,34 +1,18 @@
 package io.choerodon.issue.api.dto;
 
+import java.util.Map;
+
 /**
  * @author shinan.chen
  * @date 2018/10/24
  */
 public class ProjectConfigDetailDTO {
-    private Long id;
 
     private Long projectId;
 
-    private Long issueTypeSchemeId;
+    private Map<String, IssueTypeSchemeDTO> issueTypeSchemeMap;
 
-    private Long fieldConfigSchemeId;
-
-    private Long pageIssueTypeSchemeId;
-
-    private Long stateMachineSchemeId;
-
-    private IssueTypeSchemeDTO issueTypeScheme;
-    private StateMachineSchemeDTO stateMachineScheme;
-    private PageIssueSchemeDTO pageIssueSchemeDTO;
-    private FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private Map<String, StateMachineSchemeDTO> stringStateMachineSchemeMap;
 
     public Long getProjectId() {
         return projectId;
@@ -38,67 +22,19 @@ public class ProjectConfigDetailDTO {
         this.projectId = projectId;
     }
 
-    public Long getIssueTypeSchemeId() {
-        return issueTypeSchemeId;
+    public Map<String, IssueTypeSchemeDTO> getIssueTypeSchemeMap() {
+        return issueTypeSchemeMap;
     }
 
-    public void setIssueTypeSchemeId(Long issueTypeSchemeId) {
-        this.issueTypeSchemeId = issueTypeSchemeId;
+    public void setIssueTypeSchemeMap(Map<String, IssueTypeSchemeDTO> issueTypeSchemeMap) {
+        this.issueTypeSchemeMap = issueTypeSchemeMap;
     }
 
-    public Long getFieldConfigSchemeId() {
-        return fieldConfigSchemeId;
+    public Map<String, StateMachineSchemeDTO> getStringStateMachineSchemeMap() {
+        return stringStateMachineSchemeMap;
     }
 
-    public void setFieldConfigSchemeId(Long fieldConfigSchemeId) {
-        this.fieldConfigSchemeId = fieldConfigSchemeId;
-    }
-
-    public Long getPageIssueTypeSchemeId() {
-        return pageIssueTypeSchemeId;
-    }
-
-    public void setPageIssueTypeSchemeId(Long pageIssueTypeSchemeId) {
-        this.pageIssueTypeSchemeId = pageIssueTypeSchemeId;
-    }
-
-    public Long getStateMachineSchemeId() {
-        return stateMachineSchemeId;
-    }
-
-    public void setStateMachineSchemeId(Long stateMachineSchemeId) {
-        this.stateMachineSchemeId = stateMachineSchemeId;
-    }
-
-    public IssueTypeSchemeDTO getIssueTypeScheme() {
-        return issueTypeScheme;
-    }
-
-    public void setIssueTypeScheme(IssueTypeSchemeDTO issueTypeScheme) {
-        this.issueTypeScheme = issueTypeScheme;
-    }
-
-    public StateMachineSchemeDTO getStateMachineScheme() {
-        return stateMachineScheme;
-    }
-
-    public void setStateMachineScheme(StateMachineSchemeDTO stateMachineScheme) {
-        this.stateMachineScheme = stateMachineScheme;
-    }
-
-    public PageIssueSchemeDTO getPageIssueSchemeDTO() {
-        return pageIssueSchemeDTO;
-    }
-
-    public void setPageIssueSchemeDTO(PageIssueSchemeDTO pageIssueSchemeDTO) {
-        this.pageIssueSchemeDTO = pageIssueSchemeDTO;
-    }
-
-    public FieldConfigSchemeDetailDTO getFieldConfigSchemeDetailDTO() {
-        return fieldConfigSchemeDetailDTO;
-    }
-
-    public void setFieldConfigSchemeDetailDTO(FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO) {
-        this.fieldConfigSchemeDetailDTO = fieldConfigSchemeDetailDTO;
+    public void setStringStateMachineSchemeMap(Map<String, StateMachineSchemeDTO> stringStateMachineSchemeMap) {
+        this.stringStateMachineSchemeMap = stringStateMachineSchemeMap;
     }
 }

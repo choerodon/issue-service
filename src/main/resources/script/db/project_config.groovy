@@ -2,7 +2,7 @@ package script.db
 
 
 databaseChangeLog(logicalFilePath: 'project_config.groovy') {
-    changeSet(id: '2018-09-04-create-project-config', author: 'shinan.chen@hand-china.com') {
+    changeSet(id: '2018-11-01-create-project-config', author: 'shinan.chen@hand-china.com') {
         createTable(tableName: 'project_config') {
             column(name: 'id', type: 'BIGINT UNSIGNED', autoIncrement: 'true', remarks: '主键') {
                 constraints(primaryKey: 'true')
@@ -10,16 +10,13 @@ databaseChangeLog(logicalFilePath: 'project_config.groovy') {
             column(name: 'project_id', type: 'BIGINT UNSIGNED', remarks: '项目id') {
                 constraints(nullable: 'false')
             }
-            column(name: 'issue_type_scheme_id', type: 'BIGINT UNSIGNED', remarks: '问题类型方案id') {
+            column(name: 'scheme_id', type: 'BIGINT UNSIGNED', remarks: '方案id') {
+                constraints(nullable: 'false')
+            }
+            column(name: 'scheme_type', type: 'VARCHAR(30)', remarks: '方案类型') {
                 constraints(nullable: 'true')
             }
-            column(name: 'field_config_scheme_id', type: 'BIGINT UNSIGNED', remarks: '字段配置方案id') {
-                constraints(nullable: 'true')
-            }
-            column(name: 'page_issue_type_scheme_id', type: 'BIGINT UNSIGNED', remarks: '问题类型页面方案id') {
-                constraints(nullable: 'true')
-            }
-            column(name: 'state_machine_scheme_id', type: 'BIGINT UNSIGNED', remarks: '状态机方案id') {
+            column(name: 'apply_type', type: 'VARCHAR(30)', remarks: '应用类型') {
                 constraints(nullable: 'true')
             }
 
@@ -33,16 +30,13 @@ databaseChangeLog(logicalFilePath: 'project_config.groovy') {
             column(name: "project_id", type: "BIGINT UNSIGNED")
         }
         createIndex(tableName: "project_config", indexName: "project_config_n2") {
-            column(name: "issue_type_scheme_id", type: "BIGINT UNSIGNED")
+            column(name: "scheme_id", type: "BIGINT UNSIGNED")
         }
         createIndex(tableName: "project_config", indexName: "project_config_n3") {
-            column(name: "field_config_scheme_id", type: "BIGINT UNSIGNED")
+            column(name: "scheme_type", type: "VARCHAR(30)")
         }
         createIndex(tableName: "project_config", indexName: "project_config_n4") {
-            column(name: "page_issue_type_scheme_id", type: "BIGINT UNSIGNED")
-        }
-        createIndex(tableName: "project_config", indexName: "project_config_n5") {
-            column(name: "state_machine_scheme_id", type: "BIGINT UNSIGNED")
+            column(name: "apply_type", type: "VARCHAR(30)")
         }
     }
 }
