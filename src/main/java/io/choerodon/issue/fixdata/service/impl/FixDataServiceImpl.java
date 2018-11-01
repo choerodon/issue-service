@@ -55,11 +55,13 @@ public class FixDataServiceImpl implements FixDataService {
     private PriorityMapper priorityMapper;
 
     @Override
-    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
+    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses, Boolean isFixStatus) {
 
         logger.info("开始修复状态");
         //创建状态
-        fixStateMachineFeignClient.createStatus(statuses);
+        if (isFixStatus) {
+            fixStateMachineFeignClient.createStatus(statuses);
+        }
         logger.info("完成修复状态");
         //根据组织id分组
         Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
