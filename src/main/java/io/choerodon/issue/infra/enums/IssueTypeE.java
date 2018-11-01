@@ -8,23 +8,23 @@ public enum IssueTypeE {
     /**
      * 史诗
      */
-    EPIC("priority", "史诗", "史诗", "#743be7", "issue_epic", SchemeType.AGILE),
+    EPIC("agile_epic", "史诗", "史诗", "#743be7", "issue_epic", SchemeType.AGILE),
     /**
      * 故事
      */
-    STORY("book", "故事", "故事", "#00bfa5", "story", SchemeType.AGILE),
+    STORY("agile_story", "故事", "故事", "#00bfa5", "story", SchemeType.AGILE),
     /**
      * 缺陷
      */
-    BUG("bug_report", "缺陷", "缺陷", "#f44336", "bug", SchemeType.AGILE),
+    BUG("agile_fault", "缺陷", "缺陷", "#f44336", "bug", SchemeType.AGILE),
     /**
      * 任务
      */
-    TASK("check", "任务", "任务", "#4d90fe", "task", SchemeType.AGILE),
+    TASK("agile_task", "任务", "任务", "#4d90fe", "task", SchemeType.AGILE),
     /**
      * 子任务
      */
-    SUB_TASK("relation", "子任务", "子任务", "#4d90fe", "sub_task", SchemeType.AGILE),
+    SUB_TASK("agile_subtask", "子任务", "子任务", "#4d90fe", "sub_task", SchemeType.AGILE),
     /**
      * 测试
      */
