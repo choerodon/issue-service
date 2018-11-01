@@ -17,7 +17,7 @@ public interface FixDataService {
      * @param statusForMoveDataDOList
      * @return
      */
-    void fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList);
+    void fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList, Boolean isFixStatus);
 
     /**
      * 获取所有组织的优先级
