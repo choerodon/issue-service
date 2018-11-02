@@ -52,7 +52,6 @@ public interface StateMachineService {
      * 显示事件单转换
      *
      * @param organizationId
-     * @param currentStateId
      * @return
      */
     ResponseEntity<List<TransformDTO>> transfList(Long organizationId, Long projectId, Long issueId);
@@ -61,9 +60,7 @@ public interface StateMachineService {
      * 状态机执行转换
      *
      * @param organizationId 组织id
-     * @param stateMachineId 状态机Id
      * @param transfId       转换Id
-     * @param currentStateId 当前状态Id
      * @param issueId        事件单id
      * @return
      */
@@ -84,4 +81,13 @@ public interface StateMachineService {
      * @return
      */
     Long queryBySchemeIdAndIssueTypeId(Long stateMachineSchemeId,Long issueTypeId);
+
+    /**
+     * 通过状态机方案id查询出所有状态机
+     *
+     * @param stateMachineSchemeId
+     * @return
+     */
+    List<Long> queryBySchemeId(Long stateMachineSchemeId);
+
 }

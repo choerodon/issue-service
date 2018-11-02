@@ -156,6 +156,27 @@ public class StateMachineServiceImpl implements StateMachineService {
         return stateMachineId;
     }
 
+    @Override
+    public List<Long> queryBySchemeId(Long stateMachineSchemeId) {
+        Set<Long> stateMachineIds = new HashSet<>();
+        StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
+        if (stateMachineScheme == null) {
+            throw new CommonException("error.queryBySchemeId.stateMachineScheme.notFound");
+        }
+        if (stateMachineScheme.getDefaultStateMachineId() != null) {
+            stateMachineIds.add(stateMachineScheme.getDefaultStateMachineId());
+        } else {
+            throw new CommonException("error.queryBySchemeId.defaultStateMachineId.null");
+        }
+        StateMachineSchemeConfig select = new StateMachineSchemeConfig();
+        select.setSchemeId(stateMachineSchemeId);
+        List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(select);
+        configs.forEach(config->{
+            stateMachineIds.add(config.getStateMachineId());
+        });
+        return new ArrayList<>(stateMachineIds);
+    }
+
     @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
     public Boolean justReporter(Long instanceId, StateMachineConfigDTO configDTO) {
         Issue issue = issueMapper.selectByPrimaryKey(instanceId);

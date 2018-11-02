@@ -47,7 +47,7 @@ public class SchemeController extends BaseController {
     }
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "查询某个问题类型拥有的转换（包含可以转换到的状态）")
+    @ApiOperation(value = "查询项目下某个问题类型拥有的转换（包含可以转换到的状态）")
     @GetMapping(value = "/query_transforms")
     public ResponseEntity<List<TransformDTO>> queryTransformsByProjectId(@PathVariable("project_id") Long projectId,
                                                                          @RequestParam("current_status_id") Long currentStatusId,
@@ -55,6 +55,22 @@ public class SchemeController extends BaseController {
                                                                          @RequestParam("issue_type_id") Long issueTypeId,
                                                                          @RequestParam("scheme_type") String schemeType) {
         return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, schemeType), HttpStatus.OK);
+    }
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "查询项目下某个问题类型的所有状态")
+    @GetMapping(value = "/query_status_by_issue_type_id")
+    public ResponseEntity<List<StatusDTO>> queryStatusByIssueTypeId(@PathVariable("project_id") Long projectId,
+                                                                       @RequestParam("issue_type_id") Long issueTypeId,
+                                                                       @RequestParam("scheme_type") String schemeType) {
+        return new ResponseEntity<>(projectConfigService.queryStatusByIssueTypeId(projectId, issueTypeId, schemeType), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "查询项目下的所有状态")
+    @GetMapping(value = "/query_status_by_project_id")
+    public ResponseEntity<List<StatusDTO>> queryStatusByProjectId(@PathVariable("project_id") Long projectId,
+                                                                    @RequestParam("scheme_type") String schemeType) {
+        return new ResponseEntity<>(projectConfigService.queryStatusByProjectId(projectId, schemeType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)
