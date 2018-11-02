@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -120,4 +121,15 @@ public interface StateMachineFeignClient {
     ResponseEntity<StatusDTO> createStatusForAgile(@PathVariable("organization_id") Long organizationId,
                                                    @RequestParam("state_machine_id") Long stateMachineId,
                                                    @RequestBody StatusDTO statusDTO);
+
+    /**
+     * 查询状态机下的所有状态
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     * @return
+     */
+    @PostMapping(value = "/v1/organizations/{organization_id}/status/query_by_state_machine_id")
+    ResponseEntity<List<StatusDTO>> queryByStateMachineIds(@PathVariable("organization_id") Long organizationId,
+                                                           @RequestBody @Valid List<Long> stateMachineIds);
 }

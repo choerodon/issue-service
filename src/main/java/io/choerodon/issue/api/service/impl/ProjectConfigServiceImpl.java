@@ -213,10 +213,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long issueTypeSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType).getSchemeId();
         Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
         if (issueTypeSchemeId == null) {
-            throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            throw new CommonException("error.issueTypeSchemeId.null");
         }
         if (stateMachineSchemeId == null) {
-            throw new CommonException("error.queryIssueTypesByProjectId.getStateMachineSchemeId.null");
+            throw new CommonException("error.stateMachineSchemeId.null");
         }
         //根据方案配置表获取 问题类型
         List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
@@ -238,6 +238,30 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             }
         });
         return issueTypeWithStateMachineIds;
+    }
+
+    @Override
+    public List<StatusDTO> queryStatusByIssueTypeId(Long projectId, Long issueTypeId, String applyType) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
+        if (stateMachineSchemeId == null) {
+            throw new CommonException("error.stateMachineSchemeId.null");
+        }
+        //获取状态机
+        Long stateMachineId = stateMachineService.queryBySchemeIdAndIssueTypeId(stateMachineSchemeId, issueTypeId);
+        return stateMachineFeignClient.queryByStateMachineIds(organizationId, Collections.singletonList(stateMachineId)).getBody();
+    }
+
+    @Override
+    public List<StatusDTO> queryStatusByProjectId(Long projectId, String applyType) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
+        if (stateMachineSchemeId == null) {
+            throw new CommonException("error.stateMachineSchemeId.null");
+        }
+        //获取状态机ids
+        List<Long> stateMachineIds = stateMachineService.queryBySchemeId(stateMachineSchemeId);
+        return stateMachineFeignClient.queryByStateMachineIds(organizationId, stateMachineIds).getBody();
     }
 
     @Override

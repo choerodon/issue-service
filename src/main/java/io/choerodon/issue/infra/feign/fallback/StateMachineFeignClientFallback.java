@@ -58,4 +58,9 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     public ResponseEntity<StatusDTO> createStatusForAgile(Long organizationId, Long stateMachineId, StatusDTO statusDTO) {
         throw new CommonException("error.stateMachineFeignClient.createStatusForAgile");
     }
+
+    @Override
+    public ResponseEntity<List<StatusDTO>> queryByStateMachineIds(Long organizationId, List<Long> stateMachineIds) {
+        throw new CommonException("error.stateMachineFeignClient.queryByStateMachineIds");
+    }
 }
