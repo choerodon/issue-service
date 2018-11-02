@@ -250,7 +250,43 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
                 });
                 return transformDTOS;
             } else {
-                throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+                throw new CommonException("error.queryIssueTypesByProjectId.stateMachineSchemeId.null");
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<StatusDTO> queryStatusByIssueTypeId(Long projectId, Long issueTypeId, String schemeType) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        //敏捷信息
+        if (schemeType.equals(SchemeType.AGILE)) {
+            //获取状态机方案
+            if (projectConfig.getStateMachineSchemeId() != null) {
+                //获取状态机
+                Long stateMachineId = stateMachineService.queryBySchemeIdAndIssueTypeId(projectConfig.getStateMachineSchemeId(), issueTypeId);
+                return stateMachineFeignClient.queryByStateMachineIds(organizationId, Collections.singletonList(stateMachineId)).getBody();
+            } else {
+                throw new CommonException("error.queryStatusByIssueTypeId.stateMachineSchemeId.null");
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<StatusDTO> queryStatusByProjectId(Long projectId, String schemeType) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
+        //敏捷信息
+        if (schemeType.equals(SchemeType.AGILE)) {
+            //获取状态机方案
+            if (projectConfig.getStateMachineSchemeId() != null) {
+                //获取状态机ids
+                List<Long> stateMachineIds = stateMachineService.queryBySchemeId(projectConfig.getStateMachineSchemeId());
+                return stateMachineFeignClient.queryByStateMachineIds(organizationId, stateMachineIds).getBody();
+            } else {
+                throw new CommonException("error.queryStatusByProjectId.stateMachineSchemeId.null");
             }
         }
         return null;
