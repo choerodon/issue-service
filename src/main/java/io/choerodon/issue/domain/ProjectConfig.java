@@ -51,6 +51,14 @@ public class ProjectConfig extends AuditDomain {
         this.projectId = projectId;
     }
 
+    public Long getSchemeId() {
+        return schemeId;
+    }
+
+    public void setSchemeId(Long schemeId) {
+        this.schemeId = schemeId;
+    }
+
     public String getSchemeType() {
         return schemeType;
     }

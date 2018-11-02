@@ -7,11 +7,13 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
+import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
@@ -40,17 +42,16 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
-
     @Autowired
     private StateMachineSchemeConfigMapper configMapper;
-
     @Autowired
     private IssueTypeMapper issueTypeMapper;
-
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign;
     @Autowired
     private ProjectUtil projectUtil;
+    @Autowired
+    private ProjectConfigService projectConfigService;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -243,6 +244,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         if (isInsert != 1) {
             throw new CommonException("error.stateMachineScheme.create");
         }
+        //创建与项目的关联关系
+        projectConfigService.create(projectId, scheme.getId(), SchemeType.STATE_MACHINE, SchemeApplyType.AGILE);
         return scheme;
     }
 }

@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO;
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO;
 import io.choerodon.issue.api.dto.PageIssueSchemeLineDTO;
 import io.choerodon.issue.api.service.PageIssueSchemeService;
 import io.choerodon.issue.api.validator.PageIssueSchemeLineValidator;
@@ -44,14 +44,14 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public Page<PageIssueSchemeDTO> pageQuery(PageRequest pageRequest, PageIssueSchemeDTO schemeDTO, String params) {
+    public Page<PageIssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, PageIssueTypeSchemeDTO schemeDTO, String params) {
         PageIssueScheme scheme = modelMapper.map(schemeDTO, PageIssueScheme.class);
         Page<PageIssueScheme> page = PageHelper.doPageAndSort(pageRequest,
                 () -> schemeMapper.fulltextSearch(scheme, params));
         List<PageIssueScheme> schemes = page.getContent();
-        List<PageIssueSchemeDTO> schemeDTOS = modelMapper.map(schemes, new TypeToken<List<PageIssueSchemeDTO>>(){}.getType());
+        List<PageIssueTypeSchemeDTO> schemeDTOS = modelMapper.map(schemes, new TypeToken<List<PageIssueTypeSchemeDTO>>(){}.getType());
 
-        Page<PageIssueSchemeDTO> returnPage = new Page<>();
+        Page<PageIssueTypeSchemeDTO> returnPage = new Page<>();
         returnPage.setContent(schemeDTOS);
         returnPage.setNumber(page.getNumber());
         returnPage.setNumberOfElements(page.getNumberOfElements());
@@ -63,7 +63,7 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
 
     @Override
     @Transactional
-    public PageIssueSchemeDTO create(Long organizationId, PageIssueSchemeDTO schemeDTO) {
+    public PageIssueTypeSchemeDTO create(Long organizationId, PageIssueTypeSchemeDTO schemeDTO) {
         PageIssueScheme scheme = modelMapper.map(schemeDTO, PageIssueScheme.class);
         scheme.setOrganizationId(organizationId);
         int isInsert = schemeMapper.insert(scheme);
@@ -87,7 +87,7 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
 
     @Override
     @Transient
-    public PageIssueSchemeDTO update(Long organizationId, Long schemeId, PageIssueSchemeDTO schemeDTO) {
+    public PageIssueTypeSchemeDTO update(Long organizationId, Long schemeId, PageIssueTypeSchemeDTO schemeDTO) {
         PageIssueScheme pageIssueScheme = schemeMapper.querySchemeWithConfigById(schemeId);
         if (pageIssueScheme == null){
             throw new CommonException("error.pageIssueScheme.update.noFound");
@@ -175,12 +175,12 @@ public class PageIssueSchemeServiceImpl extends BaseServiceImpl<PageIssueScheme>
     }
 
     @Override
-    public PageIssueSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
+    public PageIssueTypeSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
         PageIssueScheme scheme = schemeMapper.querySchemeWithConfigById(schemeId);
         if (scheme == null) {
             throw new CommonException("error.stateMachineScheme.querySchemeWithConfigById.notFound");
         }
-        PageIssueSchemeDTO schemeDTO = modelMapper.map(scheme, PageIssueSchemeDTO.class);
+        PageIssueTypeSchemeDTO schemeDTO = modelMapper.map(scheme, PageIssueTypeSchemeDTO.class);
         if (scheme.getLines() != null){
             List<PageIssueSchemeLineDTO> lineDTOS = modelMapper.map(scheme.getLines(), new TypeToken<List<PageIssueSchemeLineDTO>>(){}.getType());
             schemeDTO.setLineDTOS(lineDTOS);

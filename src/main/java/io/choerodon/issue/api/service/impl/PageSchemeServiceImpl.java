@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO;
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO;
 import io.choerodon.issue.api.dto.PageSchemeDTO;
 import io.choerodon.issue.api.dto.PageSchemeDetailDTO;
 import io.choerodon.issue.api.dto.PageSchemeLineDTO;
@@ -170,7 +170,7 @@ public class PageSchemeServiceImpl extends BaseServiceImpl<PageScheme> implement
         for (PageSchemeDTO pd : contentDTO) {
             Map<String, Object> result = checkDelete(organizationId, pd.getId());
             pd.setCanDelete((Boolean) result.get("canDelete"));
-            pd.setPageIssueSchemeDTOS(result.get("pageIssueSchemes") != null ? modelMapper.map(result.get("pageIssueSchemes"), new TypeToken<List<PageIssueSchemeDTO>>() {
+            pd.setPageIssueSchemeDTOS(result.get("pageIssueSchemes") != null ? modelMapper.map(result.get("pageIssueSchemes"), new TypeToken<List<PageIssueTypeSchemeDTO>>() {
             }.getType()) : null);
         }
 

@@ -16,7 +16,7 @@ public class PageSchemeDTO {
     private Long organizationId;
 
     private Boolean canDelete;
-    private List<PageIssueSchemeDTO> pageIssueSchemeDTOS;
+    private List<PageIssueTypeSchemeDTO> pageIssueSchemeDTOS;
 
     private Long objectVersionNumber;
 
@@ -68,11 +68,11 @@ public class PageSchemeDTO {
         this.canDelete = canDelete;
     }
 
-    public List<PageIssueSchemeDTO> getPageIssueSchemeDTOS() {
+    public List<PageIssueTypeSchemeDTO> getPageIssueSchemeDTOS() {
         return pageIssueSchemeDTOS;
     }
 
-    public void setPageIssueSchemeDTOS(List<PageIssueSchemeDTO> pageIssueSchemeDTOS) {
+    public void setPageIssueSchemeDTOS(List<PageIssueTypeSchemeDTO> pageIssueSchemeDTOS) {
         this.pageIssueSchemeDTOS = pageIssueSchemeDTOS;
     }
 }

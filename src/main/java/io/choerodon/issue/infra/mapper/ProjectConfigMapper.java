@@ -15,5 +15,7 @@ import java.util.List;
 public interface ProjectConfigMapper extends BaseMapper<ProjectConfig> {
     List<ProjectConfig> queryByProjectId(@Param("projectId") Long projectId);
 
+    ProjectConfig queryBySchemeTypeAndApplyType(@Param("projectId") Long projectId, @Param("schemeType") String schemeType, @Param("applyType") String applyType);
+
     List<Long> queryProjectIdsBySchemeIds(@Param("stateMachineSchemeIds") List<Long> stateMachineSchemeIds);
 }

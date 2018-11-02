@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.controller;
 
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO;
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO;
 import io.choerodon.issue.api.service.PageIssueSchemeService;
 import io.choerodon.issue.api.validator.PageIssueSchemeLineValidator;
 import io.choerodon.issue.api.validator.PageIssueSchemeValidator;
@@ -36,13 +36,13 @@ public class PageIssueSchemeController {
     @ApiOperation(value = "分页查询问题类型页面方案列表")
     @CustomPageRequest
     @GetMapping
-    public ResponseEntity<Page<PageIssueSchemeDTO>> pagingQuery(@ApiIgnore
+    public ResponseEntity<Page<PageIssueTypeSchemeDTO>> pagingQuery(@ApiIgnore
                                                                 @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                                @PathVariable("organization_id") Long organizationId,
-                                                                @RequestParam(required = false) String name,
-                                                                @RequestParam(required = false) String description,
-                                                                @RequestParam(required = false) String[] param) {
-        PageIssueSchemeDTO schemeDTO = new PageIssueSchemeDTO();
+                                                                    @PathVariable("organization_id") Long organizationId,
+                                                                    @RequestParam(required = false) String name,
+                                                                    @RequestParam(required = false) String description,
+                                                                    @RequestParam(required = false) String[] param) {
+        PageIssueTypeSchemeDTO schemeDTO = new PageIssueTypeSchemeDTO();
         schemeDTO.setOrganizationId(organizationId);
         schemeDTO.setName(name);
         schemeDTO.setDescription(description);
@@ -52,7 +52,7 @@ public class PageIssueSchemeController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "创建问题类型页面方案")
     @PostMapping
-    public ResponseEntity<PageIssueSchemeDTO> create(@PathVariable("organization_id") Long organizationId, @RequestBody PageIssueSchemeDTO schemeDTO) {
+    public ResponseEntity<PageIssueTypeSchemeDTO> create(@PathVariable("organization_id") Long organizationId, @RequestBody PageIssueTypeSchemeDTO schemeDTO) {
         schemeValidator.createValidate(schemeDTO);
         return new ResponseEntity<>(schemeService.create(organizationId, schemeDTO), HttpStatus.OK);
     }
@@ -60,8 +60,8 @@ public class PageIssueSchemeController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "更新问题类型页面方案")
     @PutMapping(value = "/{scheme_id}")
-    public ResponseEntity<PageIssueSchemeDTO> update(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId,
-                                                     @RequestBody PageIssueSchemeDTO schemeDTO) {
+    public ResponseEntity<PageIssueTypeSchemeDTO> update(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId,
+                                                         @RequestBody PageIssueTypeSchemeDTO schemeDTO) {
         schemeValidator.updateValidate(schemeDTO);
         return new ResponseEntity<>(schemeService.update(organizationId, schemeId, schemeDTO), HttpStatus.OK);
     }
@@ -76,7 +76,7 @@ public class PageIssueSchemeController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据id查询问题类型页面方案对象")
     @GetMapping(value = "/{scheme_id}")
-    public ResponseEntity<PageIssueSchemeDTO> querySchemeWithConfigById(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
+    public ResponseEntity<PageIssueTypeSchemeDTO> querySchemeWithConfigById(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
         return new ResponseEntity<>(schemeService.querySchemeWithConfigById(organizationId, schemeId), HttpStatus.OK);
     }
 

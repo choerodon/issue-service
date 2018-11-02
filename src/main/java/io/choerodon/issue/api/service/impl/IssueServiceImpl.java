@@ -13,6 +13,8 @@ import io.choerodon.issue.domain.Issue;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.PageSchemeLineType;
+import io.choerodon.issue.infra.enums.SchemeApplyType;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.mapper.*;
@@ -173,16 +175,13 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
 
     @Override
     public Long getStateMachineId(Long projectId, Long issueId) {
-        ProjectConfig projectConfig = new ProjectConfig();
-        projectConfig.setProjectId(projectId);
-        List<ProjectConfig> projectConfigs = projectConfigMapper.select(projectConfig);
-        if (projectConfigs == null || projectConfigs.size() != 1) {
-            throw new CommonException("error.projectConfig.foundError");
+        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, SchemeApplyType.CLOOPM).getSchemeId();
+        if (stateMachineSchemeId == null) {
+            throw new CommonException("error.stateMachineSchemeId.null");
         }
-        Long stateMachineSchemeId = projectConfigs.get(0).getStateMachineSchemeId();
         Issue issue = issueMapper.selectByPrimaryKey(issueId);
         if (issue == null) {
-            throw new CommonException("error.issue.nofound");
+            throw new CommonException("error.issue.notFound");
         }
         Long issueTypeId = issue.getIssueTypeId();
         StateMachineSchemeConfig stateMachineSchemeConfig = new StateMachineSchemeConfig();

@@ -11,4 +11,8 @@ public class SchemeType {
     public static final String STATE_MACHINE = "scheme_state_machine";
 
     public static final String ISSUE_TYPE = "scheme_issue_type";
+
+    public static final String PAGE_ISSUE_TYPE = "scheme_page_issue_type";
+
+    public static final String FIELD_CONFIG = "scheme_field_config";
 }

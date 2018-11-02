@@ -6,9 +6,13 @@ import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
 import io.choerodon.issue.api.service.IssueTypeSchemeService;
 import io.choerodon.issue.api.service.ProjectConfigService;
-import io.choerodon.issue.domain.*;
+import io.choerodon.issue.domain.IssueType;
+import io.choerodon.issue.domain.IssueTypeScheme;
+import io.choerodon.issue.domain.IssueTypeSchemeConfig;
+import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.enums.IssueTypeE;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
@@ -233,12 +237,12 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
 
     @Override
     public IssueTypeSchemeDTO queryByProjectId(Long projectId) {
+        ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, SchemeApplyType.CLOOPM);
 
-        ProjectConfig projectConfig = projectConfigMapper.queryByProjectId(projectId);
-        if (projectConfig.getIssueTypeSchemeId() == null) {
-            throw new CommonException("error.projectConfig.issueTypeSchemeId,null");
+        if (projectConfig.getSchemeId() == null) {
+            throw new CommonException("error.projectConfig.schemeId.null");
         }
-        return queryById(projectUtil.getOrganizationId(projectId), projectConfig.getIssueTypeSchemeId());
+        return queryById(projectUtil.getOrganizationId(projectId), projectConfig.getSchemeId());
     }
 
     @Override
@@ -267,13 +271,16 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         }
         Integer sequence = 0;
         for (IssueTypeE issueTypeE : IssueTypeE.values()) {
-            if(!issueTypeE.getSchemeType().equals(SchemeApplyType.AGILE)){
+            if (!issueTypeE.getSchemeType().equals(SchemeApplyType.AGILE)) {
                 continue;
             }
             sequence++;
             IssueType issueType = issueTypeMap.get(issueTypeE.getTypeCode());
             createIssueTypeSchemeConfig(new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence)));
         }
+        //创建与项目的关联关系
+        projectConfigService.create(projectId, issueTypeScheme.getId(), SchemeType.ISSUE_TYPE, SchemeApplyType.AGILE);
+
         return issueTypeScheme;
     }
 

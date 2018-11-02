@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO
 import io.choerodon.issue.api.service.PageIssueSchemeLineService
 import io.choerodon.issue.api.service.PageIssueSchemeService
 import io.choerodon.issue.domain.PageIssueScheme
@@ -79,7 +79,7 @@ class PageIssueSchemeControllerSpec extends Specification {
         if (param != null) {
             url = url + "&param=" + param
         }
-        ParameterizedTypeReference<Page<PageIssueSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<PageIssueSchemeDTO>>() {
+        ParameterizedTypeReference<Page<PageIssueTypeSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<PageIssueTypeSchemeDTO>>() {
         };
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
 
@@ -98,13 +98,13 @@ class PageIssueSchemeControllerSpec extends Specification {
 
     def "create"() {
         given: '创建问题类型页面方案'
-        PageIssueSchemeDTO schemeDTO = new PageIssueSchemeDTO();
+        PageIssueTypeSchemeDTO schemeDTO = new PageIssueTypeSchemeDTO();
         schemeDTO.setName(name)
         schemeDTO.setDescription(description)
 
         when: '状态机方案写入数据库'
-        HttpEntity<PageIssueSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PageIssueSchemeDTO, orginzationId)
+        HttpEntity<PageIssueTypeSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PageIssueTypeSchemeDTO, orginzationId)
 
         then: '状态码为200，创建成功'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -119,14 +119,14 @@ class PageIssueSchemeControllerSpec extends Specification {
 
     def "update"() {
         given: '更新问题类型页面方案'
-        PageIssueSchemeDTO schemeDTO = new PageIssueSchemeDTO()
+        PageIssueTypeSchemeDTO schemeDTO = new PageIssueTypeSchemeDTO()
         schemeDTO.setName(name)
         schemeDTO.setDescription(description)
         schemeDTO.setObjectVersionNumber(1L)
         schemeDTO.setOrganizationId(orginzationId)
         when: '问题类型页面方案写入数据库'
-        HttpEntity<PageIssueSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
-        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.PUT, httpEntity, PageIssueSchemeDTO, orginzationId, schemeId)
+        HttpEntity<PageIssueTypeSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
+        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.PUT, httpEntity, PageIssueTypeSchemeDTO, orginzationId, schemeId)
 
         then: '更新成功判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -162,7 +162,7 @@ class PageIssueSchemeControllerSpec extends Specification {
 
     def "querySchemeWithConfigById"() {
         when: '根据id查询状态机方案对象'
-        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.GET, null, PageIssueSchemeDTO, orginzationId, schemeId)
+        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.GET, null, PageIssueTypeSchemeDTO, orginzationId, schemeId)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess

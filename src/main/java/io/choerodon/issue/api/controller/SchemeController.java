@@ -35,15 +35,15 @@ public class SchemeController extends BaseController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询项目的问题类型列表")
     @GetMapping(value = "/query_issue_types")
-    public ResponseEntity<List<IssueTypeDTO>> queryIssueTypesByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("scheme_type") String schemeType) {
-        return new ResponseEntity<>(projectConfigService.queryIssueTypesByProjectId(projectId, schemeType), HttpStatus.OK);
+    public ResponseEntity<List<IssueTypeDTO>> queryIssueTypesByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("apply_type") String applyType) {
+        return new ResponseEntity<>(projectConfigService.queryIssueTypesByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询项目的问题类型列表，带对应的状态机id")
     @GetMapping(value = "/query_issue_types_with_sm_id")
-    public ResponseEntity<List<IssueTypeWithStateMachineIdDTO>> queryIssueTypesWithStateMachineIdByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("scheme_type") String schemeType) {
-        return new ResponseEntity<>(projectConfigService.queryIssueTypesWithStateMachineIdByProjectId(projectId, schemeType), HttpStatus.OK);
+    public ResponseEntity<List<IssueTypeWithStateMachineIdDTO>> queryIssueTypesWithStateMachineIdByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("apply_type") String applyType) {
+        return new ResponseEntity<>(projectConfigService.queryIssueTypesWithStateMachineIdByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)
@@ -53,17 +53,17 @@ public class SchemeController extends BaseController {
                                                                          @RequestParam("current_status_id") Long currentStatusId,
                                                                          @RequestParam("issue_id") Long issueId,
                                                                          @RequestParam("issue_type_id") Long issueTypeId,
-                                                                         @RequestParam("scheme_type") String schemeType) {
-        return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, schemeType), HttpStatus.OK);
+                                                                         @RequestParam("apply_type") String applyType) {
+        return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, applyType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询项目的问题类型对应的状态机id")
     @GetMapping(value = "/query_state_machine_id")
     public ResponseEntity<Long> queryStateMachineId(@PathVariable("project_id") Long projectId,
-                                                    @RequestParam("scheme_type") String schemeType,
+                                                    @RequestParam("apply_type") String applyType,
                                                     @RequestParam("issue_type_id") Long issueTypeId) {
-        return new ResponseEntity<>(projectConfigService.queryStateMachineId(projectId, schemeType, issueTypeId), HttpStatus.OK);
+        return new ResponseEntity<>(projectConfigService.queryStateMachineId(projectId, applyType, issueTypeId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)

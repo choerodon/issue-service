@@ -9,6 +9,7 @@ import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.fixdata.feign.FixStateMachineFeignClient;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
@@ -95,16 +96,16 @@ public class FixDataServiceImpl implements FixDataService {
                     if (isInsert != 1) {
                         throw new CommonException("error.stateMachineScheme.create");
                     }
-                }else{
+                } else {
                     stateMachineScheme = schemes.get(0);
                 }
+                //创建与项目的关联关系
+                projectConfigService.create(projectId, stateMachineScheme.getId(), SchemeType.STATE_MACHINE, SchemeApplyType.AGILE);
 
                 //创建问题类型方案
-                IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectId, projectCode);
+                issueTypeSchemeService.initByConsumeCreateProject(projectId, projectCode);
                 //创建项目信息及配置默认方案
                 projectInfoService.createProject(projectId, projectCode);
-                //关联默认方案
-                projectConfigService.create(projectId, stateMachineScheme.getId(), issueTypeScheme.getId());
                 logger.info("完成修复项目{}", projectId);
             }
             logger.info("完成修复组织{}", organizationId);

@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.validator;
 
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO;
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -11,13 +11,13 @@ import org.springframework.util.StringUtils;
 @Component
 public class PageIssueSchemeValidator {
 
-    public void createValidate(PageIssueSchemeDTO schemeDTO){
+    public void createValidate(PageIssueTypeSchemeDTO schemeDTO){
         if (StringUtils.isEmpty(schemeDTO.getName())) {
             throw new CommonException("error.pageIssueScheme.name.empty");
         }
     }
 
-    public void updateValidate(PageIssueSchemeDTO schemeDTO) {
+    public void updateValidate(PageIssueTypeSchemeDTO schemeDTO) {
         if (schemeDTO.getName() != null && schemeDTO.getName().length() == 0) {
             throw new CommonException("error.pageIssueScheme.name.empty");
         }
