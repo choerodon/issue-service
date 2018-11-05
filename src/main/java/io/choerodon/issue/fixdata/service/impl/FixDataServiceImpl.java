@@ -84,7 +84,7 @@ public class FixDataServiceImpl implements FixDataService {
                 Long stateMachineId = fixStateMachineFeignClient.createStateMachine(organizationId, projectCode, statusNames).getBody();
                 //创建状态机方案
                 StateMachineScheme stateMachineScheme = new StateMachineScheme();
-                stateMachineScheme.setType(SchemeApplyType.AGILE);
+                stateMachineScheme.setApplyType(SchemeApplyType.AGILE);
                 stateMachineScheme.setName(projectCode + "默认状态机方案");
                 stateMachineScheme.setDescription(projectCode + "默认状态机方案");
                 stateMachineScheme.setDefaultStateMachineId(stateMachineId);

@@ -1,10 +1,14 @@
 package io.choerodon.issue.infra.enums;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author dinghuang123@gmail.com
  * @since 2018/10/24
  */
-public enum IssueTypeE {
+public enum InitIssueType {
     /**
      * 史诗
      */
@@ -28,7 +32,7 @@ public enum IssueTypeE {
     /**
      * 测试
      */
-    ISSUE_TEST("test", "测试", "测试", "FFB103", "issue_test", SchemeApplyType.TEST);
+    TEST("test", "测试", "测试", "FFB103", "issue_test", SchemeApplyType.TEST);
 
     private String icon;
     private String name;
@@ -36,9 +40,18 @@ public enum IssueTypeE {
     private String colour;
     private String typeCode;
     /**
-     * 用于方案类型
+     * 方案应用类型
      */
-    private String schemeType;
+    private String applyType;
+
+    InitIssueType(String icon, String name, String description, String colour, String typeCode, String applyType) {
+        this.icon = icon;
+        this.name = name;
+        this.description = description;
+        this.colour = colour;
+        this.typeCode = typeCode;
+        this.applyType = applyType;
+    }
 
     public String getIcon() {
         return icon;
@@ -80,20 +93,15 @@ public enum IssueTypeE {
         this.typeCode = typeCode;
     }
 
-    public String getSchemeType() {
-        return schemeType;
+    public String getApplyType() {
+        return applyType;
     }
 
-    public void setSchemeType(String schemeType) {
-        this.schemeType = schemeType;
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 
-    IssueTypeE(String icon, String name, String description, String colour, String typeCode, String schemeType) {
-        this.icon = icon;
-        this.name = name;
-        this.description = description;
-        this.colour = colour;
-        this.typeCode = typeCode;
-        this.schemeType = schemeType;
+    public static List<InitIssueType> listByApplyType(String applyType){
+        return Arrays.stream(InitIssueType.values()).filter(x->x.getApplyType().equals(applyType)).collect(Collectors.toList());
     }
 }

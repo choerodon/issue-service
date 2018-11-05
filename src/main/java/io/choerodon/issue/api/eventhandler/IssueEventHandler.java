@@ -63,7 +63,6 @@ public class IssueEventHandler {
         stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
         //创建默认问题类型方案
         issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-
         //创建项目信息及配置默认方案
         projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
         return data;

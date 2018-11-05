@@ -5,7 +5,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.domain.IssueType;
-import io.choerodon.issue.infra.enums.IssueTypeE;
+import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
@@ -177,9 +177,9 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
     @Override
     public void initIssueTypeByConsumeCreateOrganization(Long organizationId) {
-        for (IssueTypeE issueTypeE : IssueTypeE.values()) {
+        for (InitIssueType initIssueType : InitIssueType.values()) {
             //创建默认问题类型
-            createIssueType(new IssueType(issueTypeE.getIcon(), issueTypeE.getName(), issueTypeE.getDescription(), organizationId, issueTypeE.getColour(), issueTypeE.getTypeCode(), true));
+            createIssueType(new IssueType(initIssueType.getIcon(), initIssueType.getName(), initIssueType.getDescription(), organizationId, initIssueType.getColour(), initIssueType.getTypeCode(), true));
         }
     }
 
@@ -215,9 +215,9 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         Map<Long, Map<String, Long>> result = new HashMap<>();
         for (Long orgId : orgIds) {
             Map<String, Long> temp = new HashMap<>();
-            for (IssueTypeE issueTypeE : IssueTypeE.values()) {
-                IssueType issueType = createIssueType(new IssueType(issueTypeE.getIcon(), issueTypeE.getName(), issueTypeE.getDescription(), orgId, issueTypeE.getColour(), issueTypeE.getTypeCode(), true));
-                temp.put(issueTypeE.getTypeCode(), issueType.getId());
+            for (InitIssueType initIssueType : InitIssueType.values()) {
+                IssueType issueType = createIssueType(new IssueType(initIssueType.getIcon(), initIssueType.getName(), initIssueType.getDescription(), orgId, initIssueType.getColour(), initIssueType.getTypeCode(), true));
+                temp.put(initIssueType.getTypeCode(), issueType.getId());
             }
             result.put(orgId, temp);
         }

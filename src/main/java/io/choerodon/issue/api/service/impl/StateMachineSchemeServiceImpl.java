@@ -96,7 +96,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
 
-        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getApplyType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -112,7 +112,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
-        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getApplyType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -230,7 +230,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setType(SchemeApplyType.AGILE);
+        scheme.setApplyType(SchemeApplyType.AGILE);
         scheme.setName(projectCode + "默认状态机方案");
         scheme.setDescription(projectCode + "默认状态机方案");
         scheme.setDefaultStateMachineId(stateMachineId);

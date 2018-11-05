@@ -10,7 +10,7 @@ import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.IssueTypeSchemeConfig;
 import io.choerodon.issue.domain.ProjectConfig;
-import io.choerodon.issue.infra.enums.IssueTypeE;
+import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
@@ -86,7 +86,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Transactional
     public IssueTypeSchemeDTO create(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
 
-        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getApplyType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -108,7 +108,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Override
     public IssueTypeSchemeDTO update(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
 
-        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getApplyType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -246,47 +246,53 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     }
 
     @Override
-    public IssueTypeScheme initByConsumeCreateProject(Long projectId, String projectCode) {
+    public void initByConsumeCreateProject(Long projectId, String projectCode) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         IssueType query = new IssueType();
         query.setOrganizationId(organizationId);
         query.setInitialize(true);
         List<IssueType> issueTypes = issueTypeMapper.select(query);
         Map<String, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
-
         //初始化敏捷问题类型方案
-        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
-        issueTypeScheme.setName(projectCode + "默认类型方案");
-        issueTypeScheme.setDefaultIssueTypeId(issueTypeMap.get(IssueTypeE.STORY.getTypeCode()).getId());
-        issueTypeScheme.setType(SchemeApplyType.AGILE);
-        issueTypeScheme.setOrganizationId(organizationId);
-        issueTypeScheme.setDescription(projectCode + "默认类型方案");
-        //保证幂等性
-        List<IssueTypeScheme> issueTypeSchemes = issueTypeSchemeMapper.select(issueTypeScheme);
-        if (!issueTypeSchemes.isEmpty()) {
-            return issueTypeSchemes.get(0);
-        }
-        if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
-            throw new CommonException("error.issueType.create");
-        }
-        Integer sequence = 0;
-        for (IssueTypeE issueTypeE : IssueTypeE.values()) {
-            if (!issueTypeE.getSchemeType().equals(SchemeApplyType.AGILE)) {
-                continue;
-            }
-            sequence++;
-            IssueType issueType = issueTypeMap.get(issueTypeE.getTypeCode());
-            createIssueTypeSchemeConfig(new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence)));
-        }
-        //创建与项目的关联关系
-        projectConfigService.create(projectId, issueTypeScheme.getId(), SchemeType.ISSUE_TYPE, SchemeApplyType.AGILE);
-
-        return issueTypeScheme;
+        initScheme(projectId, organizationId, projectCode + "默认类型方案【敏捷】", issueTypeMap.get(InitIssueType.STORY.getTypeCode()).getId(), SchemeApplyType.AGILE, issueTypeMap);
+        //初始化测试问题类型方案
+        initScheme(projectId, organizationId, projectCode + "默认类型方案【测试】", issueTypeMap.get(InitIssueType.TEST.getTypeCode()).getId(), SchemeApplyType.TEST, issueTypeMap);
     }
 
-    private void createIssueTypeSchemeConfig(IssueTypeSchemeConfig issueTypeSchemeConfig) {
-        if (issueTypeSchemeConfigMapper.insert(issueTypeSchemeConfig) != 1) {
-            throw new CommonException("error.issueTypeSchemeConfig.create");
+    /**
+     * 初始化方案
+     * @param projectId
+     * @param organizationId
+     * @param name
+     * @param defaultIssueTypeId
+     * @param schemeApplyType
+     * @param issueTypeMap
+     */
+    private void initScheme(Long projectId, Long organizationId, String name, Long defaultIssueTypeId, String schemeApplyType, Map<String, IssueType> issueTypeMap) {
+        //初始化敏捷问题类型方案
+        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
+        issueTypeScheme.setName(name);
+        issueTypeScheme.setDefaultIssueTypeId(defaultIssueTypeId);
+        issueTypeScheme.setApplyType(schemeApplyType);
+        issueTypeScheme.setOrganizationId(organizationId);
+        issueTypeScheme.setDescription(name);
+        //保证幂等性
+        List<IssueTypeScheme> issueTypeSchemes = issueTypeSchemeMapper.select(issueTypeScheme);
+        if (issueTypeSchemes.isEmpty()) {
+            if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
+                throw new CommonException("error.issueTypeScheme.create");
+            }
+            Integer sequence = 0;
+            for (InitIssueType initIssueType : InitIssueType.listByApplyType(schemeApplyType)) {
+                sequence++;
+                IssueType issueType = issueTypeMap.get(initIssueType.getTypeCode());
+                IssueTypeSchemeConfig schemeConfig = new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence));
+                if (issueTypeSchemeConfigMapper.insert(schemeConfig) != 1) {
+                    throw new CommonException("error.issueTypeSchemeConfig.create");
+                }
+            }
+            //创建与项目的关联关系
+            projectConfigService.create(projectId, issueTypeScheme.getId(), SchemeType.ISSUE_TYPE, schemeApplyType);
         }
     }
 }

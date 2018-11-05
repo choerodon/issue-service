@@ -22,7 +22,7 @@ public class StateMachineScheme extends AuditDomain {
     @GeneratedValue
     private Long id;
     private String name;
-    private String type;
+    private String applyType;
     private String description;
     private Long defaultStateMachineId;
     private Long organizationId;
@@ -78,11 +78,11 @@ public class StateMachineScheme extends AuditDomain {
         this.schemeConfigs = schemeConfigs;
     }
 
-    public String getType() {
-        return type;
+    public String getApplyType() {
+        return applyType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 }
