@@ -20,7 +20,7 @@ public class IssueTypeSchemeDTO {
      */
     private Long defaultIssueTypeId;
     private Long organizationId;
-    private String type;
+    private String applyType;
     private Long objectVersionNumber;
 
     private List<IssueTypeDTO> issueTypes;
@@ -81,11 +81,11 @@ public class IssueTypeSchemeDTO {
         this.issueTypes = issueTypes;
     }
 
-    public String getType() {
-        return type;
+    public String getApplyType() {
+        return applyType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 }

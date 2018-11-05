@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author peng.jiang@hand-china.com
  */
-public class PageIssueSchemeDTO {
+public class PageIssueTypeSchemeDTO {
 
     private Long id;
     private String name;

@@ -7,10 +7,12 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
+import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
+import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
@@ -40,17 +42,16 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
-
     @Autowired
     private StateMachineSchemeConfigMapper configMapper;
-
     @Autowired
     private IssueTypeMapper issueTypeMapper;
-
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign;
     @Autowired
     private ProjectUtil projectUtil;
+    @Autowired
+    private ProjectConfigService projectConfigService;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -95,7 +96,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
 
-        if (!EnumUtil.contain(SchemeType.class, schemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getApplyType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -111,7 +112,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
-        if (!EnumUtil.contain(SchemeType.class, schemeDTO.getType())) {
+        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getApplyType())) {
             throw new CommonException("error.schemeDTO.type.illegal");
         }
 
@@ -221,28 +222,41 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public StateMachineScheme initByConsumeCreateProject(ProjectEvent projectEvent) {
-        Long projectId = projectEvent.getProjectId();
+    public void initByConsumeCreateProject(ProjectEvent projectEvent) {
         String projectCode = projectEvent.getProjectCode();
         //创建敏捷状态机方案
+        initScheme(projectCode + "默认状态机方案【敏捷】", SchemeApplyType.AGILE, projectEvent);
+        //创建测试状态机方案
+        initScheme(projectCode + "默认状态机方案【测试】", SchemeApplyType.TEST, projectEvent);
+    }
+
+    /**
+     * 初始化状态机方案
+     *
+     * @param name
+     * @param schemeApplyType
+     * @param projectEvent
+     */
+    private void initScheme(String name, String schemeApplyType, ProjectEvent projectEvent) {
+        Long projectId = projectEvent.getProjectId();
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, projectEvent).getBody();
+        Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setType(SchemeType.AGILE);
-        scheme.setName(projectCode + "默认状态机方案");
-        scheme.setDescription(projectCode + "默认状态机方案");
+        scheme.setApplyType(SchemeApplyType.AGILE);
+        scheme.setName(name);
+        scheme.setDescription(name);
         scheme.setDefaultStateMachineId(stateMachineId);
         scheme.setOrganizationId(organizationId);
         //保证幂等性
         List<StateMachineScheme> stateMachines = schemeMapper.select(scheme);
-        if (!stateMachines.isEmpty()) {
-            return stateMachines.get(0);
+        if (stateMachines.isEmpty()) {
+            int isInsert = schemeMapper.insert(scheme);
+            if (isInsert != 1) {
+                throw new CommonException("error.stateMachineScheme.create");
+            }
+            //创建与项目的关联关系
+            projectConfigService.create(projectId, scheme.getId(), SchemeType.STATE_MACHINE, schemeApplyType);
         }
-        int isInsert = schemeMapper.insert(scheme);
-        if (isInsert != 1) {
-            throw new CommonException("error.stateMachineScheme.create");
-        }
-        return scheme;
     }
 }

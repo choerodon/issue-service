@@ -1,34 +1,22 @@
 package io.choerodon.issue.api.dto;
 
+import java.util.Map;
+
 /**
  * @author shinan.chen
  * @date 2018/10/24
  */
 public class ProjectConfigDetailDTO {
-    private Long id;
 
     private Long projectId;
 
-    private Long issueTypeSchemeId;
+    private Map<String, IssueTypeSchemeDTO> issueTypeSchemeMap;
 
-    private Long fieldConfigSchemeId;
+    private Map<String, StateMachineSchemeDTO> stateMachineSchemeMap;
 
-    private Long pageIssueTypeSchemeId;
+    private Map<String, PageIssueTypeSchemeDTO> pageIssueTypeSchemeMap;
 
-    private Long stateMachineSchemeId;
-
-    private IssueTypeSchemeDTO issueTypeScheme;
-    private StateMachineSchemeDTO stateMachineScheme;
-    private PageIssueSchemeDTO pageIssueSchemeDTO;
-    private FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private Map<String, FieldConfigSchemeDetailDTO> fieldConfigchemeMap;
 
     public Long getProjectId() {
         return projectId;
@@ -38,67 +26,35 @@ public class ProjectConfigDetailDTO {
         this.projectId = projectId;
     }
 
-    public Long getIssueTypeSchemeId() {
-        return issueTypeSchemeId;
+    public Map<String, IssueTypeSchemeDTO> getIssueTypeSchemeMap() {
+        return issueTypeSchemeMap;
     }
 
-    public void setIssueTypeSchemeId(Long issueTypeSchemeId) {
-        this.issueTypeSchemeId = issueTypeSchemeId;
+    public void setIssueTypeSchemeMap(Map<String, IssueTypeSchemeDTO> issueTypeSchemeMap) {
+        this.issueTypeSchemeMap = issueTypeSchemeMap;
     }
 
-    public Long getFieldConfigSchemeId() {
-        return fieldConfigSchemeId;
+    public Map<String, StateMachineSchemeDTO> getStateMachineSchemeMap() {
+        return stateMachineSchemeMap;
     }
 
-    public void setFieldConfigSchemeId(Long fieldConfigSchemeId) {
-        this.fieldConfigSchemeId = fieldConfigSchemeId;
+    public void setStateMachineSchemeMap(Map<String, StateMachineSchemeDTO> stateMachineSchemeMap) {
+        this.stateMachineSchemeMap = stateMachineSchemeMap;
     }
 
-    public Long getPageIssueTypeSchemeId() {
-        return pageIssueTypeSchemeId;
+    public Map<String, PageIssueTypeSchemeDTO> getPageIssueTypeSchemeMap() {
+        return pageIssueTypeSchemeMap;
     }
 
-    public void setPageIssueTypeSchemeId(Long pageIssueTypeSchemeId) {
-        this.pageIssueTypeSchemeId = pageIssueTypeSchemeId;
+    public void setPageIssueTypeSchemeMap(Map<String, PageIssueTypeSchemeDTO> pageIssueTypeSchemeMap) {
+        this.pageIssueTypeSchemeMap = pageIssueTypeSchemeMap;
     }
 
-    public Long getStateMachineSchemeId() {
-        return stateMachineSchemeId;
+    public Map<String, FieldConfigSchemeDetailDTO> getFieldConfigchemeMap() {
+        return fieldConfigchemeMap;
     }
 
-    public void setStateMachineSchemeId(Long stateMachineSchemeId) {
-        this.stateMachineSchemeId = stateMachineSchemeId;
-    }
-
-    public IssueTypeSchemeDTO getIssueTypeScheme() {
-        return issueTypeScheme;
-    }
-
-    public void setIssueTypeScheme(IssueTypeSchemeDTO issueTypeScheme) {
-        this.issueTypeScheme = issueTypeScheme;
-    }
-
-    public StateMachineSchemeDTO getStateMachineScheme() {
-        return stateMachineScheme;
-    }
-
-    public void setStateMachineScheme(StateMachineSchemeDTO stateMachineScheme) {
-        this.stateMachineScheme = stateMachineScheme;
-    }
-
-    public PageIssueSchemeDTO getPageIssueSchemeDTO() {
-        return pageIssueSchemeDTO;
-    }
-
-    public void setPageIssueSchemeDTO(PageIssueSchemeDTO pageIssueSchemeDTO) {
-        this.pageIssueSchemeDTO = pageIssueSchemeDTO;
-    }
-
-    public FieldConfigSchemeDetailDTO getFieldConfigSchemeDetailDTO() {
-        return fieldConfigSchemeDetailDTO;
-    }
-
-    public void setFieldConfigSchemeDetailDTO(FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO) {
-        this.fieldConfigSchemeDetailDTO = fieldConfigSchemeDetailDTO;
+    public void setFieldConfigchemeMap(Map<String, FieldConfigSchemeDetailDTO> fieldConfigchemeMap) {
+        this.fieldConfigchemeMap = fieldConfigchemeMap;
     }
 }

@@ -5,8 +5,6 @@ import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.*;
-import io.choerodon.issue.domain.IssueTypeScheme;
-import io.choerodon.issue.domain.StateMachineScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +33,6 @@ public class IssueEventHandler {
     @Autowired
     private IssueTypeSchemeService issueTypeSchemeService;
     @Autowired
-    private ProjectConfigService projectConfigService;
-    @Autowired
     private PriorityService priorityService;
 
 
@@ -59,16 +55,12 @@ public class IssueEventHandler {
         ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
         loggerInfo(projectEvent);
 
-        //创建项目时创建初始化状态机方案
-        StateMachineScheme stateMachineScheme = stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
-        //创建默认问题类型方案
-        IssueTypeScheme issueTypeScheme = issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-
+        //创建项目时创建默认状态机方案
+        stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
+        //创建项目时创建默认问题类型方案
+        issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
         //创建项目信息及配置默认方案
         projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-
-        //关联默认方案
-        projectConfigService.create(projectEvent.getProjectId(), stateMachineScheme.getId(), issueTypeScheme.getId());
         return data;
     }
 

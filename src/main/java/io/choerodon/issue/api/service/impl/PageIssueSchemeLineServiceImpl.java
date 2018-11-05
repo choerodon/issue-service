@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO;
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO;
 import io.choerodon.issue.api.dto.PageIssueSchemeLineDTO;
 import io.choerodon.issue.api.service.PageIssueSchemeLineService;
 import io.choerodon.issue.api.service.PageIssueSchemeService;
@@ -30,7 +30,7 @@ public class PageIssueSchemeLineServiceImpl extends BaseServiceImpl<PageIssueSch
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public PageIssueSchemeDTO create(Long organizationId, Long schemeId, PageIssueSchemeLineDTO lineDTO) {
+    public PageIssueTypeSchemeDTO create(Long organizationId, Long schemeId, PageIssueSchemeLineDTO lineDTO) {
         PageIssueSchemeLine line = modelMapper.map(lineDTO, PageIssueSchemeLine.class);
         line.setSchemeId(schemeId);
         int isInsert = lineMapper.insert(line);
@@ -41,7 +41,7 @@ public class PageIssueSchemeLineServiceImpl extends BaseServiceImpl<PageIssueSch
     }
 
     @Override
-    public PageIssueSchemeDTO update(Long organizationId, Long schemeId, PageIssueSchemeLineDTO lineDTO) {
+    public PageIssueTypeSchemeDTO update(Long organizationId, Long schemeId, PageIssueSchemeLineDTO lineDTO) {
         lineDTO.setSchemeId(schemeId);
         PageIssueSchemeLine line = modelMapper.map(lineDTO, PageIssueSchemeLine.class);
         int isUpdate = lineMapper.updateByPrimaryKeySelective(line);
@@ -52,7 +52,7 @@ public class PageIssueSchemeLineServiceImpl extends BaseServiceImpl<PageIssueSch
     }
 
     @Override
-    public PageIssueSchemeDTO delete(Long organizationId, Long lineId) {
+    public PageIssueTypeSchemeDTO delete(Long organizationId, Long lineId) {
         PageIssueSchemeLine line = lineMapper.selectByPrimaryKey(lineId);
         if (line == null){
             throw new CommonException("error.pageIssueSchemeLine.delete.noFound");

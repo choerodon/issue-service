@@ -20,5 +20,12 @@
         </if>
     </select>
 
+    <select id="queryBySchemeTypeAndApplyType" resultType="io.choerodon.issue.domain.ProjectConfig">
+        SELECT *
+        FROM project_config
+        WHERE project_id = #{projectId}
+        AND scheme_type = #{schemeType}
+        AND apply_type = #{applyType}
+    </select>
 
 </mapper>

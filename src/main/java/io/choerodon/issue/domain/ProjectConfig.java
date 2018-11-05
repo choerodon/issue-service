@@ -21,10 +21,19 @@ public class ProjectConfig extends AuditDomain {
     private Long id;
 
     private Long projectId;
-    private Long issueTypeSchemeId;
-    private Long fieldConfigSchemeId;
-    private Long pageIssueTypeSchemeId;
-    private Long stateMachineSchemeId;
+    private Long schemeId;
+    private String schemeType;
+    private String applyType;
+
+    public ProjectConfig() {
+    }
+
+    public ProjectConfig(Long projectId, Long schemeId, String schemeType, String applyType) {
+        this.projectId = projectId;
+        this.schemeId = schemeId;
+        this.schemeType = schemeType;
+        this.applyType = applyType;
+    }
 
     public Long getId() {
         return id;
@@ -42,35 +51,27 @@ public class ProjectConfig extends AuditDomain {
         this.projectId = projectId;
     }
 
-    public Long getIssueTypeSchemeId() {
-        return issueTypeSchemeId;
+    public Long getSchemeId() {
+        return schemeId;
     }
 
-    public void setIssueTypeSchemeId(Long issueTypeSchemeId) {
-        this.issueTypeSchemeId = issueTypeSchemeId;
+    public void setSchemeId(Long schemeId) {
+        this.schemeId = schemeId;
     }
 
-    public Long getFieldConfigSchemeId() {
-        return fieldConfigSchemeId;
+    public String getSchemeType() {
+        return schemeType;
     }
 
-    public void setFieldConfigSchemeId(Long fieldConfigSchemeId) {
-        this.fieldConfigSchemeId = fieldConfigSchemeId;
+    public void setSchemeType(String schemeType) {
+        this.schemeType = schemeType;
     }
 
-    public Long getPageIssueTypeSchemeId() {
-        return pageIssueTypeSchemeId;
+    public String getApplyType() {
+        return applyType;
     }
 
-    public void setPageIssueTypeSchemeId(Long pageIssueTypeSchemeId) {
-        this.pageIssueTypeSchemeId = pageIssueTypeSchemeId;
-    }
-
-    public Long getStateMachineSchemeId() {
-        return stateMachineSchemeId;
-    }
-
-    public void setStateMachineSchemeId(Long stateMachineSchemeId) {
-        this.stateMachineSchemeId = stateMachineSchemeId;
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 }

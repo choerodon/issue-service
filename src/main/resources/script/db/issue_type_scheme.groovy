@@ -11,7 +11,7 @@ databaseChangeLog(logicalFilePath: 'issue_type_scheme.groovy') {
                 constraints(nullable: 'false')
             }
             column(name: 'description', type: 'VARCHAR(255)', remarks: '描述')
-            column(name: 'type', type: 'VARCHAR(30)', remarks: '问题类型方案类型')
+            column(name: 'apply_type', type: 'VARCHAR(30)', remarks: '方案应用类型')
             column(name: 'default_issue_type_id', type: 'BIGINT UNSIGNED', remarks: '默认问题类型id') {
                 constraints(nullable: 'false')
             }

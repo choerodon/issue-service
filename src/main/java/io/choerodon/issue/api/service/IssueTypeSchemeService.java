@@ -105,5 +105,5 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      * @param projectCode
      * @return
      */
-    IssueTypeScheme initByConsumeCreateProject(Long projectId, String projectCode);
+    void initByConsumeCreateProject(Long projectId, String projectCode);
 }

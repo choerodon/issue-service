@@ -1,10 +1,7 @@
 package io.choerodon.issue.fixdata.feign;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +15,8 @@ import java.util.Map;
 @Component
 public class FixStateMachineFeignClientFallback implements FixStateMachineFeignClient {
     @Override
-    public ResponseEntity<Long> createStateMachine(Long organizationId, String projectCode, List<String> statuses) {
-        throw new CommonException("error.fixStateMachineFeignClient.createStateMachine");
+    public ResponseEntity<Map<String, Long>> createAGStateMachineAndTEStateMachine(Long organizationId, String projectCode, List<String> statuses) {
+        throw new CommonException("error.fixStateMachineFeignClient.createAGStateMachineAndTEStateMachine");
     }
 
     @Override

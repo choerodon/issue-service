@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.issue.api.dto.PageIssueSchemeDTO;
+import io.choerodon.issue.api.dto.PageIssueTypeSchemeDTO;
 import io.choerodon.issue.domain.PageIssueScheme;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -19,7 +19,7 @@ public interface PageIssueSchemeService extends BaseService<PageIssueScheme> {
      * @param params 模糊查询参数
      * @return 状态机方案列表
      */
-    Page<PageIssueSchemeDTO> pageQuery(PageRequest pageRequest, PageIssueSchemeDTO schemeDTO, String params);
+    Page<PageIssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, PageIssueTypeSchemeDTO schemeDTO, String params);
 
     /**
      * 创建问题类型页面方案
@@ -27,7 +27,7 @@ public interface PageIssueSchemeService extends BaseService<PageIssueScheme> {
      * @param schemeDTO 问题类型页面方案对象
      * @return 状态机方案对象
      */
-    PageIssueSchemeDTO create(Long organizationId, PageIssueSchemeDTO schemeDTO);
+    PageIssueTypeSchemeDTO create(Long organizationId, PageIssueTypeSchemeDTO schemeDTO);
 
     /**
      * 更新问题类型页面方案
@@ -36,7 +36,7 @@ public interface PageIssueSchemeService extends BaseService<PageIssueScheme> {
      * @param schemeDTO 问题类型页面方案对象
      * @return 方案对象
      */
-    PageIssueSchemeDTO update(Long organizationId, Long schemeId, PageIssueSchemeDTO schemeDTO);
+    PageIssueTypeSchemeDTO update(Long organizationId, Long schemeId, PageIssueTypeSchemeDTO schemeDTO);
 
     /**
      * 删除问题类型页面方案
@@ -61,6 +61,6 @@ public interface PageIssueSchemeService extends BaseService<PageIssueScheme> {
      * @param schemeId 方案id
      * @return 状态机方案及配置
      */
-    PageIssueSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
+    PageIssueTypeSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
 
 }

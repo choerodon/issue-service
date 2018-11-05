@@ -199,7 +199,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Override
     public Map<Long, Map<String, Long>> initProrityByOrganization(List<Long> organizationIds) {
-        Map<Long, Map<String, Long>> result = new HashMap<>();
+        Map<Long, Map<String, Long>> result = new HashMap<>(organizationIds.size());
         for (Long organizationId : organizationIds) {
             result.put(organizationId, initPrority(organizationId));
         }
