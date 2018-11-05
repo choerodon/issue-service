@@ -3,7 +3,6 @@ package io.choerodon.issue.fixdata.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.IssueType;
-import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.issue.domain.Priority;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
@@ -80,27 +79,14 @@ public class FixDataServiceImpl implements FixDataService {
                 logger.info("开始修复项目{}", projectId);
                 String projectCode = projectUtil.getCode(projectId);
                 List<String> statusNames = listEntry.getValue().stream().map(StatusForMoveDataDO::getName).collect(Collectors.toList());
+
                 //创建状态机
-                Long stateMachineId = fixStateMachineFeignClient.createStateMachine(organizationId, projectCode, statusNames).getBody();
-                //创建状态机方案
-                StateMachineScheme stateMachineScheme = new StateMachineScheme();
-                stateMachineScheme.setApplyType(SchemeApplyType.AGILE);
-                stateMachineScheme.setName(projectCode + "默认状态机方案");
-                stateMachineScheme.setDescription(projectCode + "默认状态机方案");
-                stateMachineScheme.setDefaultStateMachineId(stateMachineId);
-                stateMachineScheme.setOrganizationId(organizationId);
-                //保证幂等性
-                List<StateMachineScheme> schemes = stateMachineSchemeMapper.select(stateMachineScheme);
-                if (schemes.isEmpty()) {
-                    int isInsert = stateMachineSchemeMapper.insert(stateMachineScheme);
-                    if (isInsert != 1) {
-                        throw new CommonException("error.stateMachineScheme.create");
-                    }
-                } else {
-                    stateMachineScheme = schemes.get(0);
-                }
-                //创建与项目的关联关系
-                projectConfigService.create(projectId, stateMachineScheme.getId(), SchemeType.STATE_MACHINE, SchemeApplyType.AGILE);
+                Map<String, Long> stateMachineIdMap = fixStateMachineFeignClient.createAGStateMachineAndTEStateMachine(organizationId, projectCode, statusNames).getBody();
+
+                //创建敏捷状态机方案
+                fixCreateStateMachineScheme(organizationId, projectId, projectCode + "默认状态机方案【敏捷】", stateMachineIdMap.get(SchemeApplyType.AGILE), SchemeApplyType.AGILE);
+                //创建测试状态机方案
+                fixCreateStateMachineScheme(organizationId, projectId, projectCode + "默认状态机方案【测试】", stateMachineIdMap.get(SchemeApplyType.TEST), SchemeApplyType.TEST);
 
                 //创建问题类型方案
                 issueTypeSchemeService.initByConsumeCreateProject(projectId, projectCode);
@@ -111,6 +97,35 @@ public class FixDataServiceImpl implements FixDataService {
             logger.info("完成修复组织{}", organizationId);
         }
         logger.info("修复成功");
+    }
+
+    /**
+     * 修复创建状态机方案
+     *
+     * @param organizationId
+     * @param projectId
+     * @param name
+     * @param stateMachineId
+     * @param schemeApplyType
+     */
+    private void fixCreateStateMachineScheme(Long organizationId, Long projectId, String name, Long stateMachineId, String schemeApplyType) {
+
+        StateMachineScheme scheme = new StateMachineScheme();
+        scheme.setApplyType(SchemeApplyType.AGILE);
+        scheme.setName(name);
+        scheme.setDescription(name);
+        scheme.setDefaultStateMachineId(stateMachineId);
+        scheme.setOrganizationId(organizationId);
+        //保证幂等性
+        List<StateMachineScheme> stateMachines = stateMachineSchemeMapper.select(scheme);
+        if (stateMachines.isEmpty()) {
+            int isInsert = stateMachineSchemeMapper.insert(scheme);
+            if (isInsert != 1) {
+                throw new CommonException("error.stateMachineScheme.create");
+            }
+            //创建与项目的关联关系
+            projectConfigService.create(projectId, scheme.getId(), SchemeType.STATE_MACHINE, schemeApplyType);
+        }
     }
 
 

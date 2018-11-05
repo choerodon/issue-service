@@ -1,9 +1,6 @@
 package io.choerodon.issue.fixdata.feign;
 
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -24,20 +21,21 @@ import java.util.Map;
 public interface FixStateMachineFeignClient {
 
     /**
-     * 修复创建项目默认状态机
+     * 修复创建项目默认敏捷状态机和测试状态机
      *
      * @param organizationId
      * @param projectCode
      * @param statuses
      * @return
      */
-    @RequestMapping(value = "/v1/fix_data/create_state_machine", method = RequestMethod.POST)
-    ResponseEntity<Long> createStateMachine(@RequestParam(value = "organization_id") Long organizationId,
-                                                       @RequestParam(value = "project_code") String projectCode,
-                                                       @RequestBody List<String> statuses);
+    @RequestMapping(value = "/v1/fix_data/create_state_machine_AG_TE", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Long>> createAGStateMachineAndTEStateMachine(@RequestParam(value = "organization_id") Long organizationId,
+                                                                            @RequestParam(value = "project_code") String projectCode,
+                                                                            @RequestBody List<String> statuses);
 
     /**
      * 根据敏捷状态数据，修复创建状态
+     *
      * @param statusForMoveDataDOList
      * @return
      */

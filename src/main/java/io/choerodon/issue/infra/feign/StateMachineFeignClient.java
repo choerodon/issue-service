@@ -88,6 +88,7 @@ public interface StateMachineFeignClient {
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project", method = RequestMethod.POST)
     ResponseEntity<Long> createStateMachineWithCreateProject(@PathVariable("organization_id") Long organizationId,
+                                                             @RequestParam("applyType") String applyType,
                                                              @RequestBody ProjectEvent projectEvent);
 
     /**
