@@ -121,9 +121,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         List<ProjectConfig> projectConfigs = projectConfigMapper.queryByProjectId(projectId);
         Map<String, List<ProjectConfig>> configMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getSchemeType));
         ProjectConfigDetailDTO projectConfigDetailDTO = new ProjectConfigDetailDTO();
+        projectConfigDetailDTO.setProjectId(projectId);
         //获取问题类型方案
         List<ProjectConfig> issueTypeSchemeConfigs = configMap.get(SchemeType.ISSUE_TYPE);
-        if (!issueTypeSchemeConfigs.isEmpty()) {
+        if (issueTypeSchemeConfigs != null && !issueTypeSchemeConfigs.isEmpty()) {
             Map<String, IssueTypeSchemeDTO> issueTypeSchemeMap = new HashMap<>(issueTypeSchemeConfigs.size());
             for (ProjectConfig projectConfig : issueTypeSchemeConfigs) {
                 IssueTypeSchemeDTO issueTypeSchemeDTO = issueTypeSchemeService.queryById(organizationId, projectConfig.getSchemeId());
@@ -133,7 +134,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         }
         //获取状态机方案
         List<ProjectConfig> stateMachineSchemeConfigs = configMap.get(SchemeType.STATE_MACHINE);
-        if (!stateMachineSchemeConfigs.isEmpty()) {
+        if (stateMachineSchemeConfigs != null && !stateMachineSchemeConfigs.isEmpty()) {
             Map<String, StateMachineSchemeDTO> stateMachineSchemeMap = new HashMap<>(stateMachineSchemeConfigs.size());
             for (ProjectConfig projectConfig : stateMachineSchemeConfigs) {
                 StateMachineSchemeDTO stateMachineSchemeDTO = stateMachineSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getSchemeId());
@@ -143,7 +144,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         }
         //获取问题类型页面方案
         List<ProjectConfig> pageIssueTypeSchemeConfigs = configMap.get(SchemeType.PAGE_ISSUE_TYPE);
-        if (!pageIssueTypeSchemeConfigs.isEmpty()) {
+        if (pageIssueTypeSchemeConfigs != null && !pageIssueTypeSchemeConfigs.isEmpty()) {
             Map<String, PageIssueTypeSchemeDTO> pageIssueTypeSchemeMap = new HashMap<>(pageIssueTypeSchemeConfigs.size());
             for (ProjectConfig projectConfig : pageIssueTypeSchemeConfigs) {
                 PageIssueTypeSchemeDTO pageIssueTypeSchemeDTO = pageIssueSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getSchemeId());
@@ -153,7 +154,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         }
         //获取字段配置方案
         List<ProjectConfig> fieldConfigSchemeConfigs = configMap.get(SchemeType.FIELD_CONFIG);
-        if (!fieldConfigSchemeConfigs.isEmpty()) {
+        if (fieldConfigSchemeConfigs != null && !fieldConfigSchemeConfigs.isEmpty()) {
             Map<String, FieldConfigSchemeDetailDTO> fieldConfigSchemeMap = new HashMap<>(fieldConfigSchemeConfigs.size());
             for (ProjectConfig projectConfig : fieldConfigSchemeConfigs) {
                 FieldConfigSchemeDetailDTO fieldConfigSchemeDTO = fieldConfigSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getSchemeId());
