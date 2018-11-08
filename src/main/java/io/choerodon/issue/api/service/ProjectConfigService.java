@@ -118,7 +118,7 @@ public interface ProjectConfigService {
     Long queryStateMachineId(Long projectId, String applyType, Long issueTypeId);
 
     /**
-     * 敏捷添加状态
+     * 【敏捷】新增状态
      *
      * @param projectId
      * @param statusDTO
@@ -126,6 +126,14 @@ public interface ProjectConfigService {
      */
     StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO);
 
+    /**
+     * 【敏捷】校验是否能新增状态
+     *
+     * @param projectId
+     * @param statusDTO
+     * @return
+     */
+    Boolean checkCreateStatusForAgile(Long projectId, StatusDTO statusDTO);
     /**
      * 查询状态机关联的项目id列表
      *
