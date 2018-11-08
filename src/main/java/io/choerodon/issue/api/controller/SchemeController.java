@@ -56,12 +56,13 @@ public class SchemeController extends BaseController {
                                                                          @RequestParam("apply_type") String applyType) {
         return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, applyType), HttpStatus.OK);
     }
+
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询项目下某个问题类型的所有状态")
     @GetMapping(value = "/query_status_by_issue_type_id")
     public ResponseEntity<List<StatusDTO>> queryStatusByIssueTypeId(@PathVariable("project_id") Long projectId,
-                                                                       @RequestParam("issue_type_id") Long issueTypeId,
-                                                                       @RequestParam("apply_type") String applyType) {
+                                                                    @RequestParam("issue_type_id") Long issueTypeId,
+                                                                    @RequestParam("apply_type") String applyType) {
         return new ResponseEntity<>(projectConfigService.queryStatusByIssueTypeId(projectId, issueTypeId, applyType), HttpStatus.OK);
     }
 
@@ -69,7 +70,7 @@ public class SchemeController extends BaseController {
     @ApiOperation(value = "查询项目下的所有状态")
     @GetMapping(value = "/query_status_by_project_id")
     public ResponseEntity<List<StatusDTO>> queryStatusByProjectId(@PathVariable("project_id") Long projectId,
-                                                                    @RequestParam("apply_type") String applyType) {
+                                                                  @RequestParam("apply_type") String applyType) {
         return new ResponseEntity<>(projectConfigService.queryStatusByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
@@ -87,8 +88,14 @@ public class SchemeController extends BaseController {
     @PostMapping(value = "/create_status_for_agile")
     public ResponseEntity<StatusDTO> createStatusForAgile(@PathVariable("project_id") Long projectId,
                                                           @RequestBody StatusDTO statusDTO) {
-        return Optional.ofNullable(projectConfigService.createStatusForAgile(projectId, statusDTO))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.status.get"));
+        return new ResponseEntity<>(projectConfigService.createStatusForAgile(projectId, statusDTO), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "【敏捷】校验是否能新增状态")
+    @PostMapping(value = "/check_create_status_for_agile")
+    public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId,
+                                                               @RequestBody StatusDTO statusDTO) {
+        return new ResponseEntity<>(projectConfigService.checkCreateStatusForAgile(projectId, statusDTO), HttpStatus.OK);
     }
 }

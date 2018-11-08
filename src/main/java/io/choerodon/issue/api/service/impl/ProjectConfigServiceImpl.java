@@ -338,9 +338,39 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         }
 
         Long stateMachineId = stateMachineScheme.getDefaultStateMachineId();
+        if (stateMachineId == null) {
+            throw new CommonException("error.stateMachineScheme.defaultStateMachineId.notNull");
+        }
 
         statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
         return statusDTO;
+    }
+
+    @Override
+    public Boolean checkCreateStatusForAgile(Long projectId, StatusDTO statusDTO) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        statusDTO.setOrganizationId(organizationId);
+        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, SchemeApplyType.AGILE).getSchemeId();
+        //校验状态机方案是否只关联一个项目
+        ProjectConfig select = new ProjectConfig();
+        select.setSchemeId(stateMachineSchemeId);
+        select.setSchemeType(SchemeType.STATE_MACHINE);
+        select.setApplyType(SchemeApplyType.AGILE);
+        if (projectConfigMapper.select(select).size() > 1) {
+            return false;
+        }
+        //校验状态机方案是否只有一个状态机
+        StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
+        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
+        schemeConfig.setSchemeId(stateMachineSchemeId);
+        if (!stateMachineSchemeConfigMapper.select(schemeConfig).isEmpty()) {
+            return false;
+        }
+        Long stateMachineId = stateMachineScheme.getDefaultStateMachineId();
+        if (stateMachineId == null) {
+            return false;
+        }
+        return true;
     }
 
     @Override
