@@ -10,6 +10,7 @@ import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shinan.chen
@@ -141,5 +142,5 @@ public interface ProjectConfigService {
      * @param stateMachineId
      * @return
      */
-    List<Long> queryProjectIds(Long organizationId, Long stateMachineId);
+    Map<String, List<Long>> queryProjectIdsMap(Long organizationId, Long stateMachineId);
 }

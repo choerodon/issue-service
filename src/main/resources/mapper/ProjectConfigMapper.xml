@@ -8,13 +8,13 @@
         WHERE project_id = #{projectId}
     </select>
 
-    <select id="queryProjectIdsBySchemeIds" resultType="java.lang.Long">
-        SELECT project_id
+    <select id="queryBySchemeIds" resultType="io.choerodon.issue.domain.ProjectConfig">
+        SELECT *
         FROM project_config
-        WHERE 1 = 1 AND
-        <if test="stateMachineSchemeIds != null and stateMachineSchemeIds.size()>0">
-            state_machine_scheme_id IN
-            <foreach item="item" index="index" collection="stateMachineSchemeIds" open="(" separator="," close=")">
+        WHERE scheme_type = #{schemeType}
+        <if test="schemeIds != null and schemeIds.size()>0">
+            AND scheme_id IN
+            <foreach item="item" index="index" collection="schemeIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
