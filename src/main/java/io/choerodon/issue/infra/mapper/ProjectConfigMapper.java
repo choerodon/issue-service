@@ -17,5 +17,5 @@ public interface ProjectConfigMapper extends BaseMapper<ProjectConfig> {
 
     ProjectConfig queryBySchemeTypeAndApplyType(@Param("projectId") Long projectId, @Param("schemeType") String schemeType, @Param("applyType") String applyType);
 
-    List<Long> queryProjectIdsBySchemeIds(@Param("stateMachineSchemeIds") List<Long> stateMachineSchemeIds);
+    List<ProjectConfig> queryBySchemeIds(@Param("schemeIds") List<Long> schemeIds, @Param("schemeType") String schemeType);
 }

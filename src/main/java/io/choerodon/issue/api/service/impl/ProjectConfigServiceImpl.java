@@ -374,7 +374,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public List<Long> queryProjectIds(Long organizationId, Long stateMachineId) {
+    public Map<String, List<Long>> queryProjectIdsMap(Long organizationId, Long stateMachineId) {
         //查询出默认状态机的状态机方案
         StateMachineScheme stateMachineScheme = new StateMachineScheme();
         stateMachineScheme.setDefaultStateMachineId(stateMachineId);
@@ -387,8 +387,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         schemeIds.addAll(stateMachineSchemeConfigMapper.select(schemeConfig).stream().map(StateMachineSchemeConfig::getSchemeId).collect(Collectors.toList()));
 
         if (!schemeIds.isEmpty()) {
-            return projectConfigMapper.queryProjectIdsBySchemeIds(schemeIds);
+            List<ProjectConfig> projectConfigs = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE);
+            Map<String, List<Long>> projectIdsMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getApplyType,Collectors.mapping(ProjectConfig::getProjectId,Collectors.toList())));
+            return projectIdsMap;
         }
-        return Collections.emptyList();
+        return Collections.emptyMap();
     }
 }

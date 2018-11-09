@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -79,12 +80,12 @@ public class StateMachineController {
 
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "查询状态机关联的项目id列表")
-    @GetMapping(value = "/query_project_ids")
-    public ResponseEntity<List<Long>> queryProjectIds(@PathVariable("organization_id") Long organizationId,
-                                                      @RequestParam("state_machine_id") Long stateMachineId) {
-        return Optional.ofNullable(projectConfigService.queryProjectIds(organizationId, stateMachineId))
+    @ApiOperation(value = "查询状态机关联的项目id列表的Map")
+    @GetMapping(value = "/query_project_ids_map")
+    public ResponseEntity<Map<String, List<Long>>> queryProjectIdsMap(@PathVariable("organization_id") Long organizationId,
+                                                                      @RequestParam("state_machine_id") Long stateMachineId) {
+        return Optional.ofNullable(projectConfigService.queryProjectIdsMap(organizationId, stateMachineId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.queryProjectIds.get"));
+                .orElseThrow(() -> new CommonException("error.queryProjectIdsMap.get"));
     }
 }
