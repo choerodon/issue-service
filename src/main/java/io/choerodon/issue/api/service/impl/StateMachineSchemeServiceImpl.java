@@ -243,7 +243,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setApplyType(SchemeApplyType.AGILE);
+        scheme.setApplyType(schemeApplyType);
         scheme.setName(name);
         scheme.setDescription(name);
         scheme.setDefaultStateMachineId(stateMachineId);

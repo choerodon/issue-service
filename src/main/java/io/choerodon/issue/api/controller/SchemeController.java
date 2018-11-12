@@ -1,7 +1,6 @@
 package io.choerodon.issue.api.controller;
 
 import io.choerodon.core.base.BaseController;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithStateMachineIdDTO;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 根据项目id获取对应数据
@@ -95,7 +93,15 @@ public class SchemeController extends BaseController {
     @ApiOperation(value = "【敏捷】校验是否能新增状态")
     @PostMapping(value = "/check_create_status_for_agile")
     public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId,
-                                                               @RequestBody StatusDTO statusDTO) {
-        return new ResponseEntity<>(projectConfigService.checkCreateStatusForAgile(projectId, statusDTO), HttpStatus.OK);
+                                                             @RequestBody StatusDTO statusDTO) {
+        return new ResponseEntity<>((Boolean) projectConfigService.checkCreateStatusForAgile(projectId).get("flag"), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "【敏捷】校验是否能删除状态")
+    @PostMapping(value = "/check_delete_status_for_agile")
+    public ResponseEntity<Boolean> checkDeleteStatusForAgile(@PathVariable("project_id") Long projectId,
+                                                             @RequestParam("status_id") Long statusId) {
+        return new ResponseEntity<>(projectConfigService.checkDeleteStatusForAgile(projectId, statusId), HttpStatus.OK);
     }
 }

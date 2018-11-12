@@ -39,6 +39,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectConfigServiceImpl.class);
     private static final String YES = "1";
     private static final String AGILE_SERVICE = "agile-service";
+    private static final String FLAG = "flag";
+    private static final String MESSAGE = "message";
+    private static final String STATEMACHINEID = "stateMachineId";
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
@@ -320,36 +323,20 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     public StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         statusDTO.setOrganizationId(organizationId);
-        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, SchemeApplyType.AGILE).getSchemeId();
-        //校验状态机方案是否只关联一个项目
-        ProjectConfig select = new ProjectConfig();
-        select.setSchemeId(stateMachineSchemeId);
-        select.setSchemeType(SchemeType.STATE_MACHINE);
-        select.setApplyType(SchemeApplyType.AGILE);
-        if (projectConfigMapper.select(select).size() > 1) {
-            throw new CommonException("error.createStatusForAgile.multiScheme");
+        Map<String, Object> result = checkCreateStatusForAgile(projectId);
+        if ((Boolean) result.get(FLAG)) {
+            Long stateMachineId = (Long) result.get(STATEMACHINEID);
+            statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
+        } else {
+            throw new CommonException((String) result.get(MESSAGE));
         }
-        //校验状态机方案是否只有一个状态机
-        StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
-        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
-        schemeConfig.setSchemeId(stateMachineSchemeId);
-        if (!stateMachineSchemeConfigMapper.select(schemeConfig).isEmpty()) {
-            throw new CommonException("error.createStatusForAgile.multiScheme");
-        }
-
-        Long stateMachineId = stateMachineScheme.getDefaultStateMachineId();
-        if (stateMachineId == null) {
-            throw new CommonException("error.stateMachineScheme.defaultStateMachineId.notNull");
-        }
-
-        statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
         return statusDTO;
     }
 
     @Override
-    public Boolean checkCreateStatusForAgile(Long projectId, StatusDTO statusDTO) {
-        Long organizationId = projectUtil.getOrganizationId(projectId);
-        statusDTO.setOrganizationId(organizationId);
+    public Map<String, Object> checkCreateStatusForAgile(Long projectId) {
+        Map<String, Object> result = new HashMap<>(3);
+        result.put(FLAG, true);
         Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, SchemeApplyType.AGILE).getSchemeId();
         //校验状态机方案是否只关联一个项目
         ProjectConfig select = new ProjectConfig();
@@ -357,20 +344,55 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         select.setSchemeType(SchemeType.STATE_MACHINE);
         select.setApplyType(SchemeApplyType.AGILE);
         if (projectConfigMapper.select(select).size() > 1) {
-            return false;
+            result.put(FLAG, false);
+            result.put(MESSAGE, "error.stateMachineScheme.multiScheme");
+            return result;
         }
         //校验状态机方案是否只有一个状态机
         StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
         StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
         schemeConfig.setSchemeId(stateMachineSchemeId);
         if (!stateMachineSchemeConfigMapper.select(schemeConfig).isEmpty()) {
-            return false;
+            result.put(FLAG, false);
+            result.put(MESSAGE, "error.stateMachineScheme.multiStateMachine");
+            return result;
         }
         Long stateMachineId = stateMachineScheme.getDefaultStateMachineId();
         if (stateMachineId == null) {
-            return false;
+            result.put(FLAG, false);
+            result.put(MESSAGE, "error.stateMachineScheme.defaultStateMachineId.notNull");
+            return result;
         }
-        return true;
+        //校验这个状态机是否只关联一个方案
+        StateMachineScheme selectScheme = new StateMachineScheme();
+        selectScheme.setDefaultStateMachineId(stateMachineId);
+        List<StateMachineScheme> selectSchemes = stateMachineSchemeMapper.select(selectScheme);
+        if (selectSchemes.size() > 1) {
+            result.put(FLAG, false);
+            result.put(MESSAGE, "error.stateMachineScheme.stateMachineMoreThanOne");
+            return result;
+        }
+        StateMachineSchemeConfig selectSchemeConfig = new StateMachineSchemeConfig();
+        selectSchemeConfig.setStateMachineId(stateMachineId);
+        if (!stateMachineSchemeConfigMapper.select(selectSchemeConfig).isEmpty()) {
+            result.put(FLAG, false);
+            result.put(MESSAGE, "error.stateMachineScheme.stateMachineMoreThanOne");
+            return result;
+        }
+        result.put(STATEMACHINEID, stateMachineId);
+        return result;
+    }
+
+    @Override
+    public Boolean checkDeleteStatusForAgile(Long projectId, Long statusId) {
+        Map<String, Object> result = checkCreateStatusForAgile(projectId);
+        if ((Boolean) result.get(FLAG)) {
+            Long stateMachineId = (Long) result.get(STATEMACHINEID);
+            //校验是否有issue用到这个状态
+        } else {
+            throw new CommonException((String) result.get(MESSAGE));
+        }
+        return null;
     }
 
     @Override
@@ -388,7 +410,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
         if (!schemeIds.isEmpty()) {
             List<ProjectConfig> projectConfigs = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE);
-            Map<String, List<Long>> projectIdsMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getApplyType,Collectors.mapping(ProjectConfig::getProjectId,Collectors.toList())));
+            Map<String, List<Long>> projectIdsMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getApplyType, Collectors.mapping(ProjectConfig::getProjectId, Collectors.toList())));
             return projectIdsMap;
         }
         return Collections.emptyMap();
