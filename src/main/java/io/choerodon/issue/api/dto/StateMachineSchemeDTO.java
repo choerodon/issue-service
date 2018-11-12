@@ -11,7 +11,6 @@ public class StateMachineSchemeDTO {
     private String name;
     private String description;
     private String applyType;
-    private Long defaultStateMachineId;
     private Long organizationId;
     private Long objectVersionNumber;
 
@@ -41,14 +40,6 @@ public class StateMachineSchemeDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getDefaultStateMachineId() {
-        return defaultStateMachineId;
-    }
-
-    public void setDefaultStateMachineId(Long defaultStateMachineId) {
-        this.defaultStateMachineId = defaultStateMachineId;
     }
 
     public Long getOrganizationId() {

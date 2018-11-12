@@ -9,8 +9,10 @@ public class StateMachineSchemeConfigDTO {
     private Long schemeId;
     private Long issueTypeId;
     private Long stateMachineId;
-    private Double sequence;
+    private Boolean isDefault;
+    private int sequence;
     private Long objectVersionNumber;
+    private Long organizationId;
 
     private String stateMachineName;
     private String issueTypeName;
@@ -80,11 +82,27 @@ public class StateMachineSchemeConfigDTO {
         this.issueTypeIcon = issueTypeIcon;
     }
 
-    public Double getSequence() {
+    public int getSequence() {
         return sequence;
     }
 
-    public void setSequence(Double sequence) {
+    public void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }

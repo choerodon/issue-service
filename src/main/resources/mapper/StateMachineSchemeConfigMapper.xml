@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper">
+
+    <select id="selectDefault" resultType="io.choerodon.issue.domain.StateMachineSchemeConfig">
+        SELECT
+        smsc.*
+        FROM
+        state_machine_scheme_config smsc
+        WHERE
+        smsc.organization_id = #{organizationId}
+        AND smsc.scheme_id = #{schemeId}
+    </select>
+
+</mapper>

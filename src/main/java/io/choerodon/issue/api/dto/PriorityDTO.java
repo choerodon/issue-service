@@ -1,7 +1,5 @@
 package io.choerodon.issue.api.dto;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.math.BigDecimal;
 
 /**
@@ -10,10 +8,8 @@ import java.math.BigDecimal;
  */
 
 public class PriorityDTO {
-    @Id
-    @GeneratedValue
-    private Long id;
 
+    private Long id;
     private String name;
     private String description;
     private String colour;
@@ -21,36 +17,6 @@ public class PriorityDTO {
     private Boolean isDefault;
     private Long objectVersionNumber;
     private BigDecimal sequence;
-
-    @Override
-    public String toString() {
-        return "PriorityDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", colour='" + colour + '\'' +
-                ", organizationId=" + organizationId +
-                ", isDefault='" + isDefault + '\'' +
-                ", objectVersionNumber=" + objectVersionNumber +
-                ", sequence=" + sequence +
-                '}';
-    }
-
-    public BigDecimal getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(BigDecimal sequence) {
-        this.sequence = sequence;
-    }
-
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
-    }
 
     public Long getId() {
         return id;
@@ -92,11 +58,27 @@ public class PriorityDTO {
         this.organizationId = organizationId;
     }
 
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
     public void setDefault(Boolean aDefault) {
         isDefault = aDefault;
     }
 
-    public Boolean getDefault() {
-        return isDefault;
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public void setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
+    }
+
+    public BigDecimal getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(BigDecimal sequence) {
+        this.sequence = sequence;
     }
 }

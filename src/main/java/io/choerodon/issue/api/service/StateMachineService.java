@@ -75,14 +75,6 @@ public interface StateMachineService {
     Issue createIssue(Long organizationId, Long stateMachineId);
 
     /**
-     * 通过状态机方案id和问题类型id查询出状态机
-     * @param stateMachineSchemeId
-     * @param issueTypeId
-     * @return
-     */
-    Long queryBySchemeIdAndIssueTypeId(Long stateMachineSchemeId,Long issueTypeId);
-
-    /**
      * 通过状态机方案id查询出所有状态机
      *
      * @param stateMachineSchemeId

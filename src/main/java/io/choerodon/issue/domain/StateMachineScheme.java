@@ -24,7 +24,6 @@ public class StateMachineScheme extends AuditDomain {
     private String name;
     private String applyType;
     private String description;
-    private Long defaultStateMachineId;
     private Long organizationId;
 
     @Transient
@@ -52,14 +51,6 @@ public class StateMachineScheme extends AuditDomain {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getDefaultStateMachineId() {
-        return defaultStateMachineId;
-    }
-
-    public void setDefaultStateMachineId(Long defaultStateMachineId) {
-        this.defaultStateMachineId = defaultStateMachineId;
     }
 
     public Long getOrganizationId() {

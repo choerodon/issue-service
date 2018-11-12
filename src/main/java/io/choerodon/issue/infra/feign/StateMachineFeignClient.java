@@ -34,6 +34,15 @@ public interface StateMachineFeignClient {
                                                           @RequestParam(value = "state_machine_id") Long stateMachineId);
 
     /**
+     * 获取组织默认状态机
+     *
+     * @param organizationId 组织id
+     * @return 状态机
+     */
+    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/default", method = RequestMethod.GET)
+    ResponseEntity<StateMachineDTO> queryDefaultStateMachine(@RequestParam(value = "organization_id") Long organizationId);
+
+    /**
      * 分页查询状态机列表
      *
      * @param organizationId

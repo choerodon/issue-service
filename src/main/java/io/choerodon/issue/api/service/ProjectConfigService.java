@@ -131,10 +131,17 @@ public interface ProjectConfigService {
      * 【敏捷】校验是否能新增状态
      *
      * @param projectId
-     * @param statusDTO
      * @return
      */
-    Boolean checkCreateStatusForAgile(Long projectId, StatusDTO statusDTO);
+    Map<String, Object> checkCreateStatusForAgile(Long projectId);
+
+    /**
+     * 【敏捷】校验是否能删除状态
+     * @param projectId
+     * @return
+     */
+    Boolean checkDeleteStatusForAgile(Long projectId, Long statusId);
+
     /**
      * 查询状态机关联的项目id列表
      *

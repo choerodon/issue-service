@@ -14,6 +14,7 @@ public class StateMachineDTO {
     private String description;
     private String status;
     private Long organizationId;
+    private Boolean isDefault;
 
     List<StateMachineSchemeDTO> stateMachineSchemeDTOs;
 
@@ -63,5 +64,13 @@ public class StateMachineDTO {
 
     public void setStateMachineSchemeDTOs(List<StateMachineSchemeDTO> stateMachineSchemeDTOs) {
         this.stateMachineSchemeDTOs = stateMachineSchemeDTOs;
+    }
+
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
     }
 }

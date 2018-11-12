@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -134,47 +135,15 @@ public class StateMachineServiceImpl implements StateMachineService {
     }
 
     @Override
-    public Long queryBySchemeIdAndIssueTypeId(Long stateMachineSchemeId, Long issueTypeId) {
-        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
-        config.setSchemeId(stateMachineSchemeId);
-        config.setIssueTypeId(issueTypeId);
-        Long stateMachineId;
-        List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(config);
-        if (configs.isEmpty()) {
-            StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
-            if (stateMachineScheme == null) {
-                throw new CommonException("error.queryBySchemeIdAndIssueTypeId.stateMachineScheme.notFound");
-            }
-            if (stateMachineScheme.getDefaultStateMachineId() != null) {
-                stateMachineId = stateMachineScheme.getDefaultStateMachineId();
-            } else {
-                throw new CommonException("error.queryBySchemeIdAndIssueTypeId.defaultStateMachineId.null");
-            }
-        } else {
-            stateMachineId = configs.get(0).getStateMachineId();
-        }
-        return stateMachineId;
-    }
-
-    @Override
     public List<Long> queryBySchemeId(Long stateMachineSchemeId) {
-        Set<Long> stateMachineIds = new HashSet<>();
         StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
         if (stateMachineScheme == null) {
             throw new CommonException("error.queryBySchemeId.stateMachineScheme.notFound");
         }
-        if (stateMachineScheme.getDefaultStateMachineId() != null) {
-            stateMachineIds.add(stateMachineScheme.getDefaultStateMachineId());
-        } else {
-            throw new CommonException("error.queryBySchemeId.defaultStateMachineId.null");
-        }
         StateMachineSchemeConfig select = new StateMachineSchemeConfig();
         select.setSchemeId(stateMachineSchemeId);
         List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(select);
-        configs.forEach(config->{
-            stateMachineIds.add(config.getStateMachineId());
-        });
-        return new ArrayList<>(stateMachineIds);
+        return configs.stream().map(StateMachineSchemeConfig::getStateMachineId).collect(Collectors.toList());
     }
 
     @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
