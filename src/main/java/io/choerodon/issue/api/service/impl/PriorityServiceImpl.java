@@ -43,8 +43,10 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priorityDTO.setSequence((priorityMapper.getNextSequence(organizationId)).add(new BigDecimal(1)));
         priorityDTO.setOrganizationId(organizationId);
         //若设置为默认值，则清空其他默认值
-        if (priorityDTO.getDefault()) {
+        if (priorityDTO.getDefault() != null && priorityDTO.getDefault()) {
             priorityMapper.updateDefaultPriority(organizationId);
+        } else {
+            priorityDTO.setDefault(false);
         }
         Priority priority = modelMapper.map(priorityDTO, Priority.class);
         if (!(this.checkName(organizationId, priorityDTO.getId(), priorityDTO.getName()))) {
@@ -75,8 +77,10 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             throw new CommonException("error.priority.update.name.same");
         }
         //若设置为默认值，则清空其他默认值
-        if (priorityDTO.getDefault()) {
+        if (priorityDTO.getDefault() != null && priorityDTO.getDefault()) {
             priorityMapper.updateDefaultPriority(priorityDTO.getOrganizationId());
+        } else {
+            priorityDTO.setDefault(false);
         }
         int isUpdate = priorityMapper.updateByPrimaryKeySelective(priority);
         if (isUpdate != 1) {

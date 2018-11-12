@@ -41,7 +41,7 @@ databaseChangeLog(logicalFilePath: 'priority.groovy') {
             column(name: "organization_id", type: "BIGINT UNSIGNED")
         }
         createIndex(tableName: "priority", indexName: "priority_n4") {
-            column(name: "is_default", type: "CHAR(1)")
+            column(name: "is_default", type: "TINYINT UNSIGNED")
         }
     }
 }
