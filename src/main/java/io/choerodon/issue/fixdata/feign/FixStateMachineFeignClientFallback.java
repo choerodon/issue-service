@@ -23,4 +23,9 @@ public class FixStateMachineFeignClientFallback implements FixStateMachineFeignC
     public void createStatus(List<StatusForMoveDataDO> statusForMoveDataDOList) {
         throw new CommonException("error.fixStateMachineFeignClient.createStatus");
     }
+
+    @Override
+    public void createDefaultStateMachine(Long organizationId) {
+        throw new CommonException("error.fixStateMachineFeignClient.createDefaultStateMachine");
+    }
 }

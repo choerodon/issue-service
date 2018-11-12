@@ -8,6 +8,7 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.ProjectConfigService;
+import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
@@ -44,6 +45,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private StateMachineSchemeMapper schemeMapper;
     @Autowired
     private StateMachineSchemeConfigMapper configMapper;
+    @Autowired
+    private StateMachineSchemeConfigService configService;
     @Autowired
     private IssueTypeMapper issueTypeMapper;
     @Autowired
@@ -106,9 +109,14 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         if (isInsert != 1) {
             throw new CommonException("error.stateMachineScheme.create");
         }
+
+        //创建一个defaultConfig【todo】stateMachineId
+        configService.createDefaultConfig(organizationId, scheme.getId(), null);
+
         scheme = schemeMapper.selectByPrimaryKey(scheme);
         return modelMapper.map(scheme, StateMachineSchemeDTO.class);
     }
+
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
@@ -246,7 +254,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         scheme.setApplyType(schemeApplyType);
         scheme.setName(name);
         scheme.setDescription(name);
-        scheme.setDefaultStateMachineId(stateMachineId);
         scheme.setOrganizationId(organizationId);
         //保证幂等性
         List<StateMachineScheme> stateMachines = schemeMapper.select(scheme);
@@ -255,6 +262,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             if (isInsert != 1) {
                 throw new CommonException("error.stateMachineScheme.create");
             }
+            //创建默认状态机配置
+            configService.createDefaultConfig(organizationId, scheme.getId(), stateMachineId);
+
             //创建与项目的关联关系
             projectConfigService.create(projectId, scheme.getId(), SchemeType.STATE_MACHINE, schemeApplyType);
         }

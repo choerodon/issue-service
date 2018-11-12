@@ -10,7 +10,13 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme_config.groovy') {
             column(name: 'scheme_id', type: 'BIGINT UNSIGNED', remarks: '方案ID')
             column(name: 'issue_type_id', type: 'BIGINT UNSIGNED', remarks: '问题类型ID')
             column(name: 'state_machine_id', type: 'BIGINT UNSIGNED', remarks: '状态机Id')
-            column(name: 'sequence', type: 'decimal', remarks: '排序')
+            column(name: 'is_default', type: 'TINYINT UNSIGNED', remarks: '是否组织默认状态机', defaultValue: '0'){
+                constraints(nullable: false)
+            }
+            column(name: 'organization_id', type: 'BIGINT UNSIGNED', remarks: '组织id')
+            column(name: 'sequence', type: 'INTEGER UNSIGNED', remarks: '排序') {
+                constraints(nullable: false)
+            }
 
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT", defaultValue: "1")
             column(name: "CREATED_BY", type: "BIGINT", defaultValue: "-1")

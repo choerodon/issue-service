@@ -25,6 +25,11 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     }
 
     @Override
+    public ResponseEntity<StateMachineDTO> queryDefaultStateMachine(Long organizationId) {
+        throw new CommonException("error.stateMachineFeignClient.queryDefaultStateMachine");
+    }
+
+    @Override
     public ResponseEntity<Page<StateMachineDTO>> pagingQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
         throw new CommonException("error.stateMachineFeignClient.pagingQuery");
     }

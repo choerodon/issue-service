@@ -42,4 +42,13 @@ public interface FixStateMachineFeignClient {
     @RequestMapping(value = "/v1/fix_data/create_status", method = RequestMethod.POST)
     void createStatus(@RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList);
 
+
+    /**
+     * 修复创建组织默认状态机
+     *
+     * @param organizationId
+     */
+    @RequestMapping(value = "/v1/fix_data/create_default_state_machine", method = RequestMethod.GET)
+    void createDefaultStateMachine(@RequestParam(value = "organization_id") Long organizationId);
+
 }

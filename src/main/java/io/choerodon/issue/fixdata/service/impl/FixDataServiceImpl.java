@@ -50,13 +50,14 @@ public class FixDataServiceImpl implements FixDataService {
     @Autowired
     private StateMachineSchemeMapper stateMachineSchemeMapper;
     @Autowired
+    private StateMachineSchemeConfigService stateMachineSchemeConfigService;
+    @Autowired
     private PriorityService priorityService;
     @Autowired
     private PriorityMapper priorityMapper;
 
     @Override
     public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses, Boolean isFixStatus) {
-
         logger.info("开始修复状态");
         //创建状态
         if (isFixStatus) {
@@ -73,6 +74,9 @@ public class FixDataServiceImpl implements FixDataService {
 
             //创建优先级
             priorityService.initProrityByOrganization(Arrays.asList(organizationId));
+
+            //创建默认状态机
+            fixStateMachineFeignClient.createDefaultStateMachine(organizationId);
 
             //根据项目id分组
             Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
@@ -111,12 +115,10 @@ public class FixDataServiceImpl implements FixDataService {
      * @param schemeApplyType
      */
     private void fixCreateStateMachineScheme(Long organizationId, Long projectId, String name, Long stateMachineId, String schemeApplyType) {
-
         StateMachineScheme scheme = new StateMachineScheme();
         scheme.setApplyType(schemeApplyType);
         scheme.setName(name);
         scheme.setDescription(name);
-        scheme.setDefaultStateMachineId(stateMachineId);
         scheme.setOrganizationId(organizationId);
         //保证幂等性
         List<StateMachineScheme> stateMachines = stateMachineSchemeMapper.select(scheme);
@@ -125,6 +127,9 @@ public class FixDataServiceImpl implements FixDataService {
             if (isInsert != 1) {
                 throw new CommonException("error.stateMachineScheme.create");
             }
+            //创建默认状态机配置
+            stateMachineSchemeConfigService.createDefaultConfig(organizationId, scheme.getId(), stateMachineId);
+
             //创建与项目的关联关系
             projectConfigService.create(projectId, scheme.getId(), SchemeType.STATE_MACHINE, schemeApplyType);
         }
