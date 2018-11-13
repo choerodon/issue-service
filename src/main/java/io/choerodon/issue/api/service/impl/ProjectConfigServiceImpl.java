@@ -345,7 +345,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //校验状态机方案是否只有一个状态机
         StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
         schemeConfig.setSchemeId(stateMachineSchemeId);
-        if (!stateMachineSchemeConfigMapper.select(schemeConfig).isEmpty()) {
+        if (stateMachineSchemeConfigMapper.select(schemeConfig).size() > 1) {
             result.put(FLAG, false);
             result.put(MESSAGE, "error.stateMachineScheme.multiStateMachine");
             return result;
@@ -361,7 +361,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         selectSchemeConfig.setStateMachineId(stateMachineId);
         selectSchemeConfig.setOrganizationId(organizationId);
         List<Long> schemeIds = stateMachineSchemeConfigMapper.select(selectSchemeConfig).stream().map(StateMachineSchemeConfig::getSchemeId).distinct().collect(Collectors.toList());
-        if (schemeIds.size()>1) {
+        if (schemeIds.size() > 1) {
             result.put(FLAG, false);
             result.put(MESSAGE, "error.stateMachineScheme.stateMachineInMoreThanOneScheme");
             return result;
