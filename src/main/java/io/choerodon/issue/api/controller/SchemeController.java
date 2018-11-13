@@ -91,15 +91,14 @@ public class SchemeController extends BaseController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "【敏捷】校验是否能新增状态")
-    @PostMapping(value = "/check_create_status_for_agile")
-    public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId,
-                                                             @RequestBody StatusDTO statusDTO) {
+    @GetMapping(value = "/check_create_status_for_agile")
+    public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId) {
         return new ResponseEntity<>((Boolean) projectConfigService.checkCreateStatusForAgile(projectId).get("flag"), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "【敏捷】校验是否能删除状态")
-    @PostMapping(value = "/check_delete_status_for_agile")
+    @GetMapping(value = "/check_delete_status_for_agile")
     public ResponseEntity<Boolean> checkDeleteStatusForAgile(@PathVariable("project_id") Long projectId,
                                                              @RequestParam("status_id") Long statusId) {
         return new ResponseEntity<>(projectConfigService.checkDeleteStatusForAgile(projectId, statusId), HttpStatus.OK);
