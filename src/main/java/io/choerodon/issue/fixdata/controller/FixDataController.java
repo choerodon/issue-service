@@ -34,9 +34,8 @@ public class FixDataController extends BaseController {
     @ApiOperation(value = "通过敏捷状态数据，修复状态、状态机、状态机方案、问题类型方案数据")
     @PostMapping(value = "/state_machine_scheme")
     public ResponseEntity fixStateMachineScheme(@ApiParam(value = "敏捷状态数据", required = true)
-                                                @RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList,
-                                                @RequestParam Boolean isFixStatus) {
-        fixDataService.fixStateMachineScheme(statusForMoveDataDOList, isFixStatus);
+                                                @RequestBody List<StatusForMoveDataDO> statusForMoveDataDOList) {
+        fixDataService.fixStateMachineScheme(statusForMoveDataDOList);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
