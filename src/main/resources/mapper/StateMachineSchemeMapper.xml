@@ -19,6 +19,7 @@
             <id property="id" column="c_id"/>
             <result property="schemeId" column="c_scheme_id"/>
             <result property="issueTypeId" column="c_issue_type_id"/>
+            <result property="isDefault" column="c_is_default"/>
             <result property="stateMachineId" column="c_state_machine_id"/>
             <result property="sequence" column="c_sequence"/>
             <result property="creationDate" column="c_creation_date"/>
@@ -34,6 +35,7 @@
           SMSC.id as c_id,
           SMSC.scheme_id as c_scheme_id,
           SMSC.issue_type_id as c_issue_type_id,
+          SMSC.is_default as c_is_default,
           SMSC.state_machine_id as c_state_machine_id,
           SMSC.sequence as c_sequence,
           SMSC.creation_date as c_creation_date,
@@ -53,6 +55,7 @@
         SMSC.issue_type_id as c_issue_type_id,
         SMSC.state_machine_id as c_state_machine_id,
         SMSC.sequence as c_sequence,
+        SMSC.is_default as c_is_default,
         SMSC.creation_date as c_creation_date,
         SMSC.created_by as c_created_by,
         SMSC.last_update_date as c_last_update_date,

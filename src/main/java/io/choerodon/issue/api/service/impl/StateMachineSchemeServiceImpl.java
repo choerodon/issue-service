@@ -74,10 +74,16 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             for (StateMachineSchemeDTO machineSchemeDTO : schemeDTOS) {
                 if (machineSchemeDTO.getConfigDTOs() != null) {
                     for (StateMachineSchemeConfigDTO configDTO : machineSchemeDTO.getConfigDTOs()) {
-                        IssueType issueType = issueTypeMapper.selectByPrimaryKey(configDTO.getIssueTypeId());
-                        if (issueType != null) {
-                            configDTO.setIssueTypeName(issueType.getName());
-                            configDTO.setIssueTypeIcon(issueType.getIcon());
+                        if(!configDTO.getDefault()){
+                            IssueType issueType = issueTypeMapper.selectByPrimaryKey(configDTO.getIssueTypeId());
+                            if (issueType != null) {
+                                configDTO.setIssueTypeName(issueType.getName());
+                                configDTO.setIssueTypeIcon(issueType.getIcon());
+                            }
+                        }else{
+                            //若为默认配置，则匹配的是所有为分配的问题类型
+                            configDTO.setIssueTypeName("所有未分配的问题类型");
+                            configDTO.setIssueTypeIcon("style");
                         }
                         StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
                         configDTO.setStateMachineName(stateMachineDTO.getName());
@@ -168,7 +174,15 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             if (issueTypes == null) {
                 issueTypes = new ArrayList<>();
             }
-            IssueType issueType = issueTypeMapper.selectByPrimaryKey(config.getIssueTypeId());
+            IssueType issueType;
+            if(!config.getDefault()){
+                issueType = issueTypeMapper.selectByPrimaryKey(config.getIssueTypeId());
+            }else{
+                //若为默认配置，则匹配的是所有为分配的问题类型
+                issueType = new IssueType();
+                issueType.setName("所有未分配的问题类型");
+                issueType.setIcon("style");
+            }
             issueTypes.add(issueType);
             map.put(config.getStateMachineId(), issueTypes);
         }
