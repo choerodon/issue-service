@@ -36,12 +36,6 @@ public class IssueEventHandler {
     private PriorityService priorityService;
 
 
-    private void loggerInfo(Object o) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.info("data: {}", o);
-        }
-    }
-
     /**
      * 创建项目事件
      *
@@ -53,8 +47,7 @@ public class IssueEventHandler {
             seq = 3)
     public String handleProjectInitByConsumeSagaTask(String data) {
         ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
-        loggerInfo(projectEvent);
-
+        LOGGER.info("接受创建项目消息{}", data);
         //创建项目时创建默认状态机方案
         stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
         //创建项目时创建默认问题类型方案
@@ -70,6 +63,7 @@ public class IssueEventHandler {
             sagaCode = ORG_CREATE,
             seq = 3)
     public String handleOrgaizationCreateByConsumeSagaTask(String data) {
+        LOGGER.info("接受创建组织消息{}", data);
         return handleOrganizationByConsumeSagaTask(data);
     }
 
@@ -78,6 +72,7 @@ public class IssueEventHandler {
             sagaCode = ORG_REGISTER,
             seq = 3)
     public String handleOrgaizationRegisterByConsumeSagaTask(String data) {
+        LOGGER.info("接受消费组织消息{}", data);
         return handleOrganizationByConsumeSagaTask(data);
     }
 
