@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +55,7 @@ public class FixDataServiceImpl implements FixDataService {
 
     @Override
     public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
+        logger.info("——————开始修复数据——————");
         logger.info("开始修复状态");
         //创建状态
         fixStateMachineFeignClient.createStatus(statuses);
@@ -78,7 +76,7 @@ public class FixDataServiceImpl implements FixDataService {
             fixStateMachineFeignClient.createDefaultStateMachine(organizationId);
 
             //根据项目id分组
-            Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
+            Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().sorted(Comparator.comparing(StatusForMoveDataDO::getProjectId)).collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
             for (Map.Entry<Long, List<StatusForMoveDataDO>> listEntry : proStatusMap.entrySet()) {
                 Long projectId = listEntry.getKey();
                 logger.info("开始修复项目{}", projectId);
@@ -101,7 +99,7 @@ public class FixDataServiceImpl implements FixDataService {
             }
             logger.info("完成修复组织{}", organizationId);
         }
-        logger.info("修复成功");
+        logger.info("——————修复成功——————");
     }
 
     /**
