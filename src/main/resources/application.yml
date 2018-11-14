@@ -13,16 +13,6 @@ spring:
     url: jdbc:mysql://localhost:3306/issue_service?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: choerodon
     password: 123456
-#  kafka:
-#    bootstrap-servers: localhost:9092
-#    producer:
-#      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-#    consumer:
-#      group-id: statemachine-service-consumer
-#      auto-offset-reset: latest
-#    listener:
-#      ack-mode: record
-#      poll-timeout: 3000
   cloud:
     bus:
       enabled: true
@@ -68,24 +58,6 @@ mybatis:
 services:
   attachment:
     url: example.com
-#logging:
-#  level:
-#    io.choerodon.issue: debug
-#请求处理的超时时间
-ribbon.ReadTimeout: 120000
-#请求连接的超时时间
-ribbon.ConnectTimeout: 30000
-
-#feign.hystrix.enabled: true
-#hystrix 熔断机制
-#hystrix:
-#  shareSecurityContext: true
-#  command:
-#    default:
-#      circuitBreaker:
-#        sleepWindowInMilliseconds: 100000
-#        forceClosed: true
-#      execution:
-#        isolation:
-#          thread:
-#            timeoutInMilliseconds: 600000
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000

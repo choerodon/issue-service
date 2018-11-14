@@ -3,6 +3,7 @@ package io.choerodon.issue.api.eventhandler;
 import com.alibaba.fastjson.JSONObject;
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload;
+import io.choerodon.issue.api.dto.payload.OrganizationRegisterPayload;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.*;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class IssueEventHandler {
      * @param data data
      */
     @SagaTask(code = TASK_PROJECT_UPDATE,
-            description = "issue消费创建项目事件初始化项目数据",
+            description = "创建项目事件",
             sagaCode = PROJECT_CREATE,
             seq = 3)
     public String handleProjectInitByConsumeSagaTask(String data) {
@@ -59,30 +60,32 @@ public class IssueEventHandler {
 
 
     @SagaTask(code = TASK_ORG_CREATE,
-            description = "issue消费创建组织初始化数据",
+            description = "创建组织事件",
             sagaCode = ORG_CREATE,
-            seq = 3)
+            seq = 1)
     public String handleOrgaizationCreateByConsumeSagaTask(String data) {
-        LOGGER.info("接受创建组织消息{}", data);
-        return handleOrganizationByConsumeSagaTask(data);
-    }
-
-    @SagaTask(code = TASK_ORG_REGISTER,
-            description = "issue消费注册组织初始化数据",
-            sagaCode = ORG_REGISTER,
-            seq = 3)
-    public String handleOrgaizationRegisterByConsumeSagaTask(String data) {
-        LOGGER.info("接受消费组织消息{}", data);
-        return handleOrganizationByConsumeSagaTask(data);
-    }
-
-    private String handleOrganizationByConsumeSagaTask(String data) {
+        LOGGER.info("消费创建组织消息{}", data);
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
         Long orgId = organizationEventPayload.getId();
         //注册组织初始化六种问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));
+        return data;
+    }
+
+    @SagaTask(code = TASK_ORG_REGISTER,
+            description = "注册组织事件",
+            sagaCode = ORG_REGISTER,
+            seq = 1)
+    public String handleOrgaizationRegisterByConsumeSagaTask(String data) {
+        LOGGER.info("消费创建组织消息{}", data);
+        OrganizationRegisterPayload payload = JSONObject.parseObject(data, OrganizationRegisterPayload.class);
+        Long organizationId = payload.getOrganizationId();
+        //注册组织初始化六种问题类型
+        issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
+        //注册组织初始化优先级
+        priorityService.initProrityByOrganization(Arrays.asList(organizationId));
         return data;
     }
 }
