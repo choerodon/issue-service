@@ -115,7 +115,6 @@ public class FixDataServiceImpl implements FixDataService {
      */
     private void fixCreateStateMachineScheme(Long organizationId, Long projectId, String name, Long stateMachineId, String schemeApplyType) {
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setApplyType(schemeApplyType);
         scheme.setName(name);
         scheme.setDescription(name);
         scheme.setOrganizationId(organizationId);

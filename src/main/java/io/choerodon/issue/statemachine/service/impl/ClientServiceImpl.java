@@ -27,7 +27,16 @@ import java.util.List;
 @Service
 public class ClientServiceImpl implements ClientService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClientServiceImpl.class);
+
+    private static final String CONFIGURE_TYPE_CONDITION = "配置类型【条件】:";
+    private static final String CONFIGURE_TYPE_VALIDATION = "配置类型【验证】:";
+    private static final String CONFIGURE_TYPE_POST_ACTION = "配置类型【后置动作】:";
+    private static final String CONDITION_ALL_MATCH = CONFIGURE_TYPE_CONDITION + "条件全部符合";
+    private static final String CONDITION_NOT_MATCH = CONFIGURE_TYPE_CONDITION + "没有符合的条件类型";
+    private static final String NO_PASS = "执行不通过";
+    private static final String PASS = "执行通过";
+    private static final String UPDATE_STATUS_FAIL = "状态更新失败";
 
     @Override
     public List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformDTOS) {
@@ -52,10 +61,10 @@ public class ClientServiceImpl implements ClientService {
     /**
      * 执行条件
      *
-     * @param instanceId
-     * @param conditionStrategy
-     * @param configDTOS
-     * @return
+     * @param instanceId        instanceId
+     * @param conditionStrategy conditionStrategy
+     * @param configDTOS        configDTOS
+     * @return ExecuteResult
      */
     @Override
     public ExecuteResult configExecuteCondition(Long instanceId, Long targetStatusId, String conditionStrategy, List<StateMachineConfigDTO> configDTOS) {
@@ -65,21 +74,20 @@ public class ClientServiceImpl implements ClientService {
         //执行代码中配置的条件
         for (StateMachineConfigDTO configDTO : configDTOS) {
             isSuccess = methodInvokeBean(StateMachineConfigType.CONDITION, configDTO, instanceId);
-
             //根据不同的条件策略返回不同结果
             if (conditionStrategy.equals(TransformConditionStrategy.ALL)) {
                 if (!isSuccess) {
-                    executeResult.setErrorMessage("配置类型【条件】:" + configDTO.getCode() + "执行不通过");
+                    executeResult.setErrorMessage(CONFIGURE_TYPE_CONDITION + configDTO.getCode() + NO_PASS);
                     break;
                 } else {
-                    executeResult.setErrorMessage("配置类型【条件】:条件全部符合");
+                    executeResult.setErrorMessage(CONDITION_ALL_MATCH);
                 }
             } else {
                 if (isSuccess) {
-                    executeResult.setErrorMessage("配置类型【条件】:" + configDTO.getCode() + "执行通过");
+                    executeResult.setErrorMessage(CONFIGURE_TYPE_CONDITION + configDTO.getCode() + PASS);
                     break;
                 } else {
-                    executeResult.setErrorMessage("配置类型【条件】:没有符合的条件类型");
+                    executeResult.setErrorMessage(CONDITION_NOT_MATCH);
                 }
             }
         }
@@ -90,10 +98,10 @@ public class ClientServiceImpl implements ClientService {
     /**
      * 执行验证
      *
-     * @param instanceId
-     * @param targetStatusId
-     * @param configDTOS
-     * @return
+     * @param instanceId     instanceId
+     * @param targetStatusId targetStatusId
+     * @param configDTOS     configDTOS
+     * @return ExecuteResult
      */
     @Override
     public ExecuteResult configExecuteValidator(Long instanceId, Long targetStatusId, List<StateMachineConfigDTO> configDTOS) {
@@ -104,7 +112,7 @@ public class ClientServiceImpl implements ClientService {
         for (StateMachineConfigDTO configDTO : configDTOS) {
             isSuccess = methodInvokeBean(StateMachineConfigType.VALIDATOR, configDTO, instanceId);
             if (!isSuccess) {
-                executeResult.setErrorMessage("配置类型【验证】:" + configDTO.getCode() + "执行不通过");
+                executeResult.setErrorMessage(CONFIGURE_TYPE_VALIDATION + configDTO.getCode() + NO_PASS);
                 break;
             }
         }
@@ -115,14 +123,14 @@ public class ClientServiceImpl implements ClientService {
     /**
      * 执行后置动作
      *
-     * @param instanceId
-     * @param targetStatusId
-     * @param configDTOS
-     * @return
+     * @param instanceId     instanceId
+     * @param targetStatusId targetStatusId
+     * @param configDTOS     configDTOS
+     * @return ExecuteResult
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ExecuteResult configExecutePostposition(Long instanceId, Long targetStatusId, List<StateMachineConfigDTO> configDTOS) {
+    public ExecuteResult configExecutePostAction(Long instanceId, Long targetStatusId, String transformType, List<StateMachineConfigDTO> configDTOS) {
         logger.info("stateMachine client configExecutePostposition start: instanceId:{}, configDTOS:{}", instanceId, configDTOS);
         ExecuteResult executeResult = new ExecuteResult();
         Boolean isSuccess = true;
@@ -135,8 +143,7 @@ public class ClientServiceImpl implements ClientService {
                 method.invoke(object, instanceId, targetStatusId);
                 logger.info("stateMachine client configExecute updateStatus with method {}: instanceId:{}, targetStatusId:{}", method.getName(), instanceId, targetStatusId);
             } catch (Exception e) {
-                logger.error("stateMachine client configExecute updateStatus invoke error {}", e.getMessage());
-                e.printStackTrace();
+                logger.error("stateMachine client configExecute updateStatus invoke error {}", e);
                 isSuccess = false;
             }
         } else {
@@ -148,34 +155,33 @@ public class ClientServiceImpl implements ClientService {
             for (StateMachineConfigDTO configDTO : configDTOS) {
                 isSuccess = methodInvokeBean(StateMachineConfigType.POSTPOSITION, configDTO, instanceId);
                 if (!isSuccess) {
-                    executeResult.setErrorMessage("配置类型【后置动作】：" + configDTO.getCode() + "执行不通过");
+                    executeResult.setErrorMessage(CONFIGURE_TYPE_POST_ACTION + configDTO.getCode() + NO_PASS);
                     break;
                 }
             }
-        }else{
-            executeResult.setErrorMessage("状态更新失败");
+        } else {
+            executeResult.setErrorMessage(UPDATE_STATUS_FAIL);
         }
         executeResult.setSuccess(isSuccess);
         executeResult.setResultStatusId(targetStatusId);
         return executeResult;
     }
 
-    public Boolean methodInvokeBean(String type, StateMachineConfigDTO configDTO, Long instanceId) {
+    private Boolean methodInvokeBean(String type, StateMachineConfigDTO configDTO, Long instanceId) {
         Boolean isSuccess = true;
         InvokeBean invokeBean = StateMachineConfigMonitor.invokeBeanMap.get(configDTO.getCode());
         if (invokeBean != null) {
             Object object = invokeBean.getObject();
             Method method = invokeBean.getMethod();
             try {
-                if(type.equals(StateMachineConfigType.POSTPOSITION)){
+                if (type.equals(StateMachineConfigType.POSTPOSITION)) {
                     method.invoke(object, instanceId, configDTO);
-                }else{
+                } else {
                     isSuccess = (Boolean) method.invoke(object, instanceId, configDTO);
                 }
                 logger.info("stateMachine client {} {} with method {}: instanceId:{}, result:{}", type, configDTO.getCode(), method.getName(), instanceId, isSuccess);
             } catch (Exception e) {
-                logger.error("stateMachine client {} {} with method {} invoke error {}", type, configDTO.getCode(), method.getName(), e.getMessage());
-                e.printStackTrace();
+                logger.error("stateMachine client {} {} with method {} invoke error {}", type, configDTO.getCode(), method.getName(), e);
                 isSuccess = false;
             }
         } else {

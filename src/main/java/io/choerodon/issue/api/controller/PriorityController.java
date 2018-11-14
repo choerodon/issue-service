@@ -141,7 +141,6 @@ public class PriorityController {
         return Optional.ofNullable(priorityService.queryByOrganizationIdList(organizationId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
-
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

@@ -18,41 +18,42 @@ public interface ClientService {
     /**
      * 根据条件过滤转换
      *
-     * @param instanceId
-     * @param transformDTOS
-     * @return
+     * @param instanceId     instanceId
+     * @param transformInfos transformInfos
+     * @return TransformInfo
      */
-    List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformDTOS);
+    List<TransformInfo> conditionFilter(Long instanceId, List<TransformInfo> transformInfos);
 
 
     /**
      * 执行条件
      *
-     * @param instanceId
-     * @param targetStatusId
-     * @param conditionStrategy
-     * @param configDTOS
-     * @return
+     * @param instanceId        instanceId
+     * @param targetStatusId    targetStatusId
+     * @param conditionStrategy conditionStrategy
+     * @param configDTOS        configDTOS
+     * @return ExecuteResult
      */
     ExecuteResult configExecuteCondition(Long instanceId, Long targetStatusId, String conditionStrategy, List<StateMachineConfigDTO> configDTOS);
 
     /**
      * 执行验证
      *
-     * @param instanceId
-     * @param targetStatusId
-     * @param configDTOS
-     * @return
+     * @param instanceId     instanceId
+     * @param targetStatusId targetStatusId
+     * @param configDTOS     configDTOS
+     * @return ExecuteResult
      */
     ExecuteResult configExecuteValidator(Long instanceId, Long targetStatusId, List<StateMachineConfigDTO> configDTOS);
 
     /**
      * 执行后置动作，单独出来，才能生效回归
      *
-     * @param instanceId
-     * @param targetStatusId
-     * @param configDTOS
-     * @return
+     * @param instanceId     instanceId
+     * @param targetStatusId targetStatusId
+     * @param configDTOS     configDTOS
+     * @return ExecuteResult
      */
-    ExecuteResult configExecutePostposition(Long instanceId, Long targetStatusId, List<StateMachineConfigDTO> configDTOS);
+    ExecuteResult configExecutePostAction(Long instanceId, Long targetStatusId, String transformType, List<StateMachineConfigDTO> configDTOS);
 }
+

@@ -20,4 +20,9 @@ public class SchemeApplyType {
      * 运维方案
      */
     public static final String CLOOPM = "cloopm";
+
+    /**
+     * 自定义
+     */
+    public static final String COMMON = "common";
 }

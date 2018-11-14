@@ -1,6 +1,5 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 
 import java.util.List;

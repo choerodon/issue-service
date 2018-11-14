@@ -104,11 +104,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
-
-        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getApplyType())) {
-            throw new CommonException("error.schemeDTO.type.illegal");
-        }
-
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         scheme.setOrganizationId(organizationId);
         int isInsert = schemeMapper.insert(scheme);
@@ -116,8 +111,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             throw new CommonException("error.stateMachineScheme.create");
         }
 
-        //创建一个defaultConfig【todo】stateMachineId
-        configService.createDefaultConfig(organizationId, scheme.getId(), null);
+        //创建一个defaultConfig
+        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryDefaultStateMachine(organizationId).getBody();
+        configService.createDefaultConfig(organizationId, scheme.getId(), stateMachineDTO.getId());
 
         scheme = schemeMapper.selectByPrimaryKey(scheme);
         return modelMapper.map(scheme, StateMachineSchemeDTO.class);
@@ -126,10 +122,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
-        if (!EnumUtil.contain(SchemeApplyType.class, schemeDTO.getApplyType())) {
-            throw new CommonException("error.schemeDTO.type.illegal");
-        }
-
         schemeDTO.setId(schemeId);
         schemeDTO.setOrganizationId(organizationId);
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
@@ -265,7 +257,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setApplyType(schemeApplyType);
         scheme.setName(name);
         scheme.setDescription(name);
         scheme.setOrganizationId(organizationId);
