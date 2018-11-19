@@ -1,6 +1,5 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public interface FixDataService {
      * @param statusForMoveDataDOList
      * @return
      */
-    void fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList, Boolean isFixStatus);
+    void fixStateMachineScheme(List<StatusForMoveDataDO> statusForMoveDataDOList);
 
     /**
      * 获取所有组织的优先级

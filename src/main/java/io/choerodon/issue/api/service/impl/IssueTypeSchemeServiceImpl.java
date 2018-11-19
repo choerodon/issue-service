@@ -85,10 +85,8 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Override
     @Transactional
     public IssueTypeSchemeDTO create(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
-
-        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getApplyType())) {
-            throw new CommonException("error.schemeDTO.type.illegal");
-        }
+        //创建的均为通用的
+        issueTypeSchemeDTO.setApplyType(SchemeApplyType.COMMON);
 
         if (!checkName(organizationId, issueTypeSchemeDTO.getName(), null)) {
             throw new CommonException("error.issueTypeScheme.name.exist");
@@ -107,11 +105,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
 
     @Override
     public IssueTypeSchemeDTO update(Long organizationId, IssueTypeSchemeDTO issueTypeSchemeDTO) {
-
-        if (!EnumUtil.contain(SchemeApplyType.class, issueTypeSchemeDTO.getApplyType())) {
-            throw new CommonException("error.schemeDTO.type.illegal");
-        }
-
+        issueTypeSchemeDTO.setApplyType(issueTypeSchemeMapper.selectByPrimaryKey(issueTypeSchemeDTO.getId()).getApplyType());
         if (issueTypeSchemeDTO.getName() != null && !checkName(organizationId, issueTypeSchemeDTO.getName(), issueTypeSchemeDTO.getId())) {
             throw new CommonException("error.issueTypeScheme.name.exist");
         }

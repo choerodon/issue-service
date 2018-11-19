@@ -52,7 +52,7 @@ public class StateMachineController {
     }
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "状态机执行转换")
+    @ApiOperation(value = "【废弃】状态机执行转换")
     @GetMapping(value = "/do_transf")
     public ResponseEntity<ExecuteResult> doTransf(@PathVariable("organization_id") Long organizationId,
                                                   @RequestParam(value = "project_id") Long projectId,
@@ -62,7 +62,7 @@ public class StateMachineController {
     }
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "显示转换")
+    @ApiOperation(value = "【废弃】显示转换")
     @GetMapping(value = "/transf_list")
     public ResponseEntity<List<TransformDTO>> transfList(@PathVariable("organization_id") Long organizationId,
                                                          @RequestParam(value = "project_id") Long projectId,
@@ -71,7 +71,7 @@ public class StateMachineController {
     }
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "创建issue和状态机实例")
+    @ApiOperation(value = "【废弃】创建issue和状态机实例")
     @GetMapping(value = "/create_issue")
     public Issue createIssue(@PathVariable("organization_id") Long organizationId,
                              @RequestParam(value = "state_machine_id") Long stateMachineId) {
@@ -80,7 +80,7 @@ public class StateMachineController {
 
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "查询状态机关联的项目id列表的Map")
+    @ApiOperation(value = "【内部调用】查询状态机关联的项目id列表的Map")
     @GetMapping(value = "/query_project_ids_map")
     public ResponseEntity<Map<String, List<Long>>> queryProjectIdsMap(@PathVariable("organization_id") Long organizationId,
                                                                       @RequestParam("state_machine_id") Long stateMachineId) {

@@ -192,9 +192,9 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     private Map<String, Long> initPrority(Long organizationId) {
         Map<String, Long> map = new HashMap<>();
-        Priority high = savePrority(organizationId, "高", new BigDecimal(0), "#FEBA3D", false);
-        Priority medium = savePrority(organizationId, "中", new BigDecimal(1), "#3B79E0", true);
-        Priority low = savePrority(organizationId, "低", new BigDecimal(2), "#969696", false);
+        Priority high = savePrority(organizationId, "高", new BigDecimal(0), "#FFB100", false);
+        Priority medium = savePrority(organizationId, "中", new BigDecimal(1), "#3575DF", true);
+        Priority low = savePrority(organizationId, "低", new BigDecimal(2), "#979797", false);
         map.put("high", high.getId());
         map.put("medium", medium.getId());
         map.put("low", low.getId());

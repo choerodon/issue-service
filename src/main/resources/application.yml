@@ -8,21 +8,11 @@ spring:
     sampler:
       percentage: 1.0
     stream:
-      enabled: true
+      enabled: false
   datasource:
     url: jdbc:mysql://localhost:3306/issue_service?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: choerodon
     password: 123456
-#  kafka:
-#    bootstrap-servers: localhost:9092
-#    producer:
-#      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-#    consumer:
-#      group-id: statemachine-service-consumer
-#      auto-offset-reset: latest
-#    listener:
-#      ack-mode: record
-#      poll-timeout: 3000
   cloud:
     bus:
       enabled: true
@@ -34,6 +24,12 @@ spring:
 choerodon:
   devops:
     message: true
+  saga:
+    consumer:
+      enabled: true # 是否启用消费端
+      thread-num: 5  # 消费线程数
+      max-poll-size: 200 # 每次拉取的最大消息数量
+      poll-interval-ms: 1000 # 拉取消息的间隔(毫秒)，默认1000毫秒
 eureka:
   instance:
     preferIpAddress: true
@@ -62,24 +58,6 @@ mybatis:
 services:
   attachment:
     url: example.com
-#logging:
-#  level:
-#    io.choerodon.issue: debug
-#请求处理的超时时间
-ribbon.ReadTimeout: 120000
-#请求连接的超时时间
-ribbon.ConnectTimeout: 30000
-
-#feign.hystrix.enabled: true
-#hystrix 熔断机制
-#hystrix:
-#  shareSecurityContext: true
-#  command:
-#    default:
-#      circuitBreaker:
-#        sleepWindowInMilliseconds: 100000
-#        forceClosed: true
-#      execution:
-#        isolation:
-#          thread:
-#            timeoutInMilliseconds: 600000
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000

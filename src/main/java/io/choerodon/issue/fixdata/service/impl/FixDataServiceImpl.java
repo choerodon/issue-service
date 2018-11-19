@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -57,12 +54,12 @@ public class FixDataServiceImpl implements FixDataService {
     private PriorityMapper priorityMapper;
 
     @Override
-    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses, Boolean isFixStatus) {
+    public void fixStateMachineScheme(List<StatusForMoveDataDO> statuses) {
+        logger.info("——————开始修复数据——————");
         logger.info("开始修复状态");
         //创建状态
-        if (isFixStatus) {
-            fixStateMachineFeignClient.createStatus(statuses);
-        }
+        fixStateMachineFeignClient.createStatus(statuses);
+
         logger.info("完成修复状态");
         //根据组织id分组
         Map<Long, List<StatusForMoveDataDO>> orgStatusMap = statuses.stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getOrganizationId));
@@ -79,7 +76,7 @@ public class FixDataServiceImpl implements FixDataService {
             fixStateMachineFeignClient.createDefaultStateMachine(organizationId);
 
             //根据项目id分组
-            Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
+            Map<Long, List<StatusForMoveDataDO>> proStatusMap = statusDOs.getValue().stream().sorted(Comparator.comparing(StatusForMoveDataDO::getProjectId)).collect(Collectors.groupingBy(StatusForMoveDataDO::getProjectId));
             for (Map.Entry<Long, List<StatusForMoveDataDO>> listEntry : proStatusMap.entrySet()) {
                 Long projectId = listEntry.getKey();
                 logger.info("开始修复项目{}", projectId);
@@ -102,7 +99,7 @@ public class FixDataServiceImpl implements FixDataService {
             }
             logger.info("完成修复组织{}", organizationId);
         }
-        logger.info("修复成功");
+        logger.info("——————修复成功——————");
     }
 
     /**
@@ -116,7 +113,6 @@ public class FixDataServiceImpl implements FixDataService {
      */
     private void fixCreateStateMachineScheme(Long organizationId, Long projectId, String name, Long stateMachineId, String schemeApplyType) {
         StateMachineScheme scheme = new StateMachineScheme();
-        scheme.setApplyType(schemeApplyType);
         scheme.setName(name);
         scheme.setDescription(name);
         scheme.setOrganizationId(organizationId);
