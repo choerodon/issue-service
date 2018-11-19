@@ -52,34 +52,6 @@ public class StateMachineController {
     }
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "【废弃】状态机执行转换")
-    @GetMapping(value = "/do_transf")
-    public ResponseEntity<ExecuteResult> doTransf(@PathVariable("organization_id") Long organizationId,
-                                                  @RequestParam(value = "project_id") Long projectId,
-                                                  @RequestParam(value = "issue_id") Long issueId,
-                                                  @RequestParam(value = "transf_id") Long transfId) {
-        return stateMachineService.doTransf(organizationId, projectId, issueId, transfId);
-    }
-
-    @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "【废弃】显示转换")
-    @GetMapping(value = "/transf_list")
-    public ResponseEntity<List<TransformDTO>> transfList(@PathVariable("organization_id") Long organizationId,
-                                                         @RequestParam(value = "project_id") Long projectId,
-                                                         @RequestParam(value = "issue_id") Long issueId) {
-        return stateMachineService.transfList(organizationId, projectId, issueId);
-    }
-
-    @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "【废弃】创建issue和状态机实例")
-    @GetMapping(value = "/create_issue")
-    public Issue createIssue(@PathVariable("organization_id") Long organizationId,
-                             @RequestParam(value = "state_machine_id") Long stateMachineId) {
-        return stateMachineService.createIssue(organizationId, stateMachineId);
-    }
-
-
-    @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "【内部调用】查询状态机关联的项目id列表的Map")
     @GetMapping(value = "/query_project_ids_map")
     public ResponseEntity<Map<String, List<Long>>> queryProjectIdsMap(@PathVariable("organization_id") Long organizationId,

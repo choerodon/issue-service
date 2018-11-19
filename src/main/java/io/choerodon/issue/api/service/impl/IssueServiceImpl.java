@@ -10,27 +10,21 @@ import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateService;
 import io.choerodon.issue.api.service.UserService;
 import io.choerodon.issue.domain.Issue;
-import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.PageSchemeLineType;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -73,8 +67,6 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
     private StateService stateService;
     @Autowired
     private ProjectUtil projectUtil;
-    @Autowired
-    private InstanceFeignClient instanceFeignClient;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -120,16 +112,6 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
         } catch (Exception e) {
             transactionManager.rollback(status);
             e.printStackTrace();
-        }
-        //创建状态机实例
-        Long organizationId = projectUtil.getOrganizationId(projectId);
-        Long stateMachineId = getStateMachineId(projectId, issue.getId());
-        ResponseEntity<ExecuteResult> executeResult = instanceFeignClient.startInstance(organizationId, serverCode, stateMachineId, issue.getId());
-        //feign调用执行失败，抛出异常回滚
-        if (!executeResult.getBody().getSuccess()) {
-            // todo 手动回滚数据时，注意后置处理等操作中，是否有需要回滚的数据
-            issueMapper.deleteByPrimaryKey(issue.getId());
-            throw new CommonException(executeResult.getBody().getErrorMessage());
         }
         return queryById(projectId, issue.getId());
     }
