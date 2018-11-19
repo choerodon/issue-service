@@ -125,6 +125,11 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (result != 1) {
             throw new CommonException("error.projectConfig.create");
         }
+
+        //若是关联状态机方案，设置状态机方案、状态机为活跃
+        if(schemeType.equals(SchemeType.STATE_MACHINE)){
+            stateMachineSchemeService.activeScheme(schemeId);
+        }
         return projectConfig;
     }
 

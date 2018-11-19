@@ -141,4 +141,15 @@ public interface StateMachineFeignClient {
     @PostMapping(value = "/v1/organizations/{organization_id}/status/query_by_state_machine_id")
     ResponseEntity<List<StatusDTO>> queryByStateMachineIds(@PathVariable("organization_id") Long organizationId,
                                                            @RequestBody @Valid List<Long> stateMachineIds);
+
+    /**
+     * 批量活跃状态机
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     * @return
+     */
+    @PostMapping(value = "/v1/organizations/{organization_id}/state_machines/active_state_machines")
+    ResponseEntity<Boolean> activeStateMachines(@PathVariable("organization_id") Long organizationId,
+                                                @RequestBody List<Long> stateMachineIds);
 }

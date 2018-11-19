@@ -64,10 +64,10 @@ public interface UserFeignClient {
     ResponseEntity<Page<OrganizationDTO>> queryOrganizations(@ApiIgnore
                                                              @SortDefault(value = "id", direction = Sort.Direction.DESC)
                                                                      PageRequest pageRequest,
-                                                             @RequestParam(required = false) String name,
-                                                             @RequestParam(required = false) String code,
-                                                             @RequestParam(required = false) Boolean enabled,
-                                                             @RequestParam(required = false) String[] params);
+                                                             @RequestParam(value = "name",required = false) String name,
+                                                             @RequestParam(value = "code",required = false) String code,
+                                                             @RequestParam(value = "enabled",required = false) Boolean enabled,
+                                                             @RequestParam(value = "params",required = false) String[] params);
 
     /**
      * 根据组织id查询所有项目
@@ -77,8 +77,8 @@ public interface UserFeignClient {
                                                           @ApiIgnore
                                                           @SortDefault(value = "id", direction = Sort.Direction.DESC)
                                                                   PageRequest pageRequest,
-                                                          @RequestParam(required = false) String name,
-                                                          @RequestParam(required = false) String code,
-                                                          @RequestParam(required = false) Boolean enabled,
-                                                          @RequestParam(required = false) String[] params);
+                                                          @RequestParam(value = "name",required = false) String name,
+                                                          @RequestParam(value = "code",required = false) String code,
+                                                          @RequestParam(value = "enabled",required = false) Boolean enabled,
+                                                          @RequestParam(value = "params",required = false) String[] params);
 }

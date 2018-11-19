@@ -68,4 +68,9 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     public ResponseEntity<List<StatusDTO>> queryByStateMachineIds(Long organizationId, List<Long> stateMachineIds) {
         throw new CommonException("error.stateMachineFeignClient.queryByStateMachineIds");
     }
+
+    @Override
+    public ResponseEntity<Boolean> activeStateMachines(Long organizationId, List<Long> stateMachineIds) {
+        throw new CommonException("error.stateMachineFeignClient.activeStateMachines");
+    }
 }

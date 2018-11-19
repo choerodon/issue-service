@@ -106,4 +106,11 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param stateMachineServiceFeign stateMachineServiceFeign
      */
     void setFeign(StateMachineFeignClient stateMachineServiceFeign);
+
+    /**
+     * 若项目关联状态机方案，设置状态机方案、状态机为活跃
+     *
+     * @param schemeId
+     */
+    void activeScheme(Long schemeId);
 }

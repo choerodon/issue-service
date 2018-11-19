@@ -11,6 +11,7 @@ public class StateMachineSchemeDTO {
     private String name;
     private String description;
     private Long organizationId;
+    private String status;
     private Long objectVersionNumber;
 
     private List<ProjectDTO> projectDTOs;
@@ -18,6 +19,14 @@ public class StateMachineSchemeDTO {
     private List<StateMachineSchemeConfigDTO> configDTOs;
 
     private List<StateMachineSchemeConfigViewDTO> viewDTOs;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Long getId() {
         return id;

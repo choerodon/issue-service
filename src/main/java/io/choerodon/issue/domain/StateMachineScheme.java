@@ -23,10 +23,19 @@ public class StateMachineScheme extends AuditDomain {
     private Long id;
     private String name;
     private String description;
+    private String status;
     private Long organizationId;
 
     @Transient
     private List<StateMachineSchemeConfig> schemeConfigs;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Long getId() {
         return id;
