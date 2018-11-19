@@ -3,15 +3,15 @@
 
 <mapper namespace="io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper">
 
-    <select id="selectDefault" resultType="io.choerodon.issue.domain.StateMachineSchemeConfig">
+    <select id="selectDefault" resultType="io.choerodon.issue.domain.StateMachineSchemeConfigDraft">
         SELECT
         smsc.*
         FROM
-        state_machine_scheme_config smsc
+        state_machine_scheme_config_draft smscd
         WHERE
-        smsc.organization_id = #{organizationId}
-        AND smsc.scheme_id = #{schemeId}
-        AND smsc.is_default = 1
+        smscd.organization_id = #{organizationId}
+        AND smscd.scheme_id = #{schemeId}
+        AND smscd.is_default = 1
     </select>
 
 </mapper>

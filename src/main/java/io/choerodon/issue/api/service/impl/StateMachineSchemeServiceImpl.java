@@ -45,8 +45,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
     @Autowired
-    private StateMachineSchemeConfigMapper configMapper;
-    @Autowired
     private StateMachineSchemeConfigService configService;
     @Autowired
     private IssueTypeMapper issueTypeMapper;
@@ -150,9 +148,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             throw new CommonException("error.stateMachineScheme.delete");
         }
         //删除方案配置信息
-        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
-        config.setSchemeId(schemeId);
-        configMapper.delete(config);
+        configService.deleteBySchemeId(organizationId,schemeId);
         return true;
     }
 
@@ -200,22 +196,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         }
         schemeDTO.setViewDTOs(viewDTOs);
         return schemeDTO;
-    }
-
-    @Override
-    @Transactional(rollbackFor = CommonException.class)
-    public List<StateMachineSchemeConfigDTO> createSchemeConfig(Long organizationId, Long schemeId, List<StateMachineSchemeConfigDTO> configDTOs) {
-        List<StateMachineSchemeConfig> configs = modelMapper.map(configDTOs, new TypeToken<List<StateMachineSchemeConfig>>() {
-        }.getType());
-        for (StateMachineSchemeConfig config : configs) {
-            config.setSchemeId(schemeId);
-        }
-        int isInsert = configMapper.insertList(configs);
-        if (isInsert < 1) {
-            throw new CommonException("error.StateMachineSchemeConfig.insert");
-        }
-        return modelMapper.map(configs, new TypeToken<List<StateMachineSchemeConfigDTO>>() {
-        }.getType());
     }
 
     @Override

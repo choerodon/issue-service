@@ -60,8 +60,6 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
-    private StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper;
-    @Autowired
     private PlatformTransactionManager transactionManager;
     @Autowired
     private StateService stateService;
@@ -153,26 +151,5 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue> implements IssueSer
         pagesDTO.setTotalPages(pages.getTotalPages());
         pagesDTO.setContent(issueDTOS);
         return pagesDTO;
-    }
-
-    @Override
-    public Long getStateMachineId(Long projectId, Long issueId) {
-        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, SchemeApplyType.CLOOPM).getSchemeId();
-        if (stateMachineSchemeId == null) {
-            throw new CommonException("error.stateMachineSchemeId.null");
-        }
-        Issue issue = issueMapper.selectByPrimaryKey(issueId);
-        if (issue == null) {
-            throw new CommonException("error.issue.notFound");
-        }
-        Long issueTypeId = issue.getIssueTypeId();
-        StateMachineSchemeConfig stateMachineSchemeConfig = new StateMachineSchemeConfig();
-        stateMachineSchemeConfig.setIssueTypeId(issueTypeId);
-        stateMachineSchemeConfig.setSchemeId(stateMachineSchemeId);
-        List<StateMachineSchemeConfig> stateMachineSchemeConfigs = stateMachineSchemeConfigMapper.select(stateMachineSchemeConfig);
-        if (stateMachineSchemeConfigs == null || stateMachineSchemeConfigs.size() != 1) {
-            throw new CommonException("error.stateMachineSchemeConfig.foundError");
-        }
-        return stateMachineSchemeConfigs.get(0).getStateMachineId();
     }
 }

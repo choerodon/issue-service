@@ -44,13 +44,4 @@ public interface StateMachineService {
      * @return
      */
     Map<String, Object> checkDelete(Long organizationId, Long stateMachineId);
-
-    /**
-     * 通过状态机方案id查询出所有状态机
-     *
-     * @param stateMachineSchemeId
-     * @return
-     */
-    List<Long> queryBySchemeId(Long stateMachineSchemeId);
-
 }

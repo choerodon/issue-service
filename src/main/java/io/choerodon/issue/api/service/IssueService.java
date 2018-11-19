@@ -22,14 +22,4 @@ public interface IssueService extends BaseService<Issue> {
     IssueDTO updateIssue(IssueDTO issueDTO, List<String> updateFieldList);
 
     Page<IssueDTO> pageQuery(Long projectId, PageRequest pageRequest, SearchDTO searchDTO);
-
-    /**
-     * 获取状态机id
-     * @param projectId 项目id
-     * @param issueId 事件单id
-     * @return
-     */
-    Long getStateMachineId(Long projectId, Long issueId);
-
-//    List<IssueDTO> queryByOrgId(Long organizationId);
 }

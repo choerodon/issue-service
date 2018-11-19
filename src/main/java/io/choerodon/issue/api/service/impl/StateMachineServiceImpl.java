@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.IssueService;
+import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.StateMachineScheme;
@@ -46,8 +47,6 @@ public class StateMachineServiceImpl implements StateMachineService {
     private IssueMapper issueMapper;
     @Autowired
     private IssueRecordMapper issueRecordMapper;
-    @Autowired
-    private StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper;
     @Autowired
     private StateMachineSchemeMapper stateMachineSchemeMapper;
     @Autowired
@@ -100,17 +99,5 @@ public class StateMachineServiceImpl implements StateMachineService {
             map.put("schemeUsed", list.size());
         }
         return map;
-    }
-
-    @Override
-    public List<Long> queryBySchemeId(Long stateMachineSchemeId) {
-        StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
-        if (stateMachineScheme == null) {
-            throw new CommonException("error.queryBySchemeId.stateMachineScheme.notFound");
-        }
-        StateMachineSchemeConfig select = new StateMachineSchemeConfig();
-        select.setSchemeId(stateMachineSchemeId);
-        List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(select);
-        return configs.stream().map(StateMachineSchemeConfig::getStateMachineId).collect(Collectors.toList());
     }
 }

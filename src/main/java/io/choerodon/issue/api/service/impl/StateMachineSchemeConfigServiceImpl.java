@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author shinan.chen
@@ -40,6 +41,13 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             throw new CommonException("error.stateMachineSchemeConfig.delete");
         }
         return stateMachineSchemeService.querySchemeWithConfigById(organizationId, schemeId);
+    }
+
+    @Override
+    public void deleteBySchemeId(Long organizationId, Long schemeId) {
+        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+        config.setSchemeId(schemeId);
+        configMapper.delete(config);
     }
 
     @Override
@@ -89,22 +97,42 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     public void updateDefaultConfig(Long organizationId, Long schemeId, Long stateMachineId) {
         StateMachineSchemeConfig defaultConfig = configMapper.selectDefault(organizationId, schemeId);
         defaultConfig.setStateMachineId(stateMachineId);
-        updateOptional(defaultConfig,"stateMachineId");
+        updateOptional(defaultConfig, "stateMachineId");
     }
 
     @Override
-    public Long queryBySchemeIdAndIssueTypeId(Long organizationId, Long stateMachineSchemeId, Long issueTypeId) {
+    public StateMachineSchemeConfig selectDefault(Long organizationId, Long schemeId) {
+        return configMapper.selectDefault(organizationId, schemeId);
+    }
+
+    @Override
+    public Long queryBySchemeIdAndIssueTypeId(Long organizationId, Long schemeId, Long issueTypeId) {
         StateMachineSchemeConfig config = new StateMachineSchemeConfig();
         config.setOrganizationId(organizationId);
-        config.setSchemeId(stateMachineSchemeId);
+        config.setSchemeId(schemeId);
         config.setIssueTypeId(issueTypeId);
         List<StateMachineSchemeConfig> configs = configMapper.select(config);
         if (!configs.isEmpty()) {
             return configs.get(0).getStateMachineId();
         } else {
             //找不到对应的issueType则取默认
-            return configMapper.selectDefault(organizationId, stateMachineSchemeId).getStateMachineId();
+            return configMapper.selectDefault(organizationId, schemeId).getStateMachineId();
         }
     }
 
+    @Override
+    public List<StateMachineSchemeConfig> queryBySchemeId(Long organizationId, Long schemeId) {
+        StateMachineSchemeConfig select = new StateMachineSchemeConfig();
+        select.setOrganizationId(organizationId);
+        select.setSchemeId(schemeId);
+        return configMapper.select(select);
+    }
+
+    @Override
+    public List<StateMachineSchemeConfig> queryByStateMachineId(Long organizationId, Long stateMachineId) {
+        StateMachineSchemeConfig selectSchemeConfig = new StateMachineSchemeConfig();
+        selectSchemeConfig.setStateMachineId(stateMachineId);
+        selectSchemeConfig.setOrganizationId(organizationId);
+        return configMapper.select(selectSchemeConfig);
+    }
 }

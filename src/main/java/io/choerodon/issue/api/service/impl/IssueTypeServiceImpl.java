@@ -39,17 +39,10 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueTypeServiceImpl.class);
 
     private IssueTypeMapper issueTypeMapper;
-    @Autowired
-    private StateMachineSchemeConfigMapper schemeConfigMapper;
 
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign;
 
-    @Autowired
-    private IssueTypeSchemeMapper issueTypeSchemeMapper;
-
-    @Autowired
-    private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
 
     private final ModelMapper modelMapper = new ModelMapper();
 

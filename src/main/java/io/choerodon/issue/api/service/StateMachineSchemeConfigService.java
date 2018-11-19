@@ -23,6 +23,14 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
     StateMachineSchemeDTO delete(Long organizationId, Long schemeId, Long stateMachineId);
 
     /**
+     * 删除状态机方案及配置
+     *
+     * @param organizationId
+     * @param schemeId
+     */
+    void deleteBySchemeId(Long organizationId, Long schemeId);
+
+    /**
      * 创建方案
      *
      * @param organizationId
@@ -51,11 +59,35 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
     void updateDefaultConfig(Long organizationId, Long schemeId, Long stateMachineId);
 
     /**
+     * 获取默认配置
+     *
+     * @return
+     */
+    StateMachineSchemeConfig selectDefault(Long organizationId, Long schemeId);
+
+    /**
      * 通过状态机方案id和问题类型id查询出状态机
-     * @param stateMachineSchemeId
+     *
+     * @param schemeId
      * @param issueTypeId
      * @return
      */
-    Long queryBySchemeIdAndIssueTypeId(Long organizationId, Long stateMachineSchemeId, Long issueTypeId);
+    Long queryBySchemeIdAndIssueTypeId(Long organizationId, Long schemeId, Long issueTypeId);
+
+    /**
+     * 根据方案查询配置
+     *
+     * @param organizationId
+     * @param schemeId
+     * @return
+     */
+    List<StateMachineSchemeConfig> queryBySchemeId(Long organizationId, Long schemeId);
+
+    /**
+     * 查询状态机关联的方案
+     *
+     * @return
+     */
+    List<StateMachineSchemeConfig> queryByStateMachineId(Long organizationId, Long stateMachineId);
 
 }

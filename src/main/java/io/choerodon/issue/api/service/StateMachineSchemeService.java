@@ -65,16 +65,6 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
     StateMachineSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
 
     /**
-     * 创建状态机方案配置
-     *
-     * @param organizationId 组织id
-     * @param schemeId       方法Id
-     * @param configDTOs     配置
-     * @return 配置列表
-     */
-    List<StateMachineSchemeConfigDTO> createSchemeConfig(Long organizationId, Long schemeId, List<StateMachineSchemeConfigDTO> configDTOs);
-
-    /**
      * 校验名字是否未被使用
      *
      * @param organizationId 组织id
