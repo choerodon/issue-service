@@ -12,7 +12,7 @@ import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.domain.StateMachineSchemeConfig;
+import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
@@ -53,6 +53,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ProjectUtil projectUtil;
     @Autowired
     private ProjectConfigService projectConfigService;
+    @Autowired
+
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -213,7 +215,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId) {
         List<Long> schemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
-        if(!schemeIds.isEmpty()){
+        if (!schemeIds.isEmpty()) {
             List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, schemeIds);
             if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
                 return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {

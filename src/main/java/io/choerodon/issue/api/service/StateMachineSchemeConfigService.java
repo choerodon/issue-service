@@ -91,4 +91,22 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      */
     List<Long> querySchemeIdsByStateMachineId(Boolean isDraft, Long organizationId, Long stateMachineId);
 
+    /**
+     * 发布状态机方案
+     *
+     * @param organizationId
+     * @param schemeId
+     * @return
+     */
+    StateMachineSchemeDTO deploy(Long organizationId, Long schemeId);
+
+    /**
+     * 删除状态机方案草稿配置
+     *
+     * @param organizationId
+     * @param schemeId
+     * @return
+     */
+    StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId);
+
 }

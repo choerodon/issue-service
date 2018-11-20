@@ -5,10 +5,13 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
+import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
+import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
+import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -33,6 +36,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     private StateMachineSchemeConfigDraftMapper configDraftMapper;
     @Autowired
     private StateMachineSchemeService stateMachineSchemeService;
+    @Autowired
+    private StateMachineSchemeMapper schemeMapper;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -186,5 +191,38 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             schemeIds = configMapper.select(select).stream().map(StateMachineSchemeConfig::getSchemeId).distinct().collect(Collectors.toList());
         }
         return schemeIds;
+    }
+
+    @Override
+    public StateMachineSchemeDTO deploy(Long organizationId, Long schemeId) {
+        return null;
+    }
+
+    @Override
+    public StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId) {
+        //删除草稿配置
+        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+        draft.setSchemeId(schemeId);
+        draft.setOrganizationId(organizationId);
+        configDraftMapper.delete(draft);
+        //写入活跃的配置写到到草稿中，id一致
+        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+        config.setSchemeId(schemeId);
+        config.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfig> configs = configMapper.select(config);
+        if (configs != null && !configs.isEmpty()) {
+            List<StateMachineSchemeConfigDraft> configDrafts = modelMapper.map(configs, new TypeToken<List<StateMachineSchemeConfigDraft>>() {
+            }.getType());
+            for (StateMachineSchemeConfigDraft insertConfig : configDrafts) {
+                int result = configDraftMapper.insert(insertConfig);
+                if (result != 1) {
+                    throw new CommonException("error.stateMachineSchemeConfig.create");
+                }
+            }
+        }
+        //更新状态机方案状态为：活跃
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+        return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 }

@@ -114,4 +114,20 @@ public class StateMachineSchemeController {
     public ResponseEntity<List<StateMachineSchemeDTO>> querySchemeByStateMachineId(@PathVariable("organization_id") Long organizationId, @PathVariable(value = "state_machine_id") Long stateMachineId) {
         return new ResponseEntity<>(schemeService.querySchemeByStateMachineId(organizationId, stateMachineId), HttpStatus.OK);
     }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "发布状态机方案")
+    @GetMapping(value = "/deploy/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> deploy(@PathVariable("organization_id") Long organizationId,
+                                                        @PathVariable("scheme_id") Long schemeId) {
+        return new ResponseEntity<>(configService.deploy(organizationId, schemeId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "删除状态机方案草稿")
+    @DeleteMapping(value = "/delete_draft/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> deleteDraft(@PathVariable("organization_id") Long organizationId,
+                                                             @PathVariable("scheme_id") Long stateMachineId) {
+        return new ResponseEntity<>(configService.deleteDraft(organizationId, stateMachineId), HttpStatus.NO_CONTENT);
+    }
 }
