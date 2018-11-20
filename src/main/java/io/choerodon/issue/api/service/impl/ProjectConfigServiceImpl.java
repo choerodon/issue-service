@@ -13,6 +13,7 @@ import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
+import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
@@ -42,6 +43,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private static final String FLAG = "flag";
     private static final String MESSAGE = "message";
     private static final String STATEMACHINEID = "stateMachineId";
+    private static final String ERROR_ISSUE_STATE_MACHINE_NOT_FOUND = "error.issueStateMachine.notFound";
+    private static final String ERROR_ISSUE_STATUS_NOT_FOUND = "error.createIssue.issueStatusNotFound";
+
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
@@ -96,6 +100,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private ProjectUtil projectUtil;
     @Autowired
     private StateMachineSchemeMapper stateMachineSchemeMapper;
+    @Autowired
+    private ProjectConfigService projectConfigService;
+    @Autowired
+    private InstanceFeignClient instanceFeignClient;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -396,5 +404,18 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             return projectIdsMap;
         }
         return Collections.emptyMap();
+    }
+
+    @Override
+    public Long queryWorkFlowFirstStatus(Long projectId, String applyType, Long issueTypeId, Long organizationId) {
+        Long statusMachineId = projectConfigService.queryStateMachineId(projectId, applyType, issueTypeId);
+        if (statusMachineId == null) {
+            throw new CommonException(ERROR_ISSUE_STATE_MACHINE_NOT_FOUND);
+        }
+        Long initStatusId = instanceFeignClient.queryInitStatusId(organizationId, statusMachineId).getBody();
+        if (initStatusId == null) {
+            throw new CommonException(ERROR_ISSUE_STATUS_NOT_FOUND);
+        }
+        return initStatusId;
     }
 }
