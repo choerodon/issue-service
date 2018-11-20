@@ -32,7 +32,7 @@ public enum InitIssueType {
     /**
      * 测试
      */
-    TEST("test", "测试", "测试", "FFB103", "issue_test", SchemeApplyType.TEST);
+    TEST("test", "测试", "测试", "#FFB103", "issue_test", SchemeApplyType.TEST);
 
     private String icon;
     private String name;
