@@ -1,10 +1,9 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
+import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.core.domain.Page;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseService;
@@ -62,7 +61,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param schemeId       方案id
      * @return 状态机方案及配置
      */
-    StateMachineSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
+    StateMachineSchemeDTO querySchemeWithConfigById(Boolean isDraft, Long organizationId, Long schemeId);
 
     /**
      * 校验名字是否未被使用

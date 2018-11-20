@@ -2,6 +2,7 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
@@ -51,6 +52,8 @@ public class StateMachineServiceImpl implements StateMachineService {
     private StateMachineSchemeMapper stateMachineSchemeMapper;
     @Autowired
     private AnalyzeServiceManager analyzeServiceManager;
+    @Autowired
+    private StateMachineSchemeConfigService stateMachineSchemeConfigService;
 
     @Override
     public ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
@@ -71,10 +74,12 @@ public class StateMachineServiceImpl implements StateMachineService {
 
     @Override
     public ResponseEntity<Boolean> delete(Long organizationId, Long stateMachineId) {
-        List<StateMachineSchemeDTO> list = schemeService.querySchemeByStateMachineId(organizationId, stateMachineId);
-        if (list != null && !list.isEmpty()) {
+        //有关联则无法删除，判断已发布的
+        if (!stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId).isEmpty()) {
             throw new CommonException("error.stateMachine.delete");
         }
+        //删除草稿的已关联当前状态机【todo】
+
         ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             throw new CommonException("error.stateMachine.delete.noFound");
@@ -91,12 +96,12 @@ public class StateMachineServiceImpl implements StateMachineService {
             map.put("reason", "noFound");
             return map;
         }
-        List<StateMachineSchemeDTO> list = schemeService.querySchemeByStateMachineId(organizationId, stateMachineId);
-        if (list == null || list.isEmpty()) {
+        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        if (schemeIds.isEmpty()) {
             map.put(CloopmCommonString.CAN_DELETE, true);
         } else {
             map.put(CloopmCommonString.CAN_DELETE, false);
-            map.put("schemeUsed", list.size());
+            map.put("schemeUsed", schemeIds.size());
         }
         return map;
     }

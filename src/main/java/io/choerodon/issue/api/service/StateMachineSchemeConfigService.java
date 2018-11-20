@@ -3,6 +3,7 @@ package io.choerodon.issue.api.service;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
+import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * @author shinan.chen
  * @Date 2018/8/2
  */
-public interface StateMachineSchemeConfigService extends BaseService<StateMachineSchemeConfig> {
+public interface StateMachineSchemeConfigService extends BaseService<StateMachineSchemeConfigDraft> {
 
     /**
      * 根据状态机id删除配置
@@ -63,7 +64,7 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      *
      * @return
      */
-    StateMachineSchemeConfig selectDefault(Long organizationId, Long schemeId);
+    StateMachineSchemeConfigDTO selectDefault(Boolean isDraft, Long organizationId, Long schemeId);
 
     /**
      * 通过状态机方案id和问题类型id查询出状态机
@@ -72,7 +73,7 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      * @param issueTypeId
      * @return
      */
-    Long queryBySchemeIdAndIssueTypeId(Long organizationId, Long schemeId, Long issueTypeId);
+    Long queryBySchemeIdAndIssueTypeId(Boolean isDraft, Long organizationId, Long schemeId, Long issueTypeId);
 
     /**
      * 根据方案查询配置
@@ -81,13 +82,13 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      * @param schemeId
      * @return
      */
-    List<StateMachineSchemeConfig> queryBySchemeId(Long organizationId, Long schemeId);
+    List<StateMachineSchemeConfigDTO> queryBySchemeId(Boolean isDraft, Long organizationId, Long schemeId);
 
     /**
      * 查询状态机关联的方案
      *
      * @return
      */
-    List<StateMachineSchemeConfig> queryByStateMachineId(Long organizationId, Long stateMachineId);
+    List<Long> querySchemeIdsByStateMachineId(Boolean isDraft, Long organizationId, Long stateMachineId);
 
 }

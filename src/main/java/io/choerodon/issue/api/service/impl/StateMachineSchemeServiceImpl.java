@@ -19,7 +19,6 @@ import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
-import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
 import io.choerodon.issue.infra.utils.ProjectUtil;
@@ -148,22 +147,22 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             throw new CommonException("error.stateMachineScheme.delete");
         }
         //删除方案配置信息
-        configService.deleteBySchemeId(organizationId,schemeId);
+        configService.deleteBySchemeId(organizationId, schemeId);
         return true;
     }
 
     @Override
-    public StateMachineSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
-        StateMachineScheme scheme = schemeMapper.querySchemeWithConfigById(schemeId);
+    public StateMachineSchemeDTO querySchemeWithConfigById(Boolean isDraft, Long organizationId, Long schemeId) {
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         if (scheme == null) {
-            throw new CommonException("error.stateMachineScheme.querySchemeWithConfigById.notFound");
+            throw new CommonException("error.stateMachineScheme.notFound");
         }
         StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
 
         //处理配置信息
-        List<StateMachineSchemeConfig> configs = scheme.getSchemeConfigs();
+        List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(isDraft, organizationId, schemeId);
         Map<Long, List<IssueType>> map = new HashMap<>();
-        for (StateMachineSchemeConfig config : configs) {
+        for (StateMachineSchemeConfigDTO config : configs) {
             List<IssueType> issueTypes = map.get(config.getStateMachineId());
             if (issueTypes == null) {
                 issueTypes = new ArrayList<>();
@@ -213,10 +212,13 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId) {
-        List<StateMachineScheme> stateMachineSchemes = schemeMapper.querySchemeByStateMachineId(organizationId, stateMachineId);
-        if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
-            return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
-            }.getType());
+        List<Long> schemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        if(!schemeIds.isEmpty()){
+            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, schemeIds);
+            if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
+                return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
+                }.getType());
+            }
         }
         return Collections.emptyList();
     }
@@ -273,8 +275,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 throw new CommonException("error.stateMachineScheme.activeScheme");
             }
         }
+        //发布操作【todo】
         //活跃方案下的所有新建状态机
-        List<StateMachineSchemeConfig> configs = schemeMapper.querySchemeWithConfigById(schemeId).getSchemeConfigs();
-        stateMachineServiceFeign.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfig::getStateMachineId).distinct().collect(Collectors.toList()));
+        List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
+        stateMachineServiceFeign.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));
     }
 }

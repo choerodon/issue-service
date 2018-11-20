@@ -1,7 +1,8 @@
 package io.choerodon.issue.api.dto;
 
 /**
- * @author peng.jiang@hand-china.com
+ * @author shinan.chen
+ * @since 2018/11/25
  */
 public class StateMachineSchemeConfigDTO {
 

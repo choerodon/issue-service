@@ -5,7 +5,7 @@
 
     <select id="selectDefault" resultType="io.choerodon.issue.domain.StateMachineSchemeConfigDraft">
         SELECT
-        smsc.*
+        smscd.*
         FROM
         state_machine_scheme_config_draft smscd
         WHERE

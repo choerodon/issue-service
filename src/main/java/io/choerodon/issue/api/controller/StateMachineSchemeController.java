@@ -78,9 +78,9 @@ public class StateMachineSchemeController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据id查询状态机方案对象")
-    @GetMapping(value = "/{scheme_id}")
-    public ResponseEntity<StateMachineSchemeDTO> getByStateId(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
-        return new ResponseEntity<>(schemeService.querySchemeWithConfigById(organizationId, schemeId), HttpStatus.OK);
+    @GetMapping(value = "/query_scheme_with_config/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> querySchemeWithConfigById(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId, @RequestParam("isDraft") Boolean isDraft) {
+        return new ResponseEntity<>(schemeService.querySchemeWithConfigById(isDraft, organizationId, schemeId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
@@ -109,7 +109,7 @@ public class StateMachineSchemeController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "根据状态机id查询所使用到该状态机的方案")
+    @ApiOperation(value = "根据状态机id查询所使用到该状态机的方案【发布】")
     @GetMapping(value = "/query_scheme/{state_machine_id}")
     public ResponseEntity<List<StateMachineSchemeDTO>> querySchemeByStateMachineId(@PathVariable("organization_id") Long organizationId, @PathVariable(value = "state_machine_id") Long stateMachineId) {
         return new ResponseEntity<>(schemeService.querySchemeByStateMachineId(organizationId, stateMachineId), HttpStatus.OK);
