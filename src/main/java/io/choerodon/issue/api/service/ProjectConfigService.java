@@ -150,4 +150,6 @@ public interface ProjectConfigService {
      * @return
      */
     Map<String, List<Long>> queryProjectIdsMap(Long organizationId, Long stateMachineId);
+
+    Long queryWorkFlowFirstStatus(Long projectId, String applyType, Long issueTypeId, Long organizationId);
 }

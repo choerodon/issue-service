@@ -136,4 +136,20 @@ public class SchemeController extends BaseController {
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
     }
+
+    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @ApiOperation(value = "查询工作流第一个状态")
+    @GetMapping("/status/query_first_status")
+    public ResponseEntity<Long> queryWorkFlowFirstStatus(@ApiParam(value = "项目id", required = true)
+                                                         @PathVariable("project_id") Long projectId,
+                                                         @ApiParam(value = "applyType", required = true)
+                                                         @RequestParam String applyType,
+                                                         @ApiParam(value = "issueTypeId", required = true)
+                                                         @RequestParam Long issueTypeId,
+                                                         @ApiParam(value = "organizationId", required = true)
+                                                         @RequestParam Long organizationId) {
+        return Optional.ofNullable(projectConfigService.queryWorkFlowFirstStatus(projectId, applyType, issueTypeId, organizationId))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.firstStatus.get"));
+    }
 }
