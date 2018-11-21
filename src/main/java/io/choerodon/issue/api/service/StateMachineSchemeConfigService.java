@@ -101,6 +101,15 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
     StateMachineSchemeDTO deploy(Long organizationId, Long schemeId);
 
     /**
+     * 发布状态机方案校验
+     *
+     * @param organizationId
+     * @param schemeId
+     * @return
+     */
+    StateMachineSchemeDTO checkDeploy(Long organizationId, Long schemeId);
+
+    /**
      * 删除状态机方案草稿配置
      *
      * @param organizationId

@@ -124,6 +124,14 @@ public class StateMachineSchemeController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "校验发布状态机方案")
+    @GetMapping(value = "/check_deploy/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> checkDeploy(@PathVariable("organization_id") Long organizationId,
+                                                        @PathVariable("scheme_id") Long schemeId) {
+        return new ResponseEntity<>(configService.checkDeploy(organizationId, schemeId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "删除状态机方案草稿")
     @DeleteMapping(value = "/delete_draft/{scheme_id}")
     public ResponseEntity<StateMachineSchemeDTO> deleteDraft(@PathVariable("organization_id") Long organizationId,

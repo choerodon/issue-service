@@ -5,6 +5,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import org.springframework.http.ResponseEntity;
@@ -72,5 +73,10 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     @Override
     public ResponseEntity<Boolean> activeStateMachines(Long organizationId, List<Long> stateMachineIds) {
         throw new CommonException("error.stateMachineFeignClient.activeStateMachines");
+    }
+
+    @Override
+    public ResponseEntity<List<StateMachineWithStatusDTO>> queryAllWithStatus(Long organizationId) {
+        throw new CommonException("error.stateMachineFeignClient.queryAllWithStatus");
     }
 }

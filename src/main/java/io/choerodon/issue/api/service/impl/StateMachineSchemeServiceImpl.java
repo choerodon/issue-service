@@ -53,8 +53,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ProjectUtil projectUtil;
     @Autowired
     private ProjectConfigService projectConfigService;
-    @Autowired
-
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -277,7 +275,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 throw new CommonException("error.stateMachineScheme.activeScheme");
             }
         }
-        //发布操作【todo】
         //活跃方案下的所有新建状态机
         List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
         stateMachineServiceFeign.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));

@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -195,6 +197,53 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
 
     @Override
     public StateMachineSchemeDTO deploy(Long organizationId, Long schemeId) {
+        return null;
+    }
+
+    @Override
+    public StateMachineSchemeDTO checkDeploy(Long organizationId, Long schemeId) {
+        //获取发布配置
+        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+        config.setSchemeId(schemeId);
+        config.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfig> deploys = configMapper.select(config);
+        Map<Long, Long> deployMap = deploys.stream().collect(Collectors.toMap(StateMachineSchemeConfig::getIssueTypeId, StateMachineSchemeConfig::getStateMachineId));
+        Long deployDefaultStateMachineId = deployMap.get(0L);
+        deployMap.remove(0L);
+        //获取草稿配置
+        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+        draft.setSchemeId(schemeId);
+        draft.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfigDraft> drafts = configDraftMapper.select(draft);
+        Map<Long, Long> draftMap = drafts.stream().collect(Collectors.toMap(StateMachineSchemeConfigDraft::getIssueTypeId, StateMachineSchemeConfigDraft::getStateMachineId));
+        Long draftDefaultStateMachineId = draftMap.get(0L);
+        draftMap.remove(0L);
+        //判断状态机有变化的问题类型
+        int size = deployMap.size()+draftMap.size();
+        Map<Long, Long> oldMap = new HashMap<>(size);
+        Map<Long, Long> newMap = new HashMap<>(size);
+        //因为发布的和草稿的都可能有增加或减少，因此需要两边都判断
+        for (Map.Entry<Long, Long> entry : deployMap.entrySet()) {
+            Long issueTypeId = entry.getKey();
+            Long oldStateMachineId = entry.getValue();
+            Long newStateMachineId = draftMap.getOrDefault(issueTypeId, draftDefaultStateMachineId);
+            if (!oldStateMachineId.equals(newStateMachineId)) {
+                oldMap.put(issueTypeId, oldStateMachineId);
+                newMap.put(issueTypeId, newStateMachineId);
+            }
+        }
+        for (Map.Entry<Long, Long> entry : draftMap.entrySet()) {
+            Long issueTypeId = entry.getKey();
+            //未判断过
+            if(oldMap.get(issueTypeId)==null){
+                Long oldStateMachineId = entry.getValue();
+                Long newStateMachineId = deployMap.getOrDefault(issueTypeId, deployDefaultStateMachineId);
+                if (!oldStateMachineId.equals(newStateMachineId)) {
+                    oldMap.put(issueTypeId, oldStateMachineId);
+                    newMap.put(issueTypeId, newStateMachineId);
+                }
+            }
+        }
         return null;
     }
 
