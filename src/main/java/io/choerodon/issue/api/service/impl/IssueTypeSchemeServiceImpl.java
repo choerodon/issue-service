@@ -5,6 +5,8 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
 import io.choerodon.issue.api.service.IssueTypeSchemeService;
+import io.choerodon.issue.api.service.IssueTypeService;
+import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeScheme;
@@ -31,9 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -57,6 +57,10 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     private ProjectUtil projectUtil;
     @Autowired
     private ProjectConfigService projectConfigService;
+    @Autowired
+    private IssueTypeService issueTypeService;
+    @Autowired
+    private PriorityService priorityService;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -246,6 +250,8 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         query.setOrganizationId(organizationId);
         query.setInitialize(true);
         List<IssueType> issueTypes = issueTypeMapper.select(query);
+        //处理老的组织没有创建的数据
+        issueTypes = initOrganizationIssueType(organizationId, issueTypes);
         Map<String, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
         //初始化敏捷问题类型方案
         initScheme(projectId, organizationId, projectCode + "默认类型方案【敏捷】", issueTypeMap.get(InitIssueType.STORY.getTypeCode()).getId(), SchemeApplyType.AGILE, issueTypeMap);
@@ -253,8 +259,24 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         initScheme(projectId, organizationId, projectCode + "默认类型方案【测试】", issueTypeMap.get(InitIssueType.TEST.getTypeCode()).getId(), SchemeApplyType.TEST, issueTypeMap);
     }
 
+    private List<IssueType> initOrganizationIssueType(Long organizationId, List<IssueType> issueTypes) {
+        if (issueTypes == null || issueTypes.isEmpty()) {
+            //注册组织初始化六种问题类型
+            issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
+            //注册组织初始化优先级
+            priorityService.initProrityByOrganization(Collections.singletonList(organizationId));
+            IssueType query = new IssueType();
+            query.setOrganizationId(organizationId);
+            query.setInitialize(true);
+            return issueTypeMapper.select(query);
+        } else {
+            return issueTypes;
+        }
+    }
+
     /**
      * 初始化方案
+     *
      * @param projectId
      * @param organizationId
      * @param name
