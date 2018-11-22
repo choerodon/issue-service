@@ -1,10 +1,9 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
+import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.core.domain.Page;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseService;
@@ -25,7 +24,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param params      模糊查询参数
      * @return 状态机方案列表
      */
-    Page<StateMachineSchemeDTO> pageQuery(PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params);
+    Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params);
 
     /**
      * 创建状态机方案
@@ -62,17 +61,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param schemeId       方案id
      * @return 状态机方案及配置
      */
-    StateMachineSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId);
-
-    /**
-     * 创建状态机方案配置
-     *
-     * @param organizationId 组织id
-     * @param schemeId       方法Id
-     * @param configDTOs     配置
-     * @return 配置列表
-     */
-    List<StateMachineSchemeConfigDTO> createSchemeConfig(Long organizationId, Long schemeId, List<StateMachineSchemeConfigDTO> configDTOs);
+    StateMachineSchemeDTO querySchemeWithConfigById(Boolean isDraft, Long organizationId, Long schemeId);
 
     /**
      * 校验名字是否未被使用
@@ -106,4 +95,11 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param stateMachineServiceFeign stateMachineServiceFeign
      */
     void setFeign(StateMachineFeignClient stateMachineServiceFeign);
+
+    /**
+     * 若项目关联状态机方案，设置状态机方案、状态机为活跃
+     *
+     * @param schemeId
+     */
+    void activeScheme(Long schemeId);
 }

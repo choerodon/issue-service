@@ -111,8 +111,8 @@ public class IssueTypeController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询所有问题类型及关联的方案")
     @GetMapping(value = "/query_issue_type/{scheme_id}")
-    public ResponseEntity<List<IssueTypeDTO>> queryIssueType(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
-        return new ResponseEntity<>(issueTypeService.queryIssueType(organizationId, schemeId), HttpStatus.OK);
+    public ResponseEntity<List<IssueTypeDTO>> queryIssueTypeByStateMachineSchemeId(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
+        return new ResponseEntity<>(issueTypeService.queryIssueTypeByStateMachineSchemeId(organizationId, schemeId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

@@ -2,26 +2,22 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
+import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
-import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
-import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -33,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author shinan.chen
@@ -44,8 +41,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
     @Autowired
-    private StateMachineSchemeConfigMapper configMapper;
-    @Autowired
     private StateMachineSchemeConfigService configService;
     @Autowired
     private IssueTypeMapper issueTypeMapper;
@@ -55,6 +50,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ProjectUtil projectUtil;
     @Autowired
     private ProjectConfigService projectConfigService;
+    @Autowired
+    private UserFeignClient userFeignClient;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -64,26 +61,36 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public Page<StateMachineSchemeDTO> pageQuery(PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
+    public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
+        //查询出组织下的所有项目
+        PageRequest projectSearch = new PageRequest();
+        projectSearch.setPage(0);
+        projectSearch.setSize(999);
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
+        Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId, x -> x));
+
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         Page<StateMachineScheme> page = PageHelper.doPageAndSort(pageRequest,
                 () -> schemeMapper.fulltextSearch(scheme, params));
         List<StateMachineScheme> schemes = page.getContent();
-        List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemes);
+        List<StateMachineScheme> schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
+        List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig, projectMap);
         if (schemeDTOS != null) {
             for (StateMachineSchemeDTO machineSchemeDTO : schemeDTOS) {
                 if (machineSchemeDTO.getConfigDTOs() != null) {
                     for (StateMachineSchemeConfigDTO configDTO : machineSchemeDTO.getConfigDTOs()) {
-                        if(!configDTO.getDefault()){
+                        if (!configDTO.getDefault()) {
                             IssueType issueType = issueTypeMapper.selectByPrimaryKey(configDTO.getIssueTypeId());
                             if (issueType != null) {
                                 configDTO.setIssueTypeName(issueType.getName());
                                 configDTO.setIssueTypeIcon(issueType.getIcon());
+                                configDTO.setIssueTypeColour(issueType.getColour());
                             }
-                        }else{
+                        } else {
                             //若为默认配置，则匹配的是所有为分配的问题类型
-                            configDTO.setIssueTypeName("所有未分配的问题类型");
+                            configDTO.setIssueTypeName("未分配类型");
                             configDTO.setIssueTypeIcon("style");
+                            configDTO.setIssueTypeColour("#808080");
                         }
                         StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
                         configDTO.setStateMachineName(stateMachineDTO.getName());
@@ -104,6 +111,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
+        schemeDTO.setStatus(StateMachineSchemeStatus.CREATE);
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         scheme.setOrganizationId(organizationId);
         int isInsert = schemeMapper.insert(scheme);
@@ -136,6 +144,10 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     @Transactional(rollbackFor = CommonException.class)
     public Boolean delete(Long organizationId, Long schemeId) {
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        if (!scheme.getStatus().equals(StateMachineSchemeStatus.CREATE)) {
+            throw new CommonException("error.stateMachineScheme.delete.illegal");
+        }
         if (schemeId == null) {
             throw new CommonException("error.stateMachineScheme.delete.schemeId.null");
         }
@@ -144,49 +156,58 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             throw new CommonException("error.stateMachineScheme.delete");
         }
         //删除方案配置信息
-        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
-        config.setSchemeId(schemeId);
-        configMapper.delete(config);
+        configService.deleteBySchemeId(organizationId, schemeId);
         return true;
     }
 
     @Override
-    public StateMachineSchemeDTO querySchemeWithConfigById(Long organizationId, Long schemeId) {
-        StateMachineScheme scheme = schemeMapper.querySchemeWithConfigById(schemeId);
+    public StateMachineSchemeDTO querySchemeWithConfigById(Boolean isDraft, Long organizationId, Long schemeId) {
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         if (scheme == null) {
-            throw new CommonException("error.stateMachineScheme.querySchemeWithConfigById.notFound");
+            throw new CommonException("error.stateMachineScheme.notFound");
         }
+
+        //如果是查询草稿，草稿若没有数据则修复
+        if (isDraft) {
+            configService.fixDraft(organizationId, schemeId);
+        }
+
         StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
 
         //处理配置信息
-        List<StateMachineSchemeConfig> configs = scheme.getSchemeConfigs();
-        Map<Long, List<IssueType>> map = new HashMap<>();
-        for (StateMachineSchemeConfig config : configs) {
+        List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(isDraft, organizationId, schemeId);
+        Map<Long, List<IssueType>> map = new HashMap<>(configs.size());
+        //取默认配置到第一个
+        Long defaultStateMachineId = null;
+        for (StateMachineSchemeConfigDTO config : configs) {
             List<IssueType> issueTypes = map.get(config.getStateMachineId());
             if (issueTypes == null) {
                 issueTypes = new ArrayList<>();
             }
             IssueType issueType;
-            if(!config.getDefault()){
+            if (!config.getDefault()) {
                 issueType = issueTypeMapper.selectByPrimaryKey(config.getIssueTypeId());
-            }else{
+            } else {
                 //若为默认配置，则匹配的是所有为分配的问题类型
                 issueType = new IssueType();
-                issueType.setName("所有未分配的问题类型");
+                issueType.setName("未分配类型");
                 issueType.setIcon("style");
+                issueType.setColour("#808080");
+                defaultStateMachineId = config.getStateMachineId();
             }
             issueTypes.add(issueType);
             map.put(config.getStateMachineId(), issueTypes);
         }
 
         List<StateMachineSchemeConfigViewDTO> viewDTOs = new ArrayList<>();
+        //处理默认配置
+        viewDTOs.add(handleDefaultConfig(organizationId, defaultStateMachineId, map));
         for (Map.Entry<Long, List<IssueType>> entry : map.entrySet()) {
             Long stateMachineId = entry.getKey();
             List<IssueType> issueTypes = entry.getValue();
             StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, stateMachineId).getBody();
             StateMachineSchemeConfigViewDTO viewDTO = new StateMachineSchemeConfigViewDTO();
             viewDTO.setStateMachineDTO(stateMachineDTO);
-
             List<IssueTypeDTO> issueTypeDTOs = modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
             }.getType());
             viewDTO.setIssueTypeDTOs(issueTypeDTOs);
@@ -196,20 +217,22 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         return schemeDTO;
     }
 
-    @Override
-    @Transactional(rollbackFor = CommonException.class)
-    public List<StateMachineSchemeConfigDTO> createSchemeConfig(Long organizationId, Long schemeId, List<StateMachineSchemeConfigDTO> configDTOs) {
-        List<StateMachineSchemeConfig> configs = modelMapper.map(configDTOs, new TypeToken<List<StateMachineSchemeConfig>>() {
-        }.getType());
-        for (StateMachineSchemeConfig config : configs) {
-            config.setSchemeId(schemeId);
-        }
-        int isInsert = configMapper.insertList(configs);
-        if (isInsert < 1) {
-            throw new CommonException("error.StateMachineSchemeConfig.insert");
-        }
-        return modelMapper.map(configs, new TypeToken<List<StateMachineSchemeConfigDTO>>() {
-        }.getType());
+    /**
+     * 处理默认配置到首位
+     *
+     * @param organizationId
+     * @param defaultStateMachineId
+     * @param map
+     * @return
+     */
+    private StateMachineSchemeConfigViewDTO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueType>> map){
+        StateMachineSchemeConfigViewDTO firstDTO = new StateMachineSchemeConfigViewDTO();
+        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, defaultStateMachineId).getBody();
+        firstDTO.setStateMachineDTO(stateMachineDTO);
+        firstDTO.setIssueTypeDTOs(modelMapper.map(map.get(defaultStateMachineId), new TypeToken<List<IssueTypeDTO>>() {
+        }.getType()));
+        map.remove(defaultStateMachineId);
+        return firstDTO;
     }
 
     @Override
@@ -227,10 +250,13 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId) {
-        List<StateMachineScheme> stateMachineSchemes = schemeMapper.querySchemeByStateMachineId(organizationId, stateMachineId);
-        if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
-            return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
-            }.getType());
+        List<Long> schemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        if (!schemeIds.isEmpty()) {
+            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, schemeIds);
+            if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
+                return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
+                }.getType());
+            }
         }
         return Collections.emptyList();
     }
@@ -257,6 +283,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
+        scheme.setStatus(StateMachineSchemeStatus.CREATE);
         scheme.setName(name);
         scheme.setDescription(name);
         scheme.setOrganizationId(organizationId);
@@ -273,5 +300,21 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             //创建与项目的关联关系
             projectConfigService.create(projectId, scheme.getId(), SchemeType.STATE_MACHINE, schemeApplyType);
         }
+    }
+
+    @Override
+    public void activeScheme(Long schemeId) {
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        //活跃状态机方案
+        if (scheme.getStatus().equals(StateMachineSchemeStatus.CREATE)) {
+            scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+            int result = updateOptional(scheme, "status");
+            if (result != 1) {
+                throw new CommonException("error.stateMachineScheme.activeScheme");
+            }
+        }
+        //活跃方案下的所有新建状态机
+        List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
+        stateMachineServiceFeign.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));
     }
 }

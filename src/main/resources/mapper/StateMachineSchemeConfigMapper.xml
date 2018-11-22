@@ -11,6 +11,7 @@
         WHERE
         smsc.organization_id = #{organizationId}
         AND smsc.scheme_id = #{schemeId}
+        AND smsc.is_default = 1
     </select>
 
 </mapper>

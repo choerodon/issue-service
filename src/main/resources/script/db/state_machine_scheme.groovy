@@ -27,4 +27,11 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme.groovy') {
             column(name: "organization_id", type: "BIGINT UNSIGNED")
         }
     }
+    changeSet(id: '2018-11-19-add-column-state-machine-scheme', author: 'shinan.chenX@gmail') {
+        addColumn(tableName: 'state_machine_scheme') {
+            column(name: 'status', type: 'VARCHAR(30)', remarks: '状态机方案的状态，此时新增字段，原有的方案应该都是active', defaultValue: "active") {
+                constraints(nullable: false)
+            }
+        }
+    }
 }

@@ -3,7 +3,9 @@ package io.choerodon.issue.api.service.impl;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
+import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.service.IssueTypeService;
+import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
@@ -24,9 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author shinan.chen
@@ -38,18 +42,13 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueTypeServiceImpl.class);
 
+    @Autowired
     private IssueTypeMapper issueTypeMapper;
     @Autowired
-    private StateMachineSchemeConfigMapper schemeConfigMapper;
-
+    private StateMachineSchemeConfigService stateMachineSchemeConfigService;
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign;
 
-    @Autowired
-    private IssueTypeSchemeMapper issueTypeSchemeMapper;
-
-    @Autowired
-    private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -163,16 +162,18 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
     }
 
     @Override
-    public List<IssueTypeDTO> queryIssueType(Long organizationId, Long schemeId) {
-        List<IssueType> list = issueTypeMapper.queryIssueType(organizationId, schemeId);
-        List<IssueTypeDTO> dtos = ConvertUtils.convertIssueTypesToDTOs(list);
-        for (IssueTypeDTO issueTypeDTO : dtos) {
-            if (issueTypeDTO.getStateMachineSchemeConfigDTO() != null && issueTypeDTO.getStateMachineSchemeConfigDTO().getStateMachineId() != null) {
-                StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, issueTypeDTO.getStateMachineSchemeConfigDTO().getStateMachineId()).getBody();
-                issueTypeDTO.getStateMachineSchemeConfigDTO().setStateMachineName(stateMachineDTO.getName());
+    public List<IssueTypeDTO> queryIssueTypeByStateMachineSchemeId(Long organizationId, Long schemeId) {
+        List<IssueTypeDTO> issueTypeDTOS = queryByOrgId(organizationId);
+        List<StateMachineSchemeConfigDTO> configDTOs = stateMachineSchemeConfigService.queryBySchemeId(true, organizationId, schemeId);
+        Map<Long, StateMachineSchemeConfigDTO> configMap = configDTOs.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId,x->x));
+        for (IssueTypeDTO issueTypeDTO : issueTypeDTOS) {
+            StateMachineSchemeConfigDTO configDTO = configMap.get(issueTypeDTO.getId());
+            if(configDTO!=null){
+                StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, configDTO.getStateMachineId()).getBody();
+                issueTypeDTO.setStateMachineName(stateMachineDTO.getName());
             }
         }
-        return dtos;
+        return issueTypeDTOS;
     }
 
     @Override
