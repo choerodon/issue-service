@@ -18,6 +18,7 @@ public class StateMachineSchemeConfigDTO {
     private String stateMachineName;
     private String issueTypeName;
     private String issueTypeIcon;
+    private String issueTypeColour;
 
     public Long getId() {
         return id;
@@ -105,5 +106,13 @@ public class StateMachineSchemeConfigDTO {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getIssueTypeColour() {
+        return issueTypeColour;
+    }
+
+    public void setIssueTypeColour(String issueTypeColour) {
+        this.issueTypeColour = issueTypeColour;
     }
 }

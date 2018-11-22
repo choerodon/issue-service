@@ -57,26 +57,15 @@ public interface UserFeignClient {
     @RequestMapping(value = "/v1/users/{id}/info", method = RequestMethod.GET)
     ResponseEntity<UserDTO> queryInfo(@PathVariable(value = "id") Long id);
 
-    /**
-     * 查询所有组织
-     */
-    @RequestMapping(value = "/v1/organizations", method = RequestMethod.GET)
-    ResponseEntity<Page<OrganizationDTO>> queryOrganizations(@ApiIgnore
-                                                             @SortDefault(value = "id", direction = Sort.Direction.DESC)
-                                                                     PageRequest pageRequest,
-                                                             @RequestParam(value = "name",required = false) String name,
-                                                             @RequestParam(value = "code",required = false) String code,
-                                                             @RequestParam(value = "enabled",required = false) Boolean enabled,
-                                                             @RequestParam(value = "params",required = false) String[] params);
 
     /**
      * 根据组织id查询所有项目
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/projects", method = RequestMethod.GET)
-    ResponseEntity<Page<ProjectDTO>> queryProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId,
-                                                          @ApiIgnore
-                                                          @SortDefault(value = "id", direction = Sort.Direction.DESC)
-                                                                  PageRequest pageRequest,
+    ResponseEntity<Page<ProjectDTO>> queryProjectsByOrgId(@PathVariable("organization_id") Long organizationId,
+                                                          @RequestParam(value = "page", required = false) Integer page,
+                                                          @RequestParam(value = "size", required = false) Integer size,
+                                                          @RequestParam(value = "sort", required = false) String[] sort,
                                                           @RequestParam(value = "name",required = false) String name,
                                                           @RequestParam(value = "code",required = false) String code,
                                                           @RequestParam(value = "enabled",required = false) Boolean enabled,

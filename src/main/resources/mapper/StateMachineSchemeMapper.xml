@@ -25,7 +25,7 @@
     </resultMap>
 
     <select id="fulltextSearch" resultType="io.choerodon.issue.domain.StateMachineScheme">
-        SELECT SMS.*,
+        SELECT SMS.*
         FROM state_machine_scheme SMS
         WHERE 1=1
         <if test="scheme.organizationId != null">

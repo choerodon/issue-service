@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,8 +65,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
         //查询出组织下的所有项目
         PageRequest projectSearch = new PageRequest();
+        projectSearch.setPage(0);
         projectSearch.setSize(999);
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, projectSearch, null, null, null, null).getBody().getContent();
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0,999,new String[]{}, null, null, null, new String[]{}).getBody().getContent();
         Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId,x->x));
 
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
@@ -83,6 +85,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                             if (issueType != null) {
                                 configDTO.setIssueTypeName(issueType.getName());
                                 configDTO.setIssueTypeIcon(issueType.getIcon());
+                                configDTO.setIssueTypeColour(issueType.getColour());
                             }
                         } else {
                             //若为默认配置，则匹配的是所有为分配的问题类型
