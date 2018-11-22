@@ -2,6 +2,7 @@ package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.mybatis.service.BaseService;
 
@@ -117,7 +118,7 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      * @param schemeId
      * @return
      */
-    StateMachineSchemeDTO checkDeploy(Long organizationId, Long schemeId);
+    List<StateMachineSchemeChangeItem> checkDeploy(Long organizationId, Long schemeId);
 
     /**
      * 删除状态机方案草稿配置

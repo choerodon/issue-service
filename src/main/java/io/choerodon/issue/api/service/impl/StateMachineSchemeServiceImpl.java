@@ -90,6 +90,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                             //若为默认配置，则匹配的是所有为分配的问题类型
                             configDTO.setIssueTypeName("未分配类型");
                             configDTO.setIssueTypeIcon("style");
+                            configDTO.setIssueTypeColour("#808080");
                         }
                         StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
                         configDTO.setStateMachineName(stateMachineDTO.getName());
@@ -175,7 +176,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
         //处理配置信息
         List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(isDraft, organizationId, schemeId);
-        Map<Long, List<IssueType>> map = new HashMap<>();
+        Map<Long, List<IssueType>> map = new HashMap<>(configs.size());
+        //取默认配置到第一个
+        Long defaultStateMachineId = null;
         for (StateMachineSchemeConfigDTO config : configs) {
             List<IssueType> issueTypes = map.get(config.getStateMachineId());
             if (issueTypes == null) {
@@ -189,19 +192,22 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 issueType = new IssueType();
                 issueType.setName("未分配类型");
                 issueType.setIcon("style");
+                issueType.setColour("#808080");
+                defaultStateMachineId = config.getStateMachineId();
             }
             issueTypes.add(issueType);
             map.put(config.getStateMachineId(), issueTypes);
         }
 
         List<StateMachineSchemeConfigViewDTO> viewDTOs = new ArrayList<>();
+        //处理默认配置
+        viewDTOs.add(handleDefaultConfig(organizationId, defaultStateMachineId, map));
         for (Map.Entry<Long, List<IssueType>> entry : map.entrySet()) {
             Long stateMachineId = entry.getKey();
             List<IssueType> issueTypes = entry.getValue();
             StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, stateMachineId).getBody();
             StateMachineSchemeConfigViewDTO viewDTO = new StateMachineSchemeConfigViewDTO();
             viewDTO.setStateMachineDTO(stateMachineDTO);
-
             List<IssueTypeDTO> issueTypeDTOs = modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
             }.getType());
             viewDTO.setIssueTypeDTOs(issueTypeDTOs);
@@ -209,6 +215,24 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         }
         schemeDTO.setViewDTOs(viewDTOs);
         return schemeDTO;
+    }
+
+    /**
+     * 处理默认配置到首位
+     *
+     * @param organizationId
+     * @param defaultStateMachineId
+     * @param map
+     * @return
+     */
+    private StateMachineSchemeConfigViewDTO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueType>> map){
+        StateMachineSchemeConfigViewDTO firstDTO = new StateMachineSchemeConfigViewDTO();
+        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, defaultStateMachineId).getBody();
+        firstDTO.setStateMachineDTO(stateMachineDTO);
+        firstDTO.setIssueTypeDTOs(modelMapper.map(map.get(defaultStateMachineId), new TypeToken<List<IssueTypeDTO>>() {
+        }.getType()));
+        map.remove(defaultStateMachineId);
+        return firstDTO;
     }
 
     @Override

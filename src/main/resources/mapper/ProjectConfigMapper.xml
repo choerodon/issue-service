@@ -40,4 +40,11 @@
         </if>
     </select>
 
+    <select id="queryConfigsBySchemeId" resultType="io.choerodon.issue.domain.ProjectConfig">
+        SELECT *
+        FROM project_config
+        WHERE scheme_id = #{schemeId}
+        AND scheme_type = #{schemeType}
+    </select>
+
 </mapper>

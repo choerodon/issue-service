@@ -18,14 +18,12 @@ public class IssueTypeDTO {
     private String description;
     private Long organizationId;
     private String colour;
-
     private String typeCode;
-
     private Boolean initialize;
-
     private Long objectVersionNumber;
 
-    private StateMachineSchemeConfigDTO stateMachineSchemeConfigDTO;
+    //用于做状态机方案的配置时
+    private String stateMachineName;
 
     public Long getId() {
         return id;
@@ -75,12 +73,12 @@ public class IssueTypeDTO {
         this.icon = icon;
     }
 
-    public StateMachineSchemeConfigDTO getStateMachineSchemeConfigDTO() {
-        return stateMachineSchemeConfigDTO;
+    public String getStateMachineName() {
+        return stateMachineName;
     }
 
-    public void setStateMachineSchemeConfigDTO(StateMachineSchemeConfigDTO stateMachineSchemeConfigDTO) {
-        this.stateMachineSchemeConfigDTO = stateMachineSchemeConfigDTO;
+    public void setStateMachineName(String stateMachineName) {
+        this.stateMachineName = stateMachineName;
     }
 
     public String getColour() {
@@ -119,7 +117,6 @@ public class IssueTypeDTO {
                 .add("typeCode", typeCode)
                 .add("initialize", initialize)
                 .add("objectVersionNumber", objectVersionNumber)
-                .add("stateMachineSchemeConfigDTO", stateMachineSchemeConfigDTO)
                 .toString();
     }
 }

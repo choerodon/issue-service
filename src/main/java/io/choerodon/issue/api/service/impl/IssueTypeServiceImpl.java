@@ -169,8 +169,8 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         for (IssueTypeDTO issueTypeDTO : issueTypeDTOS) {
             StateMachineSchemeConfigDTO configDTO = configMap.get(issueTypeDTO.getId());
             if(configDTO!=null){
-                StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, issueTypeDTO.getStateMachineSchemeConfigDTO().getStateMachineId()).getBody();
-                issueTypeDTO.getStateMachineSchemeConfigDTO().setStateMachineName(stateMachineDTO.getName());
+                StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, configDTO.getStateMachineId()).getBody();
+                issueTypeDTO.setStateMachineName(stateMachineDTO.getName());
             }
         }
         return issueTypeDTOS;

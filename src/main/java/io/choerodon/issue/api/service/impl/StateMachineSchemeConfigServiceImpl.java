@@ -1,15 +1,25 @@
 package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
+import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.issue.infra.annotation.ChangeSchemeStatus;
+import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
+import io.choerodon.issue.infra.feign.AgileFeignClient;
+import io.choerodon.issue.infra.feign.StateMachineFeignClient;
+import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
+import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
@@ -20,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,6 +51,14 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     private StateMachineSchemeService stateMachineSchemeService;
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
+    @Autowired
+    private StateMachineFeignClient stateMachineFeignClient;
+    @Autowired
+    private IssueTypeService issueTypeService;
+    @Autowired
+    private ProjectConfigMapper projectConfigMapper;
+    @Autowired
+    private AgileFeignClient agileFeignClient;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -224,7 +242,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
-    public StateMachineSchemeDTO checkDeploy(Long organizationId, Long schemeId) {
+    public List<StateMachineSchemeChangeItem> checkDeploy(Long organizationId, Long schemeId) {
         //获取发布配置
         StateMachineSchemeConfig config = new StateMachineSchemeConfig();
         config.setSchemeId(schemeId);
@@ -243,31 +261,53 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         draftMap.remove(0L);
         //判断状态机有变化的问题类型
         int size = deployMap.size() + draftMap.size();
-        Map<Long, Long> oldMap = new HashMap<>(size);
-        Map<Long, Long> newMap = new HashMap<>(size);
+        List<StateMachineSchemeChangeItem> changeItems = new ArrayList<>(size);
         //因为发布的和草稿的都可能有增加或减少，因此需要两边都判断
         for (Map.Entry<Long, Long> entry : deployMap.entrySet()) {
             Long issueTypeId = entry.getKey();
             Long oldStateMachineId = entry.getValue();
             Long newStateMachineId = draftMap.getOrDefault(issueTypeId, draftDefaultStateMachineId);
             if (!oldStateMachineId.equals(newStateMachineId)) {
-                oldMap.put(issueTypeId, oldStateMachineId);
-                newMap.put(issueTypeId, newStateMachineId);
+                changeItems.add(new StateMachineSchemeChangeItem(issueTypeId, oldStateMachineId, newStateMachineId));
             }
         }
+        Map<Long, StateMachineSchemeChangeItem> changeItemsMap = changeItems.stream().collect(Collectors.toMap(StateMachineSchemeChangeItem::getIssueTypeId, x -> x));
         for (Map.Entry<Long, Long> entry : draftMap.entrySet()) {
             Long issueTypeId = entry.getKey();
             //未判断过
-            if (oldMap.get(issueTypeId) == null) {
+            if (changeItemsMap.get(issueTypeId) == null) {
                 Long oldStateMachineId = entry.getValue();
                 Long newStateMachineId = deployMap.getOrDefault(issueTypeId, deployDefaultStateMachineId);
                 if (!oldStateMachineId.equals(newStateMachineId)) {
-                    oldMap.put(issueTypeId, oldStateMachineId);
-                    newMap.put(issueTypeId, newStateMachineId);
+                    changeItems.add(new StateMachineSchemeChangeItem(issueTypeId, oldStateMachineId, newStateMachineId));
                 }
             }
         }
-        return null;
+        //获取所有状态机及状态机的状态列表
+        List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineFeignClient.queryAllWithStatus(organizationId).getBody();
+        Map<Long, StateMachineWithStatusDTO> stateMachineMap = stateMachineWithStatusDTOs.stream().collect(Collectors.toMap(StateMachineWithStatusDTO::getId, x -> x));
+        //获取所有问题类型
+        List<IssueTypeDTO> issueTypeDTOs = issueTypeService.queryByOrgId(organizationId);
+        Map<Long, IssueTypeDTO> issueTypeMap = issueTypeDTOs.stream().collect(Collectors.toMap(IssueTypeDTO::getId, x -> x));
+        //获取当前方案配置的项目列表
+        List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
+        //要传到agile进行判断的数据，返回所有有影响的issue数量，根据issueTypeId分类
+        StateMachineSchemeDeployCheckIssue deployCheckIssue = new StateMachineSchemeDeployCheckIssue();
+        deployCheckIssue.setIssueTypeIds(changeItems.stream().map(StateMachineSchemeChangeItem::getIssueTypeId).collect(Collectors.toList()));
+        deployCheckIssue.setProjectConfigs(projectConfigs);
+        Map<Long, Long> issueCounts = agileFeignClient.checkStateMachineSchemeChange(organizationId, deployCheckIssue).getBody();
+        //拼凑数据
+        for (StateMachineSchemeChangeItem changeItem : changeItems) {
+            Long issueTypeId = changeItem.getIssueTypeId();
+            Long oldStateMachineId = changeItem.getOldStateMachineId();
+            Long newStateMachineId = changeItem.getNewStateMachineId();
+            changeItem.setIssueCount(issueCounts.get(issueTypeId));
+            changeItem.setIssueTypeDTO(issueTypeMap.get(issueTypeId));
+            changeItem.setOldStateMachine(stateMachineMap.get(oldStateMachineId));
+            changeItem.setNewStateMachine(stateMachineMap.get(newStateMachineId));
+        }
+
+        return changeItems;
     }
 
     @Override
@@ -282,6 +322,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //更新状态机方案状态为：活跃
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+        stateMachineSchemeService.updateOptional(scheme,"status");
         return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 

@@ -69,6 +69,7 @@
                 #{item}
             </foreach>
         </if>
+        order by SMS.id DESC
     </select>
 
     <select id="queryByIds" resultType="io.choerodon.issue.domain.StateMachineScheme">

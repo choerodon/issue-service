@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.validator.StateMachineSchemeValidator;
@@ -126,8 +127,8 @@ public class StateMachineSchemeController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验发布状态机方案")
     @GetMapping(value = "/check_deploy/{scheme_id}")
-    public ResponseEntity<StateMachineSchemeDTO> checkDeploy(@PathVariable("organization_id") Long organizationId,
-                                                        @PathVariable("scheme_id") Long schemeId) {
+    public ResponseEntity<List<StateMachineSchemeChangeItem>> checkDeploy(@PathVariable("organization_id") Long organizationId,
+                                                                          @PathVariable("scheme_id") Long schemeId) {
         return new ResponseEntity<>(configService.checkDeploy(organizationId, schemeId), HttpStatus.OK);
     }
 

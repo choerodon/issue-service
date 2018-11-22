@@ -52,21 +52,4 @@ public class ConvertUtils {
         return list;
     }
 
-    public static List<IssueTypeDTO> convertIssueTypesToDTOs(final List<IssueType> issueTypes) {
-        if (issueTypes == null || issueTypes.isEmpty()){
-            return Collections.emptyList();
-        }
-        ModelMapper modelMapper = new ModelMapper();
-        List<IssueTypeDTO> list = new ArrayList<>(issueTypes.size());
-        for (IssueType issueType:issueTypes) {
-            IssueTypeDTO issueTypeDTO = modelMapper.map(issueType, IssueTypeDTO.class);
-            if (issueType.getStateMachineSchemeConfig() != null){
-                StateMachineSchemeConfigDTO configDTO = modelMapper.map(issueType.getStateMachineSchemeConfig(),StateMachineSchemeConfigDTO.class);
-                issueTypeDTO.setStateMachineSchemeConfigDTO(configDTO);
-            }
-            list.add(issueTypeDTO);
-        }
-        return list;
-    }
-
 }
