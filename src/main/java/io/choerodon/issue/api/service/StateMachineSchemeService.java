@@ -24,7 +24,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param params      模糊查询参数
      * @return 状态机方案列表
      */
-    Page<StateMachineSchemeDTO> pageQuery(PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params);
+    Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params);
 
     /**
      * 创建状态机方案

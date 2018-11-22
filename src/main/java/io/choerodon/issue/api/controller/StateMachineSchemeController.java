@@ -49,7 +49,7 @@ public class StateMachineSchemeController {
         schemeDTO.setOrganizationId(organizationId);
         schemeDTO.setName(name);
         schemeDTO.setDescription(description);
-        return new ResponseEntity<>(schemeService.pageQuery(pageRequest, schemeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
+        return new ResponseEntity<>(schemeService.pageQuery(organizationId, pageRequest, schemeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

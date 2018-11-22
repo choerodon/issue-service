@@ -131,7 +131,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
-    public Long queryBySchemeIdAndIssueTypeId(Boolean isDraft, Long organizationId, Long schemeId, Long issueTypeId) {
+    public Long queryStateMachineIdBySchemeIdAndIssueTypeId(Boolean isDraft, Long organizationId, Long schemeId, Long issueTypeId) {
         if (isDraft) {
             StateMachineSchemeConfigDraft config = new StateMachineSchemeConfigDraft();
             config.setOrganizationId(organizationId);
@@ -156,6 +156,25 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
                 //找不到对应的issueType则取默认
                 return configMapper.selectDefault(organizationId, schemeId).getStateMachineId();
             }
+        }
+    }
+
+    @Override
+    public List<Long> queryIssueTypeIdBySchemeIdAndStateMachineId(Boolean isDraft, Long organizationId, Long schemeId, Long stateMachineId) {
+        if (isDraft) {
+            StateMachineSchemeConfigDraft config = new StateMachineSchemeConfigDraft();
+            config.setOrganizationId(organizationId);
+            config.setSchemeId(schemeId);
+            config.setStateMachineId(stateMachineId);
+            List<StateMachineSchemeConfigDraft> configs = configDraftMapper.select(config);
+            return configs.stream().map(StateMachineSchemeConfigDraft::getIssueTypeId).collect(Collectors.toList());
+        } else {
+            StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+            config.setOrganizationId(organizationId);
+            config.setSchemeId(schemeId);
+            config.setStateMachineId(stateMachineId);
+            List<StateMachineSchemeConfig> configs = configMapper.select(config);
+            return configs.stream().map(StateMachineSchemeConfig::getIssueTypeId).collect(Collectors.toList());
         }
     }
 

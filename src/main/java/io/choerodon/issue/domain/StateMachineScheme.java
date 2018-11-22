@@ -28,6 +28,8 @@ public class StateMachineScheme extends AuditDomain {
 
     @Transient
     private List<StateMachineSchemeConfig> schemeConfigs;
+    @Transient
+    private List<ProjectConfig> projectConfigs;
 
     public String getStatus() {
         return status;
@@ -77,4 +79,11 @@ public class StateMachineScheme extends AuditDomain {
         this.schemeConfigs = schemeConfigs;
     }
 
+    public List<ProjectConfig> getProjectConfigs() {
+        return projectConfigs;
+    }
+
+    public void setProjectConfigs(List<ProjectConfig> projectConfigs) {
+        this.projectConfigs = projectConfigs;
+    }
 }

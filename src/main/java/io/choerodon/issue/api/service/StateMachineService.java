@@ -44,4 +44,13 @@ public interface StateMachineService {
      * @return
      */
     Map<String, Object> checkDelete(Long organizationId, Long stateMachineId);
+
+    /**
+     * 删除节点校验
+     *
+     * @param organizationId
+     * @param stateMachineId
+     * @return
+     */
+    Map<String, Object> checkDeleteNode(Long organizationId, Long stateMachineId, Long statusId);
 }

@@ -262,7 +262,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException("error.stateMachineSchemeId.null");
         }
         //获取状态机
-        Long stateMachineId = stateMachineSchemeConfigService.queryBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
+        Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
         return stateMachineFeignClient.queryByStateMachineIds(organizationId, Collections.singletonList(stateMachineId)).getBody();
     }
 
@@ -289,7 +289,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //获取状态机方案
         if (projectConfig.getSchemeId() != null) {
             //获取状态机
-            Long stateMachineId = stateMachineSchemeConfigService.queryBySchemeIdAndIssueTypeId(false, organizationId, projectConfig.getSchemeId(), issueTypeId);
+            Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, projectConfig.getSchemeId(), issueTypeId);
             //获取当前状态拥有的转换
             List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, AGILE_SERVICE, stateMachineId, issueId, currentStatusId).getBody();
             //获取组织中所有状态
@@ -319,7 +319,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (stateMachineSchemeId == null) {
             throw new CommonException("error.queryStateMachineId.getStateMachineSchemeId.null");
         }
-        return stateMachineSchemeConfigService.queryBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
+        return stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
     }
 
     @Override

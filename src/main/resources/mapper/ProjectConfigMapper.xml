@@ -28,4 +28,16 @@
         AND apply_type = #{applyType}
     </select>
 
+    <select id="queryByProjectIds" resultType="io.choerodon.issue.domain.ProjectConfig">
+        SELECT *
+        FROM project_config
+        WHERE 1 = 1
+        <if test="projectIds != null and projectIds.size()>0">
+            AND project_id IN
+            <foreach item="item" index="index" collection="projectIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
 </mapper>

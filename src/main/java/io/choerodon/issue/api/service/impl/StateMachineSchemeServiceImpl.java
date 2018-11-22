@@ -2,21 +2,18 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigViewDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
+import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
@@ -53,6 +50,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ProjectUtil projectUtil;
     @Autowired
     private ProjectConfigService projectConfigService;
+    @Autowired
+    private UserFeignClient userFeignClient;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -62,12 +61,19 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public Page<StateMachineSchemeDTO> pageQuery(PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
+    public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
+        //查询出组织下的所有项目
+        PageRequest projectSearch = new PageRequest();
+        projectSearch.setSize(999);
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, projectSearch, null, null, null, null).getBody().getContent();
+        Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId,x->x));
+
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         Page<StateMachineScheme> page = PageHelper.doPageAndSort(pageRequest,
                 () -> schemeMapper.fulltextSearch(scheme, params));
         List<StateMachineScheme> schemes = page.getContent();
-        List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemes);
+        List<StateMachineScheme> schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
+        List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig,projectMap);
         if (schemeDTOS != null) {
             for (StateMachineSchemeDTO machineSchemeDTO : schemeDTOS) {
                 if (machineSchemeDTO.getConfigDTOs() != null) {

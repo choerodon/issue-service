@@ -5,10 +5,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineService;
-import io.choerodon.issue.domain.Issue;
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
@@ -59,5 +56,16 @@ public class StateMachineController {
         return Optional.ofNullable(projectConfigService.queryProjectIdsMap(organizationId, stateMachineId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.queryProjectIdsMap.get"));
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "【内部调用】状态机删除节点的校验，是否可以直接删除")
+    @GetMapping(value = "/check_delete_node")
+    public ResponseEntity<Map<String, Object>> checkDeleteNode(@PathVariable("organization_id") Long organizationId,
+                                                               @RequestParam("state_machine_id") Long stateMachineId,
+                                                               @RequestParam("status_id") Long statusId) {
+        return Optional.ofNullable(stateMachineService.checkDeleteNode(organizationId, stateMachineId, statusId))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
     }
 }

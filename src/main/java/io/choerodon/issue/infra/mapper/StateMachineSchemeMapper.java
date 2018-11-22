@@ -23,6 +23,13 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
     List<StateMachineScheme> fulltextSearch(@Param("scheme") StateMachineScheme scheme, @Param("param") String param);
 
     /**
+     * 根据id列表查询，附带配置
+     *
+     * @return 方案列表
+     */
+    List<StateMachineScheme> queryByIdsWithConfig(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
+
+    /**
      * 根据id列表查询
      *
      * @return 方案列表

@@ -67,13 +67,24 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
     StateMachineSchemeConfigDTO selectDefault(Boolean isDraft, Long organizationId, Long schemeId);
 
     /**
-     * 通过状态机方案id和问题类型id查询出状态机
+     * 通过状态机方案id和问题类型id查询出状态机id
      *
      * @param schemeId
      * @param issueTypeId
      * @return
      */
-    Long queryBySchemeIdAndIssueTypeId(Boolean isDraft, Long organizationId, Long schemeId, Long issueTypeId);
+    Long queryStateMachineIdBySchemeIdAndIssueTypeId(Boolean isDraft, Long organizationId, Long schemeId, Long issueTypeId);
+
+    /**
+     * 通过状态机方案id和状态机id查询出问题类型id
+     *
+     * @param isDraft
+     * @param organizationId
+     * @param schemeId
+     * @param stateMachineId
+     * @return
+     */
+    List<Long> queryIssueTypeIdBySchemeIdAndStateMachineId(Boolean isDraft, Long organizationId, Long schemeId, Long stateMachineId);
 
     /**
      * 根据方案查询配置
