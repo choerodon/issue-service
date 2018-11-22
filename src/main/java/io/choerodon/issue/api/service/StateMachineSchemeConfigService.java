@@ -2,7 +2,6 @@ package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
-import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.mybatis.service.BaseService;
 
@@ -128,5 +127,21 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      * @return
      */
     StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId);
+
+    /**
+     * 若草稿没有数据，则修复草稿的数据
+     *
+     * @param organizationId
+     * @param schemeId
+     */
+    void fixDraft(Long organizationId, Long schemeId);
+
+    /**
+     * 复制草稿配置给发布配置
+     *
+     * @param organizationId
+     * @param schemeId
+     */
+    void copyDraftToDeploy(Long organizationId, Long schemeId);
 
 }

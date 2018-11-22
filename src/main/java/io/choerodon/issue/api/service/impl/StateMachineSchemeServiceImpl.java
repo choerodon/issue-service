@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,15 +66,15 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         PageRequest projectSearch = new PageRequest();
         projectSearch.setPage(0);
         projectSearch.setSize(999);
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0,999,new String[]{}, null, null, null, new String[]{}).getBody().getContent();
-        Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId,x->x));
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
+        Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId, x -> x));
 
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         Page<StateMachineScheme> page = PageHelper.doPageAndSort(pageRequest,
                 () -> schemeMapper.fulltextSearch(scheme, params));
         List<StateMachineScheme> schemes = page.getContent();
         List<StateMachineScheme> schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
-        List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig,projectMap);
+        List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig, projectMap);
         if (schemeDTOS != null) {
             for (StateMachineSchemeDTO machineSchemeDTO : schemeDTOS) {
                 if (machineSchemeDTO.getConfigDTOs() != null) {
@@ -166,6 +165,12 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         if (scheme == null) {
             throw new CommonException("error.stateMachineScheme.notFound");
         }
+
+        //如果是查询草稿，草稿若没有数据则修复
+        if (isDraft) {
+            configService.fixDraft(organizationId, schemeId);
+        }
+
         StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
 
         //处理配置信息

@@ -242,7 +242,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         Long draftDefaultStateMachineId = draftMap.get(0L);
         draftMap.remove(0L);
         //判断状态机有变化的问题类型
-        int size = deployMap.size()+draftMap.size();
+        int size = deployMap.size() + draftMap.size();
         Map<Long, Long> oldMap = new HashMap<>(size);
         Map<Long, Long> newMap = new HashMap<>(size);
         //因为发布的和草稿的都可能有增加或减少，因此需要两边都判断
@@ -258,7 +258,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         for (Map.Entry<Long, Long> entry : draftMap.entrySet()) {
             Long issueTypeId = entry.getKey();
             //未判断过
-            if(oldMap.get(issueTypeId)==null){
+            if (oldMap.get(issueTypeId) == null) {
                 Long oldStateMachineId = entry.getValue();
                 Long newStateMachineId = deployMap.getOrDefault(issueTypeId, deployDefaultStateMachineId);
                 if (!oldStateMachineId.equals(newStateMachineId)) {
@@ -278,6 +278,31 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         draft.setOrganizationId(organizationId);
         configDraftMapper.delete(draft);
         //写入活跃的配置写到到草稿中，id一致
+        copyDeployToDraft(organizationId, schemeId);
+        //更新状态机方案状态为：活跃
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+        return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
+    }
+
+    @Override
+    public void fixDraft(Long organizationId, Long schemeId) {
+        //如果草稿没有数据
+        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+        draft.setSchemeId(schemeId);
+        draft.setOrganizationId(organizationId);
+        if (configDraftMapper.select(draft).isEmpty()) {
+            copyDeployToDraft(organizationId, schemeId);
+        }
+    }
+
+    /**
+     * 把活跃的配置写到到草稿中，id一致
+     *
+     * @param organizationId
+     * @param schemeId
+     */
+    private void copyDeployToDraft(Long organizationId, Long schemeId) {
         StateMachineSchemeConfig config = new StateMachineSchemeConfig();
         config.setSchemeId(schemeId);
         config.setOrganizationId(organizationId);
@@ -292,9 +317,10 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
                 }
             }
         }
-        //更新状态机方案状态为：活跃
-        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
-        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-        return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
+    }
+
+    @Override
+    public void copyDraftToDeploy(Long organizationId, Long schemeId) {
+
     }
 }
