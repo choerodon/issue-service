@@ -9,6 +9,7 @@
         <result property="description" column="description"/>
         <result property="defaultStateMachineId" column="default_state_machine_id"/>
         <result property="organizationId" column="organization_id"/>
+        <result property="status" column="status"/>
         <result property="creationDate" column="creation_date"/>
         <result property="createdBy" column="created_by"/>
         <result property="lastUpdateDate" column="last_update_date"/>

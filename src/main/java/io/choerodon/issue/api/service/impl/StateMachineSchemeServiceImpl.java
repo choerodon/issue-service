@@ -89,7 +89,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                             }
                         } else {
                             //若为默认配置，则匹配的是所有为分配的问题类型
-                            configDTO.setIssueTypeName("所有未分配的问题类型");
+                            configDTO.setIssueTypeName("未分配类型");
                             configDTO.setIssueTypeIcon("style");
                         }
                         StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
@@ -182,7 +182,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             } else {
                 //若为默认配置，则匹配的是所有为分配的问题类型
                 issueType = new IssueType();
-                issueType.setName("所有未分配的问题类型");
+                issueType.setName("未分配类型");
                 issueType.setIcon("style");
             }
             issueTypes.add(issueType);

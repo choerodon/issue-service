@@ -8,6 +8,7 @@ import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
+import io.choerodon.issue.infra.annotation.ChangeSchemeStatus;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
@@ -44,6 +45,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
+    @ChangeSchemeStatus
     public StateMachineSchemeDTO delete(Long organizationId, Long schemeId, Long stateMachineId) {
         //删除草稿
         StateMachineSchemeConfigDraft config = new StateMachineSchemeConfigDraft();
@@ -72,6 +74,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
+    @ChangeSchemeStatus
     public StateMachineSchemeDTO create(Long organizationId, Long schemeId, Long stateMachineId, List<StateMachineSchemeConfigDTO> schemeDTOs) {
         List<StateMachineSchemeConfigDraft> configs = modelMapper.map(schemeDTOs, new TypeToken<List<StateMachineSchemeConfigDraft>>() {
         }.getType());
@@ -112,6 +115,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
+    @ChangeSchemeStatus
     public void updateDefaultConfig(Long organizationId, Long schemeId, Long stateMachineId) {
         //更新草稿
         StateMachineSchemeConfigDraft defaultConfig = configDraftMapper.selectDefault(organizationId, schemeId);
