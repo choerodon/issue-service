@@ -1,14 +1,5 @@
 # application.yml
 spring:
-  sleuth:
-    integration:
-      enabled: false
-    scheduled:
-      enabled: false
-    sampler:
-      percentage: 1.0
-    stream:
-      enabled: false
   datasource:
     url: jdbc:mysql://localhost:3306/issue_service?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: choerodon
@@ -48,9 +39,6 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 15000
-  stream:
-    queue:
-      enabled: false
 mybatis:
   mapperLocations: classpath*:/mapper/*.xml
   configuration: # 数据库下划线转驼峰配置
