@@ -279,6 +279,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
 
     /**
      * 初始化方案
+     *
      * @param projectId
      * @param organizationId
      * @param name

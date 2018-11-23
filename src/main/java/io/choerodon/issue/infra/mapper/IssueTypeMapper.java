@@ -16,12 +16,4 @@ public interface IssueTypeMapper extends BaseMapper<IssueType> {
     List<IssueType> fulltextSearch(@Param("issueType") IssueType issueType, @Param("param") String param);
 
     List<IssueType> queryBySchemeId(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId);
-
-    /**
-     * 查询组织下未绑定到该方案的问题类型
-     * @param organizationId 组织id
-     * @param schemeId 方案id
-     * @return 问题类型列表
-     */
-    List<IssueType> queryIssueType(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId);
 }

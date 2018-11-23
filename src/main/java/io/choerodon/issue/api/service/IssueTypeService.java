@@ -33,12 +33,12 @@ public interface IssueTypeService extends BaseService<IssueType> {
     List<IssueTypeDTO> queryByOrgId(Long organizationId);
 
     /**
-     * 查询组织下未绑定到该方案的问题类型
+     * 通过状态机方案id查询当前组织下的问题类型（包含对应的状态机）
      *
      * @param organizationId 组织id
      * @return 问题类型列表
      */
-    List<IssueTypeDTO> queryIssueType(Long organizationId, Long schemeId);
+    List<IssueTypeDTO> queryIssueTypeByStateMachineSchemeId(Long organizationId, Long schemeId);
 
     /**
      * 消费组织创建事件生成组织初始化的五种issue类型

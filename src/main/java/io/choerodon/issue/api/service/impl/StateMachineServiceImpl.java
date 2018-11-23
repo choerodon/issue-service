@@ -2,30 +2,20 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.issue.api.dto.StateMachineConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.service.IssueService;
+import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
-import io.choerodon.issue.domain.Issue;
-import io.choerodon.issue.domain.IssueRecord;
+import io.choerodon.issue.domain.IssueTypeSchemeConfig;
+import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
+import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.TransformDTO;
-import io.choerodon.issue.infra.mapper.IssueMapper;
-import io.choerodon.issue.infra.mapper.IssueRecordMapper;
-import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
-import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
-import io.choerodon.issue.statemachine.annotation.Condition;
-import io.choerodon.issue.statemachine.annotation.Postpostition;
-import io.choerodon.issue.statemachine.annotation.UpdateStatus;
-import io.choerodon.issue.statemachine.annotation.Validator;
-import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
+import io.choerodon.issue.infra.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -58,13 +48,17 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Autowired
     private IssueRecordMapper issueRecordMapper;
     @Autowired
-    private StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper;
-    @Autowired
     private StateMachineSchemeMapper stateMachineSchemeMapper;
     @Autowired
     private AnalyzeServiceManager analyzeServiceManager;
     @Autowired
-    private InstanceFeignClient instanceFeignClient;
+    private StateMachineSchemeConfigService stateMachineSchemeConfigService;
+    @Autowired
+    private ProjectConfigMapper projectConfigMapper;
+    @Autowired
+    private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
+    @Autowired
+    private AgileFeignClient agileFeignClient;
 
     @Override
     public ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
@@ -85,10 +79,12 @@ public class StateMachineServiceImpl implements StateMachineService {
 
     @Override
     public ResponseEntity<Boolean> delete(Long organizationId, Long stateMachineId) {
-        List<StateMachineSchemeDTO> list = schemeService.querySchemeByStateMachineId(organizationId, stateMachineId);
-        if (list != null && !list.isEmpty()) {
+        //有关联则无法删除，判断已发布的
+        if (!stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId).isEmpty()) {
             throw new CommonException("error.stateMachine.delete");
         }
+        //删除草稿的已关联当前状态机【todo】
+
         ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             throw new CommonException("error.stateMachine.delete.noFound");
@@ -105,132 +101,74 @@ public class StateMachineServiceImpl implements StateMachineService {
             map.put("reason", "noFound");
             return map;
         }
-        List<StateMachineSchemeDTO> list = schemeService.querySchemeByStateMachineId(organizationId, stateMachineId);
-        if (list == null || list.isEmpty()) {
+        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        if (schemeIds.isEmpty()) {
             map.put(CloopmCommonString.CAN_DELETE, true);
         } else {
             map.put(CloopmCommonString.CAN_DELETE, false);
-            map.put("schemeUsed", list.size());
+            map.put("schemeUsed", schemeIds.size());
         }
         return map;
     }
 
     @Override
-    public ResponseEntity<List<TransformDTO>> transfList(Long organizationId, Long projectId, Long issueId) {
-        Long stateMachineId = issueService.getStateMachineId(projectId, issueId);
-        Long currentStateId = issueMapper.selectByPrimaryKey(issueId).getStatusId();
-        return stateMachineClient.transformList(organizationId, serverCode,
-                stateMachineId, issueId, currentStateId);
-    }
-
-    @Override
-    public ResponseEntity<ExecuteResult> doTransf(Long organizationId, Long projectId, Long issueId, Long transfId) {
-        Long stateMachineId = issueService.getStateMachineId(projectId, issueId);
-        Issue issue = issueService.selectByPrimaryKey(issueId);
-        if (issue == null) {
-            throw new CommonException("error.issue.noFound");
+    public Map<String, Object> checkDeleteNode(Long organizationId, Long stateMachineId, Long statusId) {
+        //返回结果，每个项目的哪些问题类型
+        Map<Long, List<Long>> issueTypeIdsMap = new HashMap<>();
+        //查询出所有问题类型方案配置
+        IssueTypeSchemeConfig issueTypeSchemeConfig = new IssueTypeSchemeConfig();
+        issueTypeSchemeConfig.setOrganizationId(organizationId);
+        Map<Long, List<Long>> issueTypeSchemeConfigMap = issueTypeSchemeConfigMapper.select(issueTypeSchemeConfig).stream().collect(Collectors.groupingBy(IssueTypeSchemeConfig::getSchemeId, Collectors.mapping(IssueTypeSchemeConfig::getIssueTypeId, Collectors.toList())));
+        //找到用到状态机的方案
+        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        List<StateMachineScheme> schemes = stateMachineSchemeMapper.queryByIds(organizationId, schemeIds);
+        //找出方案所在组织的所有配置
+        List<Long> projectIds = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE).stream().map(ProjectConfig::getProjectId).collect(Collectors.toList());
+        if (!projectIds.isEmpty()) {
+            List<ProjectConfig> projectConfigs = projectConfigMapper.queryByProjectIds(projectIds);
+            //projectId+appltType Map
+            Map<String, ProjectConfig> paMap = projectConfigs.stream().collect(Collectors.toMap(x -> x.getProjectId() + ":" + x.getSchemeType() + ":" + x.getApplyType(), x -> x));
+            Map<String, List<ProjectConfig>> schemeTypeMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getSchemeType));
+            //根据状态机方案id分类
+            Map<Long, List<ProjectConfig>> schemeIdSMMap = schemeTypeMap.get(SchemeType.STATE_MACHINE).stream().collect(Collectors.groupingBy(ProjectConfig::getSchemeId));
+            schemeIds.forEach(schemeId -> {
+                //查询出方案下与状态机关联的问题类型
+                List<Long> issueTypeIds = stateMachineSchemeConfigService.queryIssueTypeIdBySchemeIdAndStateMachineId(false, organizationId, schemeId, stateMachineId);
+                //查询出配置该方案的项目列表
+                List<ProjectConfig> projectConfigList = schemeIdSMMap.get(schemeId);
+                //该状态机是默认配置，找到与方案匹配的问题类型方案
+                for (ProjectConfig projectConfig : projectConfigList) {
+                    Long projectId = projectConfig.getProjectId();
+                    String key = projectId + ":" + SchemeType.ISSUE_TYPE + ":" + projectConfig.getApplyType();
+                    ProjectConfig issueTypeSchemeProjectConfig = paMap.get(key);
+                    List<Long> issueTypeIdsAll = issueTypeSchemeConfigMap.get(issueTypeSchemeProjectConfig.getSchemeId());
+                    //当前状态机在该方案下匹配所有未配置的问题类型
+                    if (issueTypeIds.contains(0L)) {
+                        putResult(issueTypeIdsMap, projectId, issueTypeIdsAll);
+                    } else {
+                        List<Long> checkIds = issueTypeIds.stream().filter(issueTypeId -> issueTypeIdsAll.contains(issueTypeId)).collect(Collectors.toList());
+                        putResult(issueTypeIdsMap, projectId, checkIds);
+                    }
+                }
+            });
         }
-        return instanceFeignClient.executeTransform(organizationId, serverCode, stateMachineId, issueId,
-                issue.getStatusId(), transfId);
+        Map<String, Object> result = agileFeignClient.checkDeleteNode(organizationId, statusId, issueTypeIdsMap).getBody();
+        return result;
     }
 
-    @Override
-    public List<Long> queryBySchemeId(Long stateMachineSchemeId) {
-        StateMachineScheme stateMachineScheme = stateMachineSchemeMapper.selectByPrimaryKey(stateMachineSchemeId);
-        if (stateMachineScheme == null) {
-            throw new CommonException("error.queryBySchemeId.stateMachineScheme.notFound");
+    /**
+     * 设置每个项目要校验的问题类型id列表
+     *
+     * @param result
+     * @param projectId
+     * @param issueTypeIds
+     */
+    private void putResult(Map<Long, List<Long>> result, Long projectId, List<Long> issueTypeIds) {
+        List<Long> ids = result.get(projectId);
+        if (ids == null) {
+            ids = new ArrayList<>();
         }
-        StateMachineSchemeConfig select = new StateMachineSchemeConfig();
-        select.setSchemeId(stateMachineSchemeId);
-        List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(select);
-        return configs.stream().map(StateMachineSchemeConfig::getStateMachineId).collect(Collectors.toList());
-    }
-
-    @Condition(code = "just_reporter", name = "仅允许报告人", description = "只有该报告人才能执行转换")
-    public Boolean justReporter(Long instanceId, StateMachineConfigDTO configDTO) {
-        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
-        Long currentUserId = DetailsHelper.getUserDetails().getUserId();
-        return issue != null && issue.getReporterId() != null && issue.getReporterId().equals(currentUserId);
-    }
-
-    @Condition(code = "just_admin", name = "仅允许管理员", description = "只有该管理员才能执行转换")
-    public Boolean justAdmin(Long instanceId, StateMachineConfigDTO configDTO) {
-        return true;
-    }
-
-    @Validator(code = "permission_validator", name = "权限校验", description = "校验操作的用户权限")
-    public Boolean permissionValidator(Long instanceId, StateMachineConfigDTO configDTO) {
-        return true;
-    }
-
-    @Validator(code = "time_validator", name = "时间校验", description = "根据时间校验权限")
-    public Boolean timeValidator(Long instanceId, StateMachineConfigDTO configDTO) {
-//        throw new CommonException("xx");
-        return true;
-    }
-
-    @Postpostition(code = "assign_current_user", name = "分派给当前用户", description = "分派给当前用户")
-    public void assignCurrentUser(Long instanceId, StateMachineConfigDTO configDTO) {
-//        //测试两种异常：
-//        ExecuteResult xx=null;
-//        if (true) {
-//            //获取值时空指针异常
-////            xx.getSuccess();
-//            //手动抛出的异常
-//            throw new RuntimeException("test11");
-//        }
-        Long currentUserId = DetailsHelper.getUserDetails().getUserId();
-        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
-        issue.setHandlerId(currentUserId);
-        int update = issueService.updateOptional(issue, "handlerId");
-        if (update != 1) {
-            throw new CommonException("error.assignCurrentUser.updateOptional");
-        }
-    }
-
-    @Postpostition(code = "create_change_log", name = "创建日志", description = "创建日志")
-    public void createChangeLog(Long instanceId, StateMachineConfigDTO configDTO) {
-//        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
-//        issue.setDescription(issue.getDescription()+"1");
-//        issueService.updateOptional(issue,"description");
-
-        IssueRecord issueRecord = new IssueRecord();
-        issueRecord.setIssueId(instanceId);
-        issueRecordMapper.insert(issueRecord);
-
-        throw new CommonException("xa");
-    }
-
-    @UpdateStatus
-    public void updateStatus(Long instanceId, Long targetStatusId) {
-        Issue issue = issueMapper.selectByPrimaryKey(instanceId);
-        if (targetStatusId == null) {
-            throw new CommonException("error.updateStatus.targetStateId.null");
-        }
-        issue.setStatusId(targetStatusId);
-        int update = issueService.updateOptional(issue, "statusId");
-        if (update != 1) {
-            throw new CommonException("error.updateStatus.updateOptional");
-        }
-        issue = issueMapper.selectByPrimaryKey(instanceId);
-        issue.setDescription(issue.getDescription() + "1");
-        issueService.updateOptional(issue, "description");
-//        throw new CommonException("error.updateStatus.updateOptional");
-    }
-
-    @Override
-    public Issue createIssue(Long organizationId, Long stateMachineId) {
-        Issue issue = new Issue();
-        issue.setDescription("10.18测试问题");
-        issueMapper.insert(issue);
-
-        ResponseEntity<ExecuteResult> executeResult = instanceFeignClient.startInstance(organizationId, serverCode, stateMachineId, issue.getId());
-        //feign调用执行失败，抛出异常回滚
-        if (!executeResult.getBody().getSuccess()) {
-            //手动回滚数据
-            issueMapper.deleteByPrimaryKey(issue.getId());
-            throw new CommonException(executeResult.getBody().getErrorMessage());
-        }
-        return issueMapper.selectByPrimaryKey(issue.getId());
+        ids.addAll(issueTypeIds);
+        result.put(projectId, ids);
     }
 }

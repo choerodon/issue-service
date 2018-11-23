@@ -1,10 +1,7 @@
 package io.choerodon.issue.api.service;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.issue.domain.Issue;
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -49,37 +46,11 @@ public interface StateMachineService {
     Map<String, Object> checkDelete(Long organizationId, Long stateMachineId);
 
     /**
-     * 显示事件单转换
+     * 删除节点校验
      *
-     * @param organizationId
-     * @return
-     */
-    ResponseEntity<List<TransformDTO>> transfList(Long organizationId, Long projectId, Long issueId);
-
-    /**
-     * 状态机执行转换
-     *
-     * @param organizationId 组织id
-     * @param transfId       转换Id
-     * @param issueId        事件单id
-     * @return
-     */
-    ResponseEntity<ExecuteResult> doTransf(Long organizationId, Long projectId, Long issueId, Long transfId);
-
-    /**
-     * 创建问题和状态机实例
      * @param organizationId
      * @param stateMachineId
      * @return
      */
-    Issue createIssue(Long organizationId, Long stateMachineId);
-
-    /**
-     * 通过状态机方案id查询出所有状态机
-     *
-     * @param stateMachineSchemeId
-     * @return
-     */
-    List<Long> queryBySchemeId(Long stateMachineSchemeId);
-
+    Map<String, Object> checkDeleteNode(Long organizationId, Long stateMachineId, Long statusId);
 }

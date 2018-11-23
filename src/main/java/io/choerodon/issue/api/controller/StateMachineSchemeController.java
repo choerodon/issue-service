@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.validator.StateMachineSchemeValidator;
@@ -49,7 +50,7 @@ public class StateMachineSchemeController {
         schemeDTO.setOrganizationId(organizationId);
         schemeDTO.setName(name);
         schemeDTO.setDescription(description);
-        return new ResponseEntity<>(schemeService.pageQuery(pageRequest, schemeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
+        return new ResponseEntity<>(schemeService.pageQuery(organizationId, pageRequest, schemeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
@@ -78,9 +79,9 @@ public class StateMachineSchemeController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据id查询状态机方案对象")
-    @GetMapping(value = "/{scheme_id}")
-    public ResponseEntity<StateMachineSchemeDTO> getByStateId(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId) {
-        return new ResponseEntity<>(schemeService.querySchemeWithConfigById(organizationId, schemeId), HttpStatus.OK);
+    @GetMapping(value = "/query_scheme_with_config/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> querySchemeWithConfigById(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId, @RequestParam("isDraft") Boolean isDraft) {
+        return new ResponseEntity<>(schemeService.querySchemeWithConfigById(isDraft, organizationId, schemeId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
@@ -109,9 +110,33 @@ public class StateMachineSchemeController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "根据状态机id查询所使用到该状态机的方案")
+    @ApiOperation(value = "根据状态机id查询所使用到该状态机的方案【发布】")
     @GetMapping(value = "/query_scheme/{state_machine_id}")
     public ResponseEntity<List<StateMachineSchemeDTO>> querySchemeByStateMachineId(@PathVariable("organization_id") Long organizationId, @PathVariable(value = "state_machine_id") Long stateMachineId) {
         return new ResponseEntity<>(schemeService.querySchemeByStateMachineId(organizationId, stateMachineId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "发布状态机方案")
+    @GetMapping(value = "/deploy/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> deploy(@PathVariable("organization_id") Long organizationId,
+                                                        @PathVariable("scheme_id") Long schemeId) {
+        return new ResponseEntity<>(configService.deploy(organizationId, schemeId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "校验发布状态机方案")
+    @GetMapping(value = "/check_deploy/{scheme_id}")
+    public ResponseEntity<List<StateMachineSchemeChangeItem>> checkDeploy(@PathVariable("organization_id") Long organizationId,
+                                                                          @PathVariable("scheme_id") Long schemeId) {
+        return new ResponseEntity<>(configService.checkDeploy(organizationId, schemeId), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "删除状态机方案草稿")
+    @DeleteMapping(value = "/delete_draft/{scheme_id}")
+    public ResponseEntity<StateMachineSchemeDTO> deleteDraft(@PathVariable("organization_id") Long organizationId,
+                                                             @PathVariable("scheme_id") Long stateMachineId) {
+        return new ResponseEntity<>(configService.deleteDraft(organizationId, stateMachineId), HttpStatus.NO_CONTENT);
     }
 }

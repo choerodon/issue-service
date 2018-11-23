@@ -3,6 +3,7 @@ package io.choerodon.issue.infra.feign;
 import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
@@ -141,4 +142,24 @@ public interface StateMachineFeignClient {
     @PostMapping(value = "/v1/organizations/{organization_id}/status/query_by_state_machine_id")
     ResponseEntity<List<StatusDTO>> queryByStateMachineIds(@PathVariable("organization_id") Long organizationId,
                                                            @RequestBody @Valid List<Long> stateMachineIds);
+
+    /**
+     * 批量活跃状态机
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     * @return
+     */
+    @PostMapping(value = "/v1/organizations/{organization_id}/state_machines/active_state_machines")
+    ResponseEntity<Boolean> activeStateMachines(@PathVariable("organization_id") Long organizationId,
+                                                @RequestBody List<Long> stateMachineIds);
+
+    /**
+     * 获取组织下所有状态机，包含状态
+     *
+     * @param organizationId
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/query_all_with_status")
+    ResponseEntity<List<StateMachineWithStatusDTO>> queryAllWithStatus(@PathVariable("organization_id") Long organizationId);
 }

@@ -1,35 +1,34 @@
-package io.choerodon.issue.api.dto;
+package io.choerodon.issue.domain;
+
+import io.choerodon.mybatis.annotation.ModifyAudit;
+import io.choerodon.mybatis.annotation.VersionAudit;
+import io.choerodon.mybatis.domain.AuditDomain;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @author shinan.chen
- * @since 2018/11/25
+ * @since 2018/11/19
  */
-public class StateMachineSchemeConfigDTO {
+@ModifyAudit
+@VersionAudit
+@Table(name = "state_machine_scheme_config_draft")
+public class StateMachineSchemeConfigDraft extends AuditDomain {
 
+    @Id
+    @GeneratedValue
     private Long id;
     private Long schemeId;
     private Long issueTypeId;
     private Long stateMachineId;
     private Boolean isDefault;
     private int sequence;
-    private Long objectVersionNumber;
     private Long organizationId;
-
-    private String stateMachineName;
-    private String issueTypeName;
-    private String issueTypeIcon;
-    private String issueTypeColour;
 
     public Long getId() {
         return id;
-    }
-
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
     }
 
     public void setId(Long id) {
@@ -60,30 +59,6 @@ public class StateMachineSchemeConfigDTO {
         this.stateMachineId = stateMachineId;
     }
 
-    public String getStateMachineName() {
-        return stateMachineName;
-    }
-
-    public void setStateMachineName(String stateMachineName) {
-        this.stateMachineName = stateMachineName;
-    }
-
-    public String getIssueTypeName() {
-        return issueTypeName;
-    }
-
-    public void setIssueTypeName(String issueTypeName) {
-        this.issueTypeName = issueTypeName;
-    }
-
-    public String getIssueTypeIcon() {
-        return issueTypeIcon;
-    }
-
-    public void setIssueTypeIcon(String issueTypeIcon) {
-        this.issueTypeIcon = issueTypeIcon;
-    }
-
     public int getSequence() {
         return sequence;
     }
@@ -106,13 +81,5 @@ public class StateMachineSchemeConfigDTO {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
-    }
-
-    public String getIssueTypeColour() {
-        return issueTypeColour;
-    }
-
-    public void setIssueTypeColour(String issueTypeColour) {
-        this.issueTypeColour = issueTypeColour;
     }
 }

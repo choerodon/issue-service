@@ -14,13 +14,6 @@ import java.util.List;
 public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme> {
 
     /**
-     * 获取状态机方案及其配置
-     * @param schemeId 状态机方案id
-     * @return 状态机方案及配置
-     */
-    StateMachineScheme querySchemeWithConfigById(Long schemeId);
-
-    /**
      * 分页查询状态方案
      *
      * @param scheme 状态机方案
@@ -30,10 +23,16 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
     List<StateMachineScheme> fulltextSearch(@Param("scheme") StateMachineScheme scheme, @Param("param") String param);
 
     /**
-     * 根据状态机id查询所使用到该状态机的方案
-     * @param organizationId 组织id
-     * @param stateMachineId 状态机id
+     * 根据id列表查询，附带配置
+     *
      * @return 方案列表
      */
-    List<StateMachineScheme> querySchemeByStateMachineId(@Param("organizationId") Long organizationId, @Param("stateMachineId") Long stateMachineId);
+    List<StateMachineScheme> queryByIdsWithConfig(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
+
+    /**
+     * 根据id列表查询
+     *
+     * @return 方案列表
+     */
+    List<StateMachineScheme> queryByIds(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
 }

@@ -13,6 +13,7 @@ import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
+import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
@@ -42,6 +43,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private static final String FLAG = "flag";
     private static final String MESSAGE = "message";
     private static final String STATEMACHINEID = "stateMachineId";
+    private static final String ERROR_ISSUE_STATE_MACHINE_NOT_FOUND = "error.issueStateMachine.notFound";
+    private static final String ERROR_ISSUE_STATUS_NOT_FOUND = "error.createIssue.issueStatusNotFound";
+
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
@@ -54,8 +58,6 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private IssueTypeSchemeMapper issueTypeSchemeMapper;
     @Autowired
     private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
-    @Autowired
-    private StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper;
     @Autowired
     private StateMachineSchemeConfigService stateMachineSchemeConfigService;
     @Autowired
@@ -96,6 +98,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private ProjectUtil projectUtil;
     @Autowired
     private StateMachineSchemeMapper stateMachineSchemeMapper;
+    @Autowired
+    private ProjectConfigService projectConfigService;
+    @Autowired
+    private InstanceFeignClient instanceFeignClient;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -116,6 +122,11 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         int result = projectConfigMapper.insert(projectConfig);
         if (result != 1) {
             throw new CommonException("error.projectConfig.create");
+        }
+
+        //若是关联状态机方案，设置状态机方案、状态机为活跃
+        if (schemeType.equals(SchemeType.STATE_MACHINE)) {
+            stateMachineSchemeService.activeScheme(schemeId);
         }
         return projectConfig;
     }
@@ -142,7 +153,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (stateMachineSchemeConfigs != null && !stateMachineSchemeConfigs.isEmpty()) {
             Map<String, StateMachineSchemeDTO> stateMachineSchemeMap = new HashMap<>(stateMachineSchemeConfigs.size());
             for (ProjectConfig projectConfig : stateMachineSchemeConfigs) {
-                StateMachineSchemeDTO stateMachineSchemeDTO = stateMachineSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getSchemeId());
+                StateMachineSchemeDTO stateMachineSchemeDTO = stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, projectConfig.getSchemeId());
                 stateMachineSchemeMap.put(projectConfig.getApplyType(), stateMachineSchemeDTO);
             }
             projectConfigDetailDTO.setStateMachineSchemeMap(stateMachineSchemeMap);
@@ -227,11 +238,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //根据方案配置表获取 问题类型
         List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
         //根据方案配置表获取 状态机与问题类型的对应关系
-        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
-        config.setSchemeId(stateMachineSchemeId);
-        List<StateMachineSchemeConfig> configs = stateMachineSchemeConfigMapper.select(config);
-        Map<Long, Long> map = configs.stream().collect(Collectors.toMap(StateMachineSchemeConfig::getIssueTypeId, StateMachineSchemeConfig::getStateMachineId));
-        Long defaultStateMachineId = stateMachineSchemeConfigMapper.selectDefault(organizationId, stateMachineSchemeId).getStateMachineId();
+        List<StateMachineSchemeConfigDTO> configs = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, stateMachineSchemeId);
+        Map<Long, Long> map = configs.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId, StateMachineSchemeConfigDTO::getStateMachineId));
+        Long defaultStateMachineId = stateMachineSchemeConfigService.selectDefault(false, organizationId, stateMachineSchemeId).getStateMachineId();
         List<IssueTypeWithStateMachineIdDTO> issueTypeWithStateMachineIds = modelMapper.map(issueTypes, new TypeToken<List<IssueTypeWithStateMachineIdDTO>>() {
         }.getType());
         issueTypeWithStateMachineIds.forEach(x -> {
@@ -253,7 +262,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException("error.stateMachineSchemeId.null");
         }
         //获取状态机
-        Long stateMachineId = stateMachineSchemeConfigService.queryBySchemeIdAndIssueTypeId(organizationId, stateMachineSchemeId, issueTypeId);
+        Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
         return stateMachineFeignClient.queryByStateMachineIds(organizationId, Collections.singletonList(stateMachineId)).getBody();
     }
 
@@ -265,7 +274,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException("error.stateMachineSchemeId.null");
         }
         //获取状态机ids
-        List<Long> stateMachineIds = stateMachineService.queryBySchemeId(stateMachineSchemeId);
+        List<Long> stateMachineIds = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, stateMachineSchemeId)
+                .stream().map(StateMachineSchemeConfigDTO::getStateMachineId).collect(Collectors.toList());
         return stateMachineFeignClient.queryByStateMachineIds(organizationId, stateMachineIds).getBody();
     }
 
@@ -279,7 +289,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //获取状态机方案
         if (projectConfig.getSchemeId() != null) {
             //获取状态机
-            Long stateMachineId = stateMachineSchemeConfigService.queryBySchemeIdAndIssueTypeId(organizationId, projectConfig.getSchemeId(), issueTypeId);
+            Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, projectConfig.getSchemeId(), issueTypeId);
             //获取当前状态拥有的转换
             List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, AGILE_SERVICE, stateMachineId, issueId, currentStatusId).getBody();
             //获取组织中所有状态
@@ -309,7 +319,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (stateMachineSchemeId == null) {
             throw new CommonException("error.queryStateMachineId.getStateMachineSchemeId.null");
         }
-        return stateMachineSchemeConfigService.queryBySchemeIdAndIssueTypeId(organizationId, stateMachineSchemeId, issueTypeId);
+        return stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
     }
 
     @Override
@@ -343,24 +353,19 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             return result;
         }
         //校验状态机方案是否只有一个状态机
-        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
-        schemeConfig.setSchemeId(stateMachineSchemeId);
-        if (stateMachineSchemeConfigMapper.select(schemeConfig).size() > 1) {
+        if (stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, stateMachineSchemeId).size() > 1) {
             result.put(FLAG, false);
             result.put(MESSAGE, "error.stateMachineScheme.multiStateMachine");
             return result;
         }
-        Long stateMachineId = stateMachineSchemeConfigMapper.selectDefault(organizationId, stateMachineSchemeId).getStateMachineId();
+        Long stateMachineId = stateMachineSchemeConfigService.selectDefault(false, organizationId, stateMachineSchemeId).getStateMachineId();
         if (stateMachineId == null) {
             result.put(FLAG, false);
             result.put(MESSAGE, "error.stateMachineScheme.defaultStateMachineId.notNull");
             return result;
         }
         //校验这个状态机是否只关联一个方案
-        StateMachineSchemeConfig selectSchemeConfig = new StateMachineSchemeConfig();
-        selectSchemeConfig.setStateMachineId(stateMachineId);
-        selectSchemeConfig.setOrganizationId(organizationId);
-        List<Long> schemeIds = stateMachineSchemeConfigMapper.select(selectSchemeConfig).stream().map(StateMachineSchemeConfig::getSchemeId).distinct().collect(Collectors.toList());
+        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
         if (schemeIds.size() > 1) {
             result.put(FLAG, false);
             result.put(MESSAGE, "error.stateMachineScheme.stateMachineInMoreThanOneScheme");
@@ -385,10 +390,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public Map<String, List<Long>> queryProjectIdsMap(Long organizationId, Long stateMachineId) {
         //查询状态机方案中的配置
-        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig();
-        schemeConfig.setOrganizationId(organizationId);
-        schemeConfig.setStateMachineId(stateMachineId);
-        List<Long> schemeIds = stateMachineSchemeConfigMapper.select(schemeConfig).stream().map(StateMachineSchemeConfig::getSchemeId).collect(Collectors.toList());
+        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
 
         if (!schemeIds.isEmpty()) {
             List<ProjectConfig> projectConfigs = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE);
@@ -396,5 +398,18 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             return projectIdsMap;
         }
         return Collections.emptyMap();
+    }
+
+    @Override
+    public Long queryWorkFlowFirstStatus(Long projectId, String applyType, Long issueTypeId, Long organizationId) {
+        Long statusMachineId = projectConfigService.queryStateMachineId(projectId, applyType, issueTypeId);
+        if (statusMachineId == null) {
+            throw new CommonException(ERROR_ISSUE_STATE_MACHINE_NOT_FOUND);
+        }
+        Long initStatusId = instanceFeignClient.queryInitStatusId(organizationId, statusMachineId).getBody();
+        if (initStatusId == null) {
+            throw new CommonException(ERROR_ISSUE_STATUS_NOT_FOUND);
+        }
+        return initStatusId;
     }
 }
