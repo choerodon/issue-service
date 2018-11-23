@@ -19,6 +19,7 @@ import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
@@ -301,10 +302,22 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             Long issueTypeId = changeItem.getIssueTypeId();
             Long oldStateMachineId = changeItem.getOldStateMachineId();
             Long newStateMachineId = changeItem.getNewStateMachineId();
+            StateMachineWithStatusDTO oldStateMachine = stateMachineMap.get(oldStateMachineId);
+            StateMachineWithStatusDTO newStateMachine = stateMachineMap.get(newStateMachineId);
+            List<StatusDTO> changeStatuses = new ArrayList<>();
+            List<StatusDTO> oldSMStatuses = oldStateMachine.getStatusDTOS();
+            List<StatusDTO> newSMStatuses = newStateMachine.getStatusDTOS();
+            List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
+            oldSMStatuses.forEach(oldSMStatus -> {
+                if (!newSMStatusIds.contains(oldSMStatus.getId())) {
+                    changeStatuses.add(oldSMStatus);
+                }
+            });
             changeItem.setIssueCount(issueCounts.get(issueTypeId));
             changeItem.setIssueTypeDTO(issueTypeMap.get(issueTypeId));
-            changeItem.setOldStateMachine(stateMachineMap.get(oldStateMachineId));
-            changeItem.setNewStateMachine(stateMachineMap.get(newStateMachineId));
+            changeItem.setOldStateMachine(oldStateMachine);
+            changeItem.setNewStateMachine(newStateMachine);
+            changeItem.setChangeStatuses(changeStatuses);
         }
 
         return changeItems;
@@ -322,7 +335,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //更新状态机方案状态为：活跃
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-        stateMachineSchemeService.updateOptional(scheme,"status");
+        stateMachineSchemeService.updateOptional(scheme, "status");
         return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 
