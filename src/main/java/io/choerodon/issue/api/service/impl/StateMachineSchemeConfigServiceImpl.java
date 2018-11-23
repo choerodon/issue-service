@@ -6,6 +6,8 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployUpdateIssue;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeStatusChangeItem;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
@@ -238,8 +240,23 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
-    public StateMachineSchemeDTO deploy(Long organizationId, Long schemeId) {
-        return null;
+    public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
+        //获取当前方案配置的项目列表
+        List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
+        //传入的changeItems去掉不需要的信息
+        changeItems.forEach(changeItem -> {
+            changeItem.setIssueTypeDTO(null);
+            changeItem.setIssueCount(null);
+            changeItem.setOldStateMachine(null);
+            changeItem.setNewStateMachine(null);
+            changeItem.setOldStateMachineId(null);
+            changeItem.setNewStateMachineId(null);
+        });
+        StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();
+        deployUpdateIssue.setChangeItems(changeItems);
+        deployUpdateIssue.setProjectConfigs(projectConfigs);
+        Boolean result = agileFeignClient.updateStateMachineSchemeChange(organizationId, deployUpdateIssue).getBody();
+        return result;
     }
 
     @Override
@@ -304,20 +321,22 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             Long newStateMachineId = changeItem.getNewStateMachineId();
             StateMachineWithStatusDTO oldStateMachine = stateMachineMap.get(oldStateMachineId);
             StateMachineWithStatusDTO newStateMachine = stateMachineMap.get(newStateMachineId);
-            List<StatusDTO> changeStatuses = new ArrayList<>();
             List<StatusDTO> oldSMStatuses = oldStateMachine.getStatusDTOS();
             List<StatusDTO> newSMStatuses = newStateMachine.getStatusDTOS();
+            List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems = new ArrayList<>();
             List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
+            StatusDTO newDefault = newSMStatuses.get(0);
             oldSMStatuses.forEach(oldSMStatus -> {
                 if (!newSMStatusIds.contains(oldSMStatus.getId())) {
-                    changeStatuses.add(oldSMStatus);
+                    StateMachineSchemeStatusChangeItem stateMachineSchemeStatusChangeItem = new StateMachineSchemeStatusChangeItem(oldSMStatus, newDefault);
+                    stateMachineSchemeStatusChangeItems.add(stateMachineSchemeStatusChangeItem);
                 }
             });
-            changeItem.setIssueCount(issueCounts.get(issueTypeId));
             changeItem.setIssueTypeDTO(issueTypeMap.get(issueTypeId));
+            changeItem.setIssueCount(issueCounts.get(issueTypeId));
             changeItem.setOldStateMachine(oldStateMachine);
             changeItem.setNewStateMachine(newStateMachine);
-            changeItem.setChangeStatuses(changeStatuses);
+            changeItem.setStateMachineSchemeStatusChangeItems(stateMachineSchemeStatusChangeItems);
         }
 
         return changeItems;

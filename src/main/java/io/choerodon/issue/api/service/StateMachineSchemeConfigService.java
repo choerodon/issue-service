@@ -109,7 +109,7 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      * @param schemeId
      * @return
      */
-    StateMachineSchemeDTO deploy(Long organizationId, Long schemeId);
+    Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems);
 
     /**
      * 发布状态机方案校验

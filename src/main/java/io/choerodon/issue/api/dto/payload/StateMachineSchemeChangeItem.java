@@ -2,7 +2,6 @@ package io.choerodon.issue.api.dto.payload;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class StateMachineSchemeChangeItem {
     private IssueTypeDTO issueTypeDTO;
     private StateMachineWithStatusDTO oldStateMachine;
     private StateMachineWithStatusDTO newStateMachine;
-    private List<StatusDTO> changeStatuses;
+    private List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems;
 
     public StateMachineSchemeChangeItem() {
     }
@@ -85,11 +84,11 @@ public class StateMachineSchemeChangeItem {
         this.newStateMachine = newStateMachine;
     }
 
-    public List<StatusDTO> getChangeStatuses() {
-        return changeStatuses;
+    public List<StateMachineSchemeStatusChangeItem> getStateMachineSchemeStatusChangeItems() {
+        return stateMachineSchemeStatusChangeItems;
     }
 
-    public void setChangeStatuses(List<StatusDTO> changeStatuses) {
-        this.changeStatuses = changeStatuses;
+    public void setStateMachineSchemeStatusChangeItems(List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems) {
+        this.stateMachineSchemeStatusChangeItems = stateMachineSchemeStatusChangeItems;
     }
 }
