@@ -6,6 +6,8 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployUpdateIssue;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeStatusChangeItem;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
@@ -19,6 +21,7 @@ import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
@@ -237,8 +240,23 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
-    public StateMachineSchemeDTO deploy(Long organizationId, Long schemeId) {
-        return null;
+    public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
+        //获取当前方案配置的项目列表
+        List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
+        //传入的changeItems去掉不需要的信息
+        changeItems.forEach(changeItem -> {
+            changeItem.setIssueTypeDTO(null);
+            changeItem.setIssueCount(null);
+            changeItem.setOldStateMachine(null);
+            changeItem.setNewStateMachine(null);
+            changeItem.setOldStateMachineId(null);
+            changeItem.setNewStateMachineId(null);
+        });
+        StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();
+        deployUpdateIssue.setChangeItems(changeItems);
+        deployUpdateIssue.setProjectConfigs(projectConfigs);
+        Boolean result = agileFeignClient.updateStateMachineSchemeChange(organizationId, deployUpdateIssue).getBody();
+        return result;
     }
 
     @Override
@@ -301,10 +319,24 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             Long issueTypeId = changeItem.getIssueTypeId();
             Long oldStateMachineId = changeItem.getOldStateMachineId();
             Long newStateMachineId = changeItem.getNewStateMachineId();
-            changeItem.setIssueCount(issueCounts.get(issueTypeId));
+            StateMachineWithStatusDTO oldStateMachine = stateMachineMap.get(oldStateMachineId);
+            StateMachineWithStatusDTO newStateMachine = stateMachineMap.get(newStateMachineId);
+            List<StatusDTO> oldSMStatuses = oldStateMachine.getStatusDTOS();
+            List<StatusDTO> newSMStatuses = newStateMachine.getStatusDTOS();
+            List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems = new ArrayList<>();
+            List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
+            StatusDTO newDefault = newSMStatuses.get(0);
+            oldSMStatuses.forEach(oldSMStatus -> {
+                if (!newSMStatusIds.contains(oldSMStatus.getId())) {
+                    StateMachineSchemeStatusChangeItem stateMachineSchemeStatusChangeItem = new StateMachineSchemeStatusChangeItem(oldSMStatus, newDefault);
+                    stateMachineSchemeStatusChangeItems.add(stateMachineSchemeStatusChangeItem);
+                }
+            });
             changeItem.setIssueTypeDTO(issueTypeMap.get(issueTypeId));
-            changeItem.setOldStateMachine(stateMachineMap.get(oldStateMachineId));
-            changeItem.setNewStateMachine(stateMachineMap.get(newStateMachineId));
+            changeItem.setIssueCount(issueCounts.get(issueTypeId));
+            changeItem.setOldStateMachine(oldStateMachine);
+            changeItem.setNewStateMachine(newStateMachine);
+            changeItem.setStateMachineSchemeStatusChangeItems(stateMachineSchemeStatusChangeItems);
         }
 
         return changeItems;
@@ -312,17 +344,12 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
 
     @Override
     public StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId) {
-        //删除草稿配置
-        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
-        draft.setSchemeId(schemeId);
-        draft.setOrganizationId(organizationId);
-        configDraftMapper.delete(draft);
         //写入活跃的配置写到到草稿中，id一致
-        copyDeployToDraft(organizationId, schemeId);
+        copyDeployToDraft(true, organizationId, schemeId);
         //更新状态机方案状态为：活跃
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-        stateMachineSchemeService.updateOptional(scheme,"status");
+        stateMachineSchemeService.updateOptional(scheme, "status");
         return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 
@@ -333,7 +360,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         draft.setSchemeId(schemeId);
         draft.setOrganizationId(organizationId);
         if (configDraftMapper.select(draft).isEmpty()) {
-            copyDeployToDraft(organizationId, schemeId);
+            copyDeployToDraft(false, organizationId, schemeId);
         }
     }
 
@@ -343,7 +370,15 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
      * @param organizationId
      * @param schemeId
      */
-    private void copyDeployToDraft(Long organizationId, Long schemeId) {
+    private void copyDeployToDraft(Boolean isDeleteOldDraft, Long organizationId, Long schemeId) {
+        //删除草稿配置
+        if (isDeleteOldDraft) {
+            StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+            draft.setSchemeId(schemeId);
+            draft.setOrganizationId(organizationId);
+            configDraftMapper.delete(draft);
+        }
+        //复制发布配置到草稿配置
         StateMachineSchemeConfig config = new StateMachineSchemeConfig();
         config.setSchemeId(schemeId);
         config.setOrganizationId(organizationId);
@@ -361,7 +396,28 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
-    public void copyDraftToDeploy(Long organizationId, Long schemeId) {
-
+    public void copyDraftToDeploy(Boolean isDeleteOldDeploy, Long organizationId, Long schemeId) {
+        //删除发布配置
+        if (isDeleteOldDeploy) {
+            StateMachineSchemeConfig deploy = new StateMachineSchemeConfig();
+            deploy.setSchemeId(schemeId);
+            deploy.setOrganizationId(organizationId);
+            configMapper.delete(deploy);
+        }
+        //复制草稿配置到发布配置
+        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+        draft.setSchemeId(schemeId);
+        draft.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfigDraft> configs = configDraftMapper.select(draft);
+        if (configs != null && !configs.isEmpty()) {
+            List<StateMachineSchemeConfig> configDrafts = modelMapper.map(configs, new TypeToken<List<StateMachineSchemeConfig>>() {
+            }.getType());
+            for (StateMachineSchemeConfig insertConfig : configDrafts) {
+                int result = configMapper.insert(insertConfig);
+                if (result != 1) {
+                    throw new CommonException("error.stateMachineSchemeConfig.create");
+                }
+            }
+        }
     }
 }
