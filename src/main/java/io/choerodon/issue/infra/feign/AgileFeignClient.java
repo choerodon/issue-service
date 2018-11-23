@@ -51,7 +51,7 @@ public interface AgileFeignClient {
                                                                   @RequestBody StateMachineSchemeDeployCheckIssue deployCheckIssue);
 
     /**
-     * 查询状态机方案变更后对issue的影响
+     * 状态机方案变更后批量更新issue的状态匹配
      *
      * @param organizationId
      * @param deployUpdateIssue

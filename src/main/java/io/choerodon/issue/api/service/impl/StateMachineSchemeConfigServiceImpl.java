@@ -255,7 +255,9 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();
         deployUpdateIssue.setChangeItems(changeItems);
         deployUpdateIssue.setProjectConfigs(projectConfigs);
+        //批量更新issue的状态
         Boolean result = agileFeignClient.updateStateMachineSchemeChange(organizationId, deployUpdateIssue).getBody();
+        //清理状态机实例【todo】
         return result;
     }
 
