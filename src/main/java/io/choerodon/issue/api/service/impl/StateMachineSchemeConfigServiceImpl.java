@@ -344,13 +344,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
 
     @Override
     public StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId) {
-        //删除草稿配置
-        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
-        draft.setSchemeId(schemeId);
-        draft.setOrganizationId(organizationId);
-        configDraftMapper.delete(draft);
         //写入活跃的配置写到到草稿中，id一致
-        copyDeployToDraft(organizationId, schemeId);
+        copyDeployToDraft(true, organizationId, schemeId);
         //更新状态机方案状态为：活跃
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
@@ -365,7 +360,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         draft.setSchemeId(schemeId);
         draft.setOrganizationId(organizationId);
         if (configDraftMapper.select(draft).isEmpty()) {
-            copyDeployToDraft(organizationId, schemeId);
+            copyDeployToDraft(false, organizationId, schemeId);
         }
     }
 
@@ -375,7 +370,15 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
      * @param organizationId
      * @param schemeId
      */
-    private void copyDeployToDraft(Long organizationId, Long schemeId) {
+    private void copyDeployToDraft(Boolean isDeleteOldDraft, Long organizationId, Long schemeId) {
+        //删除草稿配置
+        if (isDeleteOldDraft) {
+            StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+            draft.setSchemeId(schemeId);
+            draft.setOrganizationId(organizationId);
+            configDraftMapper.delete(draft);
+        }
+        //复制发布配置到草稿配置
         StateMachineSchemeConfig config = new StateMachineSchemeConfig();
         config.setSchemeId(schemeId);
         config.setOrganizationId(organizationId);
@@ -393,7 +396,28 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
-    public void copyDraftToDeploy(Long organizationId, Long schemeId) {
-
+    public void copyDraftToDeploy(Boolean isDeleteOldDeploy, Long organizationId, Long schemeId) {
+        //删除发布配置
+        if (isDeleteOldDeploy) {
+            StateMachineSchemeConfig deploy = new StateMachineSchemeConfig();
+            deploy.setSchemeId(schemeId);
+            deploy.setOrganizationId(organizationId);
+            configMapper.delete(deploy);
+        }
+        //复制草稿配置到发布配置
+        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+        draft.setSchemeId(schemeId);
+        draft.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfigDraft> configs = configDraftMapper.select(draft);
+        if (configs != null && !configs.isEmpty()) {
+            List<StateMachineSchemeConfig> configDrafts = modelMapper.map(configs, new TypeToken<List<StateMachineSchemeConfig>>() {
+            }.getType());
+            for (StateMachineSchemeConfig insertConfig : configDrafts) {
+                int result = configMapper.insert(insertConfig);
+                if (result != 1) {
+                    throw new CommonException("error.stateMachineSchemeConfig.create");
+                }
+            }
+        }
     }
 }

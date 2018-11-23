@@ -225,7 +225,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
      * @param map
      * @return
      */
-    private StateMachineSchemeConfigViewDTO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueType>> map){
+    private StateMachineSchemeConfigViewDTO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueType>> map) {
         StateMachineSchemeConfigViewDTO firstDTO = new StateMachineSchemeConfigViewDTO();
         StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, defaultStateMachineId).getBody();
         firstDTO.setStateMachineDTO(stateMachineDTO);
@@ -313,6 +313,8 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 throw new CommonException("error.stateMachineScheme.activeScheme");
             }
         }
+        //复制草稿配置到活跃
+        configService.copyDraftToDeploy(false, scheme.getOrganizationId(), schemeId);
         //活跃方案下的所有新建状态机
         List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
         stateMachineServiceFeign.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));

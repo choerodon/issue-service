@@ -138,11 +138,11 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
     void fixDraft(Long organizationId, Long schemeId);
 
     /**
-     * 复制草稿配置给发布配置
+     * 清除发布配置，复制草稿配置给发布配置
      *
      * @param organizationId
      * @param schemeId
      */
-    void copyDraftToDeploy(Long organizationId, Long schemeId);
+    void copyDraftToDeploy(Boolean isDeleteOldDeploy, Long organizationId, Long schemeId);
 
 }
