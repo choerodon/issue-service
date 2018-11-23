@@ -35,4 +35,9 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme_config_draft.groovy') {
             column(name: "state_machine_id", type: "BIGINT UNSIGNED")
         }
     }
+    changeSet(id: '2018-11-23-fix-table-state-machine-scheme-config-draft', author: 'shinan.chenX@gmail') {
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "insert into state_machine_scheme_config_draft select * from state_machine_scheme_config;"
+        }
+    }
 }

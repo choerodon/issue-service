@@ -130,14 +130,6 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
     StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId);
 
     /**
-     * 若草稿没有数据，则修复草稿的数据
-     *
-     * @param organizationId
-     * @param schemeId
-     */
-    void fixDraft(Long organizationId, Long schemeId);
-
-    /**
      * 清除发布配置，复制草稿配置给发布配置
      *
      * @param organizationId
