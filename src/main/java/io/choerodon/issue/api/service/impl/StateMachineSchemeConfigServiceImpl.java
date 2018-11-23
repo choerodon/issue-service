@@ -329,6 +329,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
             StatusDTO newDefault = newSMStatuses.get(0);
             oldSMStatuses.forEach(oldSMStatus -> {
+                //如果旧的状态机中有的状态，新的状态机中没有，说明这个状态需要变更
                 if (!newSMStatusIds.contains(oldSMStatus.getId())) {
                     StateMachineSchemeStatusChangeItem stateMachineSchemeStatusChangeItem = new StateMachineSchemeStatusChangeItem(oldSMStatus, newDefault);
                     stateMachineSchemeStatusChangeItems.add(stateMachineSchemeStatusChangeItem);
@@ -340,7 +341,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             changeItem.setNewStateMachine(newStateMachine);
             changeItem.setStateMachineSchemeStatusChangeItems(stateMachineSchemeStatusChangeItems);
         }
-
+        //过滤掉状态不需要变更的问题类型
+        changeItems = changeItems.stream().filter(changeItem -> !changeItem.getStateMachineSchemeStatusChangeItems().isEmpty()).collect(Collectors.toList());
         return changeItems;
     }
 
