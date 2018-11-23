@@ -355,17 +355,6 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 
-    @Override
-    public void fixDraft(Long organizationId, Long schemeId) {
-        //如果草稿没有数据
-        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
-        draft.setSchemeId(schemeId);
-        draft.setOrganizationId(organizationId);
-        if (configDraftMapper.select(draft).isEmpty()) {
-            copyDeployToDraft(false, organizationId, schemeId);
-        }
-    }
-
     /**
      * 把活跃的配置写到到草稿中，id一致
      *

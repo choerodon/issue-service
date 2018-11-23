@@ -166,14 +166,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         if (scheme == null) {
             throw new CommonException("error.stateMachineScheme.notFound");
         }
-
-        //如果是查询草稿，草稿若没有数据则修复
-        if (isDraft) {
-            configService.fixDraft(organizationId, schemeId);
-        }
-
         StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
-
         //处理配置信息
         List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(isDraft, organizationId, schemeId);
         Map<Long, List<IssueType>> map = new HashMap<>(configs.size());
