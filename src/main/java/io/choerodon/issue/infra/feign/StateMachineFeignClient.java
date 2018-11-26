@@ -164,11 +164,8 @@ public interface StateMachineFeignClient {
     @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/query_all_with_status")
     ResponseEntity<List<StateMachineWithStatusDTO>> queryAllWithStatus(@PathVariable("organization_id") Long organizationId);
 
-    @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/remove_node")
-    ResponseEntity removeStateMachineNode(@ApiParam(value = "组织id", required = true)
-                                             @PathVariable("organization_id") Long organizationId,
-                                             @ApiParam(value = "state machine id", required = true)
-                                             @RequestParam Long stateMachineId,
-                                             @ApiParam(value = "status id", required = true)
-                                             @RequestParam Long statusId);
+    @DeleteMapping(value = "/v1/organizations/{organization_id}/state_machines/remove_node")
+    ResponseEntity removeStateMachineNode(@PathVariable("organization_id") Long organizationId,
+                                          @RequestParam("stateMachineId") Long stateMachineId,
+                                          @RequestParam("statusId") Long statusId);
 }
