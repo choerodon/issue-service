@@ -7,6 +7,7 @@ import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -162,4 +163,12 @@ public interface StateMachineFeignClient {
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/query_all_with_status")
     ResponseEntity<List<StateMachineWithStatusDTO>> queryAllWithStatus(@PathVariable("organization_id") Long organizationId);
+
+    @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/remove_node")
+    ResponseEntity removeStateMachineNode(@ApiParam(value = "组织id", required = true)
+                                             @PathVariable("organization_id") Long organizationId,
+                                             @ApiParam(value = "state machine id", required = true)
+                                             @RequestParam Long stateMachineId,
+                                             @ApiParam(value = "status id", required = true)
+                                             @RequestParam Long statusId);
 }
