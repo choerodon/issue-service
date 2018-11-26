@@ -3,6 +3,7 @@ package io.choerodon.issue.api.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
@@ -384,6 +385,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         return result;
     }
 
+    @Saga(code = "agile-remove-status", description = "移除状态", inputSchemaClass = StatusPayload.class)
     @Override
     public void removeStatusForAgile(Long projectId, Long statusId) {
         Map<String, Object> result = checkCreateStatusForAgile(projectId);
@@ -396,7 +398,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
                 StatusPayload statusPayload = new StatusPayload();
                 statusPayload.setProjectId(projectId);
                 statusPayload.setStatusId(statusId);
-                sagaClient.startSaga("agile-delete-status", new StartInstanceDTO(JSON.toJSONString(statusPayload)));
+                sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload)));
             }
         } else {
             throw new CommonException((String) result.get(MESSAGE));
