@@ -13,6 +13,7 @@ import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.*;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.exception.RemoveStatusException;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
@@ -393,15 +394,19 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             Long organizationId = projectUtil.getOrganizationId(projectId);
-            ResponseEntity responseEntity = stateMachineFeignClient.removeStateMachineNode(organizationId, stateMachineId, statusId);
-            if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                StatusPayload statusPayload = new StatusPayload();
-                statusPayload.setProjectId(projectId);
-                statusPayload.setStatusId(statusId);
-                sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload)));
+            try {
+                ResponseEntity responseEntity = stateMachineFeignClient.removeStateMachineNode(organizationId, stateMachineId, statusId);
+                if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                    StatusPayload statusPayload = new StatusPayload();
+                    statusPayload.setProjectId(projectId);
+                    statusPayload.setStatusId(statusId);
+                    sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload)));
+                }
+            } catch (Exception e) {
+                throw new RemoveStatusException("error.status.remove");
             }
         } else {
-            throw new CommonException((String) result.get(MESSAGE));
+            throw new RemoveStatusException((String) result.get(MESSAGE));
         }
     }
 
