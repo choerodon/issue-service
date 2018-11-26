@@ -1,8 +1,13 @@
 package io.choerodon.issue.api.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import io.choerodon.asgard.saga.dto.StartInstanceDTO;
+import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.*;
+import io.choerodon.issue.api.dto.payload.StatusPayload;
 import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.*;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
@@ -20,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -102,6 +109,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private ProjectConfigService projectConfigService;
     @Autowired
     private InstanceFeignClient instanceFeignClient;
+    @Autowired
+    private SagaClient sagaClient;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -376,15 +385,22 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public Boolean checkDeleteStatusForAgile(Long projectId, Long statusId) {
+    public void removeStatusForAgile(Long projectId, Long statusId) {
         Map<String, Object> result = checkCreateStatusForAgile(projectId);
-        if ((Boolean) result.get(FLAG)) {
+        Boolean flag = (Boolean) result.get(FLAG);
+        if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
-            //校验是否有issue用到这个状态
+            Long organizationId = projectUtil.getOrganizationId(projectId);
+            ResponseEntity responseEntity = stateMachineFeignClient.removeStateMachineNode(organizationId, stateMachineId, statusId);
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                StatusPayload statusPayload = new StatusPayload();
+                statusPayload.setProjectId(projectId);
+                statusPayload.setStatusId(statusId);
+                sagaClient.startSaga("agile-delete-status", new StartInstanceDTO(JSON.toJSONString(statusPayload)));
+            }
         } else {
             throw new CommonException((String) result.get(MESSAGE));
         }
-        return null;
     }
 
     @Override

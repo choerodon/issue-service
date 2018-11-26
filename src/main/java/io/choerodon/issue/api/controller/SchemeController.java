@@ -108,11 +108,12 @@ public class SchemeController extends BaseController {
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
-    @ApiOperation(value = "【敏捷】校验是否能删除状态")
-    @GetMapping(value = "/schemes/check_delete_status_for_agile")
-    public ResponseEntity<Boolean> checkDeleteStatusForAgile(@PathVariable("project_id") Long projectId,
-                                                             @RequestParam("status_id") Long statusId) {
-        return new ResponseEntity<>(projectConfigService.checkDeleteStatusForAgile(projectId, statusId), HttpStatus.OK);
+    @ApiOperation(value = "【敏捷】移除状态")
+    @DeleteMapping(value = "/schemes/remove_status_for_agile")
+    public ResponseEntity removeStatusForAgile(@PathVariable("project_id") Long projectId,
+                                               @RequestParam("status_id") Long statusId) {
+        projectConfigService.removeStatusForAgile(projectId, statusId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})

@@ -79,4 +79,9 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     public ResponseEntity<List<StateMachineWithStatusDTO>> queryAllWithStatus(Long organizationId) {
         throw new CommonException("error.stateMachineFeignClient.queryAllWithStatus");
     }
+
+    @Override
+    public ResponseEntity removeStateMachineNode(Long organizationId, Long stateMachineId, Long statusId) {
+        throw new CommonException("error.StateMachineNode.remove");
+    }
 }

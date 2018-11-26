@@ -140,7 +140,7 @@ public interface ProjectConfigService {
      * @param projectId
      * @return
      */
-    Boolean checkDeleteStatusForAgile(Long projectId, Long statusId);
+    void removeStatusForAgile(Long projectId, Long statusId);
 
     /**
      * 查询状态机关联的项目id列表
