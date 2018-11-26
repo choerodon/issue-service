@@ -257,6 +257,12 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         deployUpdateIssue.setProjectConfigs(projectConfigs);
         //批量更新issue的状态
         Boolean result = agileFeignClient.updateStateMachineSchemeChange(organizationId, deployUpdateIssue).getBody();
+        //复制草稿配置到发布配置
+        copyDraftToDeploy(true, organizationId, schemeId);
+        //更新状态机方案状态为：活跃
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+        stateMachineSchemeService.updateOptional(scheme, "status");
         //清理状态机实例【todo】
         return result;
     }
@@ -329,6 +335,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
             StatusDTO newDefault = newSMStatuses.get(0);
             oldSMStatuses.forEach(oldSMStatus -> {
+                //如果旧的状态机中有的状态，新的状态机中没有，说明这个状态需要变更
                 if (!newSMStatusIds.contains(oldSMStatus.getId())) {
                     StateMachineSchemeStatusChangeItem stateMachineSchemeStatusChangeItem = new StateMachineSchemeStatusChangeItem(oldSMStatus, newDefault);
                     stateMachineSchemeStatusChangeItems.add(stateMachineSchemeStatusChangeItem);
@@ -340,7 +347,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             changeItem.setNewStateMachine(newStateMachine);
             changeItem.setStateMachineSchemeStatusChangeItems(stateMachineSchemeStatusChangeItems);
         }
-
+        //过滤掉状态不需要变更的问题类型
+        changeItems = changeItems.stream().filter(changeItem -> !changeItem.getStateMachineSchemeStatusChangeItems().isEmpty()).collect(Collectors.toList());
         return changeItems;
     }
 

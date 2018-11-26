@@ -126,7 +126,7 @@ public class StateMachineSchemeController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "发布状态机方案")
-    @GetMapping(value = "/deploy/{scheme_id}")
+    @PostMapping(value = "/deploy/{scheme_id}")
     public ResponseEntity<Boolean> deploy(@PathVariable("organization_id") Long organizationId,
                                           @PathVariable("scheme_id") Long schemeId,
                                           @RequestBody List<StateMachineSchemeChangeItem> changeItems) {

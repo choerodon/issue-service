@@ -2,6 +2,7 @@ package io.choerodon.issue.infra.feign;
 
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployUpdateIssue;
+import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -28,7 +29,7 @@ public interface AgileFeignClient {
      *
      * @param organizationId
      * @param statusId
-     * @param issueTypeIdsMap
+     * @param projectConfigs
      * @return
      */
     @PostMapping("/v1/organizations/{organization_id}/state_machine/check_delete_node")
@@ -36,7 +37,7 @@ public interface AgileFeignClient {
                                                         @PathVariable(name = "organization_id") Long organizationId,
                                                         @ApiParam(value = "状态id", required = true)
                                                         @RequestParam(value = "status_id") Long statusId,
-                                                        @RequestBody Map<Long, List<Long>> issueTypeIdsMap);
+                                                        @RequestBody List<ProjectConfig> projectConfigs);
 
     /**
      * 查询状态机方案变更后对issue的影响
