@@ -17,7 +17,7 @@ public class StateMachineSchemeChangeItem {
     private IssueTypeDTO issueTypeDTO;
     private StateMachineWithStatusDTO oldStateMachine;
     private StateMachineWithStatusDTO newStateMachine;
-    private List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems;
+    private List<StateMachineSchemeStatusChangeItem> statusChangeItems;
 
     public StateMachineSchemeChangeItem() {
     }
@@ -84,11 +84,11 @@ public class StateMachineSchemeChangeItem {
         this.newStateMachine = newStateMachine;
     }
 
-    public List<StateMachineSchemeStatusChangeItem> getStateMachineSchemeStatusChangeItems() {
-        return stateMachineSchemeStatusChangeItems;
+    public List<StateMachineSchemeStatusChangeItem> getStatusChangeItems() {
+        return statusChangeItems;
     }
 
-    public void setStateMachineSchemeStatusChangeItems(List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems) {
-        this.stateMachineSchemeStatusChangeItems = stateMachineSchemeStatusChangeItems;
+    public void setStatusChangeItems(List<StateMachineSchemeStatusChangeItem> statusChangeItems) {
+        this.statusChangeItems = statusChangeItems;
     }
 }

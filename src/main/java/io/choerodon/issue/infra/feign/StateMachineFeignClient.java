@@ -32,8 +32,8 @@ public interface StateMachineFeignClient {
      * @return 状态机
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}", method = RequestMethod.GET)
-    ResponseEntity<StateMachineDTO> queryStateMachineById(@RequestParam(value = "organization_id") Long organizationId,
-                                                          @RequestParam(value = "state_machine_id") Long stateMachineId);
+    ResponseEntity<StateMachineDTO> queryStateMachineById(@PathVariable(value = "organization_id") Long organizationId,
+                                                          @PathVariable(value = "state_machine_id") Long stateMachineId);
 
     /**
      * 获取组织默认状态机
@@ -42,7 +42,7 @@ public interface StateMachineFeignClient {
      * @return 状态机
      */
     @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/default", method = RequestMethod.GET)
-    ResponseEntity<StateMachineDTO> queryDefaultStateMachine(@RequestParam(value = "organization_id") Long organizationId);
+    ResponseEntity<StateMachineDTO> queryDefaultStateMachine(@PathVariable(value = "organization_id") Long organizationId);
 
     /**
      * 分页查询状态机列表

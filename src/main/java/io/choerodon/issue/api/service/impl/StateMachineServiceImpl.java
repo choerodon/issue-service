@@ -7,9 +7,7 @@ import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
-import io.choerodon.issue.domain.IssueTypeSchemeConfig;
 import io.choerodon.issue.domain.ProjectConfig;
-import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
@@ -22,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -116,27 +113,11 @@ public class StateMachineServiceImpl implements StateMachineService {
         //找到与状态机关联的状态机方案
         List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
         List<ProjectConfig> projectConfigs = new ArrayList<>();
-        schemeIds.forEach(schemeId->{
+        schemeIds.forEach(schemeId -> {
             //获取当前方案配置的项目列表
             projectConfigs.addAll(projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId));
         });
         Map<String, Object> result = agileFeignClient.checkDeleteNode(organizationId, statusId, projectConfigs).getBody();
         return result;
-    }
-
-    /**
-     * 设置每个项目要校验的问题类型id列表
-     *
-     * @param result
-     * @param projectId
-     * @param issueTypeIds
-     */
-    private void putResult(Map<Long, List<Long>> result, Long projectId, List<Long> issueTypeIds) {
-        List<Long> ids = result.get(projectId);
-        if (ids == null) {
-            ids = new ArrayList<>();
-        }
-        ids.addAll(issueTypeIds);
-        result.put(projectId, ids);
     }
 }
