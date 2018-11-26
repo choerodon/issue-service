@@ -243,15 +243,6 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
         //获取当前方案配置的项目列表
         List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
-        //传入的changeItems去掉不需要的信息
-        changeItems.forEach(changeItem -> {
-            changeItem.setIssueTypeDTO(null);
-            changeItem.setIssueCount(null);
-            changeItem.setOldStateMachine(null);
-            changeItem.setNewStateMachine(null);
-            changeItem.setOldStateMachineId(null);
-            changeItem.setNewStateMachineId(null);
-        });
         StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();
         deployUpdateIssue.setChangeItems(changeItems);
         deployUpdateIssue.setProjectConfigs(projectConfigs);
@@ -345,10 +336,10 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             changeItem.setIssueCount(issueCounts.get(issueTypeId));
             changeItem.setOldStateMachine(oldStateMachine);
             changeItem.setNewStateMachine(newStateMachine);
-            changeItem.setStateMachineSchemeStatusChangeItems(stateMachineSchemeStatusChangeItems);
+            changeItem.setStatusChangeItems(stateMachineSchemeStatusChangeItems);
         }
         //过滤掉状态不需要变更的问题类型
-        changeItems = changeItems.stream().filter(changeItem -> !changeItem.getStateMachineSchemeStatusChangeItems().isEmpty()).collect(Collectors.toList());
+        changeItems = changeItems.stream().filter(changeItem -> !changeItem.getStatusChangeItems().isEmpty()).collect(Collectors.toList());
         return changeItems;
     }
 

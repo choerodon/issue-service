@@ -171,6 +171,7 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
             if(configDTO!=null){
                 StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, configDTO.getStateMachineId()).getBody();
                 issueTypeDTO.setStateMachineName(stateMachineDTO.getName());
+                issueTypeDTO.setStateMachineId(stateMachineDTO.getId());
             }
         }
         return issueTypeDTOS;

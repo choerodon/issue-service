@@ -24,6 +24,7 @@ public class IssueTypeDTO {
 
     //用于做状态机方案的配置时
     private String stateMachineName;
+    private Long stateMachineId;
 
     public Long getId() {
         return id;
@@ -105,6 +106,14 @@ public class IssueTypeDTO {
         this.initialize = initialize;
     }
 
+    public Long getStateMachineId() {
+        return stateMachineId;
+    }
+
+    public void setStateMachineId(Long stateMachineId) {
+        this.stateMachineId = stateMachineId;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -117,6 +126,8 @@ public class IssueTypeDTO {
                 .add("typeCode", typeCode)
                 .add("initialize", initialize)
                 .add("objectVersionNumber", objectVersionNumber)
+                .add("stateMachineName", stateMachineName)
+                .add("stateMachineId", stateMachineId)
                 .toString();
     }
 }
