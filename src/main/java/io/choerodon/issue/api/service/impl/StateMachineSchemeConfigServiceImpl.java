@@ -11,6 +11,7 @@ import io.choerodon.issue.api.dto.payload.StateMachineSchemeStatusChangeItem;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
+import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
@@ -62,6 +63,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
     private AgileFeignClient agileFeignClient;
+    @Autowired
+    private StateMachineService stateMachineService;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -243,21 +246,30 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
         //获取当前方案配置的项目列表
         List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
+        //新增的状态机ids和删除的状态机ids
+        List<Long> oldStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getOldStateMachineId).distinct().collect(Collectors.toList());
+        List<Long> newStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getNewStateMachineId).distinct().collect(Collectors.toList());
+        //新增的状态和删除的状态
+        List<StatusDTO> addStatuses = changeItems.stream().map(StateMachineSchemeChangeItem::getAddStatuses).flatMap(x -> x.stream()).distinct().collect(Collectors.toList());
+        List<StatusDTO> deleteStatuses = changeItems.stream().map(StateMachineSchemeChangeItem::getDeleteStatuses).flatMap(x -> x.stream()).distinct().collect(Collectors.toList());
         StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();
         deployUpdateIssue.setChangeItems(changeItems);
         deployUpdateIssue.setProjectConfigs(projectConfigs);
+        deployUpdateIssue.setAddStatuses(addStatuses);
+        deployUpdateIssue.setDeleteStatuses(deleteStatuses);
         //批量更新issue的状态
         Boolean result = agileFeignClient.updateStateMachineSchemeChange(organizationId, deployUpdateIssue).getBody();
-        if(result){
+        if (result) {
             //复制草稿配置到发布配置
             copyDraftToDeploy(true, organizationId, schemeId);
             //更新状态机方案状态为：活跃
             StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
             scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
             stateMachineSchemeService.updateOptional(scheme, "status");
-            //活跃方案下的所有新建状态机
-            List<StateMachineSchemeConfigDTO> configs = queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
-            stateMachineFeignClient.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));
+            //活跃方案下的新增的状态机（状态为create的改成active）
+            stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
+            //使删除的状态机变成未活跃（状态为active和draft的改成create）
+            stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
             //清理状态机实例【todo】
         }
         return result;
@@ -298,8 +310,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             Long issueTypeId = entry.getKey();
             //未判断过
             if (changeItemsMap.get(issueTypeId) == null) {
-                Long oldStateMachineId = entry.getValue();
-                Long newStateMachineId = deployMap.getOrDefault(issueTypeId, deployDefaultStateMachineId);
+                Long oldStateMachineId = deployMap.getOrDefault(issueTypeId, deployDefaultStateMachineId);
+                Long newStateMachineId = entry.getValue();
                 if (!oldStateMachineId.equals(newStateMachineId)) {
                     changeItems.add(new StateMachineSchemeChangeItem(issueTypeId, oldStateMachineId, newStateMachineId));
                 }
@@ -327,14 +339,24 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             StateMachineWithStatusDTO newStateMachine = stateMachineMap.get(newStateMachineId);
             List<StatusDTO> oldSMStatuses = oldStateMachine.getStatusDTOS();
             List<StatusDTO> newSMStatuses = newStateMachine.getStatusDTOS();
+            List<StatusDTO> addStatuses = new ArrayList<>();
+            List<StatusDTO> deleteStatuses = new ArrayList<>();
             List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems = new ArrayList<>();
             List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
+            List<Long> oldSMStatusIds = oldSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
             StatusDTO newDefault = newSMStatuses.get(0);
             oldSMStatuses.forEach(oldSMStatus -> {
                 //如果旧的状态机中有的状态，新的状态机中没有，说明这个状态需要变更
                 if (!newSMStatusIds.contains(oldSMStatus.getId())) {
                     StateMachineSchemeStatusChangeItem stateMachineSchemeStatusChangeItem = new StateMachineSchemeStatusChangeItem(oldSMStatus, newDefault);
                     stateMachineSchemeStatusChangeItems.add(stateMachineSchemeStatusChangeItem);
+                    deleteStatuses.add(oldSMStatus);
+                }
+            });
+            newSMStatuses.forEach(newSMStatus -> {
+                //增加的状态
+                if (!oldSMStatusIds.contains(newSMStatus.getId())) {
+                    addStatuses.add(newSMStatus);
                 }
             });
             changeItem.setIssueTypeDTO(issueTypeMap.get(issueTypeId));
@@ -342,6 +364,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             changeItem.setOldStateMachine(oldStateMachine);
             changeItem.setNewStateMachine(newStateMachine);
             changeItem.setStatusChangeItems(stateMachineSchemeStatusChangeItems);
+            changeItem.setAddStatuses(addStatuses);
+            changeItem.setDeleteStatuses(deleteStatuses);
         }
         //过滤掉状态不需要变更的问题类型
         changeItems = changeItems.stream().filter(changeItem -> !changeItem.getStatusChangeItems().isEmpty()).collect(Collectors.toList());
@@ -359,13 +383,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 
-    /**
-     * 把活跃的配置写到到草稿中，id一致
-     *
-     * @param organizationId
-     * @param schemeId
-     */
-    private void copyDeployToDraft(Boolean isDeleteOldDraft, Long organizationId, Long schemeId) {
+    @Override
+    public void copyDeployToDraft(Boolean isDeleteOldDraft, Long organizationId, Long schemeId) {
         //删除草稿配置
         if (isDeleteOldDraft) {
             StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();

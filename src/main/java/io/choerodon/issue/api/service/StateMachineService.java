@@ -53,4 +53,12 @@ public interface StateMachineService {
      * @return
      */
     Map<String, Object> checkDeleteNode(Long organizationId, Long stateMachineId, Long statusId);
+
+    /**
+     * 使状态机变成非活跃状态
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     */
+    void notActiveStateMachine(Long organizationId, List<Long> stateMachineIds);
 }
