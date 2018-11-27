@@ -74,7 +74,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
     Boolean checkName(Long organizationId, Long schemeId, String name);
 
     /**
-     * 根据状态机id查询所使用到该状态机的方案
+     * 根据状态机id查询所使用到该状态机的方案，包含发布使用与草稿使用
      *
      * @param organizationId 组织id
      * @param stateMachineId 状态机id

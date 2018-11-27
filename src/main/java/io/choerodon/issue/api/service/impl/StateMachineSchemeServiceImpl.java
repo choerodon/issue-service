@@ -238,9 +238,12 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId) {
-        List<Long> schemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
-        if (!schemeIds.isEmpty()) {
-            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, schemeIds);
+        List<Long> deploySchemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        List<Long> draftSchemeIds = configService.querySchemeIdsByStateMachineId(true, organizationId, stateMachineId);
+        deploySchemeIds.addAll(draftSchemeIds);
+        deploySchemeIds = deploySchemeIds.stream().distinct().collect(Collectors.toList());
+        if (!deploySchemeIds.isEmpty()) {
+            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, deploySchemeIds);
             if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
                 return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
                 }.getType());
