@@ -87,4 +87,10 @@
         </if>
     </select>
 
+    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.StateMachineScheme">
+        SELECT SMS.*
+        FROM state_machine_scheme SMS
+        WHERE SMS.organization_id = #{organizationId}
+    </select>
+
 </mapper>

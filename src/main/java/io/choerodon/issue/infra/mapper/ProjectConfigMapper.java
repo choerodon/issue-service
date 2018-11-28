@@ -18,6 +18,14 @@ public interface ProjectConfigMapper extends BaseMapper<ProjectConfig> {
     ProjectConfig queryBySchemeTypeAndApplyType(@Param("projectId") Long projectId, @Param("schemeType") String schemeType, @Param("applyType") String applyType);
 
     List<ProjectConfig> queryBySchemeIds(@Param("schemeIds") List<Long> schemeIds, @Param("schemeType") String schemeType);
+    /**
+     * 通过方案ids查询出关联的项目（项目关联的状态机方案）
+     *
+     * @param schemeIds
+     * @param schemeType
+     * @return
+     */
+    List<ProjectConfig> handleRemoveStatusByStateMachine(@Param("schemeIds") List<Long> schemeIds, @Param("schemeType") String schemeType);
 
     List<ProjectConfig> queryByProjectIds(@Param("projectIds") List<Long> projectIds);
 

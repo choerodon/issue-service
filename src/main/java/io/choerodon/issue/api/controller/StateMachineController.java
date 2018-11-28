@@ -3,6 +3,8 @@ package io.choerodon.issue.api.controller;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.issue.api.dto.Status;
+import io.choerodon.issue.api.dto.payload.RemoveStatusWithProject;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
@@ -52,7 +54,7 @@ public class StateMachineController {
     @ApiOperation(value = "【内部调用】查询状态机关联的项目id列表的Map")
     @GetMapping(value = "/query_project_ids_map")
     public ResponseEntity<Map<String, List<Long>>> queryProjectIdsMap(@PathVariable("organization_id") Long organizationId,
-                                                                      @RequestParam("state_machine_id") Long stateMachineId) {
+                                                                      @RequestParam("stateMachineId") Long stateMachineId) {
         return Optional.ofNullable(projectConfigService.queryProjectIdsMap(organizationId, stateMachineId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.queryProjectIdsMap.get"));
@@ -62,9 +64,20 @@ public class StateMachineController {
     @ApiOperation(value = "【内部调用】状态机删除节点的校验，是否可以直接删除")
     @GetMapping(value = "/check_delete_node")
     public ResponseEntity<Map<String, Object>> checkDeleteNode(@PathVariable("organization_id") Long organizationId,
-                                                               @RequestParam("state_machine_id") Long stateMachineId,
-                                                               @RequestParam("status_id") Long statusId) {
+                                                               @RequestParam("stateMachineId") Long stateMachineId,
+                                                               @RequestParam("statusId") Long statusId) {
         return Optional.ofNullable(stateMachineService.checkDeleteNode(organizationId, stateMachineId, statusId))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
+    }
+
+    @Permission(level = ResourceLevel.PROJECT)
+    @ApiOperation(value = "【内部调用】状态机删除节点的数据处理")
+    @PostMapping(value = "/handle_remove_status_by_state_machine")
+    public ResponseEntity<List<RemoveStatusWithProject>> handleRemoveStatusByStateMachine(@PathVariable("organization_id") Long organizationId,
+                                                                                          @RequestParam("stateMachineId") Long stateMachineId,
+                                                                                          @RequestBody List<Status> deleteStatuses) {
+        return Optional.ofNullable(stateMachineService.handleRemoveStatusByStateMachine(organizationId, stateMachineId, deleteStatuses))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
     }
