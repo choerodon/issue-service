@@ -308,8 +308,6 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         List<Long> newStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getNewStateMachineId).distinct().collect(Collectors.toList());
         //新增的状态和删除的状态
         List<StatusDTO> addStatuses = new ArrayList<>(addStatusIds.size());
-        List<StatusDTO> deleteStatuses = new ArrayList<>(deleteStatusIds.size());
-        deleteStatusIds.forEach(statusId -> deleteStatuses.add(statusDTOMap.get(statusId)));
         addStatusIds.forEach(statusId -> addStatuses.add(statusDTOMap.get(statusId)));
 
         StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();

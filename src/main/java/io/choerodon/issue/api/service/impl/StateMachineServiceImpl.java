@@ -185,10 +185,12 @@ public class StateMachineServiceImpl implements StateMachineService {
             List<Long> statusIds = statuses.stream().map(StatusDTO::getId).distinct().collect(Collectors.toList());
             List<Long> confirmDeleteStatusIds = deleteStatusIds.stream().filter(x -> !statusIds.contains(x)).collect(toList());
 
-            RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();
-            removeStatusWithProject.setProjectId(projectId);
-            removeStatusWithProject.setDeleteStatusIds(confirmDeleteStatusIds);
-            removeStatusWithProjects.add(removeStatusWithProject);
+            if(!confirmDeleteStatusIds.isEmpty()){
+                RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();
+                removeStatusWithProject.setProjectId(projectId);
+                removeStatusWithProject.setDeleteStatusIds(confirmDeleteStatusIds);
+                removeStatusWithProjects.add(removeStatusWithProject);
+            }
         });
         return removeStatusWithProjects;
     }
