@@ -5,6 +5,7 @@ import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
@@ -318,6 +319,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         deployUpdateIssue.setRemoveStatusWithProjects(removeStatusWithProjects);
         deployUpdateIssue.setSchemeId(schemeId);
         deployUpdateIssue.setOrganizationId(organizationId);
+        deployUpdateIssue.setUserId(DetailsHelper.getUserDetails().getUserId());
         //批量更新issue的状态
         sagaClient.startSaga(DEPLOY_STATE_MACHINE_SCHEME, new StartInstanceDTO(JSON.toJSONString(deployUpdateIssue), "", ""));
         //复制草稿配置到发布配置

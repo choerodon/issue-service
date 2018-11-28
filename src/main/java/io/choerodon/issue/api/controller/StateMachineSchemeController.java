@@ -136,7 +136,7 @@ public class StateMachineSchemeController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "更新状态机方案发布进度【内部调用】")
-    @PutMapping(value = "/{scheme_id}")
+    @PutMapping(value = "/update_deploy_progress/{scheme_id}")
     public ResponseEntity<Boolean> updateDeployProgress(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId,
                                                         @RequestParam Integer deployProgress) {
         return new ResponseEntity<>(schemeService.updateDeployProgress(organizationId, schemeId, deployProgress), HttpStatus.OK);
