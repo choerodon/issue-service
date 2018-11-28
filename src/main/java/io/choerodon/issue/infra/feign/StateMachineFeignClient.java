@@ -83,7 +83,7 @@ public interface StateMachineFeignClient {
     ResponseEntity<StatusDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
 
     /**
-     * 根据id获取状态
+     * 根据知足id获取状态
      *
      * @param organizationId
      * @return

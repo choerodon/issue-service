@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -242,16 +243,69 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         return schemeIds;
     }
 
+    /**
+     * 根据方案id获取到项目的新状态和旧状态
+     *
+     * @param organizationId
+     * @param schemeId
+     * @return
+     */
+    private Map<String, List<Long>> queryStatusIdsBySchemeId(Long organizationId,Long schemeId){
+        Map<String, List<Long>> changeMap = new HashMap<>(2);
+        List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineFeignClient.queryAllWithStatus(organizationId).getBody();
+        Map<Long, List<StatusDTO>> smMap = stateMachineWithStatusDTOs.stream().collect(Collectors.toMap(StateMachineWithStatusDTO::getId,StateMachineWithStatusDTO::getStatusDTOS));
+        //获取发布配置
+        List<Long> oldStatusIds = new ArrayList<>();
+        StateMachineSchemeConfig config = new StateMachineSchemeConfig();
+        config.setSchemeId(schemeId);
+        config.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfig> deploys = configMapper.select(config);
+        List<Long> oldStateMachineIds = deploys.stream().map(StateMachineSchemeConfig::getStateMachineId).collect(Collectors.toList());
+        oldStateMachineIds.forEach(oldStateMachineId->{
+            oldStatusIds.addAll(smMap.get(oldStateMachineId).stream().map(StatusDTO::getId).collect(Collectors.toList()));
+        });
+        //获取草稿配置
+        List<Long> newStatusIds = new ArrayList<>();
+        StateMachineSchemeConfigDraft draft = new StateMachineSchemeConfigDraft();
+        draft.setSchemeId(schemeId);
+        draft.setOrganizationId(organizationId);
+        List<StateMachineSchemeConfigDraft> drafts = configDraftMapper.select(draft);
+        List<Long> newStateMachineIds = drafts.stream().map(StateMachineSchemeConfigDraft::getStateMachineId).collect(Collectors.toList());
+        newStateMachineIds.forEach(newStateMachineId->{
+            newStatusIds.addAll(smMap.get(newStateMachineId).stream().map(StatusDTO::getId).collect(Collectors.toList()));
+        });
+        changeMap.put("oldStatusIds",oldStatusIds.stream().distinct().collect(Collectors.toList()));
+        changeMap.put("newStatusIds",newStatusIds.stream().distinct().collect(Collectors.toList()));
+        return changeMap;
+    }
+
     @Override
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
+        //获取所有状态
+        List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+        Map<Long, StatusDTO> statusDTOMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId,x->x));
+        //获取所有状态机及状态机的状态列表
+        Map<String, List<Long>> changeMap = queryStatusIdsBySchemeId(organizationId,schemeId);
+        List<Long> oldStatusIds = changeMap.get("oldStatusIds");
+        List<Long> newStatusIds = changeMap.get("newStatusIds");
+        //减少的状态
+        List<Long> deleteStatusIds = new ArrayList<>(oldStatusIds);
+        deleteStatusIds.removeAll(newStatusIds);
+        //增加的状态
+        List<Long> addStatusIds = new ArrayList<>(newStatusIds);
+        addStatusIds.removeAll(oldStatusIds);
+
         //获取当前方案配置的项目列表
         List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
         //新增的状态机ids和删除的状态机ids
         List<Long> oldStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getOldStateMachineId).distinct().collect(Collectors.toList());
         List<Long> newStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getNewStateMachineId).distinct().collect(Collectors.toList());
         //新增的状态和删除的状态
-        List<StatusDTO> addStatuses = changeItems.stream().map(StateMachineSchemeChangeItem::getAddStatuses).flatMap(x -> x.stream()).distinct().collect(Collectors.toList());
-        List<StatusDTO> deleteStatuses = changeItems.stream().map(StateMachineSchemeChangeItem::getDeleteStatuses).flatMap(x -> x.stream()).distinct().collect(Collectors.toList());
+        List<StatusDTO> addStatuses = new ArrayList<>(addStatusIds.size());
+        List<StatusDTO> deleteStatuses = new ArrayList<>(deleteStatusIds.size());
+        deleteStatusIds.forEach(statusId->deleteStatuses.add(statusDTOMap.get(statusId)));
+        addStatusIds.forEach(statusId->addStatuses.add(statusDTOMap.get(statusId)));
+
         StateMachineSchemeDeployUpdateIssue deployUpdateIssue = new StateMachineSchemeDeployUpdateIssue();
         deployUpdateIssue.setChangeItems(changeItems);
         deployUpdateIssue.setProjectConfigs(projectConfigs);
@@ -339,24 +393,14 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             StateMachineWithStatusDTO newStateMachine = stateMachineMap.get(newStateMachineId);
             List<StatusDTO> oldSMStatuses = oldStateMachine.getStatusDTOS();
             List<StatusDTO> newSMStatuses = newStateMachine.getStatusDTOS();
-            List<StatusDTO> addStatuses = new ArrayList<>();
-            List<StatusDTO> deleteStatuses = new ArrayList<>();
             List<StateMachineSchemeStatusChangeItem> stateMachineSchemeStatusChangeItems = new ArrayList<>();
             List<Long> newSMStatusIds = newSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
-            List<Long> oldSMStatusIds = oldSMStatuses.stream().map(StatusDTO::getId).collect(Collectors.toList());
             StatusDTO newDefault = newSMStatuses.get(0);
             oldSMStatuses.forEach(oldSMStatus -> {
                 //如果旧的状态机中有的状态，新的状态机中没有，说明这个状态需要变更
                 if (!newSMStatusIds.contains(oldSMStatus.getId())) {
                     StateMachineSchemeStatusChangeItem stateMachineSchemeStatusChangeItem = new StateMachineSchemeStatusChangeItem(oldSMStatus, newDefault);
                     stateMachineSchemeStatusChangeItems.add(stateMachineSchemeStatusChangeItem);
-                    deleteStatuses.add(oldSMStatus);
-                }
-            });
-            newSMStatuses.forEach(newSMStatus -> {
-                //增加的状态
-                if (!oldSMStatusIds.contains(newSMStatus.getId())) {
-                    addStatuses.add(newSMStatus);
                 }
             });
             changeItem.setIssueTypeDTO(issueTypeMap.get(issueTypeId));
@@ -364,8 +408,6 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
             changeItem.setOldStateMachine(oldStateMachine);
             changeItem.setNewStateMachine(newStateMachine);
             changeItem.setStatusChangeItems(stateMachineSchemeStatusChangeItems);
-            changeItem.setAddStatuses(addStatuses);
-            changeItem.setDeleteStatuses(deleteStatuses);
         }
         //过滤掉状态不需要变更的问题类型
         changeItems = changeItems.stream().filter(changeItem -> !changeItem.getStatusChangeItems().isEmpty()).collect(Collectors.toList());

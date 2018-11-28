@@ -138,6 +138,7 @@ public class StateMachineServiceImpl implements StateMachineService {
                     notActiveStateMachineIds.add(stateMachineId);
                 }
             });
+            //使活跃的状态机变更为未活跃
             stateMachineClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
         }
     }
