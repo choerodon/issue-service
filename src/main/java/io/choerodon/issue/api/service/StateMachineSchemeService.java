@@ -95,4 +95,14 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param schemeId
      */
     void activeSchemeWithRefProjectConfig(Long schemeId);
+
+    /**
+     * 更新发布进度
+     *
+     * @param organizationId organizationId
+     * @param schemeId       schemeId
+     * @param deployProgress deployProgress
+     * @return Boolean
+     */
+    Boolean updateDeployProgress(Long organizationId, Long schemeId, Integer deployProgress);
 }

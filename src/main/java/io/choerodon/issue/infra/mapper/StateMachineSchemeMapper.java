@@ -17,7 +17,7 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
      * 分页查询状态方案
      *
      * @param scheme 状态机方案
-     * @param param 模糊查询参数
+     * @param param  模糊查询参数
      * @return 方案列表
      */
     List<StateMachineScheme> fulltextSearch(@Param("scheme") StateMachineScheme scheme, @Param("param") String param);
@@ -43,4 +43,14 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
      * @return
      */
     List<StateMachineScheme> queryByOrgId(@Param("organizationId") Long organizationId);
+
+    /**
+     * 更新发布进度
+     *
+     * @param organizationId organizationId
+     * @param schemeId       schemeId
+     * @param deployProgress deployProgress
+     * @return Integer
+     */
+    Integer updateDeployProgress(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId, @Param("deployProgress") Integer deployProgress);
 }

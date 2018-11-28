@@ -51,15 +51,4 @@ public interface AgileFeignClient {
                                                                   @PathVariable(name = "organization_id") Long organizationId,
                                                                   @RequestBody StateMachineSchemeDeployCheckIssue deployCheckIssue);
 
-    /**
-     * 状态机方案变更后批量更新issue的状态匹配
-     *
-     * @param organizationId
-     * @param deployUpdateIssue
-     * @return
-     */
-    @PostMapping("/v1/organizations/{organization_id}/state_machine/update_state_machine_scheme_change")
-    ResponseEntity<Boolean> updateStateMachineSchemeChange(@ApiParam(value = "组织id", required = true)
-                                                           @PathVariable(name = "organization_id") Long organizationId,
-                                                           @RequestBody StateMachineSchemeDeployUpdateIssue deployUpdateIssue);
 }

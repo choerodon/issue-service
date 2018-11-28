@@ -27,10 +27,6 @@ public class AgileFeignClientFallback implements AgileFeignClient {
         throw new CommonException("error.agileFeignClient.checkStateMachineSchemeChange");
     }
 
-    @Override
-    public ResponseEntity<Boolean> updateStateMachineSchemeChange(Long organizationId, StateMachineSchemeDeployUpdateIssue deployUpdateIssue) {
-        throw new CommonException("error.agileFeignClient.updateStateMachineSchemeChange");
-    }
 }
 
 

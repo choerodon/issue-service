@@ -37,4 +37,9 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme.groovy') {
             "update state_machine_scheme set status = 'active';"
         }
     }
+    changeSet(id: '2018-11-28-add-column-state-machine-scheme', author: 'dinghuang123@gmail.com') {
+        addColumn(tableName: 'state_machine_scheme') {
+            column(name: 'deploy_progress', type: 'int', remarks: '发布状态机方案更新agile服务进度', defaultValue: "0")
+        }
+    }
 }

@@ -1,5 +1,9 @@
 package io.choerodon.issue.api.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import io.choerodon.asgard.saga.annotation.Saga;
+import io.choerodon.asgard.saga.dto.StartInstanceDTO;
+import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
@@ -60,8 +64,12 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     private AgileFeignClient agileFeignClient;
     @Autowired
     private StateMachineService stateMachineService;
+    @Autowired
+    private SagaClient sagaClient;
 
     private ModelMapper modelMapper = new ModelMapper();
+
+    private static final String DEPLOY_STATE_MACHINE_SCHEME = "issue-deploy-statemachine-scheme";
 
     @Override
     @ChangeSchemeStatus
@@ -274,6 +282,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     }
 
     @Override
+    @Saga(code = DEPLOY_STATE_MACHINE_SCHEME, description = "issue服务发布状态机方案", inputSchemaClass = StateMachineSchemeDeployUpdateIssue.class)
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
         //获取所有状态
         List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
@@ -307,22 +316,22 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         deployUpdateIssue.setProjectConfigs(projectConfigs);
         deployUpdateIssue.setAddStatuses(addStatuses);
         deployUpdateIssue.setRemoveStatusWithProjects(removeStatusWithProjects);
+        deployUpdateIssue.setSchemeId(schemeId);
+        deployUpdateIssue.setOrganizationId(organizationId);
         //批量更新issue的状态
-        Boolean result = agileFeignClient.updateStateMachineSchemeChange(organizationId, deployUpdateIssue).getBody();
-        if (result) {
-            //复制草稿配置到发布配置
-            copyDraftToDeploy(true, organizationId, schemeId);
-            //更新状态机方案状态为：活跃
-            StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
-            scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-            stateMachineSchemeService.updateOptional(scheme, "status");
-            //活跃方案下的新增的状态机（状态为create的改成active）
-            stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
-            //使删除的状态机变成未活跃（状态为active和draft的改成create）
-            stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
-            //清理状态机实例【todo】
-        }
-        return result;
+        sagaClient.startSaga(DEPLOY_STATE_MACHINE_SCHEME, new StartInstanceDTO(JSON.toJSONString(deployUpdateIssue), "", ""));
+        //复制草稿配置到发布配置
+        copyDraftToDeploy(true, organizationId, schemeId);
+        //更新状态机方案状态为：活跃
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+        stateMachineSchemeService.updateOptional(scheme, "status");
+        //活跃方案下的新增的状态机（状态为create的改成active）
+        stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
+        //使删除的状态机变成未活跃（状态为active和draft的改成create）
+        stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
+        //清理状态机实例【todo】
+        return true;
     }
 
     @Override
