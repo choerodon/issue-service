@@ -28,9 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingLong;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 /**
  * @author shinan.chen
@@ -151,39 +149,47 @@ public class StateMachineServiceImpl implements StateMachineService {
     }
 
     @Override
-    public List<RemoveStatusWithProject> handleRemoveStatusByStateMachine(Long organizationId, Long stateMachineId, List<Status> deleteStatuses) {
+    public List<RemoveStatusWithProject> handleRemoveStatusByStateMachineId(Long organizationId, Long stateMachineId, List<Long> deleteStatusIds) {
+        //找到与状态机关联的状态机方案
+        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        List<RemoveStatusWithProject> removeStatusWithProjects = handleRemoveStatusBySchemeIds(organizationId, schemeIds, deleteStatusIds);
+        return removeStatusWithProjects;
+    }
+
+    @Override
+    public List<RemoveStatusWithProject> handleRemoveStatusBySchemeIds(Long organizationId, List<Long> schemeIds, List<Long> deleteStatusIds) {
         List<RemoveStatusWithProject> removeStatusWithProjects = new ArrayList<>();
+        if (schemeIds == null || schemeIds.isEmpty()) {
+            return removeStatusWithProjects;
+        }
         //获取所有状态机及状态机的状态列表
         List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineFeignClient.queryAllWithStatus(organizationId).getBody();
         Map<Long, List<StatusDTO>> stateMachineWithStatusDTOsMap = stateMachineWithStatusDTOs.stream().collect(Collectors.toMap(StateMachineWithStatusDTO::getId, StateMachineWithStatusDTO::getStatusDTOS));
         //查出组织下所有状态机方案配置
         List<StateMachineSchemeConfig> schemeConfigs = configMapper.queryByOrgId(organizationId);
         Map<Long, List<StateMachineSchemeConfig>> schemeConfigsMap = schemeConfigs.stream().collect(Collectors.groupingBy(StateMachineSchemeConfig::getSchemeId));
-        //找到与状态机关联的状态机方案
-        List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
-        if (!schemeIds.isEmpty()) {
-            //查出每个项目关联的状态机
-            List<ProjectConfig> projectConfigs = projectConfigMapper.handleRemoveStatusByStateMachine(schemeIds, SchemeType.STATE_MACHINE);
-            Map<Long, List<ProjectConfig>> projectMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getProjectId));
-            projectMap.entrySet().forEach(entry -> {
-                Long projectId = entry.getKey();
-                List<ProjectConfig> projectConfigsList = entry.getValue();
-                List<StatusDTO> statuses = new ArrayList<>();
-                projectConfigsList.forEach(projectConfig -> {
-                    schemeConfigsMap.get(projectConfig.getSchemeId()).forEach(schemeConfig -> {
-                        List<StatusDTO> statusDTOS = stateMachineWithStatusDTOsMap.get(schemeConfig.getStateMachineId());
-                        statuses.addAll(statusDTOS);
-                    });
-                });
-                List<Long> statusIds = statuses.stream().map(StatusDTO::getId).distinct().collect(Collectors.toList());
-                List<Long> deleteStatusIds = deleteStatuses.stream().map(Status::getId).filter(x->!statusIds.contains(x)).collect(toList());
 
-                RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();
-                removeStatusWithProject.setProjectId(projectId);
-                removeStatusWithProject.setDeleteStatusIds(deleteStatusIds);
-                removeStatusWithProjects.add(removeStatusWithProject);
+        //根据方案列表查出每个项目关联的状态机
+        List<ProjectConfig> projectConfigs = projectConfigMapper.handleRemoveStatus(schemeIds, SchemeType.STATE_MACHINE);
+        Map<Long, List<ProjectConfig>> projectMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getProjectId));
+        projectMap.entrySet().forEach(entry -> {
+            Long projectId = entry.getKey();
+            List<ProjectConfig> projectConfigsList = entry.getValue();
+            List<StatusDTO> statuses = new ArrayList<>();
+            projectConfigsList.forEach(projectConfig -> {
+                schemeConfigsMap.get(projectConfig.getSchemeId()).forEach(schemeConfig -> {
+                    List<StatusDTO> statusDTOS = stateMachineWithStatusDTOsMap.get(schemeConfig.getStateMachineId());
+                    statuses.addAll(statusDTOS);
+                });
             });
-        }
+            List<Long> statusIds = statuses.stream().map(StatusDTO::getId).distinct().collect(Collectors.toList());
+            List<Long> confirmDeleteStatusIds = deleteStatusIds.stream().filter(x -> !statusIds.contains(x)).collect(toList());
+
+            RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();
+            removeStatusWithProject.setProjectId(projectId);
+            removeStatusWithProject.setDeleteStatusIds(confirmDeleteStatusIds);
+            removeStatusWithProjects.add(removeStatusWithProject);
+        });
         return removeStatusWithProjects;
     }
 }

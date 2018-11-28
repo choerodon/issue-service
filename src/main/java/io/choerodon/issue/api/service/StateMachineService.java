@@ -69,7 +69,17 @@ public interface StateMachineService {
      *
      * @param organizationId
      * @param stateMachineId
-     * @param deleteStatuses
+     * @param deleteStatusIds
      */
-    List<RemoveStatusWithProject> handleRemoveStatusByStateMachine(Long organizationId, Long stateMachineId, List<Status> deleteStatuses);
+    List<RemoveStatusWithProject> handleRemoveStatusByStateMachineId(Long organizationId, Long stateMachineId, List<Long> deleteStatusIds);
+
+    /**
+     * 处理删除方案的某几个状态时，关联的哪几个项目哪几个状态可以删除
+     *
+     * @param organizationId
+     * @param schemeIds
+     * @param deleteStatusIds
+     * @return
+     */
+    List<RemoveStatusWithProject> handleRemoveStatusBySchemeIds(Long organizationId, List<Long> schemeIds, List<Long> deleteStatusIds);
 }

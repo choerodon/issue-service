@@ -25,7 +25,7 @@ public interface ProjectConfigMapper extends BaseMapper<ProjectConfig> {
      * @param schemeType
      * @return
      */
-    List<ProjectConfig> handleRemoveStatusByStateMachine(@Param("schemeIds") List<Long> schemeIds, @Param("schemeType") String schemeType);
+    List<ProjectConfig> handleRemoveStatus(@Param("schemeIds") List<Long> schemeIds, @Param("schemeType") String schemeType);
 
     List<ProjectConfig> queryByProjectIds(@Param("projectIds") List<Long> projectIds);
 

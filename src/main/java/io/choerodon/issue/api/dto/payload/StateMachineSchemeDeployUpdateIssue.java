@@ -12,8 +12,8 @@ import java.util.List;
 public class StateMachineSchemeDeployUpdateIssue {
     private List<StateMachineSchemeChangeItem> changeItems;
     private List<ProjectConfig> projectConfigs;
+    private List<RemoveStatusWithProject> removeStatusWithProjects;
     private List<StatusDTO> addStatuses;
-    private List<StatusDTO> deleteStatuses;
 
     public List<ProjectConfig> getProjectConfigs() {
         return projectConfigs;
@@ -39,11 +39,11 @@ public class StateMachineSchemeDeployUpdateIssue {
         this.addStatuses = addStatuses;
     }
 
-    public List<StatusDTO> getDeleteStatuses() {
-        return deleteStatuses;
+    public List<RemoveStatusWithProject> getRemoveStatusWithProjects() {
+        return removeStatusWithProjects;
     }
 
-    public void setDeleteStatuses(List<StatusDTO> deleteStatuses) {
-        this.deleteStatuses = deleteStatuses;
+    public void setRemoveStatusWithProjects(List<RemoveStatusWithProject> removeStatusWithProjects) {
+        this.removeStatusWithProjects = removeStatusWithProjects;
     }
 }

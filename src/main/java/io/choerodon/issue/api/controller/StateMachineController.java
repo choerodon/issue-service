@@ -73,11 +73,11 @@ public class StateMachineController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "【内部调用】状态机删除节点的数据处理")
-    @PostMapping(value = "/handle_remove_status_by_state_machine")
-    public ResponseEntity<List<RemoveStatusWithProject>> handleRemoveStatusByStateMachine(@PathVariable("organization_id") Long organizationId,
+    @PostMapping(value = "/handle_remove_status_by_state_machine_id")
+    public ResponseEntity<List<RemoveStatusWithProject>> handleRemoveStatusByStateMachineId(@PathVariable("organization_id") Long organizationId,
                                                                                           @RequestParam("stateMachineId") Long stateMachineId,
-                                                                                          @RequestBody List<Status> deleteStatuses) {
-        return Optional.ofNullable(stateMachineService.handleRemoveStatusByStateMachine(organizationId, stateMachineId, deleteStatuses))
+                                                                                          @RequestBody List<Long> deleteStatusIds) {
+        return Optional.ofNullable(stateMachineService.handleRemoveStatusByStateMachineId(organizationId, stateMachineId, deleteStatusIds))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
     }

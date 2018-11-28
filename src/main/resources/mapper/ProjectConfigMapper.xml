@@ -20,7 +20,7 @@
         </if>
     </select>
 
-    <select id="handleRemoveStatusByStateMachine" resultType="io.choerodon.issue.domain.ProjectConfig">
+    <select id="handleRemoveStatus" resultType="io.choerodon.issue.domain.ProjectConfig">
         SELECT *
         FROM project_config
         WHERE scheme_type = #{schemeType}
