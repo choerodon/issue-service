@@ -7,7 +7,6 @@ import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
-import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -84,7 +83,7 @@ public interface StateMachineFeignClient {
     ResponseEntity<StatusDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
 
     /**
-     * 根据id获取状态
+     * 根据知足id获取状态
      *
      * @param organizationId
      * @return
@@ -154,6 +153,17 @@ public interface StateMachineFeignClient {
     @PostMapping(value = "/v1/organizations/{organization_id}/state_machines/active_state_machines")
     ResponseEntity<Boolean> activeStateMachines(@PathVariable("organization_id") Long organizationId,
                                                 @RequestBody List<Long> stateMachineIds);
+
+    /**
+     * 批量使活跃状态机变成未活跃
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     * @return
+     */
+    @PostMapping(value = "/v1/organizations/{organization_id}/state_machines/not_active_state_machines")
+    ResponseEntity<Boolean> notActiveStateMachines(@PathVariable("organization_id") Long organizationId,
+                                                   @RequestBody List<Long> stateMachineIds);
 
     /**
      * 获取组织下所有状态机，包含状态

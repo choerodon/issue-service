@@ -14,4 +14,17 @@
         AND smsc.is_default = 1
     </select>
 
+    <select id="queryByStateMachineIds" resultType="io.choerodon.issue.domain.StateMachineSchemeConfig">
+        SELECT
+        smsc.*
+        FROM
+        state_machine_scheme_config smsc
+        WHERE
+        smsc.organization_id = #{organizationId}
+        AND smsc.state_machine_id IN
+        <foreach item="item" index="index" collection="stateMachineIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
 </mapper>

@@ -8,6 +8,7 @@ import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.infra.enums.CloopmCommonString;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -56,6 +58,8 @@ public class StateMachineServiceImpl implements StateMachineService {
     private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
     @Autowired
     private AgileFeignClient agileFeignClient;
+    @Autowired
+    private StateMachineSchemeConfigMapper configMapper;
 
     @Override
     public ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
@@ -119,5 +123,23 @@ public class StateMachineServiceImpl implements StateMachineService {
         });
         Map<String, Object> result = agileFeignClient.checkDeleteNode(organizationId, statusId, projectConfigs).getBody();
         return result;
+    }
+
+    @Override
+    public void notActiveStateMachine(Long organizationId, List<Long> stateMachineIds) {
+        List<Long> notActiveStateMachineIds = new ArrayList<>();
+        if (!stateMachineIds.isEmpty()) {
+            //校验去掉仍然有关联方案的状态机
+            List<StateMachineSchemeConfig> configs = configMapper.queryByStateMachineIds(organizationId, stateMachineIds);
+            Map<Long, List<StateMachineSchemeConfig>> configMap = configs.stream().collect(Collectors.groupingBy(StateMachineSchemeConfig::getStateMachineId));
+            stateMachineIds.forEach(stateMachineId -> {
+                List<StateMachineSchemeConfig> configList = configMap.get(stateMachineId);
+                if (configList == null || configList.isEmpty()) {
+                    notActiveStateMachineIds.add(stateMachineId);
+                }
+            });
+            //使活跃的状态机变更为未活跃
+            stateMachineClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
+        }
     }
 }

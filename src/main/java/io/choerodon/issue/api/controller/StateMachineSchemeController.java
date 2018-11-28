@@ -110,13 +110,6 @@ public class StateMachineSchemeController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "根据状态机id查询所使用到该状态机的方案【发布】")
-    @GetMapping(value = "/query_scheme/{state_machine_id}")
-    public ResponseEntity<List<StateMachineSchemeDTO>> querySchemeByStateMachineId(@PathVariable("organization_id") Long organizationId, @PathVariable(value = "state_machine_id") Long stateMachineId) {
-        return new ResponseEntity<>(schemeService.querySchemeByStateMachineId(organizationId, stateMachineId), HttpStatus.OK);
-    }
-
-    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验发布状态机方案")
     @GetMapping(value = "/check_deploy/{scheme_id}")
     public ResponseEntity<List<StateMachineSchemeChangeItem>> checkDeploy(@PathVariable("organization_id") Long organizationId,

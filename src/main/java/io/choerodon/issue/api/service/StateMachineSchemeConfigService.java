@@ -129,6 +129,15 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      */
     StateMachineSchemeDTO deleteDraft(Long organizationId, Long schemeId);
 
+
+    /**
+     * 把活跃的配置写到到草稿中，id一致
+     *
+     * @param organizationId
+     * @param schemeId
+     */
+    void copyDeployToDraft(Boolean isDeleteOldDeploy, Long organizationId, Long schemeId);
+
     /**
      * 清除发布配置，复制草稿配置给发布配置
      *
@@ -136,5 +145,4 @@ public interface StateMachineSchemeConfigService extends BaseService<StateMachin
      * @param schemeId
      */
     void copyDraftToDeploy(Boolean isDeleteOldDeploy, Long organizationId, Long schemeId);
-
 }

@@ -137,7 +137,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
         //若是关联状态机方案，设置状态机方案、状态机为活跃
         if (schemeType.equals(SchemeType.STATE_MACHINE)) {
-            stateMachineSchemeService.activeScheme(schemeId);
+            stateMachineSchemeService.activeSchemeWithRefProjectConfig(schemeId);
         }
         return projectConfig;
     }

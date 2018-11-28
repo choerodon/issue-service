@@ -45,7 +45,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Autowired
     private IssueTypeMapper issueTypeMapper;
     @Autowired
-    private StateMachineFeignClient stateMachineServiceFeign;
+    private StateMachineFeignClient stateMachineFeignClient;
     @Autowired
     private ProjectUtil projectUtil;
     @Autowired
@@ -54,11 +54,6 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private UserFeignClient userFeignClient;
 
     private ModelMapper modelMapper = new ModelMapper();
-
-    @Override
-    public void setFeign(StateMachineFeignClient stateMachineServiceFeign) {
-        this.stateMachineServiceFeign = stateMachineServiceFeign;
-    }
 
     @Override
     public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
@@ -92,7 +87,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                             configDTO.setIssueTypeIcon("style");
                             configDTO.setIssueTypeColour("#808080");
                         }
-                        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
+                        StateMachineDTO stateMachineDTO = stateMachineFeignClient.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
                         configDTO.setStateMachineName(stateMachineDTO.getName());
                     }
                 }
@@ -120,7 +115,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         }
 
         //创建一个defaultConfig
-        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryDefaultStateMachine(organizationId).getBody();
+        StateMachineDTO stateMachineDTO = stateMachineFeignClient.queryDefaultStateMachine(organizationId).getBody();
         configService.createDefaultConfig(organizationId, scheme.getId(), stateMachineDTO.getId());
 
         scheme = schemeMapper.selectByPrimaryKey(scheme);
@@ -198,7 +193,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         for (Map.Entry<Long, List<IssueType>> entry : map.entrySet()) {
             Long stateMachineId = entry.getKey();
             List<IssueType> issueTypes = entry.getValue();
-            StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, stateMachineId).getBody();
+            StateMachineDTO stateMachineDTO = stateMachineFeignClient.queryStateMachineById(organizationId, stateMachineId).getBody();
             StateMachineSchemeConfigViewDTO viewDTO = new StateMachineSchemeConfigViewDTO();
             viewDTO.setStateMachineDTO(stateMachineDTO);
             List<IssueTypeDTO> issueTypeDTOs = modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
@@ -220,9 +215,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
      */
     private StateMachineSchemeConfigViewDTO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueType>> map) {
         StateMachineSchemeConfigViewDTO firstDTO = new StateMachineSchemeConfigViewDTO();
-        StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, defaultStateMachineId).getBody();
+        StateMachineDTO stateMachineDTO = stateMachineFeignClient.queryStateMachineById(organizationId, defaultStateMachineId).getBody();
         firstDTO.setStateMachineDTO(stateMachineDTO);
-        firstDTO.setIssueTypeDTOs(modelMapper.map(map.get(defaultStateMachineId), new TypeToken<List<IssueTypeDTO>>() {
+        firstDTO.setIssueTypeDTOs(modelMapper.map(map.get(defaultStateMachineId), new TypeToken<ArrayList<IssueTypeDTO>>() {
         }.getType()));
         map.remove(defaultStateMachineId);
         return firstDTO;
@@ -243,9 +238,12 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public List<StateMachineSchemeDTO> querySchemeByStateMachineId(Long organizationId, Long stateMachineId) {
-        List<Long> schemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
-        if (!schemeIds.isEmpty()) {
-            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, schemeIds);
+        List<Long> deploySchemeIds = configService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
+        List<Long> draftSchemeIds = configService.querySchemeIdsByStateMachineId(true, organizationId, stateMachineId);
+        deploySchemeIds.addAll(draftSchemeIds);
+        deploySchemeIds = deploySchemeIds.stream().distinct().collect(Collectors.toList());
+        if (!deploySchemeIds.isEmpty()) {
+            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, deploySchemeIds);
             if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
                 return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeDTO>>() {
                 }.getType());
@@ -273,7 +271,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private void initScheme(String name, String schemeApplyType, ProjectEvent projectEvent) {
         Long projectId = projectEvent.getProjectId();
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        Long stateMachineId = stateMachineServiceFeign.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent).getBody();
+        Long stateMachineId = stateMachineFeignClient.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent).getBody();
 
         StateMachineScheme scheme = new StateMachineScheme();
         scheme.setStatus(StateMachineSchemeStatus.CREATE);
@@ -296,7 +294,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public void activeScheme(Long schemeId) {
+    public void activeSchemeWithRefProjectConfig(Long schemeId) {
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         //活跃状态机方案
         if (scheme.getStatus().equals(StateMachineSchemeStatus.CREATE)) {
@@ -306,10 +304,10 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 throw new CommonException("error.stateMachineScheme.activeScheme");
             }
         }
-        //复制草稿配置到活跃
+        //复制草稿配置到发布
         configService.copyDraftToDeploy(false, scheme.getOrganizationId(), schemeId);
         //活跃方案下的所有新建状态机
         List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
-        stateMachineServiceFeign.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));
+        stateMachineFeignClient.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));
     }
 }

@@ -74,7 +74,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
     Boolean checkName(Long organizationId, Long schemeId, String name);
 
     /**
-     * 根据状态机id查询所使用到该状态机的方案
+     * 根据状态机id查询所使用到该状态机的方案，包含发布使用与草稿使用
      *
      * @param organizationId 组织id
      * @param stateMachineId 状态机id
@@ -90,16 +90,9 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
     void initByConsumeCreateProject(ProjectEvent projectEvent);
 
     /**
-     * 单元测试mock feign用
-     *
-     * @param stateMachineServiceFeign stateMachineServiceFeign
-     */
-    void setFeign(StateMachineFeignClient stateMachineServiceFeign);
-
-    /**
      * 若项目关联状态机方案，设置状态机方案、状态机为活跃
      *
      * @param schemeId
      */
-    void activeScheme(Long schemeId);
+    void activeSchemeWithRefProjectConfig(Long schemeId);
 }
