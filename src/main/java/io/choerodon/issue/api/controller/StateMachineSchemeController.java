@@ -133,4 +133,12 @@ public class StateMachineSchemeController {
                                                              @PathVariable("scheme_id") Long stateMachineId) {
         return new ResponseEntity<>(configService.deleteDraft(organizationId, stateMachineId), HttpStatus.NO_CONTENT);
     }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "更新状态机方案发布进度【内部调用】")
+    @PutMapping(value = "/{scheme_id}")
+    public ResponseEntity<Boolean> updateDeployProgress(@PathVariable("organization_id") Long organizationId, @PathVariable("scheme_id") Long schemeId,
+                                                        @RequestParam Integer deployProgress) {
+        return new ResponseEntity<>(schemeService.updateDeployProgress(organizationId, schemeId, deployProgress), HttpStatus.OK);
+    }
 }

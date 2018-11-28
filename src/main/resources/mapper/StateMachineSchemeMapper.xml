@@ -93,4 +93,11 @@
         WHERE SMS.organization_id = #{organizationId}
     </select>
 
+    <update id="updateDeployProgress">
+        UPDATE state_machine_scheme
+        SET deploy_progress = #{deployProgress}
+        WHERE organization_id = #{organizationId}
+        and scheme_id = #{schemeId}
+    </update>
+
 </mapper>

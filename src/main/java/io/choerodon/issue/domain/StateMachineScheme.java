@@ -25,11 +25,20 @@ public class StateMachineScheme extends AuditDomain {
     private String description;
     private String status;
     private Long organizationId;
+    private Integer deployProgress;
 
     @Transient
     private List<StateMachineSchemeConfig> schemeConfigs;
     @Transient
     private List<ProjectConfig> projectConfigs;
+
+    public Integer getDeployProgress() {
+        return deployProgress;
+    }
+
+    public void setDeployProgress(Integer deployProgress) {
+        this.deployProgress = deployProgress;
+    }
 
     public String getStatus() {
         return status;

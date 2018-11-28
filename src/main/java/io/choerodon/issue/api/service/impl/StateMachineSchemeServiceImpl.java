@@ -310,4 +310,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         List<StateMachineSchemeConfigDTO> configs = configService.queryBySchemeId(false, scheme.getOrganizationId(), schemeId);
         stateMachineFeignClient.activeStateMachines(scheme.getOrganizationId(), configs.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).distinct().collect(Collectors.toList()));
     }
+
+    @Override
+    public Boolean updateDeployProgress(Long organizationId, Long schemeId, Integer deployProgress) {
+        return schemeMapper.updateDeployProgress(organizationId, schemeId, deployProgress) == 1;
+    }
 }
