@@ -15,4 +15,6 @@ public interface StateMachineSchemeConfigMapper extends BaseMapper<StateMachineS
     StateMachineSchemeConfig selectDefault(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId);
 
     List<StateMachineSchemeConfig> queryByStateMachineIds(@Param("organizationId") Long organizationId, @Param("stateMachineIds") List<Long> stateMachineIds);
+
+    List<StateMachineSchemeConfig> queryByOrgId(@Param("organizationId") Long organizationId);
 }

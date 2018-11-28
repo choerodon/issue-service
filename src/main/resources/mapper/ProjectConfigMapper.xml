@@ -20,6 +20,23 @@
         </if>
     </select>
 
+    <select id="handleRemoveStatus" resultType="io.choerodon.issue.domain.ProjectConfig">
+        SELECT *
+        FROM project_config
+        WHERE scheme_type = #{schemeType}
+        AND project_id IN(
+        SELECT pc.project_id
+        FROM project_config pc
+        WHERE pc.scheme_type = #{schemeType}
+        <if test="schemeIds != null and schemeIds.size()>0">
+            AND pc.scheme_id IN
+            <foreach item="item" index="index" collection="schemeIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        )
+    </select>
+
     <select id="queryBySchemeTypeAndApplyType" resultType="io.choerodon.issue.domain.ProjectConfig">
         SELECT *
         FROM project_config

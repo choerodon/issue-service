@@ -35,4 +35,12 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
      * @return 方案列表
      */
     List<StateMachineScheme> queryByIds(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
+
+    /**
+     * 查询出组织下所有方案
+     *
+     * @param organizationId
+     * @return
+     */
+    List<StateMachineScheme> queryByOrgId(@Param("organizationId") Long organizationId);
 }

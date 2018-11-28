@@ -27,4 +27,13 @@
         </foreach>
     </select>
 
+    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.StateMachineSchemeConfig">
+        SELECT
+        smsc.*
+        FROM
+        state_machine_scheme_config smsc
+        WHERE
+        smsc.organization_id = #{organizationId}
+    </select>
+
 </mapper>
