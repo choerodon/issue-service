@@ -3,7 +3,6 @@ package io.choerodon.issue.api.service.impl;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
-import io.choerodon.issue.api.dto.Status;
 import io.choerodon.issue.api.dto.payload.RemoveStatusWithProject;
 import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
@@ -19,6 +18,8 @@ import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.mapper.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ import static java.util.stream.Collectors.*;
 @Component
 public class StateMachineServiceImpl implements StateMachineService {
 
+    private static final Logger logger = LoggerFactory.getLogger(StateMachineServiceImpl.class);
     @Value("${spring.application.name:default}")
     private String serverCode;
     @Autowired
@@ -144,7 +146,10 @@ public class StateMachineServiceImpl implements StateMachineService {
                 }
             });
             //使活跃的状态机变更为未活跃
-            stateMachineClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
+            logger.info("notActiveStateMachine: {}", stateMachineIds.toString());
+            if (!stateMachineIds.isEmpty()) {
+                stateMachineClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
+            }
         }
     }
 
@@ -185,7 +190,7 @@ public class StateMachineServiceImpl implements StateMachineService {
             List<Long> statusIds = statuses.stream().map(StatusDTO::getId).distinct().collect(Collectors.toList());
             List<Long> confirmDeleteStatusIds = deleteStatusIds.stream().filter(x -> !statusIds.contains(x)).collect(toList());
 
-            if(!confirmDeleteStatusIds.isEmpty()){
+            if (!confirmDeleteStatusIds.isEmpty()) {
                 RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();
                 removeStatusWithProject.setProjectId(projectId);
                 removeStatusWithProject.setDeleteStatusIds(confirmDeleteStatusIds);

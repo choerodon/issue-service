@@ -327,9 +327,13 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
         stateMachineSchemeService.updateOptional(scheme, "status");
         //活跃方案下的新增的状态机（状态为create的改成active）
-        stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
+        if (!newStateMachineIds.isEmpty()) {
+            stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
+        }
         //使删除的状态机变成未活跃（状态为active和draft的改成create）
-        stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
+        if (!oldStateMachineIds.isEmpty()) {
+            stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
+        }
         //清理状态机实例【todo】
         return true;
     }
