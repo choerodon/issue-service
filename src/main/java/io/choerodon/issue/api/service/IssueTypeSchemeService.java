@@ -2,6 +2,8 @@ package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
+import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO;
+import io.choerodon.issue.api.dto.IssueTypeSchemeWithInfoDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.IssueTypeScheme;
 import io.choerodon.core.domain.Page;
@@ -62,15 +64,15 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      */
     Boolean delete(Long organizationId, Long issueTypeSchemeId);
 
-    /**
-     * 分页
-     *
-     * @param pageRequest
-     * @param issueTypeSchemeDTO
-     * @param param
-     * @return
-     */
-    Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param);
+//    /**
+//     * 分页
+//     *
+//     * @param pageRequest
+//     * @param issueTypeSchemeDTO
+//     * @param param
+//     * @return
+//     */
+//    Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param);
 
     /**
      * 校验方案名是否可用
@@ -106,4 +108,6 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      * @return
      */
     void initByConsumeCreateProject(Long projectId, String projectCode);
+
+    Page<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeDTO);
 }

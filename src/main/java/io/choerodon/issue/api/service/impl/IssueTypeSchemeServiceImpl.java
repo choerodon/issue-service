@@ -4,14 +4,13 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
+import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO;
+import io.choerodon.issue.api.dto.IssueTypeSchemeWithInfoDTO;
 import io.choerodon.issue.api.service.IssueTypeSchemeService;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.api.service.ProjectConfigService;
-import io.choerodon.issue.domain.IssueType;
-import io.choerodon.issue.domain.IssueTypeScheme;
-import io.choerodon.issue.domain.IssueTypeSchemeConfig;
-import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.domain.*;
 import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
@@ -176,30 +175,30 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         return true;
     }
 
-    @Override
-    public Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param) {
-        IssueTypeScheme issueTypeScheme = modelMapper.map(issueTypeSchemeDTO, IssueTypeScheme.class);
-
-        Page<IssueTypeScheme> pages = PageHelper.doPageAndSort(pageRequest,
-                () -> issueTypeSchemeMapper.fulltextSearch(issueTypeScheme, param));
-        List<IssueTypeScheme> content = pages.getContent();
-        List<IssueTypeSchemeDTO> contentDTO = modelMapper.map(content, new TypeToken<List<IssueTypeSchemeDTO>>() {
-        }.getType());
-        for (IssueTypeSchemeDTO scheme : contentDTO) {
-            //根据方案配置表获取 问题类型
-            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(scheme.getOrganizationId(), scheme.getId());
-            scheme.setIssueTypes(modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
-            }.getType()));
-        }
-        Page<IssueTypeSchemeDTO> pagesDTO = new Page<>();
-        pagesDTO.setNumber(pages.getNumber());
-        pagesDTO.setNumberOfElements(pages.getNumberOfElements());
-        pagesDTO.setSize(pages.getSize());
-        pagesDTO.setTotalElements(pages.getTotalElements());
-        pagesDTO.setTotalPages(pages.getTotalPages());
-        pagesDTO.setContent(contentDTO);
-        return pagesDTO;
-    }
+//    @Override
+//    public Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param) {
+//        IssueTypeScheme issueTypeScheme = modelMapper.map(issueTypeSchemeDTO, IssueTypeScheme.class);
+//
+//        Page<IssueTypeScheme> pages = PageHelper.doPageAndSort(pageRequest,
+//                () -> issueTypeSchemeMapper.fulltextSearch(issueTypeScheme, param));
+//        List<IssueTypeScheme> content = pages.getContent();
+//        List<IssueTypeSchemeDTO> contentDTO = modelMapper.map(content, new TypeToken<List<IssueTypeSchemeDTO>>() {
+//        }.getType());
+//        for (IssueTypeSchemeDTO scheme : contentDTO) {
+//            //根据方案配置表获取 问题类型
+//            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(scheme.getOrganizationId(), scheme.getId());
+//            scheme.setIssueTypes(modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
+//            }.getType()));
+//        }
+//        Page<IssueTypeSchemeDTO> pagesDTO = new Page<>();
+//        pagesDTO.setNumber(pages.getNumber());
+//        pagesDTO.setNumberOfElements(pages.getNumberOfElements());
+//        pagesDTO.setSize(pages.getSize());
+//        pagesDTO.setTotalElements(pages.getTotalElements());
+//        pagesDTO.setTotalPages(pages.getTotalPages());
+//        pagesDTO.setContent(contentDTO);
+//        return pagesDTO;
+//    }
 
     @Override
     public Boolean checkName(Long organizationId, String name, Long id) {
@@ -275,6 +274,26 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         } else {
             return issueTypes;
         }
+    }
+
+    @Override
+    public Page<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO) {
+        Page<Long> issueTypeSchemeIdsPage = PageHelper.doPageAndSort(pageRequest, () -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchDTO));
+        List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getContent());
+        List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoDTOList = modelMapper.map(issueTypeSchemeWithInfoList, new TypeToken<List<IssueTypeSchemeWithInfoDTO>>(){}.getType());
+        for (IssueTypeSchemeWithInfoDTO type : issueTypeSchemeWithInfoDTOList) {
+            for (ProjectWithInfo projectWithInfo : type.getProjectWithInfoList()) {
+                projectWithInfo.setProjectName(projectUtil.getName(projectWithInfo.getProjectId()));
+            }
+        }
+        Page<IssueTypeSchemeWithInfoDTO> returnPage = new Page<>();
+        returnPage.setContent(issueTypeSchemeWithInfoDTOList);
+        returnPage.setNumber(issueTypeSchemeIdsPage.getNumber());
+        returnPage.setNumberOfElements(issueTypeSchemeIdsPage.getNumberOfElements());
+        returnPage.setSize(issueTypeSchemeIdsPage.getSize());
+        returnPage.setTotalElements(issueTypeSchemeIdsPage.getTotalElements());
+        returnPage.setTotalPages(issueTypeSchemeIdsPage.getTotalPages());
+        return returnPage;
     }
 
     /**

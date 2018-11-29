@@ -3,8 +3,11 @@ package io.choerodon.issue.api.controller;
 import io.choerodon.core.base.BaseController;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
+import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
+import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
@@ -13,6 +16,7 @@ import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,21 +70,37 @@ public class IssueTypeController extends BaseController {
         return new ResponseEntity<>(issueTypeService.delete(organizationId, issueTypeId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+//    @Permission(level = ResourceLevel.ORGANIZATION)
+//    @ApiOperation(value = "分页查询问题类型列表")
+//    @CustomPageRequest
+//    @GetMapping
+//    public ResponseEntity<Page<IssueTypeDTO>> pageQuery(@ApiIgnore
+//                                                        @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+//                                                        @PathVariable("organization_id") Long organizationId,
+//                                                        @RequestParam(required = false) String name,
+//                                                        @RequestParam(required = false) String description,
+//                                                        @RequestParam(required = false) String[] param) {
+//        IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
+//        issueTypeDTO.setOrganizationId(organizationId);
+//        issueTypeDTO.setName(name);
+//        issueTypeDTO.setDescription(description);
+//        return new ResponseEntity<>(issueTypeService.pageQuery(pageRequest, issueTypeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
+//    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.ORGANIZATION_ADMINISTRATOR, InitRoleCode.ORGANIZATION_MEMBER})
     @ApiOperation(value = "分页查询问题类型列表")
     @CustomPageRequest
-    @GetMapping
-    public ResponseEntity<Page<IssueTypeDTO>> pageQuery(@ApiIgnore
-                                                        @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                        @PathVariable("organization_id") Long organizationId,
-                                                        @RequestParam(required = false) String name,
-                                                        @RequestParam(required = false) String description,
-                                                        @RequestParam(required = false) String[] param) {
-        IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
-        issueTypeDTO.setOrganizationId(organizationId);
-        issueTypeDTO.setName(name);
-        issueTypeDTO.setDescription(description);
-        return new ResponseEntity<>(issueTypeService.pageQuery(pageRequest, issueTypeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
+    @PostMapping("/list")
+    public ResponseEntity<Page<IssueTypeWithInfoDTO>> queryIssueTypeList(@ApiIgnore
+                                                                         @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                         @ApiParam(value = "组织id", required = true)
+                                                                         @PathVariable("organization_id") Long organizationId,
+                                                                         @ApiParam(value = "issueTypeSearchDTO", required = true)
+                                                                         @RequestBody IssueTypeSearchDTO issueTypeSearchDTO) {
+        return Optional.ofNullable(issueTypeService.queryIssueTypeList(pageRequest, organizationId, issueTypeSearchDTO))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.issueTypeList.get"));
+
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

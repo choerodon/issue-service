@@ -29,6 +29,10 @@ public class ProjectUtil {
         return queryProject(projectId).getCode();
     }
 
+    public String getName(Long projectId) {
+        return queryProject(projectId).getName();
+    }
+
     private ProjectDTO queryProject(Long projectId) {
         ProjectDTO projectDTO = map.get(projectId);
         if (projectDTO != null) {
