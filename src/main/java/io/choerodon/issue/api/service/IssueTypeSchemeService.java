@@ -64,14 +64,14 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      */
     Boolean delete(Long organizationId, Long issueTypeSchemeId);
 
-    /**
-     * 分页
-     *
-     * @param pageRequest
-     * @param issueTypeSchemeDTO
-     * @param param
-     * @return
-     */
+//    /**
+//     * 分页
+//     *
+//     * @param pageRequest
+//     * @param issueTypeSchemeDTO
+//     * @param param
+//     * @return
+//     */
 //    Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param);
 
     /**
