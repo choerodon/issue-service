@@ -32,6 +32,8 @@ import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,7 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMachineSchemeConfigDraft> implements StateMachineSchemeConfigService {
 
+    private static final Logger logger = LoggerFactory.getLogger(StateMachineSchemeConfigServiceImpl.class);
     @Autowired
     private StateMachineSchemeConfigMapper configMapper;
     @Autowired
@@ -285,10 +288,11 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     @Override
     @Saga(code = DEPLOY_STATE_MACHINE_SCHEME, description = "issue服务发布状态机方案", inputSchemaClass = StateMachineSchemeDeployUpdateIssue.class)
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
+        logger.info("deploy stateMachine scheme: {}",changeItems.toString());
         //获取所有状态
         List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
         Map<Long, StatusDTO> statusDTOMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
-        //获取所有状态机及状态机的状态列表
+        //获取当前方案增加的状态和减少的状态
         Map<String, List<Long>> changeMap = queryStatusIdsBySchemeId(organizationId, schemeId);
         List<Long> oldStatusIds = changeMap.get("oldStatusIds");
         List<Long> newStatusIds = changeMap.get("newStatusIds");
@@ -299,7 +303,14 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         List<Long> addStatusIds = new ArrayList<>(newStatusIds);
         addStatusIds.removeAll(oldStatusIds);
 
-        //处理减少的状态
+        //复制草稿配置到发布配置
+        copyDraftToDeploy(true, organizationId, schemeId);
+        //更新状态机方案状态为：活跃
+        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
+        stateMachineSchemeService.updateOptional(scheme, "status");
+
+        //处理减少的状态，要在草稿配置发布之后
         List<RemoveStatusWithProject> removeStatusWithProjects = stateMachineService.handleRemoveStatusBySchemeIds(organizationId, Arrays.asList(schemeId), deleteStatusIds);
         //获取当前方案配置的项目列表
         List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
@@ -320,12 +331,6 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         deployUpdateIssue.setUserId(DetailsHelper.getUserDetails().getUserId());
         //批量更新issue的状态
         sagaClient.startSaga(DEPLOY_STATE_MACHINE_SCHEME, new StartInstanceDTO(JSON.toJSONString(deployUpdateIssue), "", ""));
-        //复制草稿配置到发布配置
-        copyDraftToDeploy(true, organizationId, schemeId);
-        //更新状态机方案状态为：活跃
-        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
-        scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-        stateMachineSchemeService.updateOptional(scheme, "status");
         //活跃方案下的新增的状态机（状态为create的改成active）
         if (!newStateMachineIds.isEmpty()) {
             stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
