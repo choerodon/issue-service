@@ -160,12 +160,12 @@ public class StateMachineServiceImpl implements StateMachineService {
     public DeployStateMachinePayload handleStateMachineChangeStatusByStateMachineId(Long organizationId, Long stateMachineId, ChangeStatus changeStatus) {
         //找到与状态机关联的状态机方案
         List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
-        DeployStateMachinePayload deployStateMachinePayload = handleStateMachineChangeStatusBySchemeIds(organizationId, stateMachineId, schemeIds, changeStatus);
+        DeployStateMachinePayload deployStateMachinePayload = handleStateMachineChangeStatusBySchemeIds(organizationId, stateMachineId, null, schemeIds, changeStatus);
         return deployStateMachinePayload;
     }
 
     @Override
-    public DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long stateMachineId, List<Long> schemeIds, ChangeStatus changeStatus) {
+    public DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long ignoreStateMachineId, Long ignoreSchemeId, List<Long> schemeIds, ChangeStatus changeStatus) {
         if (schemeIds == null || schemeIds.isEmpty()) {
             return null;
         }
@@ -190,20 +190,24 @@ public class StateMachineServiceImpl implements StateMachineService {
             List<ProjectConfig> projectConfigsList = entry.getValue();
             List<StatusDTO> statuses = new ArrayList<>();
             projectConfigsList.forEach(projectConfig -> {
-                schemeConfigsMap.get(projectConfig.getSchemeId()).forEach(schemeConfig -> {
-                    Long smId = schemeConfig.getStateMachineId();
-                    //排除当前修改的状态机，要判断当前项目下其他状态机是否有当前要判断的状态
-                    if (!smId.equals(stateMachineId)) {
-                        List<StatusDTO> statusDTOS = stateMachineWithStatusDTOsMap.get(smId);
-                        statuses.addAll(statusDTOS);
-                    }
-                });
+                Long schemeId = projectConfig.getSchemeId();
+                //忽略当前修改的状态机方案，要判断当前项目下其他方案下的状态机是否有当前要判断的状态
+                if (!schemeId.equals(ignoreSchemeId)) {
+                    schemeConfigsMap.get(schemeId).forEach(schemeConfig -> {
+                        Long smId = schemeConfig.getStateMachineId();
+                        //忽略当前修改的状态机，要判断当前项目下其他状态机是否有当前要判断的状态
+                        if (!smId.equals(ignoreStateMachineId)) {
+                            List<StatusDTO> statusDTOS = stateMachineWithStatusDTOsMap.get(smId);
+                            statuses.addAll(statusDTOS);
+                        }
+                    });
+                }
             });
             List<Long> statusIds = statuses.stream().map(StatusDTO::getId).distinct().collect(Collectors.toList());
             //取当前项目真正减少的状态
             List<Long> confirmDeleteStatusIds = deleteStatusIds.stream().filter(x -> !statusIds.contains(x)).collect(toList());
             //取当前项目真正增加的状态
-            List<Long> confirmAddStatusIds = addStatusIds.stream().filter(x -> !schemeIds.contains(x)).collect(toList());
+            List<Long> confirmAddStatusIds = addStatusIds.stream().filter(x -> !statusIds.contains(x)).collect(toList());
 
             if (!confirmDeleteStatusIds.isEmpty()) {
                 RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();

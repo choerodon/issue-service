@@ -69,7 +69,8 @@ public interface StateMachineService {
      *
      * @param organizationId
      * @param stateMachineId
-     * @param deleteStatusIds
+     * @param changeStatus
+     * @return
      */
     DeployStateMachinePayload handleStateMachineChangeStatusByStateMachineId(Long organizationId, Long stateMachineId, ChangeStatus changeStatus);
 
@@ -77,9 +78,11 @@ public interface StateMachineService {
      * 发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态
      *
      * @param organizationId
+     * @param ignoreStateMachineId 忽略当前修改的状态机
+     * @param ignoreSchemeId 忽略当前修改的状态机方案
      * @param schemeIds
-     * @param deleteStatusIds
+     * @param changeStatus
      * @return
      */
-    DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long stateMachineId, List<Long> schemeIds, ChangeStatus changeStatus);
+    DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long ignoreStateMachineId, Long ignoreSchemeId, List<Long> schemeIds, ChangeStatus changeStatus);
 }

@@ -10,6 +10,14 @@ public class ChangeStatus {
     private List<Long> addStatusIds;
     private List<Long> deleteStatusIds;
 
+    public ChangeStatus() {
+    }
+
+    public ChangeStatus(List<Long> addStatusIds, List<Long> deleteStatusIds) {
+        this.addStatusIds = addStatusIds;
+        this.deleteStatusIds = deleteStatusIds;
+    }
+
     public List<Long> getDeleteStatusIds() {
         return deleteStatusIds;
     }

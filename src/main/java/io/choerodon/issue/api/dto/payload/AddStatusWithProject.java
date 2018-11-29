@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.dto.payload;
 
+import io.choerodon.issue.infra.feign.dto.StatusDTO;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
 public class AddStatusWithProject {
     private Long projectId;
     private List<Long> addStatusIds;
+    private List<StatusDTO> addStatuses;
 
     public Long getProjectId() {
         return projectId;
@@ -24,5 +27,13 @@ public class AddStatusWithProject {
 
     public void setAddStatusIds(List<Long> addStatusIds) {
         this.addStatusIds = addStatusIds;
+    }
+
+    public List<StatusDTO> getAddStatuses() {
+        return addStatuses;
+    }
+
+    public void setAddStatuses(List<StatusDTO> addStatuses) {
+        this.addStatuses = addStatuses;
     }
 }
