@@ -36,7 +36,10 @@ public class ConvertUtils {
         if (null != projectConfigs && !projectConfigs.isEmpty()){
             List<ProjectDTO> projectDTOS = new ArrayList<>(projectConfigs.size());
             for(ProjectConfig config:projectConfigs){
-                projectDTOS.add(projectMap.get(config.getProjectId()));
+                ProjectDTO projectDTO = projectMap.get(config.getProjectId());
+                if(projectDTO!=null){
+                    projectDTOS.add(projectDTO);
+                }
             }
             schemeDTO.setProjectDTOs(projectDTOS);
         }
