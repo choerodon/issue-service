@@ -1,8 +1,8 @@
 package io.choerodon.issue.api.service;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.issue.api.dto.Status;
-import io.choerodon.issue.api.dto.payload.RemoveStatusWithProject;
+import io.choerodon.issue.api.dto.payload.ChangeStatus;
+import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import org.springframework.http.ResponseEntity;
 
@@ -65,21 +65,24 @@ public interface StateMachineService {
     void notActiveStateMachine(Long organizationId, List<Long> stateMachineIds);
 
     /**
-     * 处理删除状态机的某几个状态时，关联的哪几个项目哪几个状态可以删除
+     * 发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态
      *
      * @param organizationId
      * @param stateMachineId
-     * @param deleteStatusIds
-     */
-    List<RemoveStatusWithProject> handleRemoveStatusByStateMachineId(Long organizationId, Long stateMachineId, List<Long> deleteStatusIds);
-
-    /**
-     * 处理删除方案的某几个状态时，关联的哪几个项目哪几个状态可以删除
-     *
-     * @param organizationId
-     * @param schemeIds
-     * @param deleteStatusIds
+     * @param changeStatus
      * @return
      */
-    List<RemoveStatusWithProject> handleRemoveStatusBySchemeIds(Long organizationId, List<Long> schemeIds, List<Long> deleteStatusIds);
+    DeployStateMachinePayload handleStateMachineChangeStatusByStateMachineId(Long organizationId, Long stateMachineId, ChangeStatus changeStatus);
+
+    /**
+     * 发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态
+     *
+     * @param organizationId
+     * @param ignoreStateMachineId 忽略当前修改的状态机
+     * @param ignoreSchemeId 忽略当前修改的状态机方案
+     * @param schemeIds
+     * @param changeStatus
+     * @return
+     */
+    DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long ignoreStateMachineId, Long ignoreSchemeId, List<Long> schemeIds, ChangeStatus changeStatus);
 }

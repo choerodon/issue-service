@@ -1,7 +1,6 @@
 package io.choerodon.issue.api.dto.payload;
 
 import io.choerodon.issue.domain.ProjectConfig;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 
 import java.util.List;
 
@@ -13,10 +12,10 @@ public class StateMachineSchemeDeployUpdateIssue {
     private Long schemeId;
     private Long organizationId;
     private Long userId;
-    private List<StateMachineSchemeChangeItem> changeItems;
     private List<ProjectConfig> projectConfigs;
+    private List<StateMachineSchemeChangeItem> changeItems;
     private List<RemoveStatusWithProject> removeStatusWithProjects;
-    private List<StatusDTO> addStatuses;
+    private List<AddStatusWithProject> addStatusWithProjects;
 
     public Long getUserId() {
         return userId;
@@ -42,14 +41,6 @@ public class StateMachineSchemeDeployUpdateIssue {
         this.organizationId = organizationId;
     }
 
-    public List<ProjectConfig> getProjectConfigs() {
-        return projectConfigs;
-    }
-
-    public void setProjectConfigs(List<ProjectConfig> projectConfigs) {
-        this.projectConfigs = projectConfigs;
-    }
-
     public List<StateMachineSchemeChangeItem> getChangeItems() {
         return changeItems;
     }
@@ -58,19 +49,27 @@ public class StateMachineSchemeDeployUpdateIssue {
         this.changeItems = changeItems;
     }
 
-    public List<StatusDTO> getAddStatuses() {
-        return addStatuses;
-    }
-
-    public void setAddStatuses(List<StatusDTO> addStatuses) {
-        this.addStatuses = addStatuses;
-    }
-
     public List<RemoveStatusWithProject> getRemoveStatusWithProjects() {
         return removeStatusWithProjects;
     }
 
     public void setRemoveStatusWithProjects(List<RemoveStatusWithProject> removeStatusWithProjects) {
         this.removeStatusWithProjects = removeStatusWithProjects;
+    }
+
+    public List<AddStatusWithProject> getAddStatusWithProjects() {
+        return addStatusWithProjects;
+    }
+
+    public void setAddStatusWithProjects(List<AddStatusWithProject> addStatusWithProjects) {
+        this.addStatusWithProjects = addStatusWithProjects;
+    }
+
+    public List<ProjectConfig> getProjectConfigs() {
+        return projectConfigs;
+    }
+
+    public void setProjectConfigs(List<ProjectConfig> projectConfigs) {
+        this.projectConfigs = projectConfigs;
     }
 }
