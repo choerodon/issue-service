@@ -3,6 +3,9 @@ package io.choerodon.issue.api.service.impl;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.payload.AddStatusWithProject;
+import io.choerodon.issue.api.dto.payload.ChangeStatus;
+import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
 import io.choerodon.issue.api.dto.payload.RemoveStatusWithProject;
 import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
@@ -154,19 +157,24 @@ public class StateMachineServiceImpl implements StateMachineService {
     }
 
     @Override
-    public List<RemoveStatusWithProject> handleRemoveStatusByStateMachineId(Long organizationId, Long stateMachineId, List<Long> deleteStatusIds) {
+    public DeployStateMachinePayload handleStateMachineChangeStatusByStateMachineId(Long organizationId, Long stateMachineId, ChangeStatus changeStatus) {
         //找到与状态机关联的状态机方案
         List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
-        List<RemoveStatusWithProject> removeStatusWithProjects = handleRemoveStatusBySchemeIds(organizationId, schemeIds, deleteStatusIds);
-        return removeStatusWithProjects;
+        DeployStateMachinePayload deployStateMachinePayload = handleStateMachineChangeStatusBySchemeIds(organizationId, stateMachineId, schemeIds, changeStatus);
+        return deployStateMachinePayload;
     }
 
     @Override
-    public List<RemoveStatusWithProject> handleRemoveStatusBySchemeIds(Long organizationId, List<Long> schemeIds, List<Long> deleteStatusIds) {
-        List<RemoveStatusWithProject> removeStatusWithProjects = new ArrayList<>();
+    public DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long stateMachineId, List<Long> schemeIds, ChangeStatus changeStatus) {
         if (schemeIds == null || schemeIds.isEmpty()) {
-            return removeStatusWithProjects;
+            return null;
         }
+        DeployStateMachinePayload deployStateMachinePayload = new DeployStateMachinePayload();
+        List<RemoveStatusWithProject> removeStatusWithProjects = new ArrayList<>();
+        List<AddStatusWithProject> addStatusWithProjects = new ArrayList<>();
+        List<Long> deleteStatusIds = changeStatus.getDeleteStatusIds();
+        List<Long> addStatusIds = changeStatus.getAddStatusIds();
+
         //获取所有状态机及状态机的状态列表
         List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineFeignClient.queryAllWithStatus(organizationId).getBody();
         Map<Long, List<StatusDTO>> stateMachineWithStatusDTOsMap = stateMachineWithStatusDTOs.stream().collect(Collectors.toMap(StateMachineWithStatusDTO::getId, StateMachineWithStatusDTO::getStatusDTOS));
@@ -183,12 +191,19 @@ public class StateMachineServiceImpl implements StateMachineService {
             List<StatusDTO> statuses = new ArrayList<>();
             projectConfigsList.forEach(projectConfig -> {
                 schemeConfigsMap.get(projectConfig.getSchemeId()).forEach(schemeConfig -> {
-                    List<StatusDTO> statusDTOS = stateMachineWithStatusDTOsMap.get(schemeConfig.getStateMachineId());
-                    statuses.addAll(statusDTOS);
+                    Long smId = schemeConfig.getStateMachineId();
+                    //排除当前修改的状态机，要判断当前项目下其他状态机是否有当前要判断的状态
+                    if (!smId.equals(stateMachineId)) {
+                        List<StatusDTO> statusDTOS = stateMachineWithStatusDTOsMap.get(smId);
+                        statuses.addAll(statusDTOS);
+                    }
                 });
             });
             List<Long> statusIds = statuses.stream().map(StatusDTO::getId).distinct().collect(Collectors.toList());
+            //取当前项目真正减少的状态
             List<Long> confirmDeleteStatusIds = deleteStatusIds.stream().filter(x -> !statusIds.contains(x)).collect(toList());
+            //取当前项目真正增加的状态
+            List<Long> confirmAddStatusIds = addStatusIds.stream().filter(x -> !schemeIds.contains(x)).collect(toList());
 
             if (!confirmDeleteStatusIds.isEmpty()) {
                 RemoveStatusWithProject removeStatusWithProject = new RemoveStatusWithProject();
@@ -196,7 +211,15 @@ public class StateMachineServiceImpl implements StateMachineService {
                 removeStatusWithProject.setDeleteStatusIds(confirmDeleteStatusIds);
                 removeStatusWithProjects.add(removeStatusWithProject);
             }
+            if (!confirmAddStatusIds.isEmpty()) {
+                AddStatusWithProject addStatusWithProject = new AddStatusWithProject();
+                addStatusWithProject.setProjectId(projectId);
+                addStatusWithProject.setAddStatusIds(confirmAddStatusIds);
+                addStatusWithProjects.add(addStatusWithProject);
+            }
         });
-        return removeStatusWithProjects;
+        deployStateMachinePayload.setRemoveStatusWithProjects(removeStatusWithProjects);
+        deployStateMachinePayload.setAddStatusWithProjects(addStatusWithProjects);
+        return deployStateMachinePayload;
     }
 }

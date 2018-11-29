@@ -288,7 +288,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     @Override
     @Saga(code = DEPLOY_STATE_MACHINE_SCHEME, description = "issue服务发布状态机方案", inputSchemaClass = StateMachineSchemeDeployUpdateIssue.class)
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
-        logger.info("deploy stateMachine scheme: {}",changeItems.toString());
+        logger.info("deploy stateMachine scheme size: {}",changeItems.size());
         //获取所有状态
         List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
         Map<Long, StatusDTO> statusDTOMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
@@ -317,7 +317,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //新增的状态机ids和删除的状态机ids
         List<Long> oldStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getOldStateMachineId).distinct().collect(Collectors.toList());
         List<Long> newStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getNewStateMachineId).distinct().collect(Collectors.toList());
-        //新增的状态和删除的状态
+        //新增的状态
         List<StatusDTO> addStatuses = new ArrayList<>(addStatusIds.size());
         addStatusIds.forEach(statusId -> addStatuses.add(statusDTOMap.get(statusId)));
 

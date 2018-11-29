@@ -3,8 +3,8 @@ package io.choerodon.issue.api.controller;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.issue.api.dto.Status;
-import io.choerodon.issue.api.dto.payload.RemoveStatusWithProject;
+import io.choerodon.issue.api.dto.payload.ChangeStatus;
+import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
 import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
@@ -72,13 +72,13 @@ public class StateMachineController {
     }
 
     @Permission(level = ResourceLevel.PROJECT)
-    @ApiOperation(value = "【内部调用】状态机删除节点的数据处理")
-    @PostMapping(value = "/handle_remove_status_by_state_machine_id")
-    public ResponseEntity<List<RemoveStatusWithProject>> handleRemoveStatusByStateMachineId(@PathVariable("organization_id") Long organizationId,
-                                                                                          @RequestParam("stateMachineId") Long stateMachineId,
-                                                                                          @RequestBody List<Long> deleteStatusIds) {
-        return Optional.ofNullable(stateMachineService.handleRemoveStatusByStateMachineId(organizationId, stateMachineId, deleteStatusIds))
+    @ApiOperation(value = "【内部调用】发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态")
+    @PostMapping(value = "/handle_state_machine_change_status_by_state_machine_id")
+    public ResponseEntity<DeployStateMachinePayload> handleStateMachineChangeStatusByStateMachineId(@PathVariable("organization_id") Long organizationId,
+                                                                                        @RequestParam("stateMachineId") Long stateMachineId,
+                                                                                        @RequestBody ChangeStatus changeStatus) {
+        return Optional.ofNullable(stateMachineService.handleStateMachineChangeStatusByStateMachineId(organizationId, stateMachineId, changeStatus))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
+                .orElseThrow(() -> new CommonException("error.handleRemoveStatusByStateMachineId.get"));
     }
 }
