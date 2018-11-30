@@ -110,6 +110,7 @@
                  open="(" close=")" separator=",">
             #{issueTypeSchemeId}
         </foreach>
+        order by its.id desc
     </select>
 
 </mapper>
