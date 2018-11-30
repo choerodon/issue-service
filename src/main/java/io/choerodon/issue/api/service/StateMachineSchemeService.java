@@ -67,11 +67,10 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * 校验名字是否未被使用
      *
      * @param organizationId 组织id
-     * @param schemeId       校验id
      * @param name           名称
      * @return
      */
-    Boolean checkName(Long organizationId, Long schemeId, String name);
+    Boolean checkName(Long organizationId, String name);
 
     /**
      * 根据状态机id查询所使用到该状态机的方案，包含发布使用与草稿使用

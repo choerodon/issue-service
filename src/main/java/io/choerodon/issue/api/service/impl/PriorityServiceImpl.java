@@ -40,6 +40,9 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     @Override
     @Transactional
     public PriorityDTO create(Long organizationId, PriorityDTO priorityDTO) {
+        if (checkName(organizationId, priorityDTO.getName())) {
+            throw new CommonException("error.priority.create.name.same");
+        }
         priorityDTO.setSequence((priorityMapper.getNextSequence(organizationId)).add(new BigDecimal(1)));
         priorityDTO.setOrganizationId(organizationId);
         //若设置为默认值，则清空其他默认值
@@ -49,9 +52,6 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             priorityDTO.setDefault(false);
         }
         Priority priority = modelMapper.map(priorityDTO, Priority.class);
-        if (!(this.checkName(organizationId, priorityDTO.getId(), priorityDTO.getName()))) {
-            throw new CommonException("error.priority.create.name.same");
-        }
         int isInsert = priorityMapper.insert(priority);
         if (isInsert != 1) {
             throw new CommonException("error.priority.create");
@@ -72,10 +72,10 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     @Override
     @Transactional
     public PriorityDTO update(PriorityDTO priorityDTO) {
-        Priority priority = modelMapper.map(priorityDTO, Priority.class);
-        if (!(this.checkName(priorityDTO.getOrganizationId(), priorityDTO.getId(), priorityDTO.getName()))) {
+        if (checkName(priorityDTO.getOrganizationId(), priorityDTO.getName())) {
             throw new CommonException("error.priority.update.name.same");
         }
+        Priority priority = modelMapper.map(priorityDTO, Priority.class);
         //若设置为默认值，则清空其他默认值
         if (priorityDTO.getDefault() != null && priorityDTO.getDefault()) {
             priorityMapper.updateDefaultPriority(priorityDTO.getOrganizationId());
@@ -91,14 +91,13 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     }
 
     @Override
-    public Boolean checkName(Long organizationId, Long priorityId, String name) {
+    public Boolean checkName(Long organizationId, String name) {
         Priority priority = new Priority();
         priority.setOrganizationId(organizationId);
         priority.setName(name);
-        priority = priorityMapper.selectOne(priority);
-        if (priority != null) {
-            //若传了id，则为更新校验（更新校验不校验本身），不传为创建校验
-            return priority.getId().equals(priorityId);
+        Priority res = priorityMapper.selectOne(priority);
+        if (res == null) {
+            return false;
         }
         return true;
     }

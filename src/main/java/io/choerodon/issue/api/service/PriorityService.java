@@ -48,11 +48,10 @@ public interface PriorityService extends BaseService<Priority> {
      * 检查组织下的优先级名称是否重复
      *
      * @param organizationId 组织id
-     * @param priorityId 更新的优先级对象id
      * @param name 创建或更新的优先级名称
      * @return 是否重复 true or false
      */
-    Boolean checkName(Long organizationId, Long priorityId, String name);
+    Boolean checkName(Long organizationId, String name);
     /**
      * 根据id更新优先级的顺序
      *

@@ -85,8 +85,11 @@ public class PriorityController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验优先级名字是否未被使用")
     @GetMapping(value = "/organizations/{organization_id}/priority/check_name")
-    public ResponseEntity<Boolean> checkName(@PathVariable("organization_id") Long organizationId, @RequestParam(value = "priority_id", required = false) Long priorityId, @RequestParam("name") String name) {
-        return new ResponseEntity<>(priorityService.checkName(organizationId, priorityId, name), HttpStatus.OK);
+    public ResponseEntity<Boolean> checkName(@PathVariable("organization_id") Long organizationId,
+                                             @RequestParam("name") String name) {
+        return Optional.ofNullable(priorityService.checkName(organizationId, name))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.priorityName.check"));
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
