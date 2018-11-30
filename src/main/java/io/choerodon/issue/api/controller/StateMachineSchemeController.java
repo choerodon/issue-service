@@ -1,6 +1,7 @@
 package io.choerodon.issue.api.controller;
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/v1/organizations/{organization_id}/state_machine_scheme")
@@ -105,8 +107,11 @@ public class StateMachineSchemeController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验状态机方案名字是否未被使用")
     @GetMapping(value = "/check_name")
-    public ResponseEntity<Boolean> checkName(@PathVariable("organization_id") Long organizationId, @RequestParam(value = "scheme_id", required = false) Long schemeId, @RequestParam("name") String name) {
-        return new ResponseEntity<>(schemeService.checkName(organizationId, schemeId, name), HttpStatus.OK);
+    public ResponseEntity<Boolean> checkName(@PathVariable("organization_id") Long organizationId,
+                                             @RequestParam("name") String name) {
+        return Optional.ofNullable(schemeService.checkName(organizationId, name))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.stateMachineSchemeName.check"));
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

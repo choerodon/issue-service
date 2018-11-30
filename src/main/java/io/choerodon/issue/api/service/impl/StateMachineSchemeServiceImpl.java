@@ -106,6 +106,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public StateMachineSchemeDTO create(Long organizationId, StateMachineSchemeDTO schemeDTO) {
+        if (checkName(organizationId, schemeDTO.getName())) {
+            throw new CommonException("error.stateMachineName.exist");
+        }
         schemeDTO.setStatus(StateMachineSchemeStatus.CREATE);
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         scheme.setOrganizationId(organizationId);
@@ -224,14 +227,13 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     }
 
     @Override
-    public Boolean checkName(Long organizationId, Long schemeId, String name) {
+    public Boolean checkName(Long organizationId, String name) {
         StateMachineScheme scheme = new StateMachineScheme();
         scheme.setOrganizationId(organizationId);
         scheme.setName(name);
-        scheme = schemeMapper.selectOne(scheme);
-        if (scheme != null) {
-            //若传了id，则为更新校验（更新校验不校验本身），不传为创建校验
-            return scheme.getId().equals(schemeId);
+        StateMachineScheme res = schemeMapper.selectOne(scheme);
+        if (res == null) {
+            return false;
         }
         return true;
     }
