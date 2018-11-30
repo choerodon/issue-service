@@ -4,25 +4,48 @@
 <mapper namespace="io.choerodon.issue.infra.mapper.IssueTypeMapper">
 
     <!--<select id="fulltextSearch" resultType="io.choerodon.issue.domain.IssueType">-->
-        <!--SELECT * FROM issue_type-->
-        <!--WHERE 1=1-->
-        <!--<if test="issueType.organizationId != null">-->
-            <!--AND organization_id = #{issueType.organizationId}-->
-        <!--</if>-->
-        <!--<if test="issueType.name != null">-->
-            <!--AND name LIKE concat('%',#{issueType.name},'%')-->
-        <!--</if>-->
-        <!--<if test="issueType.description != null">-->
-            <!--AND description LIKE concat('%',#{issueType.description},'%')-->
-        <!--</if>-->
-        <!--<if test="param != null">-->
-            <!--AND ( name LIKE concat('%',#{param},'%')-->
-            <!--OR description LIKE concat('%',#{param},'%')-->
-            <!--)-->
-        <!--</if>-->
+    <!--SELECT * FROM issue_type-->
+    <!--WHERE 1=1-->
+    <!--<if test="issueType.organizationId != null">-->
+    <!--AND organization_id = #{issueType.organizationId}-->
+    <!--</if>-->
+    <!--<if test="issueType.name != null">-->
+    <!--AND name LIKE concat('%',#{issueType.name},'%')-->
+    <!--</if>-->
+    <!--<if test="issueType.description != null">-->
+    <!--AND description LIKE concat('%',#{issueType.description},'%')-->
+    <!--</if>-->
+    <!--<if test="param != null">-->
+    <!--AND ( name LIKE concat('%',#{param},'%')-->
+    <!--OR description LIKE concat('%',#{param},'%')-->
+    <!--)-->
+    <!--</if>-->
     <!--</select>-->
 
+    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.IssueType">
+        SELECT
+        t.*
+        FROM issue_type t
+        WHERE t.organization_id = #{organizationId}
+    </select>
+
     <select id="queryBySchemeId" resultType="io.choerodon.issue.domain.IssueType">
+        SELECT
+        t.*,
+        c.sequence
+        FROM issue_type t
+        LEFT JOIN issue_type_scheme_config c on c.issue_type_id = t.id
+        WHERE 1=1
+        <if test="organizationId != null">
+            AND t.organization_id = #{organizationId}
+        </if>
+        <if test="schemeId != null">
+            AND c.scheme_id = #{schemeId}
+        </if>
+        order by c.sequence
+    </select>
+
+    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.IssueType">
         SELECT
         t.*,
         c.sequence
@@ -65,7 +88,8 @@
         <id property="organizationId" column="it_organization_id"/>
         <id property="initialize" column="it_is_initialize"/>
         <id property="objectVersionNumber" column="it_object_version_number"/>
-        <collection property="issueTypeSchemeRelationList" autoMapping="true" ofType="io.choerodon.issue.domain.IssueTypeSchemeRelation">
+        <collection property="issueTypeSchemeRelationList" autoMapping="true"
+                    ofType="io.choerodon.issue.domain.IssueTypeSchemeRelation">
             <id property="issueTypeSchemeId" column="itscits_scheme_id"/>
             <id property="issueTypeSchemeName" column="itscits_name"/>
         </collection>
@@ -87,12 +111,12 @@
         from issue_type it
         left join
         (
-           select
-           itsc.issue_type_id,
-           itsc.scheme_id,
-           its.name
-           from issue_type_scheme_config itsc, issue_type_scheme its
-           where itsc.scheme_id = its.id
+        select
+        itsc.issue_type_id,
+        itsc.scheme_id,
+        its.name
+        from issue_type_scheme_config itsc, issue_type_scheme its
+        where itsc.scheme_id = its.id
         ) itscits on it.id = itscits.issue_type_id
         where organization_id = #{organizationId}
         and it.id in
