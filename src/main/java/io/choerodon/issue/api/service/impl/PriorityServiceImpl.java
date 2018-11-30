@@ -69,10 +69,21 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         return true;
     }
 
+    private Boolean checkNameUpdate(Long organizationId, Long priorityId, String name) {
+        Priority priority = new Priority();
+        priority.setOrganizationId(organizationId);
+        priority.setName(name);
+        Priority res = priorityMapper.selectOne(priority);
+        if (res != null && !priorityId.equals(res.getId())) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     @Transactional
     public PriorityDTO update(PriorityDTO priorityDTO) {
-        if (checkName(priorityDTO.getOrganizationId(), priorityDTO.getName())) {
+        if (checkNameUpdate(priorityDTO.getOrganizationId(), priorityDTO.getId(), priorityDTO.getName())) {
             throw new CommonException("error.priority.update.name.same");
         }
         Priority priority = modelMapper.map(priorityDTO, Priority.class);

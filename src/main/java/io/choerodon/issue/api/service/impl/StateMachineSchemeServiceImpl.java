@@ -125,9 +125,22 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         return modelMapper.map(scheme, StateMachineSchemeDTO.class);
     }
 
+    private Boolean checkNameUpdate(Long organizationId, Long schemeId, String name) {
+        StateMachineScheme scheme = new StateMachineScheme();
+        scheme.setOrganizationId(organizationId);
+        scheme.setName(name);
+        StateMachineScheme res = schemeMapper.selectOne(scheme);
+        if (res != null && !schemeId.equals(res.getId())) {
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public StateMachineSchemeDTO update(Long organizationId, Long schemeId, StateMachineSchemeDTO schemeDTO) {
+        if (checkNameUpdate(organizationId, schemeId, schemeDTO.getName())) {
+            throw new CommonException("error.stateMachineName.exist");
+        }
         schemeDTO.setId(schemeId);
         schemeDTO.setOrganizationId(organizationId);
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
