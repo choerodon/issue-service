@@ -86,6 +86,11 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     }
 
     @Override
+    public ResponseEntity<List<StateMachineDTO>> queryByOrgId(Long organizationId) {
+        throw new CommonException("error.stateMachineFeignClient.queryByOrgId");
+    }
+
+    @Override
     public ResponseEntity removeStateMachineNode(Long organizationId, Long stateMachineId, Long statusId) {
         throw new CommonException("error.StateMachineNode.remove");
     }

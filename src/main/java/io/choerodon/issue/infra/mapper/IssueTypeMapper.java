@@ -19,6 +19,8 @@ public interface IssueTypeMapper extends BaseMapper<IssueType> {
 
     List<IssueType> queryBySchemeId(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId);
 
+    List<IssueType> queryByOrgId(@Param("organizationId") Long organizationId);
+
     List<Long> selectIssueTypeIds(@Param("organizationId") Long organizationId, @Param("issueTypeSearchDTO") IssueTypeSearchDTO issueTypeSearchDTO);
 
     List<IssueTypeWithInfo> queryIssueTypeList(@Param("organizationId") Long organizationId, @Param("issueTypeIds") List<Long> issueTypeIds);

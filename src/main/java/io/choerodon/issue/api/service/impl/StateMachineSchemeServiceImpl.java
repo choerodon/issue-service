@@ -38,6 +38,9 @@ import java.util.stream.Collectors;
 @Component
 public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineScheme> implements StateMachineSchemeService {
 
+    private static final String WITHOUT_CONFIG_ISSUE_TYPE_NAME = "未分配类型";
+    private static final String WITHOUT_CONFIG_ISSUE_TYPE_ICON = "style";
+    private static final String WITHOUT_CONFIG_ISSUE_TYPE_COLOUR = "808080";
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
     @Autowired
@@ -58,15 +61,19 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
         //查询出组织下的所有项目
-        PageRequest projectSearch = new PageRequest();
-        projectSearch.setPage(0);
-        projectSearch.setSize(999);
         List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
         Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId, x -> x));
+        //查询组织下的所有问题类型
+        List<IssueType> issueTypes = issueTypeMapper.queryByOrgId(organizationId);
+        Map<Long, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getId, x -> x));
+        //查询组织下的所有状态机
+        List<StateMachineDTO> stateMachineDTOS = stateMachineFeignClient.queryByOrgId(organizationId).getBody();
+        Map<Long, StateMachineDTO> stateMachineDTOMap = stateMachineDTOS.stream().collect(Collectors.toMap(StateMachineDTO::getId, x -> x));
 
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         Page<StateMachineScheme> page = PageHelper.doPageAndSort(pageRequest,
                 () -> schemeMapper.fulltextSearch(scheme, params));
+
         List<StateMachineScheme> schemes = page.getContent();
         List<StateMachineScheme> schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
         List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig, projectMap);
@@ -75,7 +82,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 if (machineSchemeDTO.getConfigDTOs() != null) {
                     for (StateMachineSchemeConfigDTO configDTO : machineSchemeDTO.getConfigDTOs()) {
                         if (!configDTO.getDefault()) {
-                            IssueType issueType = issueTypeMapper.selectByPrimaryKey(configDTO.getIssueTypeId());
+                            IssueType issueType = issueTypeMap.get(configDTO.getIssueTypeId());
                             if (issueType != null) {
                                 configDTO.setIssueTypeName(issueType.getName());
                                 configDTO.setIssueTypeIcon(issueType.getIcon());
@@ -83,12 +90,14 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                             }
                         } else {
                             //若为默认配置，则匹配的是所有为分配的问题类型
-                            configDTO.setIssueTypeName("未分配类型");
-                            configDTO.setIssueTypeIcon("style");
-                            configDTO.setIssueTypeColour("#808080");
+                            configDTO.setIssueTypeName(WITHOUT_CONFIG_ISSUE_TYPE_NAME);
+                            configDTO.setIssueTypeIcon(WITHOUT_CONFIG_ISSUE_TYPE_ICON);
+                            configDTO.setIssueTypeColour(WITHOUT_CONFIG_ISSUE_TYPE_COLOUR);
                         }
-                        StateMachineDTO stateMachineDTO = stateMachineFeignClient.queryStateMachineById(schemeDTO.getOrganizationId(), configDTO.getStateMachineId()).getBody();
-                        configDTO.setStateMachineName(stateMachineDTO.getName());
+                        StateMachineDTO stateMachineDTO = stateMachineDTOMap.get(configDTO.getStateMachineId());
+                        if (stateMachineDTO != null) {
+                            configDTO.setStateMachineName(stateMachineDTO.getName());
+                        }
                     }
                 }
             }
@@ -194,9 +203,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             } else {
                 //若为默认配置，则匹配的是所有为分配的问题类型
                 issueType = new IssueType();
-                issueType.setName("未分配类型");
-                issueType.setIcon("style");
-                issueType.setColour("#808080");
+                issueType.setName(WITHOUT_CONFIG_ISSUE_TYPE_NAME);
+                issueType.setIcon(WITHOUT_CONFIG_ISSUE_TYPE_ICON);
+                issueType.setColour(WITHOUT_CONFIG_ISSUE_TYPE_COLOUR);
                 defaultStateMachineId = config.getStateMachineId();
             }
             issueTypes.add(issueType);

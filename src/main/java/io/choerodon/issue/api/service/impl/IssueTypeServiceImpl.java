@@ -172,9 +172,7 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
     @Override
     public List<IssueTypeDTO> queryByOrgId(Long organizationId) {
-        IssueType issueType = new IssueType();
-        issueType.setOrganizationId(organizationId);
-        List<IssueType> issueTypes = issueTypeMapper.select(issueType);
+        List<IssueType> issueTypes = issueTypeMapper.queryByOrgId(organizationId);
         return modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
         }.getType());
     }
