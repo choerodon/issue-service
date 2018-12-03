@@ -45,22 +45,6 @@
         order by c.sequence
     </select>
 
-    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.IssueType">
-        SELECT
-        t.*,
-        c.sequence
-        FROM issue_type t
-        LEFT JOIN issue_type_scheme_config c on c.issue_type_id = t.id
-        WHERE 1=1
-        <if test="organizationId != null">
-            AND t.organization_id = #{organizationId}
-        </if>
-        <if test="schemeId != null">
-            AND c.scheme_id = #{schemeId}
-        </if>
-        order by c.sequence
-    </select>
-
     <select id="selectIssueTypeIds" resultType="java.lang.Long">
         select
         it.id
