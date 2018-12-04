@@ -183,7 +183,15 @@ public interface StateMachineFeignClient {
     @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/query_by_org_id")
     ResponseEntity<List<StateMachineDTO>> queryByOrgId(@PathVariable("organization_id") Long organizationId);
 
-    @DeleteMapping(value = "/v1/organizations/{organization_id}/state_machines/remove_node")
+    /**
+     * 敏捷移除状态
+     *
+     * @param organizationId
+     * @param stateMachineId
+     * @param statusId
+     * @return
+     */
+    @DeleteMapping(value = "/v1/organizations/{organization_id}/status/remove_status_for_agile")
     ResponseEntity removeStateMachineNode(@PathVariable("organization_id") Long organizationId,
                                           @RequestParam("stateMachineId") Long stateMachineId,
                                           @RequestParam("statusId") Long statusId);

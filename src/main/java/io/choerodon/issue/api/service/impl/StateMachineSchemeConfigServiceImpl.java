@@ -324,7 +324,6 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         if (!oldStateMachineIds.isEmpty()) {
             stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
         }
-        //清理状态机实例【todo】
         return true;
     }
 
