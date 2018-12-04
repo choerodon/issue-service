@@ -1,9 +1,9 @@
 package io.choerodon.issue.api.controller;
 
-import io.choerodon.issue.api.dto.UserDTO;
-import io.choerodon.issue.api.service.ProjectUserService;
 import io.choerodon.core.base.BaseController;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.issue.api.dto.UserDTO;
+import io.choerodon.issue.api.service.ProjectUserService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class ProjectUserController extends BaseController {
     public ResponseEntity<UserDTO> create(@PathVariable(name = "organization_id") Long organizationId,
                                           @PathVariable(name = "project_id") Long projectId,
                                           @RequestBody UserDTO userDTO) {
-        return projectUserService.createUser(organizationId, projectId,userDTO);
+        return projectUserService.createUser(organizationId, projectId, userDTO);
     }
 
 }
