@@ -50,7 +50,7 @@ public class StateMachineController {
         return stateMachineService.delete(organizationId, stateMachineId);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "【内部调用】查询状态机关联的项目id列表的Map")
     @GetMapping(value = "/query_project_ids_map")
     public ResponseEntity<Map<String, List<Long>>> queryProjectIdsMap(@PathVariable("organization_id") Long organizationId,
@@ -60,7 +60,7 @@ public class StateMachineController {
                 .orElseThrow(() -> new CommonException("error.queryProjectIdsMap.get"));
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "【内部调用】状态机删除节点的校验，是否可以直接删除")
     @GetMapping(value = "/check_delete_node")
     public ResponseEntity<Map<String, Object>> checkDeleteNode(@PathVariable("organization_id") Long organizationId,
@@ -71,7 +71,7 @@ public class StateMachineController {
                 .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "【内部调用】发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态")
     @PostMapping(value = "/handle_state_machine_change_status_by_state_machine_id")
     public ResponseEntity<DeployStateMachinePayload> handleStateMachineChangeStatusByStateMachineId(@PathVariable("organization_id") Long organizationId,
