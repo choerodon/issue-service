@@ -55,4 +55,18 @@ databaseChangeLog(logicalFilePath: 'issue_type.groovy') {
             column(name: 'organization_id')
         }
     }
+
+    changeSet(id: '2018-12-07-fix-add-default-issue-auto-test', author: 'shinan.chenX@gmail') {
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "insert into issue_type(name,description,colour,icon,type_code,is_initialize,organization_id) " +
+            "select '自动化测试' as name,'自动化测试' as description,'#00BFA5' as colour,'auto_test' as icon,'issue_auto_test' as type_code,'1' as is_initialize, organization_id " +
+            "from issue_type where type_code='issue_test'"
+        }
+    }
+
+    changeSet(id: '2018-12-07-fix-update-issue-test', author: 'shinan.chenX@gmail') {
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "update issue_type set colour = '#4D90FE', icon = 'table_chart' where type_code = 'issue_test'"
+        }
+    }
 }

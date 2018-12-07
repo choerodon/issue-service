@@ -263,7 +263,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
 
     private List<IssueType> initOrganizationIssueType(Long organizationId, List<IssueType> issueTypes) {
         if (issueTypes == null || issueTypes.isEmpty()) {
-            //注册组织初始化六种问题类型
+            //注册组织初始化七种问题类型
             issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
             //注册组织初始化优先级
             priorityService.initProrityByOrganization(Collections.singletonList(organizationId));

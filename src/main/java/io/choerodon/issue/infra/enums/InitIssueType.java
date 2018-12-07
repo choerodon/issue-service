@@ -32,7 +32,11 @@ public enum InitIssueType {
     /**
      * 测试
      */
-    TEST("test", "测试", "测试", "#FFB103", "issue_test", SchemeApplyType.TEST);
+    TEST("table_chart", "测试", "测试", "#4D90FE", "issue_test", SchemeApplyType.TEST),
+    /**
+     * 自动化测试
+     */
+    AUTO_TEST("auto_test", "自动化测试", "自动化测试", "#00BFA5", "issue_auto_test", SchemeApplyType.TEST);
 
     private String icon;
     private String name;
