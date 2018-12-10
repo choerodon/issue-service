@@ -219,7 +219,7 @@ class IssueTypeControllerSpec extends Specification {
         }
         when: '分页查询'
         ParameterizedTypeReference<Page<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<Page<IssueTypeDTO>>() {
-        };
+        }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
 
         then: '返回结果'
@@ -289,7 +289,7 @@ class IssueTypeControllerSpec extends Specification {
 
         then: '状态码为200，调用成功'
         def actRequest = false
-        def actResponseSize = 0;
+        def actResponseSize = 0
         if (entity != null) {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true

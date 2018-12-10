@@ -83,7 +83,7 @@ public interface ProjectConfigService {
      * @param projectId
      * @param currentStatusId
      * @param issueId
-     * @param issueTypeId
+     * @param
      * @param applyType
      * @return
      */
