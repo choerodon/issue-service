@@ -2,15 +2,18 @@ package io.choerodon.issue.api.service.impl;
 
 
 import com.alibaba.fastjson.JSON;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.StatusPayload;
 import io.choerodon.issue.api.service.*;
-import io.choerodon.issue.domain.*;
+import io.choerodon.issue.domain.Field;
+import io.choerodon.issue.domain.FieldConfigLine;
+import io.choerodon.issue.domain.IssueType;
+import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.exception.RemoveStatusException;
@@ -400,7 +403,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
                     StatusPayload statusPayload = new StatusPayload();
                     statusPayload.setProjectId(projectId);
                     statusPayload.setStatusId(statusId);
-                    sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload)));
+                    sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload), "", "", ResourceLevel.PROJECT.value(), projectId));
                 }
             } catch (Exception e) {
                 throw new RemoveStatusException("error.status.remove");
