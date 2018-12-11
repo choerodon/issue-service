@@ -40,7 +40,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     private static final String WITHOUT_CONFIG_ISSUE_TYPE_NAME = "未分配类型";
     private static final String WITHOUT_CONFIG_ISSUE_TYPE_ICON = "style";
-    private static final String WITHOUT_CONFIG_ISSUE_TYPE_COLOUR = "808080";
+    private static final String WITHOUT_CONFIG_ISSUE_TYPE_COLOUR = "#808080";
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
     @Autowired
