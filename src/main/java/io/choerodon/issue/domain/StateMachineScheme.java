@@ -26,6 +26,7 @@ public class StateMachineScheme extends AuditDomain {
     private String status;
     private Long organizationId;
     private Integer deployProgress;
+    private String deployStatus;
 
     @Transient
     private List<StateMachineSchemeConfig> schemeConfigs;
@@ -94,5 +95,13 @@ public class StateMachineScheme extends AuditDomain {
 
     public void setProjectConfigs(List<ProjectConfig> projectConfigs) {
         this.projectConfigs = projectConfigs;
+    }
+
+    public String getDeployStatus() {
+        return deployStatus;
+    }
+
+    public void setDeployStatus(String deployStatus) {
+        this.deployStatus = deployStatus;
     }
 }

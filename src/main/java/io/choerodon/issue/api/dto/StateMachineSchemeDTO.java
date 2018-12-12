@@ -13,6 +13,7 @@ public class StateMachineSchemeDTO {
     private Long organizationId;
     private String status;
     private Long objectVersionNumber;
+    private String deployStatus;
 
     private List<ProjectDTO> projectDTOs;
 
@@ -90,5 +91,13 @@ public class StateMachineSchemeDTO {
 
     public void setProjectDTOs(List<ProjectDTO> projectDTOs) {
         this.projectDTOs = projectDTOs;
+    }
+
+    public String getDeployStatus() {
+        return deployStatus;
+    }
+
+    public void setDeployStatus(String deployStatus) {
+        this.deployStatus = deployStatus;
     }
 }

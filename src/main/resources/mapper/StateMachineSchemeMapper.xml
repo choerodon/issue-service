@@ -100,4 +100,11 @@
         and id = #{schemeId}
     </update>
 
+    <update id="updateDeployStatus">
+        UPDATE state_machine_scheme
+        SET deploy_status = #{deployStatus}
+        WHERE organization_id = #{organizationId}
+        and id = #{schemeId}
+    </update>
+
 </mapper>
