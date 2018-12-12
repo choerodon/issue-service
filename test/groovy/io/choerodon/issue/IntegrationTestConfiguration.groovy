@@ -1,23 +1,22 @@
 package io.choerodon.issue
 
+import com.alibaba.fastjson.JSON
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
 import io.choerodon.issue.api.dto.payload.ProjectEvent
 import io.choerodon.issue.api.eventhandler.IssueEventHandler
-import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.core.oauth.CustomUserDetails
 import io.choerodon.issue.infra.utils.ProjectUtil
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Primary
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
@@ -64,25 +63,13 @@ class IntegrationTestConfiguration {
         detachedMockFactory.Mock(KafkaTemplate)
     }
 
-    @Bean("projectUtil")
-    @Primary
-    ProjectUtil projectUtil() {
-        Mockito.mock(ProjectUtil.class)
-    }
-
-    @Bean
-    StateMachineFeignClient stateMachineFeignClient() {
-        detachedMockFactory.Mock(StateMachineFeignClient)
-    }
-
     @PostConstruct
     void init() {
         liquibaseExecutor.execute()
         setTestRestTemplateJWT()
-        projectUtil.getOrganizationId(1) >> 1L
         OrganizationCreateEventPayload organizationEvent = new OrganizationCreateEventPayload()
         organizationEvent.id = 1
-        issueEventHandler.handleOrgaizationInitByConsumeSagaTask(JSON.toJSONString(organizationEvent))
+        issueEventHandler.handleOrgaizationCreateByConsumeSagaTask(JSON.toJSONString(organizationEvent))
         ProjectEvent projectEvent = new ProjectEvent()
         projectEvent.projectId = 1
         projectEvent.projectCode = "test"
@@ -105,8 +92,8 @@ class IntegrationTestConfiguration {
     static String createJWT(final String key, final ObjectMapper objectMapper) {
         Signer signer = new MacSigner(key)
         CustomUserDetails defaultUserDetails = new CustomUserDetails('default', 'unknown', Collections.emptyList())
-        defaultUserDetails.setUserId(0L)
-        defaultUserDetails.setOrganizationId(0L)
+        defaultUserDetails.setUserId(1L)
+        defaultUserDetails.setOrganizationId(1L)
         defaultUserDetails.setLanguage('zh_CN')
         defaultUserDetails.setTimeZone('CCT')
         String jwtToken = null
@@ -120,18 +107,12 @@ class IntegrationTestConfiguration {
 
     @TestConfiguration
     @Order(1)
-    public static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            System.out.println("我在SecurityConfiguration");
             http.csrf().ignoringAntMatchers("/h2-console/**")
                     .and()
-                    .headers().frameOptions().disable();
-//            http.csrf().ignoringAntMatchers("/h2-console/**")
-//            .and()
-//            .authorizeRequests()
-//                    .antMatchers("/h2-console/**").permitAll();
         }
     }
 }

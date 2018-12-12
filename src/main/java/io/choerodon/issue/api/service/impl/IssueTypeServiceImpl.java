@@ -29,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -144,9 +141,12 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
 
     @Override
     public Page<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO) {
-        Page<Long> issuetypeIdsPage =PageHelper.doPageAndSort(pageRequest, () -> issueTypeMapper.selectIssueTypeIds(organizationId, issueTypeSearchDTO));
-        List<IssueTypeWithInfo> issueTypeWithInfoList = issueTypeMapper.queryIssueTypeList(organizationId, issuetypeIdsPage.getContent());
-        List<IssueTypeWithInfoDTO> issueTypeWithInfoDTOList = modelMapper.map(issueTypeWithInfoList, new TypeToken<List<IssueTypeWithInfoDTO>>(){}.getType());
+        Page<Long> issuetypeIdsPage = PageHelper.doPageAndSort(pageRequest, () -> issueTypeMapper.selectIssueTypeIds(organizationId, issueTypeSearchDTO));
+        List<IssueTypeWithInfoDTO> issueTypeWithInfoDTOList = new ArrayList<>(issuetypeIdsPage.getContent().size());
+        if (issuetypeIdsPage.getContent() != null && !issuetypeIdsPage.getContent().isEmpty()) {
+            issueTypeWithInfoDTOList.addAll(modelMapper.map(issueTypeMapper.queryIssueTypeList(organizationId, issuetypeIdsPage.getContent()), new TypeToken<List<IssueTypeWithInfoDTO>>() {
+            }.getType()));
+        }
         Page<IssueTypeWithInfoDTO> returnPage = new Page<>();
         returnPage.setContent(issueTypeWithInfoDTOList);
         returnPage.setNumber(issuetypeIdsPage.getNumber());
@@ -181,10 +181,10 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
     public List<IssueTypeDTO> queryIssueTypeByStateMachineSchemeId(Long organizationId, Long schemeId) {
         List<IssueTypeDTO> issueTypeDTOS = queryByOrgId(organizationId);
         List<StateMachineSchemeConfigDTO> configDTOs = stateMachineSchemeConfigService.queryBySchemeId(true, organizationId, schemeId);
-        Map<Long, StateMachineSchemeConfigDTO> configMap = configDTOs.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId,x->x));
+        Map<Long, StateMachineSchemeConfigDTO> configMap = configDTOs.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId, x -> x));
         for (IssueTypeDTO issueTypeDTO : issueTypeDTOS) {
             StateMachineSchemeConfigDTO configDTO = configMap.get(issueTypeDTO.getId());
-            if(configDTO!=null){
+            if (configDTO != null) {
                 StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, configDTO.getStateMachineId()).getBody();
                 issueTypeDTO.setStateMachineName(stateMachineDTO.getName());
                 issueTypeDTO.setStateMachineId(stateMachineDTO.getId());

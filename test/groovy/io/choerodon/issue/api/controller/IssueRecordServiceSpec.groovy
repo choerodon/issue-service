@@ -82,7 +82,7 @@ class IssueRecordServiceSpec extends Specification {
 
     def "queryByIssueId"() {
         when: '查询事件单修改记录'
-        List<IssueRecordViewDTO> viewDTOList = issueRecordService.queryByIssueId(issueId);
+        List<IssueRecordViewDTO> viewDTOList = issueRecordService.queryByIssueId(testProjectId, issueId)
 
         then: '创建记录成功，返回事件单下所有修改记录'
         viewDTOList.size() == size
