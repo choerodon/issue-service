@@ -22,6 +22,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
 
+import java.util.stream.Collectors
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 @ActiveProfiles("test")
@@ -32,55 +34,24 @@ class StateMachineSchemeControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    StateMachineSchemeService schemeService;
+    StateMachineSchemeService schemeService
 
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign
 
     @Shared
-    Long orginzationId = 1L;
+    Long organizationId = 1L
 
     @Shared
-    Long stateMachineId = 1L;
+    Long stateMachineId = 1L
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/state_machine_scheme'
 
     @Shared
-    List<StateMachineScheme> list = new ArrayList<>()
-
-    //初始化40条数据 设置mock StateMachineServiceFeign
-    def setup() {
-        //Mock StateMachineServiceFeign
-        // *_表示任何长度的参数
-        StateMachineDTO stateMachineDTO = new StateMachineDTO();
-        stateMachineDTO.setId(stateMachineId)
-        stateMachineDTO.setName("状态机名称")
-        stateMachineDTO.setDescription("状态机描述")
-        ResponseEntity<StateMachineDTO> responseEntity = new ResponseEntity<>(stateMachineDTO, HttpStatus.OK)
-        stateMachineServiceFeign.queryStateMachineById(*_) >> responseEntity
-
-        def name = 'name'
-        def description = 'description'
-        def testType = '1'
-        for (int i = 2; i <= 40; i++) {
-            StateMachineScheme scheme = new StateMachineScheme();
-            scheme.setId(i);
-            scheme.setName(name + i)
-            scheme.setDescription(description + i)
-            scheme.setOrganizationId(orginzationId)
-            int isInsert = schemeService.insert(scheme)
-            if (isInsert == 1) {
-                list.add(scheme)
-            }
-        }
-    }
-
-    def cleanup() {
-        StateMachineScheme del = new StateMachineScheme();
-        schemeService.delete(del);//清空数据
-        list.clear();
-    }
+    List<StateMachineSchemeDTO> list = new ArrayList<>()
+    @Shared
+    List<Long> configIds = new ArrayList<>()
 
     def "pagingQuery"() {
         when: '查询状态机方案列表'
@@ -95,36 +66,38 @@ class StateMachineSchemeControllerSpec extends Specification {
             url = url + "&param=" + param
         }
         ParameterizedTypeReference<Page<StateMachineSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<StateMachineSchemeDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         entity.getBody().size() == size
 
         where: '测试用例：'
-        name     | description     | param  || isSuccess | size
-        null     | null            | null   || true      | 20
-        'name40' | null            | null   || true      | 1
-        null     | 'description40' | null   || true      | 1
-        'name40' | 'description40' | null   || true      | 1
-        null     | null            | 'name' || true      | 20
+        name              | description     | param  || isSuccess | size
+        null              | null            | null   || true      | 4
+        'test默认状态机方案【测试】' | null            | null   || true      | 2
+        null              | 'description40' | null   || true      | 4
+        'name40'          | 'description40' | null   || true      | 4
+        null              | null            | 'name' || true      | 4
     }
 
     def "create"() {
         given: '创建状态机方案'
-        StateMachineSchemeDTO schemeDTO = new StateMachineSchemeDTO();
+        StateMachineSchemeDTO schemeDTO = new StateMachineSchemeDTO()
         schemeDTO.setName(name)
-        schemeDTO.setType(type)
         schemeDTO.setDescription(description)
 
         when: '状态机方案写入数据库'
         HttpEntity<StateMachineSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, StateMachineSchemeDTO, orginzationId)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, StateMachineSchemeDTO, organizationId)
 
         then: '状态码为200，创建成功'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
+        if (reponseResult) {
+            list.add(entity.body)
+        }
 
         where: '测试用例：'
         name         | description         | type     || isSuccess | reponseResult
@@ -136,103 +109,64 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "update"() {
         given: '更新状态机方案'
-        StateMachineSchemeDTO schemeDTO = new StateMachineSchemeDTO()
+        StateMachineSchemeDTO schemeDTO = list.get(0)
         schemeDTO.setName(name)
         schemeDTO.setDescription(description)
-        schemeDTO.setObjectVersionNumber(1L)
-        schemeDTO.setOrganizationId(orginzationId)
+        schemeDTO.setOrganizationId(organizationId)
         when: '状态机方案写入数据库'
         HttpEntity<StateMachineSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
-        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.PUT, httpEntity, StateMachineSchemeDTO, orginzationId, schemeId)
+        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.PUT, httpEntity, StateMachineSchemeDTO, organizationId, schemeDTO.id)
 
         then: '更新成功判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
 
         where: '测试用例：'
-        schemeId | name         | description         || isSuccess | reponseResult
-        1        | 'test-name1' | 'test-description1' || true      | true
-        1        | null         | 'test-description1' || true      | true
-        1        | ""           | 'test-description1' || true      | false
-    }
-
-    def "delete"() {
-        when: '删除状态机方案'
-        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.DELETE, null, Object, orginzationId, schemeId)
-
-        then: '删除结果判断'
-        entity.getStatusCode().is2xxSuccessful() == isSuccess
-        if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
-            entity.getBody() != null && entity.getBody() == reponseResult
-        } else if (entity.getBody() != null) {
-            Map map = (Map) entity.getBody();
-            map.get("failed") == reponseResult;
-            map.get("code") == "error.stateMachineScheme.delete";
-        }
-
-        where: '测试用例：'
-        schemeId || isSuccess | reponseResult
-//        null                || true      | false
-        1        || true      | true
-        99       || true      | true
+        name         | description         || isSuccess | reponseResult
+        'test-name1' | 'test-description1' || true      | true
+        null         | 'test-description1' || true      | false
+        ""           | 'test-description1' || true      | false
     }
 
     def "querySchemeWithConfigById"() {
         when: '根据id查询状态机方案对象'
-        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.GET, null, StateMachineSchemeDTO, orginzationId, schemeId)
+        def entity = restTemplate.exchange(baseUrl + "/query_scheme_with_config/{scheme_id}?isDraft={isDraft}", HttpMethod.GET, null, StateMachineSchemeDTO, organizationId, schemeId, isDraft)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
 
         where: '测试用例：'
-        schemeId || isSuccess | reponseResult
-        null     || true      | false
-        1        || true      | true
-        99       || true      | false
+        schemeId       | isDraft || isSuccess | reponseResult
+        null           | false    | false     | false
+        list.get(0).id | true     | true      | true
+        99             | true     | true      | false
     }
 
     def "createConfig"() {
-        /*given: '设置feign mock'
-        StateMachineSchemeConfigDTO configDTO = new StateMachineSchemeConfigDTO();
-        configDTO.setIssueTypeId(1L);
+        given: '设置feign mock'
+        StateMachineSchemeConfigDTO configDTO = new StateMachineSchemeConfigDTO()
+        configDTO.setIssueTypeId(1L)
         List<StateMachineSchemeConfigDTO> configDTOS = new ArrayList<>()
-        configDTOS.add(configDTO);
+        configDTOS.add(configDTO)
 
         when: '创建方案配置'
         HttpEntity<List<StateMachineSchemeConfigDTO>> httpEntity = new HttpEntity<>(configDTOS)
-        def entity = restTemplate.exchange(baseUrl + "/create_config/{scheme_id}/{state_machine_id}", HttpMethod.POST, httpEntity, StateMachineSchemeDTO, orginzationId, schemeId, stateMachineId)
+        def entity = restTemplate.exchange(baseUrl + "/create_config/{scheme_id}/{state_machine_id}", HttpMethod.POST, httpEntity, StateMachineSchemeDTO, organizationId, schemeId, stateMachineId)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
+        if (reponseResult) {
+            entity.getBody().getConfigDTOs().each { a ->
+                configIds.add(a.id)
+            }
+        }
 
         where: '测试用例：'
         schemeId            | stateMachineId || isSuccess | reponseResult
 //        null                | null           || false     | false
-        list.get(0).getId() | 1              || true      | true*/
-    }
-
-    def "deleteConfig"() {
-        given: '创建方案配置'
-        StateMachineSchemeConfigDTO configDTO = new StateMachineSchemeConfigDTO();
-        configDTO.setIssueTypeId(1L);
-        configDTO.setStateMachineId(1L);
-        List<StateMachineSchemeConfigDTO> configDTOS = new ArrayList<>()
-        configDTOS.add(configDTO);
-        schemeService.createSchemeConfig(orginzationId, list.get(0).getId(), configDTOS);
-
-        when: '删除方案配置'
-        def entity = restTemplate.exchange(baseUrl + "/delete_config/{scheme_id}/{state_machine_id}", HttpMethod.DELETE, null, StateMachineSchemeDTO, orginzationId, schemeId, stateMachineId)
-
-        then: '结果判断'
-        entity.getStatusCode().is2xxSuccessful() == isSuccess
-        (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
-
-        where: '测试用例：'
-        schemeId | stateMachineId || isSuccess | reponseResult
-//        null                | null           || false     | false
-        1        | 1              || true      | true
+        list.get(0).getId() | 1              || true      | true
     }
 
     def "checkName"() {
@@ -245,22 +179,39 @@ class StateMachineSchemeControllerSpec extends Specification {
             url = url + "&name=" + name
         }
 
-        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {};
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
+        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {}
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         entity.getBody() != null && entity.getBody() == reponseResult
 
         where: '测试用例：'
-        scheme_id | name       || isSuccess | reponseResult
-//        null                | null       || false     | false
-        null      | 'name1'    || true      | false
-        null      | 'namename' || true      | true
-        1         | 'name1'    || true      | true
-        1         | 'name2'    || true      | false
-        1         | 'testtest' || true      | true
-//        list.get(0).getId() | null       || true      | false
+        scheme_id           | name       || isSuccess | reponseResult
+        null                | 'name1'    || true      | false
+        list.get(0).getId() | 'name1'    || true      | false
+    }
+
+    def "deleteConfig"() {
+        when: '删除方案配置'
+        def entity = restTemplate.exchange(baseUrl + "/delete_config/{scheme_id}/{state_machine_id}", HttpMethod.DELETE, null, StateMachineSchemeDTO, organizationId, id, 1L)
+
+        then: '结果判断'
+        entity.body
+
+        where: '测试用例：'
+        id << list
+    }
+
+    def "delete"() {
+        when: '删除状态机方案'
+        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.DELETE, null, Object, organizationId, stateMachineScheme.id)
+
+        then: '删除结果判断'
+        entity.body
+
+        where: '测试用例：'
+        stateMachineScheme << list
     }
 
 

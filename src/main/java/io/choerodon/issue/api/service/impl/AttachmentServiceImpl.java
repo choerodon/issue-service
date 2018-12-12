@@ -152,7 +152,7 @@ public class AttachmentServiceImpl extends BaseServiceImpl<Attachment> implement
         if (attachmentMapper.insert(attachment) != 1) {
             throw new CommonException(INSERT_ERROR);
         }
-        return ConvertHelper.convert(attachmentMapper.selectByPrimaryKey(attachment.getId()), Attachment.class);
+        return attachmentMapper.selectByPrimaryKey(attachment.getId());
     }
 
     @Override

@@ -2,9 +2,11 @@ package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.IssueTypeDTO
+import io.choerodon.issue.api.dto.IssueTypeSearchDTO
 import io.choerodon.issue.api.service.IssueTypeService
 import io.choerodon.issue.domain.IssueType
 import io.choerodon.core.domain.Page
+import io.choerodon.issue.infra.mapper.IssueTypeMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -31,16 +33,16 @@ class IssueTypeControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    IssueTypeService issueTypeService;
+    IssueTypeService issueTypeService
+
+    @Autowired
+    IssueTypeMapper issueTypeMapper
 
     @Shared
-    Long testOrginzationId = 1L;
+    Long organizationId = 1L
 
     @Shared
-    List<IssueTypeDTO> list = new ArrayList<>();
-
-    @Shared
-    String baseUrl = '/v1/organizations/{organization_id}/issue_type'
+    List<IssueTypeDTO> list = new ArrayList<>()
 
     /**
      * 测试编写说明：
@@ -51,38 +53,18 @@ class IssueTypeControllerSpec extends Specification {
      * 5、在path和param中的参数均有null校验，若传null，调用成功，被spring抛出异常，被捕获，entity返回值为200，actRequest为true
      */
 
-    //初始化5条数据
-    def setup() {
-        println "执行初始化"
-        for (int i = 1; i <= 5; i++) {
-            IssueTypeDTO issueTypeDTO = new IssueTypeDTO()
-            issueTypeDTO.setId(i)
-            issueTypeDTO.setName("init_name" + i)
-            issueTypeDTO.setIcon("init_icon" + i)
-            issueTypeDTO.setDescription("init_description" + i)
-            issueTypeDTO.setOrganizationId(testOrginzationId)
-            issueTypeDTO = issueTypeService.create(testOrginzationId, issueTypeDTO)
-            list.add(issueTypeDTO)
-        }
-    }
-
-    def cleanup() {
-        IssueType del = new IssueType()
-        issueTypeService.delete(del);//清空数据
-        list.clear();
-    }
-
     def "create"() {
         given: '准备工作'
-        IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
-        issueTypeDTO.setName(name);
-        issueTypeDTO.setIcon(icon);
-        issueTypeDTO.setDescription(description);
-        issueTypeDTO.setOrganizationId(testOrginzationId);
+        IssueTypeDTO issueTypeDTO = new IssueTypeDTO()
+        issueTypeDTO.setName(name)
+        issueTypeDTO.setTypeCode(name)
+        issueTypeDTO.setIcon(icon)
+        issueTypeDTO.setDescription(description)
+        issueTypeDTO.setOrganizationId(organizationId)
 
         when: '创建问题类型'
         HttpEntity<IssueTypeDTO> httpEntity = new HttpEntity<>(issueTypeDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, IssueTypeDTO, testOrginzationId)
+        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type", HttpMethod.POST, httpEntity, IssueTypeDTO, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -93,6 +75,7 @@ class IssueTypeControllerSpec extends Specification {
                 if (entity.getBody() != null) {
                     if (entity.getBody().getId() != null) {
                         actResponse = true
+                        list.add(entity.body)
                     }
                 }
             }
@@ -101,25 +84,26 @@ class IssueTypeControllerSpec extends Specification {
         actResponse == expResponse
 
         where: '测试用例：'
-        name         | icon    | description    || expRequest | expResponse
-        'name1'      | 'icon1' | 'description1' || true       | true
-        null         | 'icon1' | 'description1' || true       | false
-        'name1'      | null    | 'description1' || true       | true
-        'name1'      | 'icon1' | null           || true       | true
-        'init_name1' | 'icon1' | 'description1' || true       | false
+        name         | icon    | typeCode | description    || expRequest | expResponse
+        'name1'      | 'icon1' | 'test'   | 'description1' || true       | true
+        null         | 'icon1' | 'test'   | 'description1' || true       | false
+        'name1'      | null    | 'test'   | 'description1' || true       | false
+        'name11'     | 'icon1' | 'test'   | null           || true       | true
+        'init_name1' | 'icon1' | 'test'   | 'description1' || true       | true
     }
 
     def "update"() {
         given: '准备工作'
-        IssueTypeDTO issueTypeDTO = list.get(0);
-        issueTypeDTO.setName(name);
-        issueTypeDTO.setIcon(icon);
-        issueTypeDTO.setDescription(description);
-        issueTypeDTO.setOrganizationId(testOrginzationId);
+        IssueTypeDTO issueTypeDTO = list.get(0)
+        issueTypeDTO.setName(name)
+        issueTypeDTO.setIcon(icon)
+        issueTypeDTO.setDescription(description)
+        issueTypeDTO.setOrganizationId(organizationId)
+        issueTypeDTO.setObjectVersionNumber(objectVersionNumber)
 
         when: '更新问题类型'
         HttpEntity<IssueTypeDTO> httpEntity = new HttpEntity<>(issueTypeDTO)
-        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, IssueTypeDTO, testOrginzationId, issueTypeDTO.getId())
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + '/{id}', HttpMethod.PUT, httpEntity, IssueTypeDTO, organizationId, issueTypeDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -138,12 +122,12 @@ class IssueTypeControllerSpec extends Specification {
         actResponse == expResponse
 
         where: '测试用例：'
-        name         | icon    | description    || expRequest | expResponse
-        'name1'      | 'icon1' | 'description1' || true       | true
-        null         | 'icon1' | 'description1' || true       | false
-        'name1'      | null    | 'description1' || true       | true
-        'name1'      | 'icon1' | null           || true       | true
-        'init_name2' | 'icon1' | 'description1' || true       | false
+        name         | icon    | description    | objectVersionNumber || expRequest | expResponse
+        'name1'      | 'icon1' | 'description1' | 1                    | true       | true
+        null         | 'icon1' | 'description1' | 1                    | true       | false
+        'name1'      | null    | 'description1' | 2                    | true       | true
+        'name1'      | 'icon1' | null           | 3                    | true       | true
+        'init_name2' | 'icon1' | 'description1' | 3                    | true       | false
     }
 
     def "checkDelete"() {
@@ -151,7 +135,7 @@ class IssueTypeControllerSpec extends Specification {
         def issueTypeId = id
 
         when: '校验问题类型是否可以删除'
-        def entity = restTemplate.exchange(baseUrl + "/check_delete/{id}", HttpMethod.GET, null, Map, testOrginzationId, issueTypeId)
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/check_delete/{id}", HttpMethod.GET, null, Map, organizationId, issueTypeId)
 
         then: '状态码为200，调用成功'
 
@@ -177,50 +161,17 @@ class IssueTypeControllerSpec extends Specification {
         null   || false      | false
     }
 
-    def "delete"() {
-        given: '准备工作'
-        def issueTypeId = id
-
-        when: '删除问题类型'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, testOrginzationId, issueTypeId)
-
-        then: '状态码为200，调用成功'
-        def actRequest = false
-        def actResponse = false
-        if (entity != null) {
-            if (entity.getStatusCode().is2xxSuccessful()) {
-                actRequest = true
-                if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
-                    actResponse = entity.getBody()
-                }
-            }
-        }
-        actRequest == expRequest
-        actResponse == expResponse
-
-        where: '测试用例：'
-        id     || expRequest | expResponse
-        '1'    || true       | true
-        '9999' || true       | false
-        null   || false      | false
-    }
-
     def "pageQuery"() {
         given: '准备工作'
-        def url = baseUrl + "?1=1"
-        if (name != null) {
-            url = url + "&name=" + name
-        }
-        if (description != null) {
-            url = url + "&description=" + description
-        }
-        if (param != null) {
-            url = url + "&param=" + param
-        }
+        def url = '/v1/organizations/{organization_id}/issue_type/list?page={page}&&size={size}'
+        IssueTypeSearchDTO issueTypeSearchDTO = new IssueTypeSearchDTO()
+        issueTypeSearchDTO.name = name
+        issueTypeSearchDTO.description = description
+        issueTypeSearchDTO.param = param
         when: '分页查询'
-        ParameterizedTypeReference<Page<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<Page<IssueTypeDTO>>() {
-        }
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
+        ParameterizedTypeReference<Page<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<Page<IssueTypeDTO>>() {}
+        HttpEntity<IssueTypeSearchDTO> issueTypeSearchDTOHttpEntity = new HttpEntity<>(issueTypeSearchDTO)
+        def entity = restTemplate.exchange(url, HttpMethod.POST, issueTypeSearchDTOHttpEntity, typeRef, organizationId, 0, 10000)
 
         then: '返回结果'
         def actRequest = false
@@ -229,7 +180,7 @@ class IssueTypeControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }
@@ -238,17 +189,17 @@ class IssueTypeControllerSpec extends Specification {
 
         where: '测试用例：'
         name         | description         | param  || expRequest | expResponseSize
-        null         | null                | null   || true       | 5
+        null         | null                | null   || true       | 10
         'init_name1' | null                | null   || true       | 1
-        null         | 'init_description1' | null   || true       | 1
-        null         | null                | 'init' || true       | 5
+        null         | 'init_description1' | null   || true       | 0
+        null         | null                | 'init' || true       | 1
         'notFound'   | null                | null   || true       | 0
-        'init'       | 'init'              | 'init' || true       | 5
+        'init'       | 'init'              | 'init' || true       | 0
     }
 
     def "checkName"() {
         given: '准备工作'
-        def url = baseUrl + "/check_name?1=1"
+        def url = '/v1/organizations/{organization_id}/issue_type' + "/check_name?1=1"
         if (name != null) {
             url = url + "&name=" + name
         }
@@ -257,7 +208,7 @@ class IssueTypeControllerSpec extends Specification {
         }
 
         when: '校验问题类型名字是否未被使用'
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, testOrginzationId)
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, organizationId)
 
         then: '状态码为200，调用成功'
 
@@ -271,21 +222,19 @@ class IssueTypeControllerSpec extends Specification {
         }
         actRequest == expRequest
         actResponse == expResponse
-//        then:
-//        thrown(Exception)
 
         where: '测试用例：'
         name         | id   || expRequest | expResponse
         'init_name1' | null || true       | false
-        'init_name1' | '1'  || true       | true
-        'name1'      | null || true       | true
+        'init_name1' | '1'  || true       | false
+        'init_name2' | null || true       | true
     }
 
     def "queryByOrgId"() {
         when: '获取问题类型列表'
         ParameterizedTypeReference<List<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<List<IssueTypeDTO>>() {
-        };
-        def entity = restTemplate.exchange(baseUrl + "/types", HttpMethod.GET, null, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/types", HttpMethod.GET, null, typeRef, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -304,7 +253,7 @@ class IssueTypeControllerSpec extends Specification {
 
         where: '测试用例：'
         expRequest | expResponseSize
-        true       | 5
+        true       | 10
     }
 
     def "queryById"() {
@@ -312,7 +261,7 @@ class IssueTypeControllerSpec extends Specification {
         def issueTypeId = id
 
         when: '根据id查询问题类型'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, IssueTypeDTO, testOrginzationId, issueTypeId)
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/{id}", HttpMethod.GET, null, IssueTypeDTO, organizationId, issueTypeId)
 
         then: '状态码为200，调用成功'
 
@@ -335,6 +284,21 @@ class IssueTypeControllerSpec extends Specification {
         id     || expRequest | expResponse
         '1'    || true       | true
         '9999' || true       | false
-        null   || true       | false
+        null   || false      | false
+    }
+
+    def "delete"() {
+        given: '准备工作'
+        def issueTypeId = issueType.id
+
+        when: '删除问题类型'
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/{id}", HttpMethod.DELETE, null, Object, organizationId, issueTypeId)
+
+        then: '状态码为200，调用成功'
+        entity.body == true
+
+        where: ''
+        issueType << list
+
     }
 }

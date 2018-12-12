@@ -33,3 +33,5 @@ eureka:
 services:
   attachment:
     url: example.com
+testScanIgnore:
+  enabled: true
