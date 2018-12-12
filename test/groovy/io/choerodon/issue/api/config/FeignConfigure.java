@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
@@ -58,6 +59,13 @@ public class FeignConfigure {
         userDTO.setRealName("XX");
         userDTO.setLoginName("XX");
         Mockito.when(userFeignClient.queryInfo(Matchers.anyLong())).thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
+        Page<ProjectDTO> projectDTOS = new Page<>();
+        List<ProjectDTO> projectDTOList = new ArrayList<>(1);
+        projectDTOList.add(projectDTO);
+        projectDTOS.setContent(projectDTOList);
+        projectDTOS.setTotalPages(1);
+        projectDTOS.setSize(1);
+        Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt(), Matchers.any(String[].class), Matchers.anyString(), Matchers.anyString(), Matchers.anyBoolean(), Matchers.any(String[].class))).thenReturn(new ResponseEntity<>(projectDTOS, HttpStatus.OK));
         return userFeignClient;
     }
 

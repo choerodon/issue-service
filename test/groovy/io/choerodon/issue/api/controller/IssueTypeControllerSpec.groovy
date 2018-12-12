@@ -222,14 +222,12 @@ class IssueTypeControllerSpec extends Specification {
         }
         actRequest == expRequest
         actResponse == expResponse
-//        then:
-//        thrown(Exception)
 
         where: '测试用例：'
         name         | id   || expRequest | expResponse
         'init_name1' | null || true       | false
-        'init_name1' | '1'  || true       | true
-        'name1'      | null || true       | true
+        'init_name1' | '1'  || true       | false
+        'init_name2' | null || true       | true
     }
 
     def "queryByOrgId"() {
@@ -255,7 +253,7 @@ class IssueTypeControllerSpec extends Specification {
 
         where: '测试用例：'
         expRequest | expResponseSize
-        true       | 5
+        true       | 10
     }
 
     def "queryById"() {
@@ -286,7 +284,7 @@ class IssueTypeControllerSpec extends Specification {
         id     || expRequest | expResponse
         '1'    || true       | true
         '9999' || true       | false
-        null   || true       | false
+        null   || false      | false
     }
 
     def "delete"() {

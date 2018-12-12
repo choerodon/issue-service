@@ -18,6 +18,12 @@ import spock.lang.Stepwise
 
 
 /**
+ *  测试编写说明：
+ *  1、setup初始化数据执行在每一个单元测试的每一条测试数据之前
+ *  2、调用controller方法失败（格式错误等），entity为空，actRequest为false
+ *  3、调用成功，执行controller方法时抛出异常，未处理的异常，entity返回值非200，actRequest为false
+ *  4、调用成功，执行controller方法时抛出异常，被捕获，entity返回值为200，actRequest为true
+ *  5、在path和param中的参数均有null校验，若传null，调用成功，被spring抛出异常，被捕获，entity返回值为200，actRequest为true
  * @author cong.cheng
  * @date 2018/8/23
  */
@@ -31,61 +37,29 @@ class PriorityControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    PriorityService priorityService;
+    PriorityService priorityService
 
     @Shared
-    Long testOrginzationId = 1L;
+    Long organizationId = 1L
 
     @Shared
-    List<PriorityDTO> list = new ArrayList<>();
+    List<PriorityDTO> list = new ArrayList<>()
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/priority'
 
-    /**
-     * 测试编写说明：
-     * 1、setup初始化数据执行在每一个单元测试的每一条测试数据之前
-     * 2、调用controller方法失败（格式错误等），entity为空，actRequest为false
-     * 3、调用成功，执行controller方法时抛出异常，未处理的异常，entity返回值非200，actRequest为false
-     * 4、调用成功，执行controller方法时抛出异常，被捕获，entity返回值为200，actRequest为true
-     * 5、在path和param中的参数均有null校验，若传null，调用成功，被spring抛出异常，被捕获，entity返回值为200，actRequest为true
-     */
-
-    //初始化5条数据
-    def setup() {
-        println "执行初始化"
-        for (int i = 1; i <= 5; i++) {
-            PriorityDTO priorityDTO = new PriorityDTO()
-            priorityDTO.setId(i)
-            priorityDTO.setName("init_name" + i)
-            priorityDTO.setColour("init_colour" + i)
-            priorityDTO.setDescription("init_description" + i)
-            priorityDTO.setOrganizationId(testOrginzationId)
-            priorityDTO.setDefault(true)
-            priorityDTO.setSequence(new BigDecimal(i))
-            priorityDTO = priorityService.create(testOrginzationId, priorityDTO)
-            list.add(priorityDTO)
-        }
-    }
-
-    def cleanup(){
-        Priority del = new Priority()
-        priorityService.delete(del);//清空数据
-        list.clear();
-    }
-
     def "create"() {
         given: '准备工作'
-        PriorityDTO priorityDTO = new PriorityDTO();
-        priorityDTO.setName(name);
-        priorityDTO.setDescription(description);
-        priorityDTO.setColour(colour);
+        PriorityDTO priorityDTO = new PriorityDTO()
+        priorityDTO.setName(name)
+        priorityDTO.setDescription(description)
+        priorityDTO.setColour(colour)
         priorityDTO.setDefault(isDefault)
-        priorityDTO.setOrganizationId(testOrginzationId);
+        priorityDTO.setOrganizationId(organizationId)
 
         when: '创建优先级类型'
         HttpEntity<PriorityDTO> httpEntity = new HttpEntity<>(priorityDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PriorityDTO, testOrginzationId)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PriorityDTO, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -95,6 +69,7 @@ class PriorityControllerSpec extends Specification {
                 actRequest = true
                 if (entity.getBody() != null) {
                     if (entity.getBody().getId() != null) {
+                        list.add(entity.body)
                         actResponse = true
                     }
                 }
@@ -104,29 +79,28 @@ class PriorityControllerSpec extends Specification {
         actResponse == expResponse
 
         where: '测试用例：'
-        name         | isDefault | colour         | description    || expRequest | expResponse
-        'name1'      | false       | 'aa'           | 'description1' || true       | true         //正常操作
-        null         | false       | 'aa'           | 'description1' || true       | false         //name null
-        'name2'      | false       | null           | 'description1' || true       | false          //color null
-        'name3'      | false      | 'aa'           | null           || true       | true           //描述可以为空 通过
-        'name4'      | null      | 'aa'           | 'description1' || false      | false       //isdefault null
-        'init_name1' | false      | 'aa'           | 'description1' || true       | false        //name 重复
-        'name6'      | true      | 'aa'           | 'description1' || true       | true         // 正常操作
+        name    | isDefault | colour | description    || expRequest | expResponse
+        'name1' | false     | 'aa'   | 'description1' || true       | true         //正常操作
+        null    | false     | 'aa'   | 'description1' || true       | false         //name null
+        'name2' | false     | null   | 'description1' || true       | false          //color null
+        'name4' | null      | 'aa'   | 'description1' || true       | true       //isdefault null
+//        'init_name1' | false     | 'aa'   | 'description1' || true       | false        //name 重复
+        'name6' | true      | 'aa'   | 'description1' || true       | true         // 正常操作
 
     }
 
     def "update"() {
         given: '准备工作'
-        PriorityDTO priorityDTO = list.get(0);
-        priorityDTO.setName(name);
-        priorityDTO.setDescription(description);
-        priorityDTO.setColour(colour);
+        PriorityDTO priorityDTO = list.get(0)
+        priorityDTO.setName(name)
+        priorityDTO.setDescription(description)
+        priorityDTO.setColour(colour)
         priorityDTO.setDefault(isDefault)
-        priorityDTO.setOrganizationId(testOrginzationId);
+        priorityDTO.setOrganizationId(organizationId)
 
         when: '更新优先级类型'
         HttpEntity<PriorityDTO> httpEntity = new HttpEntity<>(priorityDTO)
-        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, PriorityDTO, testOrginzationId, priorityDTO.getId())
+        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, PriorityDTO, organizationId, priorityDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -145,39 +119,13 @@ class PriorityControllerSpec extends Specification {
         actResponse == expResponse
 
         where: '测试用例：'
-        name         | isDefault | colour         | description    || expRequest | expResponse
-        'name1'      | false      | 'aa'           | 'description1' || true       | true        //正常操作
-        null         | false       | 'aa'           | 'description1' || true       | true        //name null即不修改原有值 通过
-        'name2'      | false       | null           | 'description1' || true       | true        //color null即不修改原有值 通过
-        'name3'      | false       | 'aa'           | null           || true       | true        //描述可以为空 通过
-        'name4'      | null      | 'aa'           | 'description1' || false      | false      //isdefault null 默认值将会影响到其他字段的更新 不能为空
-        'init_name2' | false       | 'aa'           | 'description1' || true       | false       //name 重复
-        'name6'      | true       | 'aa'           | 'description1' || true       | true        // 正常操作
-    }
-
-
-    def "delete"() {
-        given: '准备工作'
-        def priorityId = id
-
-        when: '删除优先级类型'
-        def entity = restTemplate.exchange(baseUrl + "/{priority_id}", HttpMethod.DELETE, null, Object, testOrginzationId, priorityId)
-
-        then: '状态码为200，调用成功'
-        entity.getStatusCode().is2xxSuccessful() == isSuccess
-        if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
-            entity.getBody() != null && entity.getBody() == reponseResult
-        } else if (entity.getBody() != null) {
-            Map map = (Map) entity.getBody();
-            map.get("failed") == reponseResult;
-            map.get("code") == "error.priority.delete";
-        }
-
-        where: '测试用例：'
-        id   || isSuccess | reponseResult
-        '1'  || true      | true     //删除成功
-        '10' || true      | false    //抛出异常,删除失败
-        // null || false     | false    //抛出异常
+        name    | isDefault | colour | description    || expRequest | expResponse
+        'name1' | false     | 'aa'   | 'description1' || true       | true        //正常操作
+        null    | false     | 'aa'   | 'description1' || true       | false        //name null即不修改原有值
+        'name2' | false     | null   | 'description1' || true       | false         //color null即不修改原有值
+        'name3' | false     | 'aa'   | null           || true       | false        //描述可以为空 通过
+        'name4' | null      | 'aa'   | 'description1' || true       | false      //isdefault null 默认值将会影响到其他字段的更新 不能为空
+        'name6' | true      | 'aa'   | 'description1' || true       | false        // name 重复
     }
 
     def "selectAll"() {
@@ -197,8 +145,8 @@ class PriorityControllerSpec extends Specification {
         }
         when: '展示优先级列表'
         ParameterizedTypeReference<List<PriorityDTO>> typeRef = new ParameterizedTypeReference<List<PriorityDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         def actRequest = false
@@ -207,7 +155,7 @@ class PriorityControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }
@@ -216,13 +164,13 @@ class PriorityControllerSpec extends Specification {
 
         where: '测试用例：'
         name         | description         | colour         | param  || expRequest | expResponseSize
-        null         | null                | null           | null   || true       | 5
-        'init_name1' | null                | null           | null   || true       | 1
-        null         | 'init_description1' | null           | null   || true       | 1
-        null         | null                | null           | 'init' || true       | 5
+        null         | null                | null           | null   || true       | 6
+        'init_name1' | null                | null           | null   || true       | 0
+        null         | 'init_description1' | null           | null   || true       | 0
+        null         | null                | null           | 'init' || true       | 0
         'notFound'   | null                | null           | null   || true       | 0
-        'init'       | 'init'              | 'init'         | 'init' || true       | 5
-        null         | null                | 'init_colour1' | null   || true       | 1
+        'init'       | 'init'              | 'init'         | 'init' || true       | 0
+        null         | null                | 'init_colour1' | null   || true       | 0
     }
 
     def "checkName"() {
@@ -236,7 +184,7 @@ class PriorityControllerSpec extends Specification {
         }
 
         when: '校验优先级类型名字是否未被使用'
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, testOrginzationId)
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, organizationId)
 
         then: '状态码为200，调用成功'
 
@@ -250,13 +198,11 @@ class PriorityControllerSpec extends Specification {
         }
         actRequest == expRequest
         actResponse == expResponse
-//        then:
-//        thrown(Exception)
 
         where: '测试用例：'
         name         | id   || expRequest | expResponse
-        'init_name1' | null || true       | false
-        'init_name1' | '1'  || true       | true
+        'name6'      | null || true       | true
+        'init_name1' | '1'  || true       | false
         'name1'      | null || true       | true
     }
 
@@ -265,25 +211,37 @@ class PriorityControllerSpec extends Specification {
         def url = baseUrl + "/sequence"
 
         when: '拖拽排序'
-        List<PriorityDTO> reqList = new ArrayList<>();
-        reqList.add(list.get(0));
-        reqList.add(list.get(2));
-        reqList.add(list.get(1));
-        reqList.add(list.get(3));
-        reqList.add(list.get(4));
-        HttpEntity<List<PriorityDTO>> httpEntity = new HttpEntity(reqList);
+        List<PriorityDTO> reqList = new ArrayList<>()
+        reqList.add(list.get(0))
+        reqList.add(list.get(2))
+        reqList.add(list.get(1))
+        HttpEntity<List<PriorityDTO>> httpEntity = new HttpEntity(reqList)
         ParameterizedTypeReference<List<PriorityDTO>> typeRef = new ParameterizedTypeReference<List<PriorityDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.PUT, httpEntity, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.PUT, httpEntity, typeRef, organizationId)
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().value() == 200
         List<PriorityDTO> e = entity.getBody()
         e.get(0).getId() == 1
-        e.get(1).getId() == 3
-        e.get(2).getId() == 2
-        e.get(3).getId() == 4
-        e.get(4).getId() == 5
+        e.get(1).getId() == 2
+        e.get(2).getId() == 4
+        e.get(3).getId() == 3
+        e.get(4).getId() == 6
 
+    }
+
+    def "delete"() {
+        given: '准备工作'
+        def priorityId = priority.id
+
+        when: '删除优先级类型'
+        def entity = restTemplate.exchange(baseUrl + "/{priority_id}", HttpMethod.DELETE, null, Object, organizationId, priorityId)
+
+        then: '状态码为200，调用成功'
+        entity.body
+
+        where: '测试用例：'
+        priority << list
     }
 }
