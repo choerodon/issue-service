@@ -337,6 +337,15 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
     @Override
     public Boolean updateDeployProgress(Long organizationId, Long schemeId, Integer deployProgress) {
-        return schemeMapper.updateDeployProgress(organizationId, schemeId, deployProgress) == 1;
+        int update = schemeMapper.updateDeployProgress(organizationId, schemeId, deployProgress);
+        if (update == 1) {
+            //若已完成，更新发布状态
+            if (deployProgress.equals(100)) {
+                schemeMapper.updateDeployStatus(organizationId, schemeId, "done");
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 }

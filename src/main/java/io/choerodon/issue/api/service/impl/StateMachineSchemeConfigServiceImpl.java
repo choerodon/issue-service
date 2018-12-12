@@ -295,6 +295,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
 
         changeMap.put("deleteStatusIds", deleteStatusIds);
         changeMap.put("addStatusIds", addStatusIds);
+
+        schemeMapper.updateDeployStatus(organizationId, schemeId, "done");
         return changeMap;
     }
 
@@ -312,6 +314,8 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         stateMachineSchemeService.updateOptional(scheme, "status");
         //发布后，再进行状态增加与减少的判断，并发送saga
         ChangeStatus changeStatus = new ChangeStatus(addStatusIds, deleteStatusIds);
+        //发布之前，更新deployStatus为doing
+        schemeMapper.updateDeployStatus(organizationId, schemeId, "doing");
         sagaService.deployStateMachineScheme(organizationId, schemeId, changeItems, changeStatus);
         //新增的状态机ids和删除的状态机ids
         List<Long> oldStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getOldStateMachineId).distinct().collect(Collectors.toList());

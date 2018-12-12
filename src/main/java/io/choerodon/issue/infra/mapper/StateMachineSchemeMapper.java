@@ -53,4 +53,13 @@ public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme>
      * @return Integer
      */
     Integer updateDeployProgress(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId, @Param("deployProgress") Integer deployProgress);
+
+    /**
+     * 更新发布状态
+     *
+     * @param organizationId
+     * @param schemeId
+     * @param deployStatus
+     */
+    void updateDeployStatus(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId, @Param("deployStatus") String deployStatus);
 }

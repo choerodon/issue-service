@@ -42,4 +42,9 @@ databaseChangeLog(logicalFilePath: 'state_machine_scheme.groovy') {
             column(name: 'deploy_progress', type: 'int', remarks: '发布状态机方案更新agile服务进度', defaultValue: "0")
         }
     }
+    changeSet(id: '2018-12-12-add-column-state-machine-scheme', author: 'shinan.chenX@gmail.com') {
+        addColumn(tableName: 'state_machine_scheme') {
+            column(name: 'deploy_status', type: 'VARCHAR(30)', remarks: '状态机方案的发布状态', defaultValue: "done")
+        }
+    }
 }
