@@ -28,22 +28,22 @@ class PageSchemeControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    PageService pageService;
+    PageService pageService
 
     @Autowired
-    FieldService fieldService;
+    FieldService fieldService
 
     @Autowired
-    PageFieldRefService pageFieldRefService;
+    PageFieldRefService pageFieldRefService
 
     @Autowired
-    PageSchemeService pageSchemeService;
+    PageSchemeService pageSchemeService
 
     @Autowired
-    PageSchemeLineService pageSchemeLineService;
+    PageSchemeLineService pageSchemeLineService
 
     @Shared
-    Long orginzationId = 1L;
+    Long organizationId = 1L
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/page_scheme'
@@ -63,11 +63,11 @@ class PageSchemeControllerSpec extends Specification {
         def fieldName = 'name-'
         def fieldDescription = 'description-'
         for (FieldType e : FieldType.values()) {
-            FieldDTO fieldDTO = new FieldDTO();
-            fieldDTO.setName(fieldName + e.value());
-            fieldDTO.setDescription(fieldDescription + e.value());
+            FieldDTO fieldDTO = new FieldDTO()
+            fieldDTO.setName(fieldName + e.value())
+            fieldDTO.setDescription(fieldDescription + e.value())
             fieldDTO.setType(e.value())
-            FieldDTO insertDTO = fieldService.create(orginzationId, fieldDTO)
+            FieldDTO insertDTO = fieldService.create(organizationId, fieldDTO)
             if (insertDTO != null) {
                 fieldList.add(insertDTO)
             }
@@ -76,15 +76,15 @@ class PageSchemeControllerSpec extends Specification {
         def pageName = 'pageName'
         def pageDescription = 'pageDescription'
         for (int i = 1; i <= 10; i++) {
-            PageDetailDTO pageDetailDTO = new PageDetailDTO();
-            pageDetailDTO.setId(i);
+            PageDetailDTO pageDetailDTO = new PageDetailDTO()
+            pageDetailDTO.setId(i)
             pageDetailDTO.setName(pageName + i)
             pageDetailDTO.setDescription(pageDescription + i)
-            pageDetailDTO.setOrganizationId(orginzationId)
-            FieldDTO fieldDTO2 = new FieldDTO();
-            fieldDTO2.setId(fieldList.get(0).getId());
-            pageDetailDTO.setFieldDTOs(Arrays.asList(fieldDTO2));
-            PageDetailDTO insertDTO = pageService.create(orginzationId, pageDetailDTO)
+            pageDetailDTO.setOrganizationId(organizationId)
+            FieldDTO fieldDTO2 = new FieldDTO()
+            fieldDTO2.setId(fieldList.get(0).getId())
+            pageDetailDTO.setFieldDTOs(Arrays.asList(fieldDTO2))
+            PageDetailDTO insertDTO = pageService.create(organizationId, pageDetailDTO)
             if (insertDTO != null) {
                 pageList.add(insertDTO)
             }
@@ -94,30 +94,30 @@ class PageSchemeControllerSpec extends Specification {
         def name = 'name'
         def description = 'description'
         for (int i = 1; i <= 40; i++) {
-            PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO();
-            pageSchemeDetailDTO.setId(i);
+            PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO()
+            pageSchemeDetailDTO.setId(i)
             pageSchemeDetailDTO.setName(name + i)
             pageSchemeDetailDTO.setDescription(description + i)
-            pageSchemeDetailDTO.setOrganizationId(orginzationId)
+            pageSchemeDetailDTO.setOrganizationId(organizationId)
 
-            List<PageSchemeLineDTO> pageSchemeLineDTOS = new ArrayList<>();
-            PageSchemeLineDTO lineDTO1 = new PageSchemeLineDTO();
-            lineDTO1.setPageId(pageList.get(0).getId());
-            lineDTO1.setType(PageSchemeLineType.DEFAULT.value());
+            List<PageSchemeLineDTO> pageSchemeLineDTOS = new ArrayList<>()
+            PageSchemeLineDTO lineDTO1 = new PageSchemeLineDTO()
+            lineDTO1.setPageId(pageList.get(0).getId())
+            lineDTO1.setType(PageSchemeLineType.DEFAULT.value())
 
-            PageSchemeLineDTO lineDTO2 = new PageSchemeLineDTO();
-            lineDTO2.setPageId(pageList.get(1).getId());
-            lineDTO2.setType(PageSchemeLineType.CREATE.value());
+            PageSchemeLineDTO lineDTO2 = new PageSchemeLineDTO()
+            lineDTO2.setPageId(pageList.get(1).getId())
+            lineDTO2.setType(PageSchemeLineType.CREATE.value())
 
-            PageSchemeLineDTO lineDTO3 = new PageSchemeLineDTO();
-            lineDTO3.setPageId(pageList.get(2).getId());
-            lineDTO3.setType(PageSchemeLineType.EDIT.value());
+            PageSchemeLineDTO lineDTO3 = new PageSchemeLineDTO()
+            lineDTO3.setPageId(pageList.get(2).getId())
+            lineDTO3.setType(PageSchemeLineType.EDIT.value())
 
-            pageSchemeLineDTOS.add(lineDTO1);
-            pageSchemeLineDTOS.add(lineDTO2);
-            pageSchemeLineDTOS.add(lineDTO3);
-            pageSchemeDetailDTO.setPageSchemeLineDTOS(pageSchemeLineDTOS);
-            PageSchemeDetailDTO insertDTO = pageSchemeService.create(orginzationId, pageSchemeDetailDTO)
+            pageSchemeLineDTOS.add(lineDTO1)
+            pageSchemeLineDTOS.add(lineDTO2)
+            pageSchemeLineDTOS.add(lineDTO3)
+            pageSchemeDetailDTO.setPageSchemeLineDTOS(pageSchemeLineDTOS)
+            PageSchemeDetailDTO insertDTO = pageSchemeService.create(organizationId, pageSchemeDetailDTO)
             if (insertDTO != null) {
                 pageSchemeList.add(insertDTO)
             }
@@ -126,49 +126,49 @@ class PageSchemeControllerSpec extends Specification {
 
     def cleanup() {
         //清空数据
-        Field delField = new Field();
-        fieldService.delete(delField);
-        Page page = new Page();
-        pageService.delete(page);
-        PageFieldRef pageFieldRef = new PageFieldRef();
-        pageFieldRefService.delete(pageFieldRef);
-        PageScheme pageScheme = new PageScheme();
-        pageSchemeService.delete(pageScheme);
-        PageSchemeLine pageSchemeLine = new PageSchemeLine();
-        pageSchemeLineService.delete(pageSchemeLine);
-        fieldList.clear();
-        pageList.clear();
-        pageSchemeList.clear();
+        Field delField = new Field()
+        fieldService.delete(delField)
+        Page page = new Page()
+        pageService.delete(page)
+        PageFieldRef pageFieldRef = new PageFieldRef()
+        pageFieldRefService.delete(pageFieldRef)
+        PageScheme pageScheme = new PageScheme()
+        pageSchemeService.delete(pageScheme)
+        PageSchemeLine pageSchemeLine = new PageSchemeLine()
+        pageSchemeLineService.delete(pageSchemeLine)
+        fieldList.clear()
+        pageList.clear()
+        pageSchemeList.clear()
     }
 
     def "create"() {
         given: '创建页面'
-        PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO();
+        PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO()
         pageSchemeDetailDTO.setName(name)
         pageSchemeDetailDTO.setDescription(description)
-        pageSchemeDetailDTO.setOrganizationId(orginzationId)
+        pageSchemeDetailDTO.setOrganizationId(organizationId)
 
-        List<PageSchemeLineDTO> pageSchemeLineDTOS = new ArrayList<>();
-        PageSchemeLineDTO lineDTO1 = new PageSchemeLineDTO();
-        lineDTO1.setPageId(pageList.get(0).getId());
-        lineDTO1.setType(PageSchemeLineType.DEFAULT.value());
+        List<PageSchemeLineDTO> pageSchemeLineDTOS = new ArrayList<>()
+        PageSchemeLineDTO lineDTO1 = new PageSchemeLineDTO()
+        lineDTO1.setPageId(pageList.get(0).getId())
+        lineDTO1.setType(PageSchemeLineType.DEFAULT.value())
 
-        PageSchemeLineDTO lineDTO2 = new PageSchemeLineDTO();
-        lineDTO2.setPageId(pageList.get(1).getId());
-        lineDTO2.setType(PageSchemeLineType.CREATE.value());
+        PageSchemeLineDTO lineDTO2 = new PageSchemeLineDTO()
+        lineDTO2.setPageId(pageList.get(1).getId())
+        lineDTO2.setType(PageSchemeLineType.CREATE.value())
 
-        PageSchemeLineDTO lineDTO3 = new PageSchemeLineDTO();
-        lineDTO3.setPageId(pageList.get(2).getId());
-        lineDTO3.setType(PageSchemeLineType.EDIT.value());
+        PageSchemeLineDTO lineDTO3 = new PageSchemeLineDTO()
+        lineDTO3.setPageId(pageList.get(2).getId())
+        lineDTO3.setType(PageSchemeLineType.EDIT.value())
 
-        pageSchemeLineDTOS.add(lineDTO1);
-        pageSchemeLineDTOS.add(lineDTO2);
-        pageSchemeLineDTOS.add(lineDTO3);
-        pageSchemeDetailDTO.setPageSchemeLineDTOS(pageSchemeLineDTOS);
+        pageSchemeLineDTOS.add(lineDTO1)
+        pageSchemeLineDTOS.add(lineDTO2)
+        pageSchemeLineDTOS.add(lineDTO3)
+        pageSchemeDetailDTO.setPageSchemeLineDTOS(pageSchemeLineDTOS)
 
         when: '状态机方案写入数据库'
         HttpEntity<PageSchemeDetailDTO> httpEntity = new HttpEntity<>(pageSchemeDetailDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PageSchemeDetailDTO, orginzationId)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PageSchemeDetailDTO, organizationId)
 
         then: '状态码为200，创建成功'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -183,7 +183,7 @@ class PageSchemeControllerSpec extends Specification {
 
     def "queryById"() {
         when: '根据id查询页面'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, PageDetailDTO, orginzationId, pageId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, PageDetailDTO, organizationId, pageId)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -198,33 +198,33 @@ class PageSchemeControllerSpec extends Specification {
 
     def "update"() {
         given: '修改页面'
-        PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO();
+        PageSchemeDetailDTO pageSchemeDetailDTO = new PageSchemeDetailDTO()
         pageSchemeDetailDTO.setName(name)
         pageSchemeDetailDTO.setDescription(description)
-        pageSchemeDetailDTO.setOrganizationId(orginzationId)
+        pageSchemeDetailDTO.setOrganizationId(organizationId)
         pageSchemeDetailDTO.setObjectVersionNumber(1L)
 
-        List<PageSchemeLineDTO> pageSchemeLineDTOS = new ArrayList<>();
-        PageSchemeLineDTO lineDTO1 = new PageSchemeLineDTO();
-        lineDTO1.setPageId(pageList.get(0).getId());
-        lineDTO1.setType(PageSchemeLineType.DEFAULT.value());
+        List<PageSchemeLineDTO> pageSchemeLineDTOS = new ArrayList<>()
+        PageSchemeLineDTO lineDTO1 = new PageSchemeLineDTO()
+        lineDTO1.setPageId(pageList.get(0).getId())
+        lineDTO1.setType(PageSchemeLineType.DEFAULT.value())
 
-        PageSchemeLineDTO lineDTO2 = new PageSchemeLineDTO();
-        lineDTO2.setPageId(pageList.get(1).getId());
-        lineDTO2.setType(PageSchemeLineType.CREATE.value());
+        PageSchemeLineDTO lineDTO2 = new PageSchemeLineDTO()
+        lineDTO2.setPageId(pageList.get(1).getId())
+        lineDTO2.setType(PageSchemeLineType.CREATE.value())
 
-        PageSchemeLineDTO lineDTO3 = new PageSchemeLineDTO();
-        lineDTO3.setPageId(pageList.get(2).getId());
-        lineDTO3.setType(PageSchemeLineType.EDIT.value());
+        PageSchemeLineDTO lineDTO3 = new PageSchemeLineDTO()
+        lineDTO3.setPageId(pageList.get(2).getId())
+        lineDTO3.setType(PageSchemeLineType.EDIT.value())
 
-        pageSchemeLineDTOS.add(lineDTO1);
-        pageSchemeLineDTOS.add(lineDTO2);
-        pageSchemeLineDTOS.add(lineDTO3);
-        pageSchemeDetailDTO.setPageSchemeLineDTOS(pageSchemeLineDTOS);
+        pageSchemeLineDTOS.add(lineDTO1)
+        pageSchemeLineDTOS.add(lineDTO2)
+        pageSchemeLineDTOS.add(lineDTO3)
+        pageSchemeDetailDTO.setPageSchemeLineDTOS(pageSchemeLineDTOS)
 
         when: '问题类型页面方案写入数据库'
         HttpEntity<PageSchemeDetailDTO> httpEntity = new HttpEntity<>(pageSchemeDetailDTO)
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.PUT, httpEntity, PageSchemeDetailDTO, orginzationId, pageId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.PUT, httpEntity, PageSchemeDetailDTO, organizationId, pageId)
 
         then: '更新成功判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -239,16 +239,16 @@ class PageSchemeControllerSpec extends Specification {
 
     def "delete"() {
         when: '删除页面'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, orginzationId, pageSchemeId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, organizationId, pageSchemeId)
 
         then: '删除结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
             entity.getBody() != null && entity.getBody() == reponseResult
         } else if (entity.getBody() != null) {
-            Map map = (Map) entity.getBody();
-            map.get("failed") == reponseResult;
-            map.get("code") == "error.pageScheme.delete";
+            Map map = (Map) entity.getBody()
+            map.get("failed") == reponseResult
+            map.get("code") == "error.pageScheme.delete"
         }
 
         where: '测试用例：'
@@ -272,8 +272,8 @@ class PageSchemeControllerSpec extends Specification {
             url = url + "&param=" + param
         }
         ParameterizedTypeReference<io.choerodon.core.domain.Page<PageSchemeDTO>> typeRef = new ParameterizedTypeReference<io.choerodon.core.domain.Page<PageSchemeDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -299,8 +299,8 @@ class PageSchemeControllerSpec extends Specification {
             url = url + "&name=" + name
         }
 
-        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {};
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
+        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {}
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -322,8 +322,8 @@ class PageSchemeControllerSpec extends Specification {
         when: '分页查询页面列表'
         def url = baseUrl + "/query_all"
         ParameterizedTypeReference<List<PageSchemeDetailDTO>> typeRef = new ParameterizedTypeReference<List<PageSchemeDetailDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -332,6 +332,17 @@ class PageSchemeControllerSpec extends Specification {
         where: '测试用例：'
         isSuccess | size
         true      | 40
+    }
+
+    def "checkDelete"() {
+        when: '校验页面方案是否可以删除'
+        def entity = restTemplate.getForEntity(baseUrl + "/check_delete/{id}", Map, organizationId, pageSchemeList.get(0).id)
+
+        then: '返回结果'
+        entity.getStatusCode().is2xxSuccessful()
+
+        expect: '验证'
+        entity.body.get("canDelete")
     }
 
 

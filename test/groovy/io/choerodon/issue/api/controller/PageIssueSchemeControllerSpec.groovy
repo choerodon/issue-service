@@ -28,13 +28,13 @@ class PageIssueSchemeControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    PageIssueSchemeService schemeService;
+    PageIssueSchemeService schemeService
 
     @Autowired
-    PageIssueSchemeLineService lineService;
+    PageIssueSchemeLineService lineService
 
     @Shared
-    Long orginzationId = 1L;
+    Long orginzationId = 1L
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/page_issue'
@@ -47,9 +47,9 @@ class PageIssueSchemeControllerSpec extends Specification {
         def name = 'name'
         def description = 'description'
         def testType = '1'
-        for (int i = 1; i <= 40; i++) {
-            PageIssueScheme scheme = new PageIssueScheme();
-            scheme.setId(i);
+        for (int i = 1 ;i <= 40 ;i++) {
+            PageIssueScheme scheme = new PageIssueScheme()
+            scheme.setId(i)
             scheme.setName(name + i)
             scheme.setDescription(description + i)
             scheme.setOrganizationId(orginzationId)
@@ -62,9 +62,9 @@ class PageIssueSchemeControllerSpec extends Specification {
 
     def cleanup() {
         //清空数据
-        PageIssueScheme del = new PageIssueScheme();
-        schemeService.delete(del);
-        list.clear();
+        PageIssueScheme del = new PageIssueScheme()
+        schemeService.delete(del)
+        list.clear()
     }
 
     def "pagingQuery"() {
@@ -80,7 +80,7 @@ class PageIssueSchemeControllerSpec extends Specification {
             url = url + "&param=" + param
         }
         ParameterizedTypeReference<Page<PageIssueTypeSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<PageIssueTypeSchemeDTO>>() {
-        };
+        }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
 
         then: '返回结果'
@@ -98,7 +98,7 @@ class PageIssueSchemeControllerSpec extends Specification {
 
     def "create"() {
         given: '创建问题类型页面方案'
-        PageIssueTypeSchemeDTO schemeDTO = new PageIssueTypeSchemeDTO();
+        PageIssueTypeSchemeDTO schemeDTO = new PageIssueTypeSchemeDTO()
         schemeDTO.setName(name)
         schemeDTO.setDescription(description)
 
@@ -148,9 +148,9 @@ class PageIssueSchemeControllerSpec extends Specification {
         if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
             entity.getBody() != null && entity.getBody() == reponseResult
         } else if (entity.getBody() != null) {
-            Map map = (Map) entity.getBody();
-            map.get("failed") == reponseResult;
-            map.get("code") == "error.pageIssueScheme.delete";
+            Map map = (Map) entity.getBody()
+            map.get("failed") == reponseResult
+            map.get("code") == "error.pageIssueScheme.delete"
         }
 
         where: '测试用例：'
@@ -186,7 +186,7 @@ class PageIssueSchemeControllerSpec extends Specification {
             url = url + "&name=" + name
         }
 
-        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {};
+        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {}
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
 
         then: '结果判断'

@@ -2,10 +2,11 @@ package io.choerodon.issue
 
 import com.alibaba.fastjson.JSON
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.choerodon.core.oauth.CustomUserDetails
 import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
 import io.choerodon.issue.api.dto.payload.ProjectEvent
 import io.choerodon.issue.api.eventhandler.IssueEventHandler
+import io.choerodon.core.oauth.CustomUserDetails
+import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,6 +49,8 @@ class IntegrationTestConfiguration {
     TestRestTemplate testRestTemplate
     @Autowired
     IssueEventHandler issueEventHandler
+    @Autowired
+    ProjectConfigMapper projectConfigMapper
 
     @Autowired
     LiquibaseExecutor liquibaseExecutor
@@ -65,7 +68,7 @@ class IntegrationTestConfiguration {
         projectEvent.projectId = 1
         projectEvent.projectCode = "test"
         issueEventHandler.handleProjectInitByConsumeSagaTask(JSON.toJSONString(projectEvent))
-
+        System.out.print("初始化数据成功")
     }
 
     private void setTestRestTemplateJWT() {

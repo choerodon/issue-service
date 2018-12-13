@@ -19,6 +19,8 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
 
+import java.util.stream.Collectors
+
 /**
  * @author shinan.chen
  * @date 2018/8/13
@@ -161,7 +163,7 @@ class IssueTypeControllerSpec extends Specification {
         null   || false      | false
     }
 
-    def "pageQuery"() {
+    def "queryIssueTypeList"() {
         given: '准备工作'
         def url = '/v1/organizations/{organization_id}/issue_type/list?page={page}&&size={size}'
         IssueTypeSearchDTO issueTypeSearchDTO = new IssueTypeSearchDTO()
@@ -256,7 +258,7 @@ class IssueTypeControllerSpec extends Specification {
         true       | 10
     }
 
-    def "queryById"() {
+    def "queryIssueTypeById"() {
         given: '准备工作'
         def issueTypeId = id
 
@@ -287,12 +289,58 @@ class IssueTypeControllerSpec extends Specification {
         null   || false      | false
     }
 
+    def "queryIssueTypeByStateMachineSchemeId"() {
+        when: '向查询所有问题类型及关联的方案接口发请求'
+        def entity = restTemplate.getForEntity('/v1/organizations/{organization_id}/issue_type/query_issue_type_with_state_machine?schemeId={schemeId}', List, organizationId, 1L)
+
+        then: '返回值'
+        entity.statusCode.is2xxSuccessful()
+        and: '设置值'
+
+        List<IssueTypeDTO> issueTypeDTOList = entity.body
+
+        expect: '设置期望值'
+        issueTypeDTOList.size() == 10
+    }
+
+    def "listIssueTypeMap"() {
+        when: '向根据组织id查询类型，map接口发请求'
+        def entity = restTemplate.getForEntity('/v1/organizations/{organization_id}/issue_type/type_map', Map, organizationId)
+
+        then: '返回值'
+        entity.statusCode.is2xxSuccessful()
+        and: '设置值'
+
+        Map<Long, IssueTypeDTO> issueTypeDTOMap = entity.body
+
+        expect: '设置期望值'
+        issueTypeDTOMap.get("1") != null
+    }
+
+    def "initIssueTypeData"() {
+        given: "准备数据"
+        List<Long> organizationIds = new ArrayList<>(1)
+        organizationIds.add(organizationId)
+
+        when: '向根据组织id查询类型，map接口发请求'
+        def entity = restTemplate.postForEntity('/v1/organizations/{organization_id}/issue_type/init_data', organizationIds, Map, organizationId)
+
+        then: '返回值'
+        entity.statusCode.is2xxSuccessful()
+        and: '设置值'
+
+        Map<Long, Map<String, Long>> map = entity.body
+
+        expect: '设置期望值'
+        map.get("1") != null
+    }
+
     def "delete"() {
         given: '准备工作'
         def issueTypeId = issueType.id
 
         when: '删除问题类型'
-        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/{id}", HttpMethod.DELETE, null, Object, organizationId, issueTypeId)
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type/{id}', HttpMethod.DELETE, null, Object, organizationId, issueTypeId)
 
         then: '状态码为200，调用成功'
         entity.body == true

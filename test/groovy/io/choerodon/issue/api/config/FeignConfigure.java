@@ -1,21 +1,27 @@
 package io.choerodon.issue.api.config;
 
 
+import io.choerodon.asgard.saga.dto.SagaInstanceDTO;
+import io.choerodon.asgard.saga.dto.StartInstanceDTO;
+import io.choerodon.asgard.saga.feign.SagaClient;
+import io.choerodon.asgard.saga.feign.SagaClientCallback;
 import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.FileFeignClient;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
-import io.choerodon.issue.infra.feign.dto.TransformDTO;
+import io.choerodon.issue.infra.feign.dto.*;
+import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.FileFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.StateMachineFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
 import io.choerodon.issue.infra.utils.ProjectUtil;
+import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
+import io.choerodon.issue.statemachine.fegin.InstanceFeignClientFallback;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +31,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 
 /**
@@ -79,6 +84,20 @@ public class FeignConfigure {
         return fileFeignClient;
     }
 
+    @Bean
+    @Primary
+    InstanceFeignClient instanceFeignClient() {
+        InstanceFeignClient instanceFeignClient = Mockito.mock(InstanceFeignClientFallback.class);
+        ExecuteResult executeResult = new ExecuteResult();
+        executeResult.setResultStatusId(1L);
+        executeResult.setSuccess(true);
+        Mockito.when(instanceFeignClient.startInstance(Matchers.anyLong(), Matchers.anyString(), Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(
+                executeResult, HttpStatus.OK));
+        Mockito.when(instanceFeignClient.executeTransform(Matchers.anyLong(), Matchers.anyString(), Matchers.anyLong(), Matchers.anyLong(), Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(executeResult, HttpStatus.OK));
+        Mockito.when(instanceFeignClient.queryInitStatusId(Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(1L, HttpStatus.OK));
+        return instanceFeignClient;
+    }
+
     @Bean("projectUtil")
     @Primary
     ProjectUtil projectUtil() {
@@ -87,6 +106,29 @@ public class FeignConfigure {
         Mockito.when(projectUtil.getCode(Matchers.anyLong())).thenReturn("test");
         Mockito.when(projectUtil.getName(Matchers.anyLong())).thenReturn("test");
         return projectUtil;
+    }
+
+    @Bean
+    @Primary
+    @SuppressWarnings("unchecked")
+    AgileFeignClient agileFeignClient() {
+        AgileFeignClient agileFeignClient = Mockito.mock(AgileFeignClientFallback.class);
+        Map<String, Object> map = new HashMap<>();
+        Map<Long, Long> map2 = new HashMap<>();
+        map.put("XX", "XX");
+        map2.put(1L, 1L);
+        Mockito.when(agileFeignClient.checkDeleteNode(Matchers.anyLong(), Matchers.anyLong(), Matchers.any(List.class))).thenReturn(new ResponseEntity<>(map, HttpStatus.OK));
+        Mockito.when(agileFeignClient.checkStateMachineSchemeChange(Matchers.anyLong(), Matchers.any(StateMachineSchemeDeployCheckIssue.class))).thenReturn(new ResponseEntity<>(map2, HttpStatus.OK));
+        return agileFeignClient;
+    }
+
+    @Bean
+    @Primary
+    SagaClient sagaClient() {
+
+        SagaClient sagaClient = Mockito.mock(SagaClientCallback.class);
+        Mockito.when(sagaClient.startSaga(Matchers.anyString(), Matchers.any(StartInstanceDTO.class))).thenReturn(new SagaInstanceDTO());
+        return sagaClient;
     }
 
     @Bean
