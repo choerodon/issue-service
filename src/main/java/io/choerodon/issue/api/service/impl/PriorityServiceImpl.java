@@ -89,17 +89,18 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         Priority priority = modelMapper.map(priorityDTO, Priority.class);
         //若设置为默认值，则清空其他默认值
         if (priorityDTO.getDefault() != null && priorityDTO.getDefault()) {
-            priorityMapper.updateDefaultPriority(priorityDTO.getOrganizationId());
-        } else {
-            //如果只有一个默认优先级时，无法取消当前默认优先级
-            Priority select = new Priority();
-            select.setOrganizationId(priorityDTO.getOrganizationId());
-            select.setDefault(true);
-            if (priorityMapper.select(select).size() > 1) {
-                priorityDTO.setDefault(false);
-            } else {
-                priorityDTO.setDefault(true);
+            if(!priorityDTO.getDefault()){
+                //如果只有一个默认优先级时，无法取消当前默认优先级
+                Priority select = new Priority();
+                select.setOrganizationId(priorityDTO.getOrganizationId());
+                select.setDefault(true);
+                if (priorityMapper.select(select).size() > 1) {
+                    priorityDTO.setDefault(false);
+                } else {
+                    priorityDTO.setDefault(true);
+                }
             }
+            priorityMapper.updateDefaultPriority(priorityDTO.getOrganizationId());
         }
         int isUpdate = priorityMapper.updateByPrimaryKeySelective(priority);
         if (isUpdate != 1) {
