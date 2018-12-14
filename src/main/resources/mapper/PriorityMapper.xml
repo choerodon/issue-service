@@ -42,4 +42,10 @@
         UPDATE priority SET is_default = 0
         WHERE organization_id=#{organizationId} AND is_default = 1
     </update>
+
+    <select id="selectDefaultCount" resultType="java.lang.Integer">
+      SELECT count(*) FROM priority
+      WHERE organization_id = #{organizationId}
+      and is_default = 1
+    </select>
 </mapper>
