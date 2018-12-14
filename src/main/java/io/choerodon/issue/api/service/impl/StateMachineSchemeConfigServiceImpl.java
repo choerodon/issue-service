@@ -295,13 +295,15 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
 
         changeMap.put("deleteStatusIds", deleteStatusIds);
         changeMap.put("addStatusIds", addStatusIds);
-
-        schemeMapper.updateDeployStatus(organizationId, schemeId, "done");
         return changeMap;
     }
 
     @Override
-    public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems) {
+    public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems, Long objectVersionNumber) {
+        StateMachineScheme select = schemeMapper.selectByPrimaryKey(schemeId);
+        if ("doing".equals(select.getDeployStatus())||!select.getObjectVersionNumber().equals(objectVersionNumber)) {
+            throw new CommonException("error.stateMachineScheme.illegal");
+        }
         //获取当前方案增加的状态和减少的状态
         Map<String, List<Long>> changeMap = queryStatusIdsBySchemeId(organizationId, schemeId);
         List<Long> deleteStatusIds = changeMap.get("deleteStatusIds");
