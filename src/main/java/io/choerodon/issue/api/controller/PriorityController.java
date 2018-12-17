@@ -4,21 +4,18 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.PriorityDTO;
 import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.api.validator.PriorityValidator;
-import io.choerodon.issue.domain.Priority;
 import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +27,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/v1")
 public class PriorityController {
-    private static final String YES = "1";
     @Autowired
     private PriorityService priorityService;
 

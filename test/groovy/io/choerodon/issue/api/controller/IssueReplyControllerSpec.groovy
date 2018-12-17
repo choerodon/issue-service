@@ -29,13 +29,13 @@ class IssueReplyControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    IssueReplyService issueReplyService;
+    IssueReplyService issueReplyService
 
     @Shared
-    Long testProjectId = 1L;
+    Long testProjectId = 1L
 
     @Shared
-    List<IssueReplyDTO> list = new ArrayList<>();
+    List<IssueReplyDTO> list = new ArrayList<>()
 
     @Shared
     String baseUrl = '/v1/projects/{project_id}/issue_reply'
@@ -57,18 +57,18 @@ class IssueReplyControllerSpec extends Specification {
 
     def cleanup() {
         IssueReply del = new IssueReply()
-        issueReplyService.delete(del);//清空数据
-        list.clear();
+        issueReplyService.delete(del)//清空数据
+        list.clear()
     }
 
     def "create"() {
         given: '准备工作'
-        IssueReplyDTO issueReplyDTO = new IssueReplyDTO();
-        issueReplyDTO.setUserId(userId);
-        issueReplyDTO.setContent(content);
-        issueReplyDTO.setIssueId(issueId);
-        issueReplyDTO.setSourceReplyId(sourceReplyId);
-        issueReplyDTO.setProjectId(testProjectId);
+        IssueReplyDTO issueReplyDTO = new IssueReplyDTO()
+        issueReplyDTO.setUserId(userId)
+        issueReplyDTO.setContent(content)
+        issueReplyDTO.setIssueId(issueId)
+        issueReplyDTO.setSourceReplyId(sourceReplyId)
+        issueReplyDTO.setProjectId(testProjectId)
 
         when: '创建事件单回复'
         HttpEntity<IssueReplyDTO> httpEntity = new HttpEntity<>(issueReplyDTO)
@@ -101,12 +101,12 @@ class IssueReplyControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        IssueReplyDTO issueReplyDTO = list.get(0);
-        issueReplyDTO.setUserId(userId);
-        issueReplyDTO.setContent(content);
-        issueReplyDTO.setIssueId(issueId);
-        issueReplyDTO.setSourceReplyId(sourceReplyId);
-        issueReplyDTO.setProjectId(testProjectId);
+        IssueReplyDTO issueReplyDTO = list.get(0)
+        issueReplyDTO.setUserId(userId)
+        issueReplyDTO.setContent(content)
+        issueReplyDTO.setIssueId(issueId)
+        issueReplyDTO.setSourceReplyId(sourceReplyId)
+        issueReplyDTO.setProjectId(testProjectId)
 
 
         when: '修改事件单回复'
@@ -174,7 +174,7 @@ class IssueReplyControllerSpec extends Specification {
         }
         when: '列表查询'
         ParameterizedTypeReference<List<IssueReplyDTO>> typeRef = new ParameterizedTypeReference<List<IssueReplyDTO>>() {
-        };
+        }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testProjectId)
 
         then: '返回结果'
@@ -184,7 +184,7 @@ class IssueReplyControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }

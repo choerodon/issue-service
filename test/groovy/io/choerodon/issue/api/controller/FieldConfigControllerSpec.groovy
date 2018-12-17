@@ -43,28 +43,28 @@ class FieldConfigControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    FieldConfigService fieldConfigService;
+    FieldConfigService fieldConfigService
 
     @Autowired
-    FieldService fieldService;
+    FieldService fieldService
 
     @Autowired
-    FieldOptionService fieldOptionService;
+    FieldOptionService fieldOptionService
 
     @Autowired
-    FieldConfigLineService fieldConfigLineService;
+    FieldConfigLineService fieldConfigLineService
 
     @Autowired
-    FieldConfigLineMapper fieldConfigLineMapper;
+    FieldConfigLineMapper fieldConfigLineMapper
 
     @Shared
-    Long testOrginzationId = 1L;
+    Long organizationId = 1L
 
     @Shared
-    List<FieldConfigDTO> list = new ArrayList<>();
+    List<FieldConfigDTO> list = new ArrayList<>()
 
     @Shared
-    List<FieldConfigLineDTO> list2 = new ArrayList<>();
+    List<FieldConfigLineDTO> list2 = new ArrayList<>()
 
 
     @Shared
@@ -83,16 +83,16 @@ class FieldConfigControllerSpec extends Specification {
         fieldInput.setType(FieldType.INPUT.value())
         fieldInput.setDefaultValue("init_default_value")
         fieldInput.setExtraConfig(null)
-        fieldInput.setOrganizationId(testOrginzationId)
-        fieldService.create(testOrginzationId, fieldInput)
+        fieldInput.setOrganizationId(organizationId)
+        fieldService.create(organizationId, fieldInput)
         // 初始化5条字段配置
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1;i <= 5; i++) {
             FieldConfigDTO fieldConfigDTO = new FieldConfigDTO()
             fieldConfigDTO.setId(i)
             fieldConfigDTO.setName("init_name" + i)
             fieldConfigDTO.setDescription("init_description" + i)
-            fieldConfigDTO.setOrganizationId(testOrginzationId)
-            fieldConfigDTO = fieldConfigService.create(testOrginzationId, fieldConfigDTO)
+            fieldConfigDTO.setOrganizationId(organizationId)
+            fieldConfigDTO = fieldConfigService.create(organizationId, fieldConfigDTO)
             list.add(fieldConfigDTO)
         }
         //创建一个字段，同步到fieldConfigLine中
@@ -103,33 +103,33 @@ class FieldConfigControllerSpec extends Specification {
         fieldInput2.setType(FieldType.INPUT.value())
         fieldInput2.setDefaultValue("init_default_value")
         fieldInput2.setExtraConfig(null)
-        fieldInput2.setOrganizationId(testOrginzationId)
-        fieldService.create(testOrginzationId, fieldInput2)
+        fieldInput2.setOrganizationId(organizationId)
+        fieldService.create(organizationId, fieldInput2)
 
     }
 
     def cleanup() {
         FieldConfig del = new FieldConfig()
-        fieldConfigService.delete(del);//清空数据
+        fieldConfigService.delete(del)//清空数据
         Field del1 = new Field()
-        fieldService.delete(del1);//清空数据
+        fieldService.delete(del1)//清空数据
         FieldOption delo = new FieldOption()
         fieldOptionService.delete(delo)
-        FieldConfigLine delf = new FieldConfigLine();
+        FieldConfigLine delf = new FieldConfigLine()
         fieldConfigLineService.delete(delf)
-        list.clear();
-        list2.clear();
+        list.clear()
+        list2.clear()
     }
 
     def "create"() {
         given: '准备工作'
-        FieldConfigDTO fieldConfigDTO = new FieldConfigDTO();
+        FieldConfigDTO fieldConfigDTO = new FieldConfigDTO()
         fieldConfigDTO.setName(name)
-        fieldConfigDTO.setOrganizationId(testOrginzationId);
+        fieldConfigDTO.setOrganizationId(organizationId)
 
         when: '创建字段配置'
         HttpEntity<FieldConfigDTO> httpEntity = new HttpEntity<>(fieldConfigDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, FieldConfigDTO, testOrginzationId)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, FieldConfigDTO, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -156,13 +156,13 @@ class FieldConfigControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        FieldConfigDTO fieldConfigDTO = list.get(0);
-        fieldConfigDTO.setName(name);
-        fieldConfigDTO.setOrganizationId(testOrginzationId);
+        FieldConfigDTO fieldConfigDTO = list.get(0)
+        fieldConfigDTO.setName(name)
+        fieldConfigDTO.setOrganizationId(organizationId)
 
         when: '更新字段配置'
         HttpEntity<FieldConfigDTO> httpEntity = new HttpEntity<>(fieldConfigDTO)
-        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, FieldConfigDTO, testOrginzationId, fieldConfigDTO.getId())
+        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, FieldConfigDTO, organizationId, fieldConfigDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -192,7 +192,7 @@ class FieldConfigControllerSpec extends Specification {
         def fieldConfigId = id
 
         when: '删除字段配置'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, testOrginzationId, fieldConfigId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, organizationId, fieldConfigId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -229,8 +229,8 @@ class FieldConfigControllerSpec extends Specification {
         }
         when: '分页查询'
         ParameterizedTypeReference<Page<FieldConfigDTO>> typeRef = new ParameterizedTypeReference<Page<FieldConfigDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         def actRequest = false
@@ -239,7 +239,7 @@ class FieldConfigControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }
@@ -267,7 +267,7 @@ class FieldConfigControllerSpec extends Specification {
         }
 
         when: '校验字段配置名字是否未被使用'
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, testOrginzationId)
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, organizationId)
 
         then: '状态码为200，调用成功'
 
@@ -292,12 +292,12 @@ class FieldConfigControllerSpec extends Specification {
     def "queryByOrgId"() {
         when: '获取字段配置列表'
         ParameterizedTypeReference<List<FieldConfigDTO>> typeRef = new ParameterizedTypeReference<List<FieldConfigDTO>>() {
-        };
-        def entity = restTemplate.exchange(baseUrl + "/configs", HttpMethod.GET, null, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange(baseUrl + "/configs", HttpMethod.GET, null, typeRef, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
-        def actResponseSize = 0;
+        def actResponseSize = 0
         if (entity != null) {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
@@ -320,7 +320,7 @@ class FieldConfigControllerSpec extends Specification {
         def fieldConfigId = id
 
         when: '根据id查询字段配置'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, FieldConfigDetailDTO, testOrginzationId, fieldConfigId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, FieldConfigDetailDTO, organizationId, fieldConfigId)
 
         then: '状态码为200，调用成功'
 
@@ -332,7 +332,7 @@ class FieldConfigControllerSpec extends Specification {
                 if (entity.getBody() != null) {
                     if (entity.getBody().getId() != null) {
                         if (entity.getBody().getFieldConfigLineDTOList() != null) {
-                            actResponseSize = entity.getBody().getFieldConfigLineDTOList().size();
+                            actResponseSize = entity.getBody().getFieldConfigLineDTOList().size()
                         }
                     }
                 }
@@ -351,17 +351,17 @@ class FieldConfigControllerSpec extends Specification {
     def "updateFieldConfigLine"() {
         given: '准备工作'
         FieldConfigLine fieldConfigLine = fieldConfigLineMapper.selectOne()
-        FieldConfigLineDTO fieldConfigLineDTO = new FieldConfigLineDTO();
+        FieldConfigLineDTO fieldConfigLineDTO = new FieldConfigLineDTO()
         fieldConfigLineDTO.setId(fieldConfigLine.getId())
         fieldConfigLineDTO.setFieldId(fieldConfigLine.getFieldId())
         fieldConfigLineDTO.setFieldConfigId(fieldConfigLine.getFieldConfigId())
-        fieldConfigLineDTO.setIsRequired(isRequired);
+        fieldConfigLineDTO.setIsRequired(isRequired)
         fieldConfigLineDTO.setIsDisplay(isDisPlayed)
         fieldConfigLineDTO.setObjectVersionNumber(1)
 
         when: '修改字段配置'
         HttpEntity<FieldConfigLineDTO> httpEntity = new HttpEntity<>(fieldConfigLineDTO)
-        def entity = restTemplate.exchange(baseUrl2 + '/{id}', HttpMethod.PUT, httpEntity, FieldConfigLineDTO, testOrginzationId, fieldConfigLineDTO.getId())
+        def entity = restTemplate.exchange(baseUrl2 + '/{id}', HttpMethod.PUT, httpEntity, FieldConfigLineDTO, organizationId, fieldConfigLineDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false

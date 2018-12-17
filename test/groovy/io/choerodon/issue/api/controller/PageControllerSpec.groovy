@@ -33,16 +33,16 @@ class PageControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    PageService pageService;
+    PageService pageService
 
     @Autowired
-    FieldService fieldService;
+    FieldService fieldService
 
     @Autowired
-    PageFieldRefService pageFieldRefService;
+    PageFieldRefService pageFieldRefService
 
     @Shared
-    Long orginzationId = 1L;
+    Long orginzationId = 1L
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/page'
@@ -59,9 +59,9 @@ class PageControllerSpec extends Specification {
         def fieldName = 'name-'
         def fieldDescription = 'description-'
         for (FieldType e : FieldType.values()) {
-            FieldDTO fieldDTO = new FieldDTO();
-            fieldDTO.setName(fieldName + e.value());
-            fieldDTO.setDescription(fieldDescription + e.value());
+            FieldDTO fieldDTO = new FieldDTO()
+            fieldDTO.setName(fieldName + e.value())
+            fieldDTO.setDescription(fieldDescription + e.value())
             fieldDTO.setType(e.value())
             FieldDTO insertDTO = fieldService.create(orginzationId, fieldDTO)
             if (insertDTO != null) {
@@ -72,14 +72,14 @@ class PageControllerSpec extends Specification {
         def name = 'name'
         def description = 'description'
         for (int i = 1; i <= 40; i++) {
-            PageDetailDTO pageDetailDTO = new PageDetailDTO();
-            pageDetailDTO.setId(i);
+            PageDetailDTO pageDetailDTO = new PageDetailDTO()
+            pageDetailDTO.setId(i)
             pageDetailDTO.setName(name + i)
             pageDetailDTO.setDescription(description + i)
             pageDetailDTO.setOrganizationId(orginzationId)
-            FieldDTO fieldDTO2 = new FieldDTO();
-            fieldDTO2.setId(fieldList.get(0).getId());
-            pageDetailDTO.setFieldDTOs(Arrays.asList(fieldDTO2));
+            FieldDTO fieldDTO2 = new FieldDTO()
+            fieldDTO2.setId(fieldList.get(0).getId())
+            pageDetailDTO.setFieldDTOs(Arrays.asList(fieldDTO2))
             PageDetailDTO insertDTO = pageService.create(orginzationId, pageDetailDTO)
             if (insertDTO != null) {
                 list.add(insertDTO)
@@ -88,26 +88,27 @@ class PageControllerSpec extends Specification {
     }
 
     def cleanup() {
+        //todo 用接口清除
         //清空数据
-        Field delField = new Field();
-        fieldService.delete(delField);
-        Page page = new Page();
-        pageService.delete(page);
-        PageFieldRef pageFieldRef = new PageFieldRef();
-        pageFieldRefService.delete(pageFieldRef);
-        fieldList.clear();
-        list.clear();
+        Field delField = new Field()
+        fieldService.delete(delField)
+        Page page = new Page()
+        pageService.delete(page)
+        PageFieldRef pageFieldRef = new PageFieldRef()
+        pageFieldRefService.delete(pageFieldRef)
+        fieldList.clear()
+        list.clear()
     }
 
     def "create"() {
         given: '创建页面'
-        PageDetailDTO pageDetailDTO = new PageDetailDTO();
+        PageDetailDTO pageDetailDTO = new PageDetailDTO()
         pageDetailDTO.setName(name)
         pageDetailDTO.setDescription(description)
         pageDetailDTO.setOrganizationId(orginzationId)
-        FieldDTO fieldDTO = new FieldDTO();
-        fieldDTO.setId(fieldList.get(1).getId());
-        pageDetailDTO.setFieldDTOs(Arrays.asList(fieldDTO));
+        FieldDTO fieldDTO = new FieldDTO()
+        fieldDTO.setId(fieldList.get(1).getId())
+        pageDetailDTO.setFieldDTOs(Arrays.asList(fieldDTO))
 
         when: '状态机方案写入数据库'
         HttpEntity<PageDetailDTO> httpEntity = new HttpEntity<>(pageDetailDTO)
@@ -141,7 +142,7 @@ class PageControllerSpec extends Specification {
 
     def "update"() {
         given: '修改页面'
-        PageDetailDTO pageDetailDTO = new PageDetailDTO();
+        PageDetailDTO pageDetailDTO = new PageDetailDTO()
         pageDetailDTO.setName(name)
         pageDetailDTO.setDescription(description)
         pageDetailDTO.setObjectVersionNumber(1L)
@@ -171,9 +172,9 @@ class PageControllerSpec extends Specification {
         if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
             entity.getBody() != null && entity.getBody() == reponseResult
         } else if (entity.getBody() != null) {
-            Map map = (Map) entity.getBody();
-            map.get("failed") == reponseResult;
-            map.get("code") == "error.page.delete";
+            Map map = (Map) entity.getBody()
+            map.get("failed") == reponseResult
+            map.get("code") == "error.page.delete"
         }
 
         where: '测试用例：'
@@ -197,7 +198,7 @@ class PageControllerSpec extends Specification {
             url = url + "&param=" + param
         }
         ParameterizedTypeReference<io.choerodon.core.domain.Page<PageDTO>> typeRef = new ParameterizedTypeReference<io.choerodon.core.domain.Page<PageDTO>>() {
-        };
+        }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
 
         then: '返回结果'
@@ -213,6 +214,18 @@ class PageControllerSpec extends Specification {
         null     | null            | 'name' || true      | 20
     }
 
+    def "listQuery"() {
+        when: '分页查询页面列表'
+
+        def entity = restTemplate.getForEntity(baseUrl + "/pages", List, orginzationId)
+
+        then: '返回结果'
+        entity.getStatusCode().is2xxSuccessful()
+
+        expect: "验证"
+        entity.body.size() == 40
+    }
+
 
     def "checkName"() {
         when: '校验名字是否未被使用'
@@ -224,7 +237,7 @@ class PageControllerSpec extends Specification {
             url = url + "&name=" + name
         }
 
-        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {};
+        ParameterizedTypeReference<Boolean> typeRef = new ParameterizedTypeReference<Boolean>() {}
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, orginzationId)
 
         then: '结果判断'

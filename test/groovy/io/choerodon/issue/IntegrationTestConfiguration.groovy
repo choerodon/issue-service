@@ -6,16 +6,14 @@ import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
 import io.choerodon.issue.api.dto.payload.ProjectEvent
 import io.choerodon.issue.api.eventhandler.IssueEventHandler
 import io.choerodon.core.oauth.CustomUserDetails
-import io.choerodon.issue.infra.utils.ProjectUtil
+import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpRequest
@@ -23,7 +21,6 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.jwt.JwtHelper
@@ -52,16 +49,13 @@ class IntegrationTestConfiguration {
     TestRestTemplate testRestTemplate
     @Autowired
     IssueEventHandler issueEventHandler
+    @Autowired
+    ProjectConfigMapper projectConfigMapper
 
     @Autowired
     LiquibaseExecutor liquibaseExecutor
 
     final ObjectMapper objectMapper = new ObjectMapper()
-
-    @Bean
-    KafkaTemplate kafkaTemplate() {
-        detachedMockFactory.Mock(KafkaTemplate)
-    }
 
     @PostConstruct
     void init() {
@@ -74,7 +68,7 @@ class IntegrationTestConfiguration {
         projectEvent.projectId = 1
         projectEvent.projectCode = "test"
         issueEventHandler.handleProjectInitByConsumeSagaTask(JSON.toJSONString(projectEvent))
-
+        System.out.print("初始化数据成功")
     }
 
     private void setTestRestTemplateJWT() {

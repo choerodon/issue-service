@@ -3,6 +3,7 @@ package io.choerodon.issue.api.controller
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.IssueTypeDTO
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO
+import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO
 import io.choerodon.issue.api.service.IssueTypeSchemeService
 import io.choerodon.issue.api.service.IssueTypeService
 import io.choerodon.issue.domain.IssueType
@@ -280,6 +281,23 @@ class IssueTypeSchemeControllerSpec extends Specification {
         '1'    || true       | true
         '9999' || true       | false
         null   || false      | false
+    }
+
+    def "queryIssueTypeSchemeList"() {
+        given: '准备数据'
+        IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO = new IssueTypeSchemeSearchDTO()
+        issueTypeSchemeSearchDTO.description = "XX"
+        issueTypeSchemeSearchDTO.name = "XX"
+        issueTypeSchemeSearchDTO.param = "XX"
+        HttpEntity<IssueTypeSchemeSearchDTO> httpEntity = new HttpEntity<>(issueTypeSchemeSearchDTO)
+        when: '分页查询问题类型方案列表'
+        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type_scheme/list?page={page}&&size={size}", HttpMethod.POST, httpEntity, Page, organizationId, 1, 1000)
+
+        then: '状态码为200，调用成功'
+        entity.statusCode.is2xxSuccessful()
+
+        expect: '测试用例：'
+        entity.body.content.size() == 0
     }
 
     def "delete"() {

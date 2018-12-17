@@ -39,22 +39,22 @@ class FiledControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    FieldService fieldService;
+    FieldService fieldService
 
     @Autowired
-    FieldOptionService fieldOptionService;
+    FieldOptionService fieldOptionService
 
     @Autowired
-    PageService pageService;
+    PageService pageService
 
     @Autowired
-    FieldOptionMapper fieldOptionMapper;
+    FieldOptionMapper fieldOptionMapper
 
     @Shared
-    Long testOrginzationId = 1L;
+    Long organizationId = 1L
 
     @Shared
-    List<Field> list = new ArrayList<>();
+    List<Field> list = new ArrayList<>()
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/field'
@@ -73,8 +73,8 @@ class FiledControllerSpec extends Specification {
         fieldCascade.setType(FieldType.CASCADE.value())
         fieldCascade.setDefaultValue(null)
         fieldCascade.setExtraConfig(null)
-        fieldCascade.setOrganizationId(testOrginzationId)
-        fieldCascade = fieldService.create(testOrginzationId, fieldCascade)
+        fieldCascade.setOrganizationId(organizationId)
+        fieldCascade = fieldService.create(organizationId, fieldCascade)
         list.add(fieldCascade)
 
         //初始化 复选框
@@ -85,8 +85,8 @@ class FiledControllerSpec extends Specification {
         fieldCheckbox.setType(FieldType.CHECKBOX.value())
         fieldCheckbox.setDefaultValue(null)
         fieldCheckbox.setExtraConfig(null)
-        fieldCheckbox.setOrganizationId(testOrginzationId)
-        fieldCheckbox = fieldService.create(testOrginzationId, fieldCheckbox)
+        fieldCheckbox.setOrganizationId(organizationId)
+        fieldCheckbox = fieldService.create(organizationId, fieldCheckbox)
         list.add(fieldCheckbox)
 
         //初始化 日期时间选择器
@@ -97,8 +97,8 @@ class FiledControllerSpec extends Specification {
         fieldDatetime.setType(FieldType.DATETIME.value())
         fieldDatetime.setDefaultValue("2018-01-01 12:12:12")
         fieldDatetime.setExtraConfig("1") //是否设置当前时间为默认日期
-        fieldDatetime.setOrganizationId(testOrginzationId)
-        fieldDatetime = fieldService.create(testOrginzationId, fieldDatetime)
+        fieldDatetime.setOrganizationId(organizationId)
+        fieldDatetime = fieldService.create(organizationId, fieldDatetime)
         list.add(fieldDatetime)
 
         //初始化 文本框（单行）
@@ -109,8 +109,8 @@ class FiledControllerSpec extends Specification {
         fieldInput.setType(FieldType.INPUT.value())
         fieldInput.setDefaultValue("init_default_value")
         fieldInput.setExtraConfig(null)
-        fieldInput.setOrganizationId(testOrginzationId)
-        fieldInput = fieldService.create(testOrginzationId, fieldInput)
+        fieldInput.setOrganizationId(organizationId)
+        fieldInput = fieldService.create(organizationId, fieldInput)
         list.add(fieldInput)
 
         //初始化 标签
@@ -121,8 +121,8 @@ class FiledControllerSpec extends Specification {
         fieldLabel.setType(FieldType.LABEL.value())
         fieldLabel.setDefaultValue("init_default_value")//用逗号隔开
         fieldLabel.setExtraConfig(null)
-        fieldLabel.setOrganizationId(testOrginzationId)
-        fieldLabel = fieldService.create(testOrginzationId, fieldLabel)
+        fieldLabel.setOrganizationId(organizationId)
+        fieldLabel = fieldService.create(organizationId, fieldLabel)
         list.add(fieldLabel)
 
         //初始化 选择器（多选）
@@ -133,15 +133,15 @@ class FiledControllerSpec extends Specification {
         fieldMultiple.setType(FieldType.MULTIPLE.value())
         fieldMultiple.setDefaultValue(null)
         fieldMultiple.setExtraConfig(null)
-        fieldMultiple.setOrganizationId(testOrginzationId)
-        fieldService.create(testOrginzationId, fieldMultiple)
+        fieldMultiple.setOrganizationId(organizationId)
+        fieldService.create(organizationId, fieldMultiple)
         list.add(fieldMultiple)
 
-        FieldDetailDTO fieldDetailDTO = fieldService.queryById(testOrginzationId, fieldMultiple.getId());
+        FieldDetailDTO fieldDetailDTO = fieldService.queryById(organizationId, fieldMultiple.getId())
         //更新字段选项
-        FieldOption fieldOption = new FieldOption();
+        FieldOption fieldOption = new FieldOption()
         fieldOption.setId(1)
-        fieldOption.setFieldId(fieldDetailDTO.getId());
+        fieldOption.setFieldId(fieldDetailDTO.getId())
         fieldOption.setParentId(0L)
         fieldOption.setIsEnable("1")
         fieldOption.setIsDefault("1")
@@ -157,8 +157,8 @@ class FiledControllerSpec extends Specification {
         fieldNumber.setType(FieldType.NUMBER.value())
         fieldNumber.setDefaultValue("0")
         fieldNumber.setExtraConfig("0") //是否小数
-        fieldNumber.setOrganizationId(testOrginzationId)
-        fieldNumber = fieldService.create(testOrginzationId, fieldNumber)
+        fieldNumber.setOrganizationId(organizationId)
+        fieldNumber = fieldService.create(organizationId, fieldNumber)
         list.add(fieldNumber)
 
         //初始化 单选框
@@ -169,8 +169,8 @@ class FiledControllerSpec extends Specification {
         fieldRadio.setType(FieldType.RADIO.value())
         fieldRadio.setDefaultValue(null)
         fieldRadio.setExtraConfig(null)
-        fieldRadio.setOrganizationId(testOrginzationId)
-        fieldRadio = fieldService.create(testOrginzationId, fieldRadio)
+        fieldRadio.setOrganizationId(organizationId)
+        fieldRadio = fieldService.create(organizationId, fieldRadio)
         list.add(fieldRadio)
 
         //初始化 选择器（单选）
@@ -181,8 +181,8 @@ class FiledControllerSpec extends Specification {
         fieldSingle.setType(FieldType.SINGLE.value())
         fieldSingle.setDefaultValue(null)
         fieldSingle.setExtraConfig(null)
-        fieldSingle.setOrganizationId(testOrginzationId)
-        fieldSingle = fieldService.create(testOrginzationId, fieldSingle)
+        fieldSingle.setOrganizationId(organizationId)
+        fieldSingle = fieldService.create(organizationId, fieldSingle)
         list.add(fieldSingle)
 
         //初始化 文本框（多行）
@@ -193,8 +193,8 @@ class FiledControllerSpec extends Specification {
         fieldText.setType(FieldType.TEXT.value())
         fieldText.setDefaultValue(null)
         fieldText.setExtraConfig(null)
-        fieldText.setOrganizationId(testOrginzationId)
-        fieldText = fieldService.create(testOrginzationId, fieldText)
+        fieldText.setOrganizationId(organizationId)
+        fieldText = fieldService.create(organizationId, fieldText)
         list.add(fieldText)
 
         //初始化 时间选择器
@@ -205,8 +205,8 @@ class FiledControllerSpec extends Specification {
         fieldTime.setType(FieldType.TIME.value())
         fieldTime.setDefaultValue("12:12:12")
         fieldTime.setExtraConfig("1") //是否设置当前时间为默认日期
-        fieldTime.setOrganizationId(testOrginzationId)
-        fieldTime = fieldService.create(testOrginzationId, fieldTime)
+        fieldTime.setOrganizationId(organizationId)
+        fieldTime = fieldService.create(organizationId, fieldTime)
         list.add(fieldTime)
 
         //初始化 URL
@@ -217,31 +217,31 @@ class FiledControllerSpec extends Specification {
         fieldUrl.setType(FieldType.URL.value())
         fieldUrl.setDefaultValue(null)
         fieldUrl.setExtraConfig(null)
-        fieldUrl.setOrganizationId(testOrginzationId)
-        fieldUrl = fieldService.create(testOrginzationId, fieldUrl)
+        fieldUrl.setOrganizationId(organizationId)
+        fieldUrl = fieldService.create(organizationId, fieldUrl)
         list.add(fieldUrl)
     }
 
     def cleanup() {
         Field del = new Field()
-        fieldService.delete(del);//清空数据
+        fieldService.delete(del)//清空数据
         FieldOption delo = new FieldOption()
         fieldOptionService.delete(delo)
-        list.clear();
+        list.clear()
     }
 
     def "create"() {
         given: '准备工作'
-        FieldDTO fieldDTO = new FieldDTO();
+        FieldDTO fieldDTO = new FieldDTO()
         fieldDTO.setName(name)
         fieldDTO.setType(type)
         fieldDTO.setDefaultValue(defaultValue)
         fieldDTO.setExtraConfig(extraConfig)
-        fieldDTO.setOrganizationId(testOrginzationId)
+        fieldDTO.setOrganizationId(organizationId)
 
         when: '创建字段'
         HttpEntity<FieldDTO> httpEntity = new HttpEntity<>(fieldDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, FieldDTO, testOrginzationId)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, FieldDTO, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -279,26 +279,26 @@ class FiledControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        FieldDetailDTO fieldMultiple = fieldService.queryById(testOrginzationId, 6);
+        FieldDetailDTO fieldMultiple = fieldService.queryById(organizationId, 6)
 
-        FieldOptionDTO fieldOptionDTO1 = new FieldOptionDTO();
-        fieldOptionDTO1.setFieldId(fieldMultiple.getId());
+        FieldOptionDTO fieldOptionDTO1 = new FieldOptionDTO()
+        fieldOptionDTO1.setFieldId(fieldMultiple.getId())
         fieldOptionDTO1.setId(fieldOptionId1)
         fieldOptionDTO1.setValue(fieldOptionValue1)
         fieldOptionDTO1.setParentId(fieldOptionParentId1)
         fieldOptionDTO1.setObjectVersionNumber(fieldOptionObjectVersionNumber1)
 
-        FieldOptionDTO fieldOptionDTO2 = new FieldOptionDTO();
-        fieldOptionDTO2.setFieldId(fieldMultiple.getId());
+        FieldOptionDTO fieldOptionDTO2 = new FieldOptionDTO()
+        fieldOptionDTO2.setFieldId(fieldMultiple.getId())
         fieldOptionDTO2.setId(fieldOptionId2)
         fieldOptionDTO2.setValue(fieldOptionValue2)
         fieldOptionDTO2.setParentId(fieldOptionParentId2)
         fieldOptionDTO2.setObjectVersionNumber(fieldOptionObjectVersionNumber2)
-        fieldMultiple.setFieldOptions(Arrays.asList(fieldOptionDTO1, fieldOptionDTO2));
+        fieldMultiple.setFieldOptions(Arrays.asList(fieldOptionDTO1, fieldOptionDTO2))
 
         when: '更新字段'
         HttpEntity<FieldDetailDTO> httpEntity = new HttpEntity<>(fieldMultiple)
-        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, FieldDetailDTO, testOrginzationId, fieldMultiple.getId())
+        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, FieldDetailDTO, organizationId, fieldMultiple.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -328,7 +328,7 @@ class FiledControllerSpec extends Specification {
         def fieldId = id
 
         when: '删除字段'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, testOrginzationId, fieldId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.DELETE, null, Object, organizationId, fieldId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -365,8 +365,8 @@ class FiledControllerSpec extends Specification {
         }
         when: '分页查询'
         ParameterizedTypeReference<Page<FieldDTO>> typeRef = new ParameterizedTypeReference<Page<FieldDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         def actRequest = false
@@ -375,7 +375,7 @@ class FiledControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }
@@ -401,7 +401,7 @@ class FiledControllerSpec extends Specification {
             url = url + "&id=" + id
         }
         when: '校验字段名字是否未被使用'
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, testOrginzationId)
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Boolean.class, organizationId)
 
         then: '状态码为200，调用成功'
 
@@ -437,8 +437,8 @@ class FiledControllerSpec extends Specification {
         }
         when: '列表查询'
         ParameterizedTypeReference<List<FieldDTO>> typeRef = new ParameterizedTypeReference<List<FieldDTO>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
         then: '返回结果'
         def actRequest = false
@@ -447,7 +447,7 @@ class FiledControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }
@@ -468,7 +468,7 @@ class FiledControllerSpec extends Specification {
         def fieldId = id
 
         when: '根据id查询字段'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, FieldDetailDTO, testOrginzationId, fieldId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, FieldDetailDTO, organizationId, fieldId)
 
         then: '状态码为200，调用成功'
 
@@ -494,12 +494,12 @@ class FiledControllerSpec extends Specification {
         null   || true       | false
     }
 
-    def "update_related_page"() {
+    def "updateRelatedPage"() {
         given: '准备工作'
         PageDetailDTO page = new PageDetailDTO()
         page.setId(1L)
         page.setName("testPage")
-        pageService.create(testOrginzationId, page);
+        pageService.create(organizationId, page)
 
         def url = baseUrl + "/update_related_page?1=1"
         if (fieldId != null) {
@@ -509,9 +509,9 @@ class FiledControllerSpec extends Specification {
         when: '更新关联页面'
         HttpEntity<List<Long>> httpEntity = new HttpEntity<>(Arrays.asList(pageId))
         ParameterizedTypeReference<List<Long>> typeRef = new ParameterizedTypeReference<List<Long>>() {
-        };
-        def entity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object, testOrginzationId)
-        pageService.delete(testOrginzationId, 1L);
+        }
+        def entity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object, organizationId)
+        pageService.delete(organizationId, 1L)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -536,13 +536,13 @@ class FiledControllerSpec extends Specification {
         9999    | 1      || true       | false
     }
 
-    def "query_related_page"() {
+    def "queryRelatedPage"() {
         given: '准备工作'
         PageDetailDTO page = new PageDetailDTO()
         page.setId(1L)
         page.setName("testPage")
-        pageService.create(testOrginzationId, page);
-        fieldService.updateRelatedPage(testOrginzationId, 1L, Arrays.asList(1L))
+        pageService.create(organizationId, page)
+        fieldService.updateRelatedPage(organizationId, 1L, Arrays.asList(1L))
 
         def url = baseUrl + "/query_related_page?1=1"
         if (fieldId != null) {
@@ -550,8 +550,8 @@ class FiledControllerSpec extends Specification {
         }
 
         when: '获取关联页面'
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Object, testOrginzationId)
-        pageService.delete(testOrginzationId, 1L);
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Object, organizationId)
+        pageService.delete(organizationId, 1L)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -561,7 +561,7 @@ class FiledControllerSpec extends Specification {
                 actRequest = true
                 if (entity.getBody() != null) {
                     if (entity.getBody() instanceof ArrayList) {
-                        actResponseSize = entity.getBody().size();
+                        actResponseSize = entity.getBody().size()
                     }
                 }
             }
@@ -584,7 +584,7 @@ class FiledControllerSpec extends Specification {
         }
 
         when: '校验问题类型是否可以删除'
-        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Map, testOrginzationId)
+        def entity = restTemplate.exchange(url, HttpMethod.GET, null, Map, organizationId)
 
         then: '状态码为200，调用成功'
 

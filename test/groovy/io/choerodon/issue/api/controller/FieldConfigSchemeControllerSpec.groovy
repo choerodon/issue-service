@@ -35,22 +35,22 @@ class FieldConfigSchemeControllerSpec extends Specification {
     TestRestTemplate restTemplate
 
     @Autowired
-    FieldConfigSchemeService fieldConfigSchemeService;
+    FieldConfigSchemeService fieldConfigSchemeService
 
     @Autowired
-    FieldConfigSchemeLineService fieldConfigSchemeLineService;
+    FieldConfigSchemeLineService fieldConfigSchemeLineService
 
     @Shared
-    Long testOrginzationId = 1L;
+    Long testOrginzationId = 1L
 
     @Shared
-    List<FieldConfigSchemeDetailDTO> list1 = new ArrayList<>();
+    List<FieldConfigSchemeDetailDTO> list1 = new ArrayList<>()
 
     @Shared
-    List<FieldConfigSchemeDTO> list2 = new ArrayList<>();
+    List<FieldConfigSchemeDTO> list2 = new ArrayList<>()
 
     @Shared
-    List<FieldConfigSchemeLineDTO> lineDTOList = new ArrayList<>();
+    List<FieldConfigSchemeLineDTO> lineDTOList = new ArrayList<>()
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/field_config_scheme'
@@ -79,22 +79,22 @@ class FieldConfigSchemeControllerSpec extends Specification {
 
     def cleanup() {
         FieldConfigScheme del = new FieldConfigScheme()
-        fieldConfigSchemeService.delete(del);//清空数据
+        fieldConfigSchemeService.delete(del)//清空数据
         FieldConfigSchemeLine del2 = new FieldConfigSchemeLine()
-        fieldConfigSchemeLineService.delete(del2);
-        list1.clear();
-        list2.clear();
-        lineDTOList.clear();
+        fieldConfigSchemeLineService.delete(del2)
+        list1.clear()
+        list2.clear()
+        lineDTOList.clear()
     }
 
     def "create"() {
         given: '准备工作'
-        FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO = new FieldConfigSchemeDetailDTO();
-        fieldConfigSchemeDetailDTO.setName(name);
-        fieldConfigSchemeDetailDTO.setDescription(description);
-        fieldConfigSchemeDetailDTO.setOrganizationId(testOrginzationId);
+        FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO = new FieldConfigSchemeDetailDTO()
+        fieldConfigSchemeDetailDTO.setName(name)
+        fieldConfigSchemeDetailDTO.setDescription(description)
+        fieldConfigSchemeDetailDTO.setOrganizationId(testOrginzationId)
 
-        FieldConfigSchemeLineDTO fieldConfigSchemeLineDTO = new FieldConfigSchemeLineDTO();
+        FieldConfigSchemeLineDTO fieldConfigSchemeLineDTO = new FieldConfigSchemeLineDTO()
         fieldConfigSchemeLineDTO.setSchemeId(schemeId)
         fieldConfigSchemeLineDTO.setIssueTypeId(issueTypeId)
         fieldConfigSchemeLineDTO.setFieldConfigId(fieldConfigId)
@@ -135,12 +135,12 @@ class FieldConfigSchemeControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO = list1.get(0);
-        fieldConfigSchemeDetailDTO.setName(name);
-        fieldConfigSchemeDetailDTO.setDescription(description);
-        fieldConfigSchemeDetailDTO.setOrganizationId(testOrginzationId);
+        FieldConfigSchemeDetailDTO fieldConfigSchemeDetailDTO = list1.get(0)
+        fieldConfigSchemeDetailDTO.setName(name)
+        fieldConfigSchemeDetailDTO.setDescription(description)
+        fieldConfigSchemeDetailDTO.setOrganizationId(testOrginzationId)
 
-        FieldConfigSchemeLineDTO fieldConfigSchemeLineDTO = new FieldConfigSchemeLineDTO();
+        FieldConfigSchemeLineDTO fieldConfigSchemeLineDTO = new FieldConfigSchemeLineDTO()
         fieldConfigSchemeLineDTO.setSchemeId(schemeId)
         fieldConfigSchemeLineDTO.setIssueTypeId(issueTypeId)
         fieldConfigSchemeLineDTO.setFieldConfigId(fieldConfigId)
@@ -189,7 +189,7 @@ class FieldConfigSchemeControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null && entity.getBody() instanceof Boolean) {
-                    actResponse = entity.getBody();
+                    actResponse = entity.getBody()
                 }
             }
         }
@@ -215,7 +215,7 @@ class FieldConfigSchemeControllerSpec extends Specification {
         }
         when: '分页查询'
         ParameterizedTypeReference<Page<FieldConfigSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<FieldConfigSchemeDTO>>() {
-        };
+        }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, testOrginzationId)
 
         then: '返回结果'
@@ -225,7 +225,7 @@ class FieldConfigSchemeControllerSpec extends Specification {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
                 if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size();
+                    actResponseSize = entity.getBody().size()
                 }
             }
         }

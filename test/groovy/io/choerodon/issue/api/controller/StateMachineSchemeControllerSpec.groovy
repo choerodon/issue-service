@@ -4,10 +4,13 @@ import io.choerodon.core.domain.Page
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO
+import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem
 import io.choerodon.issue.api.service.StateMachineSchemeService
 import io.choerodon.issue.domain.StateMachineScheme
+import io.choerodon.issue.domain.StateMachineSchemeConfig
 import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO
+import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -35,6 +38,8 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     @Autowired
     StateMachineSchemeService schemeService
+    @Autowired
+    StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper
 
     @Autowired
     private StateMachineFeignClient stateMachineServiceFeign
@@ -50,6 +55,8 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     @Shared
     List<StateMachineSchemeDTO> list = new ArrayList<>()
+    @Shared
+    List<StateMachineSchemeChangeItem> stateMachineSchemeChangeItemList = new ArrayList<>()
     @Shared
     List<Long> configIds = new ArrayList<>()
 
@@ -75,11 +82,11 @@ class StateMachineSchemeControllerSpec extends Specification {
 
         where: '测试用例：'
         name              | description     | param  || isSuccess | size
-        null              | null            | null   || true      | 4
-        'test默认状态机方案【测试】' | null            | null   || true      | 2
-        null              | 'description40' | null   || true      | 4
-        'name40'          | 'description40' | null   || true      | 4
-        null              | null            | 'name' || true      | 4
+        null              | null            | null   || true      | 2
+        'test默认状态机方案【测试】' | null            | null   || true      | 1
+        null              | 'description40' | null   || true      | 2
+        'name40'          | 'description40' | null   || true      | 2
+        null              | null            | 'name' || true      | 2
     }
 
     def "create"() {
@@ -187,9 +194,61 @@ class StateMachineSchemeControllerSpec extends Specification {
         entity.getBody() != null && entity.getBody() == reponseResult
 
         where: '测试用例：'
-        scheme_id           | name       || isSuccess | reponseResult
-        null                | 'name1'    || true      | false
-        list.get(0).getId() | 'name1'    || true      | false
+        scheme_id           | name    || isSuccess | reponseResult
+        null                | 'name1' || true      | false
+        list.get(0).getId() | 'name1' || true      | false
+    }
+
+    def "checkDeploy"() {
+        given: "准备数据"
+        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig()
+        schemeConfig.issueTypeId = 1L
+        schemeConfig.schemeId = 1L
+        schemeConfig.organizationId = 1L
+        schemeConfig.stateMachineId = 1L
+        stateMachineSchemeConfigMapper.insert(schemeConfig)
+        configIds.add(schemeConfig.id)
+        when: '校验发布状态机方案'
+        def entity = restTemplate.getForEntity(baseUrl + "/check_deploy/{scheme_id}", List, organizationId, 1L)
+
+        then: '结果判断'
+        entity.getStatusCode().is2xxSuccessful()
+    }
+
+    def "deploy"() {
+        given: "准备数据"
+        HttpEntity<List<StateMachineSchemeChangeItem>> httpEntity = new HttpEntity<>(stateMachineSchemeChangeItemList)
+        when: '发布状态机方案'
+        def entity = restTemplate.exchange(baseUrl + "/deploy/{scheme_id}", HttpMethod.POST, httpEntity, Boolean, organizationId, 1L)
+
+        then: '结果判断'
+        entity.getStatusCode().is2xxSuccessful()
+
+        expect: "校验结果"
+        entity.body
+    }
+
+    def "updateDeployProgress"() {
+        given: "准备数据"
+        HttpEntity<List<StateMachineSchemeChangeItem>> httpEntity = new HttpEntity<>(stateMachineSchemeChangeItemList)
+        when: '更新状态机方案发布进度'
+        def entity = restTemplate.exchange(baseUrl + "/update_deploy_progress/{scheme_id}?deployProgress={deployProgress}", HttpMethod.PUT, httpEntity, Boolean, organizationId, list.get(0).id, 0)
+
+        then: '结果判断'
+        entity.getStatusCode().is2xxSuccessful()
+
+        expect: "校验结果"
+        entity.body
+    }
+
+    def "deleteDraft"() {
+        when: '删除状态机方案草稿'
+        def entity = restTemplate.exchange(baseUrl + "/delete_draft/{scheme_id}", HttpMethod.DELETE, null, StateMachineSchemeDTO, organizationId, list.get(0).id)
+
+        then: '结果判断'
+        StateMachineSchemeDTO schemeDTO = entity.body
+        expect: '测试用例：'
+        schemeDTO != null
     }
 
     def "deleteConfig"() {

@@ -32,10 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -279,11 +276,15 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     @Override
     public Page<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO) {
         Page<Long> issueTypeSchemeIdsPage = PageHelper.doPageAndSort(pageRequest, () -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchDTO));
-        List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getContent());
-        List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoDTOList = modelMapper.map(issueTypeSchemeWithInfoList, new TypeToken<List<IssueTypeSchemeWithInfoDTO>>(){}.getType());
-        for (IssueTypeSchemeWithInfoDTO type : issueTypeSchemeWithInfoDTOList) {
-            for (ProjectWithInfo projectWithInfo : type.getProjectWithInfoList()) {
-                projectWithInfo.setProjectName(projectUtil.getName(projectWithInfo.getProjectId()));
+        List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoDTOList = new ArrayList<>(issueTypeSchemeIdsPage.getContent().size());
+        if (issueTypeSchemeIdsPage.getContent() != null && !issueTypeSchemeIdsPage.getContent().isEmpty()) {
+            List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getContent());
+            issueTypeSchemeWithInfoDTOList = modelMapper.map(issueTypeSchemeWithInfoList, new TypeToken<List<IssueTypeSchemeWithInfoDTO>>() {
+            }.getType());
+            for (IssueTypeSchemeWithInfoDTO type : issueTypeSchemeWithInfoDTOList) {
+                for (ProjectWithInfo projectWithInfo : type.getProjectWithInfoList()) {
+                    projectWithInfo.setProjectName(projectUtil.getName(projectWithInfo.getProjectId()));
+                }
             }
         }
         Page<IssueTypeSchemeWithInfoDTO> returnPage = new Page<>();

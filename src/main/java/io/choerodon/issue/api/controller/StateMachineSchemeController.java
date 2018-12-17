@@ -127,8 +127,9 @@ public class StateMachineSchemeController {
     @PostMapping(value = "/deploy/{scheme_id}")
     public ResponseEntity<Boolean> deploy(@PathVariable("organization_id") Long organizationId,
                                           @PathVariable("scheme_id") Long schemeId,
+                                          @RequestParam("objectVersionNumber") Long objectVersionNumber,
                                           @RequestBody List<StateMachineSchemeChangeItem> changeItems) {
-        return new ResponseEntity<>(configService.deploy(organizationId, schemeId, changeItems), HttpStatus.OK);
+        return new ResponseEntity<>(configService.deploy(organizationId, schemeId, changeItems, objectVersionNumber), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

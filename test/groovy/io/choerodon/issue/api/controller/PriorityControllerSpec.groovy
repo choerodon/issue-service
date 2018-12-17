@@ -206,11 +206,11 @@ class PriorityControllerSpec extends Specification {
         'name1'      | null || true       | true
     }
 
-    def "sequence"() {
+    def "updateByList"() {
         given: '准备工作'
         def url = baseUrl + "/sequence"
 
-        when: '拖拽排序'
+        when: '更新展示顺序'
         List<PriorityDTO> reqList = new ArrayList<>()
         reqList.add(list.get(0))
         reqList.add(list.get(2))
@@ -229,6 +229,66 @@ class PriorityControllerSpec extends Specification {
         e.get(3).getId() == 3
         e.get(4).getId() == 6
 
+    }
+
+    def "queryByOrganizationId"() {
+        given: '准备工作'
+        def url = baseUrl + "/list"
+
+        when: '更新展示顺序'
+        def entity = restTemplate.getForEntity(url, Map, organizationId)
+
+        then: '状态码为200，调用成功'
+        entity.getStatusCode().is2xxSuccessful()
+        Map<Long, PriorityDTO> priorityDTOMap = entity.body
+
+        expect: "期望值"
+        priorityDTOMap.get("1") != null
+    }
+
+    def "queryDefaultByOrganizationId"() {
+        given: '准备工作'
+        def url = baseUrl + "/default"
+
+        when: '更新展示顺序'
+        def entity = restTemplate.getForEntity(url, PriorityDTO, organizationId)
+
+        then: '状态码为200，调用成功'
+        entity.getStatusCode().is2xxSuccessful()
+        PriorityDTO priorityDTO = entity.body
+
+        expect: "期望值"
+        priorityDTO != null
+    }
+
+    def "queryByOrganizationIdList"() {
+        given: '准备工作'
+        def url = baseUrl + "/list_by_org"
+
+        when: '更新展示顺序'
+        def entity = restTemplate.getForEntity(url, List, organizationId)
+
+        then: '状态码为200，调用成功'
+        entity.getStatusCode().is2xxSuccessful()
+        List<PriorityDTO> priorityDTO = entity.body
+
+        expect: "期望值"
+        priorityDTO.size() == 6
+    }
+
+    def "queryById"() {
+        given: '准备工作'
+        def url = baseUrl + "/{id}"
+
+        when: '更新展示顺序'
+        def entity = restTemplate.getForEntity(url, PriorityDTO, organizationId, 1L)
+
+        then: '状态码为200，调用成功'
+        entity.getStatusCode().is2xxSuccessful()
+        PriorityDTO priorityDTO = entity.body
+
+        expect: "期望值"
+        priorityDTO != null
     }
 
     def "delete"() {
