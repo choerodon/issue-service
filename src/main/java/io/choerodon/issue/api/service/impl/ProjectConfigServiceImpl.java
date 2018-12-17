@@ -313,6 +313,13 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
                 StatusDTO statusDTO = statusMap.get(transformDTO.getEndStatusId());
                 transformDTO.setStatusDTO(statusDTO);
             });
+            //如果转换中不包含当前状态，则添加一个self
+            if (transformDTOS.stream().noneMatch(transformDTO -> currentStatusId.equals(transformDTO.getEndStatusId()))) {
+                TransformDTO self = new TransformDTO();
+                self.setEndStatusId(currentStatusId);
+                self.setStatusDTO(statusMap.get(currentStatusId));
+                transformDTOS.add(self);
+            }
             return transformDTOS;
         } else {
             throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
