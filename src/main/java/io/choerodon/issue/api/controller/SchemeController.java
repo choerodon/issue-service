@@ -121,7 +121,7 @@ public class SchemeController extends BaseController {
     @GetMapping(value = "/schemes/check_remove_status_for_agile")
     public ResponseEntity<Boolean> checkRemoveStatusForAgile(@PathVariable("project_id") Long projectId,
                                                              @RequestParam("status_id") Long statusId) {
-        return new ResponseEntity<>(projectConfigService.checkRemoveStatusForAgile(projectId, statusId), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(projectConfigService.checkRemoveStatusForAgile(projectId, statusId), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
