@@ -203,7 +203,7 @@ public interface StateMachineFeignClient {
      * @param stateMachineId
      * @return
      */
-    @GetMapping(value = "/v1/organizations/{organization_id}/status/query_init_status_id")
+    @GetMapping(value = "/v1/organizations/{organization_id}/instances/query_init_status_id")
     ResponseEntity<Long> queryInitStatusId(@PathVariable("organization_id") Long organizationId,
                                            @RequestParam("state_machine_id") Long stateMachineId);
 }
