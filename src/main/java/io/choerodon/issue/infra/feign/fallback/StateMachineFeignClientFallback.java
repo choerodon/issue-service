@@ -92,6 +92,11 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
 
     @Override
     public ResponseEntity removeStateMachineNode(Long organizationId, Long stateMachineId, Long statusId) {
-        throw new CommonException("error.StateMachineNode.remove");
+        throw new CommonException("error.stateMachineFeignClient.removeStateMachineNode");
+    }
+
+    @Override
+    public ResponseEntity<Long> queryInitStatusId(Long organizationId, Long stateMachineId) {
+        throw new CommonException("error.stateMachineFeignClient.queryInitStatusId");
     }
 }

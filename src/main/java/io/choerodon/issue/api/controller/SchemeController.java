@@ -117,6 +117,14 @@ public class SchemeController extends BaseController {
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @ApiOperation(value = "【敏捷】校验是否能删除状态")
+    @GetMapping(value = "/schemes/check_remove_status_for_agile")
+    public ResponseEntity<Boolean> checkRemoveStatusForAgile(@PathVariable("project_id") Long projectId,
+                                                             @RequestParam("status_id") Long statusId) {
+        return new ResponseEntity<>(projectConfigService.checkRemoveStatusForAgile(projectId, statusId), HttpStatus.NO_CONTENT);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "根据项目id查询组织默认优先级")
     @GetMapping("/priority/default")
     public ResponseEntity<PriorityDTO> queryDefaultByOrganizationId(@ApiParam(value = "项目id", required = true)
