@@ -195,4 +195,15 @@ public interface StateMachineFeignClient {
     ResponseEntity removeStateMachineNode(@PathVariable("organization_id") Long organizationId,
                                           @RequestParam("stateMachineId") Long stateMachineId,
                                           @RequestParam("statusId") Long statusId);
+
+    /**
+     * 获取状态机的初始状态
+     *
+     * @param organizationId
+     * @param stateMachineId
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/instances/query_init_status_id")
+    ResponseEntity<Long> queryInitStatusId(@PathVariable("organization_id") Long organizationId,
+                                           @RequestParam("state_machine_id") Long stateMachineId);
 }

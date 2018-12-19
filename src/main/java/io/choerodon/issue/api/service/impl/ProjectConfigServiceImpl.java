@@ -97,19 +97,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Autowired
     private FieldConfigSchemeService fieldConfigSchemeService;
     @Autowired
-    private FieldConfigService fieldConfigService;
-    @Autowired
-    private IssueTypeService issueTypeService;
-    @Autowired
-    private PageSchemeService pageSchemeService;
-    @Autowired
-    private StateMachineService stateMachineService;
-    @Autowired
     private StateMachineFeignClient stateMachineFeignClient;
     @Autowired
     private ProjectUtil projectUtil;
-    @Autowired
-    private StateMachineSchemeMapper stateMachineSchemeMapper;
     @Autowired
     private ProjectConfigService projectConfigService;
     @Autowired
@@ -404,6 +394,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             Long organizationId = projectUtil.getOrganizationId(projectId);
+            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId,stateMachineId).getBody();
+            if(statusId.equals(initStatusId)){
+                throw new CommonException("error.initStatus.illegal");
+            }
             try {
                 ResponseEntity responseEntity = stateMachineFeignClient.removeStateMachineNode(organizationId, stateMachineId, statusId);
                 if (responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -415,6 +409,20 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             } catch (Exception e) {
                 throw new RemoveStatusException("error.status.remove");
             }
+        } else {
+            throw new RemoveStatusException((String) result.get(MESSAGE));
+        }
+    }
+
+    @Override
+    public Boolean checkRemoveStatusForAgile(Long projectId, Long statusId) {
+        Map<String, Object> result = checkCreateStatusForAgile(projectId);
+        Boolean flag = (Boolean) result.get(FLAG);
+        if (flag) {
+            Long stateMachineId = (Long) result.get(STATEMACHINEID);
+            Long organizationId = projectUtil.getOrganizationId(projectId);
+            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId,stateMachineId).getBody();
+            return !statusId.equals(initStatusId);
         } else {
             throw new RemoveStatusException((String) result.get(MESSAGE));
         }
