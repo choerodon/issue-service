@@ -9,9 +9,10 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.StatusPayload;
-import io.choerodon.issue.api.service.*;
-import io.choerodon.issue.domain.Field;
-import io.choerodon.issue.domain.FieldConfigLine;
+import io.choerodon.issue.api.service.IssueTypeSchemeService;
+import io.choerodon.issue.api.service.ProjectConfigService;
+import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
+import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
@@ -20,7 +21,10 @@ import io.choerodon.issue.infra.exception.RemoveStatusException;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
-import io.choerodon.issue.infra.mapper.*;
+import io.choerodon.issue.infra.mapper.IssueTypeMapper;
+import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
+import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
+import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
@@ -61,10 +65,6 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
-    private FieldMapper fieldMapper;
-    @Autowired
-    private FieldConfigLineMapper fieldConfigLineMapper;
-    @Autowired
     private IssueTypeMapper issueTypeMapper;
     @Autowired
     private IssueTypeSchemeMapper issueTypeSchemeMapper;
@@ -73,29 +73,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Autowired
     private StateMachineSchemeConfigService stateMachineSchemeConfigService;
     @Autowired
-    private PageIssueSchemeLineMapper pageIssueSchemeLineMapper;
-    @Autowired
-    private PageSchemeMapper pageSchemeMapper;
-    @Autowired
-    private FieldConfigSchemeLineMapper fieldConfigSchemeLineMapper;
-    @Autowired
-    private FieldConfigMapper fieldConfigMapper;
-    @Autowired
-    private FieldConfigSchemeMapper fieldConfigSchemeMapper;
-    @Autowired
-    private PageIssueSchemeLineService pageIssueSchemeLineService;
-    @Autowired
-    private PageSchemeLineService pageSchemeLineService;
-    @Autowired
-    private FieldConfigSchemeLineService fieldConfigSchemeLineService;
-    @Autowired
     private IssueTypeSchemeService issueTypeSchemeService;
     @Autowired
     private StateMachineSchemeService stateMachineSchemeService;
-    @Autowired
-    private PageIssueSchemeService pageIssueSchemeService;
-    @Autowired
-    private FieldConfigSchemeService fieldConfigSchemeService;
     @Autowired
     private StateMachineFeignClient stateMachineFeignClient;
     @Autowired
@@ -162,49 +142,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             }
             projectConfigDetailDTO.setStateMachineSchemeMap(stateMachineSchemeMap);
         }
-        //获取问题类型页面方案
-        List<ProjectConfig> pageIssueTypeSchemeConfigs = configMap.get(SchemeType.PAGE_ISSUE_TYPE);
-        if (pageIssueTypeSchemeConfigs != null && !pageIssueTypeSchemeConfigs.isEmpty()) {
-            Map<String, PageIssueTypeSchemeDTO> pageIssueTypeSchemeMap = new HashMap<>(pageIssueTypeSchemeConfigs.size());
-            for (ProjectConfig projectConfig : pageIssueTypeSchemeConfigs) {
-                PageIssueTypeSchemeDTO pageIssueTypeSchemeDTO = pageIssueSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getSchemeId());
-                pageIssueTypeSchemeMap.put(projectConfig.getApplyType(), pageIssueTypeSchemeDTO);
-            }
-            projectConfigDetailDTO.setPageIssueTypeSchemeMap(pageIssueTypeSchemeMap);
-        }
-        //获取字段配置方案
-        List<ProjectConfig> fieldConfigSchemeConfigs = configMap.get(SchemeType.FIELD_CONFIG);
-        if (fieldConfigSchemeConfigs != null && !fieldConfigSchemeConfigs.isEmpty()) {
-            Map<String, FieldConfigSchemeDetailDTO> fieldConfigSchemeMap = new HashMap<>(fieldConfigSchemeConfigs.size());
-            for (ProjectConfig projectConfig : fieldConfigSchemeConfigs) {
-                FieldConfigSchemeDetailDTO fieldConfigSchemeDTO = fieldConfigSchemeService.querySchemeWithConfigById(organizationId, projectConfig.getSchemeId());
-                fieldConfigSchemeMap.put(projectConfig.getApplyType(), fieldConfigSchemeDTO);
-            }
-            projectConfigDetailDTO.setFieldConfigchemeMap(fieldConfigSchemeMap);
-        }
         return projectConfigDetailDTO;
-    }
-
-    @Override
-    public List<Field> queryFieldByIssueTypeAndPageType(Long organizationId, Long projectId, Long issueTypeId, String pageType) {
-
-        ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.PAGE_ISSUE_TYPE, SchemeApplyType.CLOOPM);
-        Long pageSchemeId = pageIssueSchemeLineService.getPageSchemeIdByIssueTypeId(projectConfig.getSchemeId(), issueTypeId);
-        Long pageId = pageSchemeLineService.getPageIdByPageType(pageSchemeId, pageType);
-        List<Field> fields = fieldMapper.queryByPageId(organizationId, pageId);
-
-        return fields;
-    }
-
-    @Override
-    public List<FieldConfigLine> queryFieldConfigLinesByIssueType(Long organizationId, Long projectId, Long issueTypeId) {
-
-        ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.FIELD_CONFIG, SchemeApplyType.CLOOPM);
-        Long fieldConfigId = fieldConfigSchemeLineService.getFieldConfigIdByIssueTypeId(projectConfig.getSchemeId(), issueTypeId);
-        List<FieldConfigLine> fieldConfigLines = fieldConfigLineMapper.queryByFieldConfigId(fieldConfigId);
-
-        //过滤掉隐藏字段
-        return fieldConfigLines.stream().filter(x -> x.getIsDisplay().equals(YES)).collect(Collectors.toList());
     }
 
     @Override
@@ -394,8 +332,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             Long organizationId = projectUtil.getOrganizationId(projectId);
-            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId,stateMachineId).getBody();
-            if(statusId.equals(initStatusId)){
+            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId, stateMachineId).getBody();
+            if (statusId.equals(initStatusId)) {
                 throw new CommonException("error.initStatus.illegal");
             }
             try {
@@ -421,7 +359,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             Long organizationId = projectUtil.getOrganizationId(projectId);
-            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId,stateMachineId).getBody();
+            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId, stateMachineId).getBody();
             return !statusId.equals(initStatusId);
         } else {
             throw new RemoveStatusException((String) result.get(MESSAGE));

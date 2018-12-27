@@ -14,10 +14,6 @@ public class ProjectConfigDetailDTO {
 
     private Map<String, StateMachineSchemeDTO> stateMachineSchemeMap;
 
-    private Map<String, PageIssueTypeSchemeDTO> pageIssueTypeSchemeMap;
-
-    private Map<String, FieldConfigSchemeDetailDTO> fieldConfigchemeMap;
-
     public Long getProjectId() {
         return projectId;
     }
@@ -40,21 +36,5 @@ public class ProjectConfigDetailDTO {
 
     public void setStateMachineSchemeMap(Map<String, StateMachineSchemeDTO> stateMachineSchemeMap) {
         this.stateMachineSchemeMap = stateMachineSchemeMap;
-    }
-
-    public Map<String, PageIssueTypeSchemeDTO> getPageIssueTypeSchemeMap() {
-        return pageIssueTypeSchemeMap;
-    }
-
-    public void setPageIssueTypeSchemeMap(Map<String, PageIssueTypeSchemeDTO> pageIssueTypeSchemeMap) {
-        this.pageIssueTypeSchemeMap = pageIssueTypeSchemeMap;
-    }
-
-    public Map<String, FieldConfigSchemeDetailDTO> getFieldConfigchemeMap() {
-        return fieldConfigchemeMap;
-    }
-
-    public void setFieldConfigchemeMap(Map<String, FieldConfigSchemeDetailDTO> fieldConfigchemeMap) {
-        this.fieldConfigchemeMap = fieldConfigchemeMap;
     }
 }

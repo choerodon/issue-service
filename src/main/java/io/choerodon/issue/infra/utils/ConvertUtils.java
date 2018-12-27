@@ -1,10 +1,8 @@
 package io.choerodon.issue.infra.utils;
 
-import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
-import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
@@ -12,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,16 +25,17 @@ public class ConvertUtils {
         ModelMapper modelMapper = new ModelMapper();
         StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
         List<StateMachineSchemeConfig> schemeConfigs = scheme.getSchemeConfigs();
-        if (null != schemeConfigs && !schemeConfigs.isEmpty()){
-            List<StateMachineSchemeConfigDTO> schemeConfigDTOS = modelMapper.map(schemeConfigs,new TypeToken<List<StateMachineSchemeConfigDTO>>(){}.getType());
+        if (null != schemeConfigs && !schemeConfigs.isEmpty()) {
+            List<StateMachineSchemeConfigDTO> schemeConfigDTOS = modelMapper.map(schemeConfigs, new TypeToken<List<StateMachineSchemeConfigDTO>>() {
+            }.getType());
             schemeDTO.setConfigDTOs(schemeConfigDTOS);
         }
         List<ProjectConfig> projectConfigs = scheme.getProjectConfigs();
-        if (null != projectConfigs && !projectConfigs.isEmpty()){
+        if (null != projectConfigs && !projectConfigs.isEmpty()) {
             List<ProjectDTO> projectDTOS = new ArrayList<>(projectConfigs.size());
-            for(ProjectConfig config:projectConfigs){
+            for (ProjectConfig config : projectConfigs) {
                 ProjectDTO projectDTO = projectMap.get(config.getProjectId());
-                if(projectDTO!=null){
+                if (projectDTO != null) {
                     projectDTOS.add(projectDTO);
                 }
             }
@@ -48,7 +46,7 @@ public class ConvertUtils {
 
     public static List<StateMachineSchemeDTO> convertStateMachineSchemesToDTOs(final List<StateMachineScheme> schemes, final Map<Long, ProjectDTO> projectMap) {
         List<StateMachineSchemeDTO> list = new ArrayList<>(schemes.size());
-        for (StateMachineScheme scheme:schemes) {
+        for (StateMachineScheme scheme : schemes) {
             StateMachineSchemeDTO schemeDTO = convertStateMachineSchemeToDTO(scheme, projectMap);
             list.add(schemeDTO);
         }

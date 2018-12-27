@@ -66,7 +66,7 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body.size() == 0
+        entity.body.size() == 1
     }
 
     def "queryStatusByIssueTypeId"() {
