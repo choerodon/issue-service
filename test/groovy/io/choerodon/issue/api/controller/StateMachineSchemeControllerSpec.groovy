@@ -219,7 +219,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         given: "准备数据"
         HttpEntity<List<StateMachineSchemeChangeItem>> httpEntity = new HttpEntity<>(stateMachineSchemeChangeItemList)
         when: '发布状态机方案'
-        def entity = restTemplate.exchange(baseUrl + "/deploy/{scheme_id}", HttpMethod.POST, httpEntity, Boolean, organizationId, 1L)
+        def entity = restTemplate.exchange(baseUrl + "/deploy/{scheme_id}?objectVersionNumber=2", HttpMethod.POST, httpEntity, Boolean, organizationId, 1L)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful()

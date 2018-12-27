@@ -3,8 +3,6 @@ package io.choerodon.issue.api.service;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithStateMachineIdDTO;
 import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
-import io.choerodon.issue.domain.Field;
-import io.choerodon.issue.domain.FieldConfigLine;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
@@ -36,28 +34,6 @@ public interface ProjectConfigService {
      * @return
      */
     ProjectConfigDetailDTO queryById(Long projectId);
-
-    /**
-     * 根据问题类型和页面类型获取页面字段
-     *
-     * @param organizationId
-     * @param projectId
-     * @param issueTypeId
-     * @param pageType
-     * @return
-     */
-    List<Field> queryFieldByIssueTypeAndPageType(Long organizationId, Long projectId, Long issueTypeId, String pageType);
-
-    /**
-     * 根据问题类型获取字段配置信息
-     *
-     * @param organizationId
-     * @param projectId
-     * @param issueTypeId
-     * @return
-     */
-
-    List<FieldConfigLine> queryFieldConfigLinesByIssueType(Long organizationId, Long projectId, Long issueTypeId);
 
     /**
      * 根据项目id找到方案返回问题类型列表
@@ -137,14 +113,13 @@ public interface ProjectConfigService {
 
     /**
      * 【敏捷】校验是否能删除状态
+     *
      * @param projectId
      * @return
      */
     void removeStatusForAgile(Long projectId, Long statusId);
 
     /**
-     *
-     *
      * @param projectId
      * @param statusId
      * @return

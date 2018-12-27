@@ -7,7 +7,6 @@ import io.choerodon.issue.api.dto.payload.AddStatusWithProject;
 import io.choerodon.issue.api.dto.payload.ChangeStatus;
 import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
 import io.choerodon.issue.api.dto.payload.RemoveStatusWithProject;
-import io.choerodon.issue.api.service.IssueService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.api.service.StateMachineService;
@@ -20,7 +19,8 @@ import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
-import io.choerodon.issue.infra.mapper.*;
+import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
+import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,21 +49,9 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Autowired
     private StateMachineSchemeService schemeService;
     @Autowired
-    private IssueService issueService;
-    @Autowired
-    private IssueMapper issueMapper;
-    @Autowired
-    private IssueRecordMapper issueRecordMapper;
-    @Autowired
-    private StateMachineSchemeMapper stateMachineSchemeMapper;
-    @Autowired
-    private AnalyzeServiceManager analyzeServiceManager;
-    @Autowired
     private StateMachineSchemeConfigService stateMachineSchemeConfigService;
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
-    @Autowired
-    private IssueTypeSchemeConfigMapper issueTypeSchemeConfigMapper;
     @Autowired
     private AgileFeignClient agileFeignClient;
     @Autowired

@@ -7,6 +7,7 @@ import io.choerodon.issue.domain.Priority;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.fixdata.dto.StatusForMoveDataDO;
 import io.choerodon.issue.fixdata.feign.FixStateMachineFeignClient;
+import io.choerodon.issue.fixdata.service.FixDataService;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
