@@ -19,19 +19,19 @@ import java.util.List;
  */
 @Component
 public class VerifyUpdateUtil {
-    public List<String> verifyUpdateField(JSONObject jsonObject,Object objectUpdate) {
+    public List<String> verifyUpdateField(JSONObject jsonObject, Object objectUpdate) {
         List<String> fieldList = new ArrayList<>();
         Class objectClass = objectUpdate.getClass();
-        jsonObject.forEach((String k,Object v)->{
+        jsonObject.forEach((String k, Object v) -> {
             try {
                 Field field = objectClass.getDeclaredField(k);
                 field.setAccessible(true);
                 //把值设置到属性中
-                Boolean flag = handleFieldType(field,objectUpdate,v);
-                if(flag){
+                Boolean flag = handleFieldType(field, objectUpdate, v);
+                if (flag) {
                     fieldList.add(k);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 throw new CommonException("error.verifyUpdateField.value");
             }
         });

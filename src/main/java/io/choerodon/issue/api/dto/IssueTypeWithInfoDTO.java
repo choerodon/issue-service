@@ -1,7 +1,6 @@
 package io.choerodon.issue.api.dto;
 
 import io.choerodon.issue.domain.IssueTypeSchemeRelation;
-import org.xnio.streams.LimitedInputStream;
 
 import java.util.List;
 

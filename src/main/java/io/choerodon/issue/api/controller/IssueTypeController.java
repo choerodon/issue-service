@@ -9,7 +9,6 @@ import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
 import io.choerodon.issue.api.service.IssueTypeService;
-import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -69,23 +68,6 @@ public class IssueTypeController extends BaseController {
     public ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId) {
         return new ResponseEntity<>(issueTypeService.delete(organizationId, issueTypeId), HttpStatus.OK);
     }
-
-//    @Permission(level = ResourceLevel.ORGANIZATION)
-//    @ApiOperation(value = "分页查询问题类型列表")
-//    @CustomPageRequest
-//    @GetMapping
-//    public ResponseEntity<Page<IssueTypeDTO>> pageQuery(@ApiIgnore
-//                                                        @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-//                                                        @PathVariable("organization_id") Long organizationId,
-//                                                        @RequestParam(required = false) String name,
-//                                                        @RequestParam(required = false) String description,
-//                                                        @RequestParam(required = false) String[] param) {
-//        IssueTypeDTO issueTypeDTO = new IssueTypeDTO();
-//        issueTypeDTO.setOrganizationId(organizationId);
-//        issueTypeDTO.setName(name);
-//        issueTypeDTO.setDescription(description);
-//        return new ResponseEntity<>(issueTypeService.pageQuery(pageRequest, issueTypeDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
-//    }
 
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.ORGANIZATION_ADMINISTRATOR, InitRoleCode.ORGANIZATION_MEMBER})
     @ApiOperation(value = "分页查询问题类型列表")

@@ -18,7 +18,6 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
-import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.ListChangeUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -119,18 +118,18 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
             throw new CommonException("error.issueTypeScheme.update");
         }
         //更新方案配置,等待校验[toDo]
-        List<IssueType> newIssueTypes = modelMapper.map(issueTypeSchemeDTO.getIssueTypes(), new TypeToken<List<IssueType>>() {
-        }.getType());
-        List<IssueType> oldIssueTypes = issueTypeMapper.queryBySchemeId(issueTypeSchemeDTO.getOrganizationId(), issueTypeSchemeDTO.getId());
-
-        BiPredicate<IssueType, IssueType> myEquals = (IssueType x1, IssueType x2) -> {
-            if (x1.getId() != null && !x1.getId().equals(x2.getId())) {
-                return false;
-            }
-            return true;
-        };
-        List<IssueType> add = ListChangeUtil.getAddList(newIssueTypes, oldIssueTypes, myEquals);
-        List<IssueType> reduce = ListChangeUtil.getReduceList(newIssueTypes, oldIssueTypes, myEquals);
+//        List<IssueType> newIssueTypes = modelMapper.map(issueTypeSchemeDTO.getIssueTypes(), new TypeToken<List<IssueType>>() {
+//        }.getType());
+//        List<IssueType> oldIssueTypes = issueTypeMapper.queryBySchemeId(issueTypeSchemeDTO.getOrganizationId(), issueTypeSchemeDTO.getId());
+//
+//        BiPredicate<IssueType, IssueType> myEquals = (IssueType x1, IssueType x2) -> {
+//            if (x1.getId() != null && !x1.getId().equals(x2.getId())) {
+//                return false;
+//            }
+//            return true;
+//        };
+//        List<IssueType> add = ListChangeUtil.getAddList(newIssueTypes, oldIssueTypes, myEquals);
+//        List<IssueType> reduce = ListChangeUtil.getReduceList(newIssueTypes, oldIssueTypes, myEquals);
 
         issueTypeSchemeConfigMapper.deleteBySchemeId(organizationId, issueTypeSchemeDTO.getId());
         createConfig(organizationId, issueTypeScheme.getId(), issueTypeSchemeDTO.getIssueTypes());
@@ -171,31 +170,6 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         }
         return true;
     }
-
-//    @Override
-//    public Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param) {
-//        IssueTypeScheme issueTypeScheme = modelMapper.map(issueTypeSchemeDTO, IssueTypeScheme.class);
-//
-//        Page<IssueTypeScheme> pages = PageHelper.doPageAndSort(pageRequest,
-//                () -> issueTypeSchemeMapper.fulltextSearch(issueTypeScheme, param));
-//        List<IssueTypeScheme> content = pages.getContent();
-//        List<IssueTypeSchemeDTO> contentDTO = modelMapper.map(content, new TypeToken<List<IssueTypeSchemeDTO>>() {
-//        }.getType());
-//        for (IssueTypeSchemeDTO scheme : contentDTO) {
-//            //根据方案配置表获取 问题类型
-//            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(scheme.getOrganizationId(), scheme.getId());
-//            scheme.setIssueTypes(modelMapper.map(issueTypes, new TypeToken<List<IssueTypeDTO>>() {
-//            }.getType()));
-//        }
-//        Page<IssueTypeSchemeDTO> pagesDTO = new Page<>();
-//        pagesDTO.setNumber(pages.getNumber());
-//        pagesDTO.setNumberOfElements(pages.getNumberOfElements());
-//        pagesDTO.setSize(pages.getSize());
-//        pagesDTO.setTotalElements(pages.getTotalElements());
-//        pagesDTO.setTotalPages(pages.getTotalPages());
-//        pagesDTO.setContent(contentDTO);
-//        return pagesDTO;
-//    }
 
     @Override
     public Boolean checkName(Long organizationId, String name, Long id) {

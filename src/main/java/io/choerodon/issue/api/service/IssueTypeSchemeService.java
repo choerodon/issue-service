@@ -1,12 +1,11 @@
 package io.choerodon.issue.api.service;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeWithInfoDTO;
-import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.IssueTypeScheme;
-import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseService;
 
@@ -63,16 +62,6 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      * @return
      */
     Boolean delete(Long organizationId, Long issueTypeSchemeId);
-
-//    /**
-//     * 分页
-//     *
-//     * @param pageRequest
-//     * @param issueTypeSchemeDTO
-//     * @param param
-//     * @return
-//     */
-//    Page<IssueTypeSchemeDTO> pageQuery(PageRequest pageRequest, IssueTypeSchemeDTO issueTypeSchemeDTO, String param);
 
     /**
      * 校验方案名是否可用

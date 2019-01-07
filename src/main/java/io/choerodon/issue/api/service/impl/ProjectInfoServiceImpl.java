@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 @RefreshScope
 public class ProjectInfoServiceImpl implements ProjectInfoService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectInfoServiceImpl.class);
-
     @Autowired
     private ProjectInfoMapper projectInfoMapper;
 

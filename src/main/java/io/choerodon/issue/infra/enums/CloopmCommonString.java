@@ -4,6 +4,9 @@ package io.choerodon.issue.infra.enums;
  * @author cong.cheng@hand-china.com
  */
 public class CloopmCommonString {
+    private CloopmCommonString() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 是否可被删除

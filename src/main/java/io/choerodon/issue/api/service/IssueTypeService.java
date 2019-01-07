@@ -1,10 +1,10 @@
 package io.choerodon.issue.api.service;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
 import io.choerodon.issue.domain.IssueType;
-import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseService;
 
@@ -27,8 +27,6 @@ public interface IssueTypeService extends BaseService<IssueType> {
     Boolean delete(Long organizationId, Long issueTypeId);
 
     Map<String, Object> checkDelete(Long organizationId, Long issueTypeId);
-
-//    Page<IssueTypeDTO> pageQuery(PageRequest pageRequest, IssueTypeDTO issueTypeDTO, String param);
 
     Page<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO);
 

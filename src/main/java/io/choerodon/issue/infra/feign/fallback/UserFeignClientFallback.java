@@ -2,7 +2,6 @@ package io.choerodon.issue.infra.feign.fallback;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.OrganizationDTO;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.infra.feign.UserFeignClient;

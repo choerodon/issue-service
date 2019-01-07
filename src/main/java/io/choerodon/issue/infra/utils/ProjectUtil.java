@@ -42,7 +42,7 @@ public class ProjectUtil {
             if (projectDTO != null) {
                 map.put(projectId, projectDTO);
                 return projectDTO;
-            }else{
+            } else {
                 throw new CommonException("error.queryProject.notFound");
             }
         }

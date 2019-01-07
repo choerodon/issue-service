@@ -30,8 +30,6 @@ import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
@@ -53,8 +51,6 @@ import java.util.stream.Collectors;
 @RefreshScope
 public class ProjectConfigServiceImpl implements ProjectConfigService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectConfigServiceImpl.class);
-    private static final String YES = "1";
     private static final String AGILE_SERVICE = "agile-service";
     private static final String FLAG = "flag";
     private static final String MESSAGE = "message";
