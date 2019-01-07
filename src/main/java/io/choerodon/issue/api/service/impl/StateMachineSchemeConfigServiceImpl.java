@@ -31,8 +31,6 @@ import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +49,6 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMachineSchemeConfigDraft> implements StateMachineSchemeConfigService {
 
-    private static final Logger logger = LoggerFactory.getLogger(StateMachineSchemeConfigServiceImpl.class);
     @Autowired
     private StateMachineSchemeConfigMapper configMapper;
     @Autowired
@@ -301,7 +298,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
     @Override
     public Boolean deploy(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems, Long objectVersionNumber) {
         StateMachineScheme select = schemeMapper.selectByPrimaryKey(schemeId);
-        if ("doing".equals(select.getDeployStatus())||!select.getObjectVersionNumber().equals(objectVersionNumber)) {
+        if ("doing".equals(select.getDeployStatus()) || !select.getObjectVersionNumber().equals(objectVersionNumber)) {
             throw new CommonException("error.stateMachineScheme.illegal");
         }
         //获取当前方案增加的状态和减少的状态

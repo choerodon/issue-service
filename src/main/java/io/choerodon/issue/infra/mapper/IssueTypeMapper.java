@@ -15,7 +15,6 @@ import java.util.List;
  */
 @Component
 public interface IssueTypeMapper extends BaseMapper<IssueType> {
-//    List<IssueType> fulltextSearch(@Param("issueType") IssueType issueType, @Param("param") String param);
 
     List<IssueType> queryBySchemeId(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId);
 

@@ -4,7 +4,6 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseService;
 

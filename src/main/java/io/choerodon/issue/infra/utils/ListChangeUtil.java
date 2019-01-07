@@ -9,6 +9,10 @@ import java.util.function.BiPredicate;
  * @date 2018/8/13
  */
 public class ListChangeUtil {
+    private ListChangeUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 计算列表newList相对于oldList的增加的情况，兼容任何类型元素的列表数据结构
      *
@@ -17,7 +21,7 @@ public class ListChangeUtil {
      * @return 返回增加的元素组成的列表
      */
     public static <E> List<E> getAddList(List<E> newList, List<E> oldList, BiPredicate myEquals) {
-        List<E> addList = new ArrayList<E>();
+        List<E> addList = new ArrayList<>();
         if (newList != null) {
             for (int i = 0; i < newList.size(); i++) {
                 if (!myListContains(oldList, newList.get(i), myEquals)) {
@@ -36,7 +40,7 @@ public class ListChangeUtil {
      * @return 返回减少的元素组成的列表
      */
     public static <E> List<E> getReduceList(List<E> newList, List<E> oldList, BiPredicate myEquals) {
-        List<E> reduceList = new ArrayList<E>();
+        List<E> reduceList = new ArrayList<>();
         if (oldList != null) {
             for (int i = 0; i < oldList.size(); i++) {
                 if (!myListContains(newList, oldList.get(i), myEquals)) {
@@ -52,8 +56,8 @@ public class ListChangeUtil {
      *
      * @param sourceList 源列表
      * @param element    待判断的包含元素
-     * @Param myEquals   自定义相等方法
      * @return 包含返回 true，不包含返回 false
+     * @Param myEquals   自定义相等方法
      */
     private static <E> boolean myListContains(List<E> sourceList, E element, BiPredicate myEquals) {
         if (sourceList == null || element == null) {
@@ -63,7 +67,7 @@ public class ListChangeUtil {
             return false;
         }
         for (E tip : sourceList) {
-            if (myEquals.test(tip,element)) {
+            if (myEquals.test(tip, element)) {
                 return true;
             }
         }

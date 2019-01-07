@@ -3,7 +3,6 @@ package io.choerodon.issue.api.dto;
 import io.choerodon.issue.domain.IssueTypeWithInfo;
 import io.choerodon.issue.domain.ProjectWithInfo;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

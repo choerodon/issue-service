@@ -1,7 +1,6 @@
 package io.choerodon.issue.api.dto;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 
 import javax.validation.constraints.NotNull;
 

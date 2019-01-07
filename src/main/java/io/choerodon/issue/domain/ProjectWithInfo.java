@@ -1,7 +1,5 @@
 package io.choerodon.issue.domain;
 
-import java.util.List;
-
 /**
  * Created by HuangFuqiang@choerodon.io on 2018/11/29.
  * Email: fuqianghuang01@gmail.com

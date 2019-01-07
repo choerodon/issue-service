@@ -58,9 +58,8 @@ public class ChangeSchemeStatusAspect {
 
         try {
             return pjp.proceed();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Throwable e) {
+            throw new CommonException("error.changeSchemeStatusAspect.proceed", e);
         }
-        return null;
     }
 }

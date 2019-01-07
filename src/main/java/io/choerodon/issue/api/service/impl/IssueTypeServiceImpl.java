@@ -9,15 +9,10 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.domain.IssueType;
-import io.choerodon.issue.domain.IssueTypeWithInfo;
 import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
-import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
-import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
-import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
-import io.choerodon.issue.infra.utils.ConvertUtils;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.service.BaseServiceImpl;
@@ -29,7 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,8 +37,6 @@ import java.util.stream.Collectors;
 @Component
 @RefreshScope
 public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements IssueTypeService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IssueTypeServiceImpl.class);
 
     @Autowired
     private IssueTypeMapper issueTypeMapper;
@@ -121,23 +117,6 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
         //校验
         return true;
     }
-
-//    @Override
-//    public Page<IssueTypeDTO> pageQuery(PageRequest pageRequest, IssueTypeDTO issueTypeDTO, String param) {
-//        IssueType issueType = modelMapper.map(issueTypeDTO, IssueType.class);
-//        Page<IssueType> pages = PageHelper.doPageAndSort(pageRequest,
-//                () -> issueTypeMapper.fulltextSearch(issueType, param));
-//
-//        Page<IssueTypeDTO> pagesDTO = new Page<>();
-//        pagesDTO.setNumber(pages.getNumber());
-//        pagesDTO.setNumberOfElements(pages.getNumberOfElements());
-//        pagesDTO.setSize(pages.getSize());
-//        pagesDTO.setTotalElements(pages.getTotalElements());
-//        pagesDTO.setTotalPages(pages.getTotalPages());
-//        pagesDTO.setContent(modelMapper.map(pages.getContent(), new TypeToken<List<IssueTypeDTO>>() {
-//        }.getType()));
-//        return pagesDTO;
-//    }
 
     @Override
     public Page<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO) {
