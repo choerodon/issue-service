@@ -6,10 +6,8 @@ import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem
 import io.choerodon.issue.api.service.StateMachineSchemeService
-import io.choerodon.issue.domain.StateMachineScheme
 import io.choerodon.issue.domain.StateMachineSchemeConfig
 import io.choerodon.issue.infra.feign.StateMachineFeignClient
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,14 +16,10 @@ import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
-
-import java.util.stream.Collectors
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
@@ -84,9 +78,8 @@ class StateMachineSchemeControllerSpec extends Specification {
         name              | description     | param  || isSuccess | size
         null              | null            | null   || true      | 2
         'test默认状态机方案【测试】' | null            | null   || true      | 1
-        null              | 'description40' | null   || true      | 2
-        'name40'          | 'description40' | null   || true      | 2
-        null              | null            | 'name' || true      | 2
+        null              | null            | 'test' || true      | 2
+        null              | null            | 'xx'   || true      | 0
     }
 
     def "create"() {
