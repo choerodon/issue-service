@@ -75,7 +75,10 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
                 () -> schemeMapper.fulltextSearch(scheme, params));
 
         List<StateMachineScheme> schemes = page.getContent();
-        List<StateMachineScheme> schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
+        List<StateMachineScheme> schemesWithConfig = new ArrayList<>();
+        if(!schemes.isEmpty()){
+            schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
+        }
         List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig, projectMap);
         if (schemeDTOS != null) {
             for (StateMachineSchemeDTO machineSchemeDTO : schemeDTOS) {
