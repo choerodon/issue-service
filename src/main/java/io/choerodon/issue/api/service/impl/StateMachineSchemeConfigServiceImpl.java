@@ -289,9 +289,17 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //增加的状态
         List<Long> addStatusIds = new ArrayList<>(newStatusIds);
         addStatusIds.removeAll(oldStatusIds);
+        //减少的状态机
+        List<Long> deleteStateMachineIds = new ArrayList<>(oldStateMachineIds);
+        deleteStateMachineIds.removeAll(newStateMachineIds);
+        //增加的状态机
+        List<Long> addStateMachineIds = new ArrayList<>(newStateMachineIds);
+        addStateMachineIds.removeAll(oldStateMachineIds);
 
         changeMap.put("deleteStatusIds", deleteStatusIds);
         changeMap.put("addStatusIds", addStatusIds);
+        changeMap.put("deleteStateMachineIds", deleteStateMachineIds);
+        changeMap.put("addStateMachineIds", addStateMachineIds);
         return changeMap;
     }
 
@@ -317,15 +325,15 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         schemeMapper.updateDeployStatus(organizationId, schemeId, "doing");
         sagaService.deployStateMachineScheme(organizationId, schemeId, changeItems, changeStatus);
         //新增的状态机ids和删除的状态机ids
-        List<Long> oldStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getOldStateMachineId).distinct().collect(Collectors.toList());
-        List<Long> newStateMachineIds = changeItems.stream().map(StateMachineSchemeChangeItem::getNewStateMachineId).distinct().collect(Collectors.toList());
+        List<Long> deleteStateMachineIds = changeMap.get("deleteStateMachineIds");
+        List<Long> addStateMachineIds = changeMap.get("addStateMachineIds");
         //活跃方案下的新增的状态机（状态为create的改成active）
-        if (!newStateMachineIds.isEmpty()) {
-            stateMachineFeignClient.activeStateMachines(organizationId, newStateMachineIds);
+        if (!addStateMachineIds.isEmpty()) {
+            stateMachineFeignClient.activeStateMachines(organizationId, addStateMachineIds);
         }
         //使删除的状态机变成未活跃（状态为active和draft的改成create）
-        if (!oldStateMachineIds.isEmpty()) {
-            stateMachineService.notActiveStateMachine(organizationId, oldStateMachineIds);
+        if (!deleteStateMachineIds.isEmpty()) {
+            stateMachineService.notActiveStateMachine(organizationId, deleteStateMachineIds);
         }
         return true;
     }

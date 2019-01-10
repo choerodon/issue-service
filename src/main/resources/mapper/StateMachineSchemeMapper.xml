@@ -62,7 +62,7 @@
         FROM state_machine_scheme SMS
         LEFT JOIN state_machine_scheme_config SMSC on SMS.id = SMSC.scheme_id
         LEFT JOIN project_config PC on SMS.id = PC.scheme_id
-        WHERE 1=1
+        WHERE SMS.organization_id = #{organizationId}
         <if test="schemeIds != null and schemeIds.size()>0">
             AND SMS.id IN
             <foreach item="item" index="index" collection="schemeIds" open="(" separator="," close=")">
