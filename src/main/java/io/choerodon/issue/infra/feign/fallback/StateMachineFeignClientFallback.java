@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shinan.chen
@@ -98,5 +99,10 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     @Override
     public ResponseEntity<Long> queryInitStatusId(Long organizationId, Long stateMachineId) {
         throw new CommonException("error.stateMachineFeignClient.queryInitStatusId");
+    }
+
+    @Override
+    public ResponseEntity<Map<Long, Map<Long, List<TransformDTO>>>> queryStatusTransformsMap(Long organizationId, List<Long> stateMachineIds) {
+        throw new CommonException("error.stateMachineFeignClient.queryStatusTransformsMap");
     }
 }

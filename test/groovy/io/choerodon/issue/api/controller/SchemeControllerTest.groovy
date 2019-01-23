@@ -69,6 +69,18 @@ class SchemeControllerTest extends Specification {
         entity.body.size() == 1
     }
 
+    def "queryTransformsMapByProjectId"() {
+        when: '查询项目下所有问题类型所有状态对应的转换'
+        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/schemes/query_transforms_map?apply_type={apply_type}",
+                Object, projectId, "agile")
+
+        then: '返回结果'
+        entity.getStatusCode().is2xxSuccessful()
+
+        expect: '期望验证'
+        entity.statusCode.value() == 200
+    }
+
     def "queryStatusByIssueTypeId"() {
         when: '查询项目下某个问题类型的所有状态'
         def entity = restTemplate.getForEntity("/v1/projects/{project_id}/schemes/query_status_by_issue_type_id?issue_type_id={issue_type_id}&apply_type={apply_type}",

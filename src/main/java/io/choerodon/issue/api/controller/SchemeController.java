@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -64,6 +65,14 @@ public class SchemeController extends BaseController {
                                                                          @RequestParam("issue_type_id") Long issueTypeId,
                                                                          @RequestParam("apply_type") String applyType) {
         return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, applyType), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @ApiOperation(value = "查询项目下所有问题类型所有状态对应的转换")
+    @GetMapping(value = "/schemes/query_transforms_map")
+    public ResponseEntity<Map<Long, Map<Long, List<TransformDTO>>>> queryTransformsMapByProjectId(@PathVariable("project_id") Long projectId,
+                                                                                                  @RequestParam("apply_type") String applyType) {
+        return new ResponseEntity<>(projectConfigService.queryTransformsMapByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})

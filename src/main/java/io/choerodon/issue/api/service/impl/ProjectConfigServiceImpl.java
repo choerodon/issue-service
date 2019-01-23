@@ -36,10 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -246,8 +243,40 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             }
             return transformDTOS;
         } else {
-            throw new CommonException("error.queryIssueTypesByProjectId.issueTypeSchemeId.null");
+            throw new CommonException("error.queryIssueTypesByProjectId.stateMachineSchemeId.null");
         }
+    }
+
+    @Override
+    public Map<Long, Map<Long, List<TransformDTO>>> queryTransformsMapByProjectId(Long projectId, String applyType) {
+        if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
+            throw new CommonException("error.applyType.illegal");
+        }
+        //获取状态机方案
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        ProjectConfig smProjectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType);
+        if (smProjectConfig.getSchemeId() == null) {
+            throw new CommonException("error.queryTransformsMapByProjectId.stateMachineSchemeId.null");
+        }
+        List<StateMachineSchemeConfigDTO> smsConfigDTO = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, smProjectConfig.getSchemeId());
+        //获取问题类型方案
+        ProjectConfig itProjectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType);
+        if (itProjectConfig.getSchemeId() == null) {
+            throw new CommonException("error.queryTransformsMapByProjectId.issueTypeSchemeId.null");
+        }
+        List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, itProjectConfig.getSchemeId());
+        List<Long> stateMachineIds = smsConfigDTO.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).collect(Collectors.toList());
+        //状态机id->状态id->转换列表
+        Map<Long, Map<Long, List<TransformDTO>>> statusMap = stateMachineFeignClient.queryStatusTransformsMap(organizationId, stateMachineIds).getBody();
+        Map<Long, Long> idMap = smsConfigDTO.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId, StateMachineSchemeConfigDTO::getStateMachineId));
+        //问题类型id->状态id->转换列表
+        Map<Long, Map<Long, List<TransformDTO>>> resultMap = new HashMap<>(issueTypes.size());
+        for (IssueType issueType : issueTypes) {
+            //找不到取默认
+            Long stateMachineId = Optional.ofNullable(idMap.get(issueType.getId())).orElse(idMap.get(0L));
+            resultMap.put(issueType.getId(), statusMap.get(stateMachineId));
+        }
+        return resultMap;
     }
 
     @Override

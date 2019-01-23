@@ -136,4 +136,6 @@ public interface ProjectConfigService {
     Map<String, List<Long>> queryProjectIdsMap(Long organizationId, Long stateMachineId);
 
     Long queryWorkFlowFirstStatus(Long projectId, String applyType, Long issueTypeId, Long organizationId);
+
+    Map<Long, Map<Long, List<TransformDTO>>> queryTransformsMapByProjectId(Long projectId, String applyType);
 }
