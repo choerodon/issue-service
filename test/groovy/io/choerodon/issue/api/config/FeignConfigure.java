@@ -31,10 +31,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 
 /**
@@ -199,6 +201,13 @@ public class FeignConfigure {
         Mockito.when(stateMachineFeignClient.queryAllWithStatus(Matchers.anyLong())).thenReturn(new ResponseEntity<>(stateMachineWithStatusDTOS, HttpStatus.OK));
         Mockito.when(stateMachineFeignClient.queryByOrgId(Matchers.anyLong())).thenReturn(new ResponseEntity<>(stateMachineDTOS, HttpStatus.OK));
         Mockito.when(stateMachineFeignClient.removeStateMachineNode(Matchers.anyLong(), Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+
+        Map<Long, Map<Long, List<TransformDTO>>> statusMap = new HashMap<>();
+        List<TransformDTO> list = new ArrayList<>();
+        Map<Long, List<TransformDTO>> map = new HashMap<>();
+        map.put(1L, list);
+        statusMap.put(1L, map);
+        Mockito.when(stateMachineFeignClient.queryStatusTransformsMap(Matchers.anyLong(), Matchers.anyListOf(Long.class))).thenReturn(new ResponseEntity<>(statusMap, HttpStatus.OK));
         return stateMachineFeignClient;
     }
 

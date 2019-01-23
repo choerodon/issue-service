@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shinan.chen
@@ -83,7 +84,7 @@ public interface StateMachineFeignClient {
     ResponseEntity<StatusDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
 
     /**
-     * 根据知足id获取状态
+     * 根据组织id获取状态
      *
      * @param organizationId
      * @return
@@ -206,4 +207,16 @@ public interface StateMachineFeignClient {
     @GetMapping(value = "/v1/organizations/{organization_id}/instances/query_init_status_id")
     ResponseEntity<Long> queryInitStatusId(@PathVariable("organization_id") Long organizationId,
                                            @RequestParam("state_machine_id") Long stateMachineId);
+
+
+    /**
+     * 【初始化项目】创建项目时创建该项目的状态机，返回状态机id
+     *
+     * @param organizationId
+     * @return
+     */
+    @PostMapping(value = "/v1/organizations/{organization_id}/state_machine_transforms/query_status_transforms_map")
+    ResponseEntity<Map<Long, Map<Long, List<TransformDTO>>>> queryStatusTransformsMap(@PathVariable("organization_id") Long organizationId,
+                                                                                      @RequestBody List<Long> stateMachineIds);
+
 }
