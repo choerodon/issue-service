@@ -14,6 +14,10 @@ public final class SagaTopic {
         //task
         public static final String TASK_PROJECT_UPDATE = "issue-create-project";
 
+        public static final String ISSUE_DEMO_PROJECT_CLEAN = "demo-issue-project-clean";
+
+        public static final String DEMO_PROJECT_CLEAN = "demo-project-clean";
+
     }
 
     public static class Organization {
