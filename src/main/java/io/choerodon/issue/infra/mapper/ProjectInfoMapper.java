@@ -14,4 +14,6 @@ public interface ProjectInfoMapper extends BaseMapper<ProjectInfo> {
     ProjectInfo queryByProjectId(@Param("projectId") Long projectId);
 
     int updateIssueMaxNum(@Param("projectId") Long projectId);
+
+    void demoProjectClean(@Param("projectId") Long projectId);
 }
