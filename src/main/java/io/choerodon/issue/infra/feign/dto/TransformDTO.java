@@ -10,7 +10,16 @@ public class TransformDTO {
     private Long stateMachineId;
     private Long endStatusId;
 
+    private String statusType;
     private StatusDTO statusDTO;
+
+    public String getStatusType() {
+        return statusType;
+    }
+
+    public void setStatusType(String statusType) {
+        this.statusType = statusType;
+    }
 
     public Long getId() {
         return id;

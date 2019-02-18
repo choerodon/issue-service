@@ -271,10 +271,24 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Map<Long, Long> idMap = smsConfigDTO.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId, StateMachineSchemeConfigDTO::getStateMachineId));
         //问题类型id->状态id->转换列表
         Map<Long, Map<Long, List<TransformDTO>>> resultMap = new HashMap<>(issueTypes.size());
+        //获取组织所有状态
+        List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+        Map<Long, StatusDTO> sMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
+        statusMap.entrySet().forEach(x->x.getValue().entrySet().forEach(y->y.getValue().forEach(transformDTO -> {
+            StatusDTO statusDTO = sMap.get(transformDTO.getEndStatusId());
+            if(statusDTO!=null){
+                transformDTO.setStatusType(statusDTO.getType());
+            }
+        })));
+        //匹配默认状态机的问题类型映射
+        Long defaultStateMachineId = idMap.get(0L);
+        resultMap.put(0L, statusMap.get(defaultStateMachineId));
+        //匹配状态机的问题类型映射
         for (IssueType issueType : issueTypes) {
-            //找不到取默认
-            Long stateMachineId = Optional.ofNullable(idMap.get(issueType.getId())).orElse(idMap.get(0L));
-            resultMap.put(issueType.getId(), statusMap.get(stateMachineId));
+            Long stateMachineId = idMap.get(issueType.getId());
+            if(stateMachineId!=null){
+                resultMap.put(issueType.getId(), statusMap.get(stateMachineId));
+            }
         }
         return resultMap;
     }
