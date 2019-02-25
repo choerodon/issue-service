@@ -74,21 +74,6 @@ public class IssueEventHandler {
         return data;
     }
 
-    @SagaTask(code = TASK_ORG_REGISTER,
-            description = "注册组织事件",
-            sagaCode = ORG_REGISTER,
-            seq = 1)
-    public String handleOrgaizationRegisterByConsumeSagaTask(String data) {
-        LOGGER.info("消费创建组织消息{}", data);
-        OrganizationRegisterPayload payload = JSONObject.parseObject(data, OrganizationRegisterPayload.class);
-        Long organizationId = payload.getOrganizationId();
-        //注册组织初始化六种问题类型
-        issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
-        //注册组织初始化优先级
-        priorityService.initProrityByOrganization(Arrays.asList(organizationId));
-        return data;
-    }
-
     @SagaTask(code = ISSUE_DEMO_PROJECT_CLEAN,
             description = "demo项目清除数据",
             sagaCode = DEMO_PROJECT_CLEAN,
