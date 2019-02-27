@@ -45,7 +45,7 @@ public class DemoEventHandler {
             description = "demo创建组织事件",
             sagaCode = REGISTER_ORG,
             seq = 40)
-    public String orgCreateForDemoInit(String data) {
+    public OrganizationRegisterEventPayload orgCreateForDemoInit(String data) {
         LOGGER.info("demo消费创建组织消息{}", data);
         OrganizationRegisterEventPayload organizationRegisterEventPayload = JSONObject.parseObject(data, OrganizationRegisterEventPayload.class);
         Long orgId = organizationRegisterEventPayload.getOrganization().getId();
@@ -53,14 +53,14 @@ public class DemoEventHandler {
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));
-        return data;
+        return organizationRegisterEventPayload;
     }
 
     @SagaTask(code = REGISTER_ISSUE_INIT_PROJECT,
             description = "demo创建项目事件",
             sagaCode = REGISTER_ORG,
             seq = 110)
-    public String projectCreateForDemoInit(String data) {
+    public OrganizationRegisterEventPayload projectCreateForDemoInit(String data) {
         LOGGER.info("demo接受创建项目消息{}", data);
         OrganizationRegisterEventPayload organizationRegisterEventPayload = JSONObject.parseObject(data, OrganizationRegisterEventPayload.class);
         ProjectEvent projectEvent = new ProjectEvent();
@@ -73,6 +73,6 @@ public class DemoEventHandler {
         issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
         //创建项目信息及配置默认方案
         projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-        return data;
+        return organizationRegisterEventPayload;
     }
 }
