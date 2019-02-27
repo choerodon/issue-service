@@ -2,9 +2,7 @@ package io.choerodon.issue.api.eventhandler;
 
 import com.alibaba.fastjson.JSONObject;
 import io.choerodon.asgard.saga.annotation.SagaTask;
-import io.choerodon.issue.api.dto.payload.DemoPayload;
 import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload;
-import io.choerodon.issue.api.dto.payload.OrganizationRegisterPayload;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.service.*;
 import org.slf4j.Logger;
@@ -72,15 +70,5 @@ public class IssueEventHandler {
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));
         return data;
-    }
-
-    @SagaTask(code = ISSUE_DEMO_PROJECT_CLEAN,
-            description = "demo项目清除数据",
-            sagaCode = DEMO_PROJECT_CLEAN,
-            seq = 1)
-    public void demoProjectClean(String message) {
-        DemoPayload demoPayload = JSONObject.parseObject(message, DemoPayload.class);
-        Long projectId = demoPayload.getProjectId();
-        projectInfoService.demoProjectClean(projectId);
     }
 }
