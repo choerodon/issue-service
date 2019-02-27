@@ -21,11 +21,9 @@ public class DemoEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DemoEventHandler.class);
 
-    private static final String DEMO_AGILE_ORG_CREATE_EVENT = "demo-agile-org-create-event";
     private static final String REGISTER_ISSUE_INIT_ORG = "register-issue-init-org";
-
-    private static final String DEMO_ISSUE_PRO_DEMO_INIT = "demo-issue-pro-demo-init";
     private static final String REGISTER_ISSUE_INIT_PROJECT = "register-issue-init-project";
+    private static final String REGISTER_ORG = "register-org";
 
     @Autowired
     private IssueTypeService issueTypeService;
@@ -43,9 +41,9 @@ public class DemoEventHandler {
     private IssueTypeSchemeService issueTypeSchemeService;
 
 
-    @SagaTask(code = DEMO_AGILE_ORG_CREATE_EVENT,
+    @SagaTask(code = REGISTER_ISSUE_INIT_ORG,
             description = "demo创建组织事件",
-            sagaCode = REGISTER_ISSUE_INIT_ORG,
+            sagaCode = REGISTER_ORG,
             seq = 40)
     public String orgCreateForDemoInit(String data) {
         LOGGER.info("demo消费创建组织消息{}", data);
@@ -58,9 +56,9 @@ public class DemoEventHandler {
         return data;
     }
 
-    @SagaTask(code = DEMO_ISSUE_PRO_DEMO_INIT,
+    @SagaTask(code = REGISTER_ISSUE_INIT_PROJECT,
             description = "demo创建项目事件",
-            sagaCode = REGISTER_ISSUE_INIT_PROJECT,
+            sagaCode = REGISTER_ORG,
             seq = 110)
     public String projectCreateForDemoInit(String data) {
         LOGGER.info("demo接受创建项目消息{}", data);
