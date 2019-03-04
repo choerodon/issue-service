@@ -268,6 +268,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Override
     public Boolean delete(Long organizationId, Long priorityId, Long changePriorityId) {
+
         List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
