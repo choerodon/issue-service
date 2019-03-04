@@ -4,7 +4,8 @@
 <mapper namespace="io.choerodon.issue.infra.mapper.PriorityMapper">
 
     <select id="fulltextSearch" resultType="io.choerodon.issue.domain.Priority">
-        SELECT P.*
+        SELECT P.*,
+        P.is_enable as enable
         FROM priority P
         WHERE 1=1
         <if test="priority.organizationId != null">
@@ -25,7 +26,7 @@
             OR P.colour LIKE concat('%',#{param},'%')
             )
         </if>
-        ORDER BY P.enable,P.sequence
+        ORDER BY P.is_enable,P.sequence
     </select>
 
     <select id="getNextSequence" resultType="decimal">
@@ -44,7 +45,7 @@
 
     <update id="updateMinIdAsDefault">
         UPDATE priority SET is_default = 1
-        AND id = (
+        WHERE id = (
          select t.id from(
              select min(p.id) as id from priority p
              WHERE p.organization_id=#{organizationId}
