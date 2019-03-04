@@ -231,6 +231,9 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Override
     public PriorityDTO enablePriority(Long organizationId, Long id, Boolean enable) {
+        if (!enable) {
+            validPriority(organizationId);
+        }
         Priority priority = priorityMapper.selectByPrimaryKey(id);
         if (priority == null) {
             throw new CommonException(NOT_FOUND);
@@ -268,7 +271,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Override
     public Boolean delete(Long organizationId, Long priorityId, Long changePriorityId) {
-
+        validPriority(organizationId);
         List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
@@ -290,5 +293,19 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             throw new CommonException("error.priority.delete");
         }
         return true;
+    }
+
+    /**
+     * 最后一个有效优先级无法删除/失效
+     *
+     * @param organizationId
+     */
+    private void validPriority(Long organizationId) {
+        Priority priority = new Priority();
+        priority.setEnable(true);
+        priority.setOrganizationId(organizationId);
+        if (priorityMapper.select(priority).size() <= 1) {
+            throw new CommonException(DELETE_ILLEGAL);
+        }
     }
 }
