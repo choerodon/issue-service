@@ -1,9 +1,14 @@
 package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.CustomUserDetails;
+import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.issue.api.dto.PriorityDTO;
+import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.domain.Priority;
+import io.choerodon.issue.infra.feign.AgileFeignClient;
+import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
 import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
@@ -15,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author cong.cheng
@@ -26,9 +32,15 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Autowired
     private PriorityMapper priorityMapper;
+    @Autowired
+    private UserFeignClient userFeignClient;
+    @Autowired
+    private AgileFeignClient agileFeignClient;
 
     private ModelMapper modelMapper = new ModelMapper();
+
     private static final String NOT_FOUND = "error.priority.notFound";
+    private static final String DELETE_ILLEGAL = "error.priority.deleteIllegal";
 
     @Override
     public List<PriorityDTO> selectAll(PriorityDTO priorityDTO, String param) {
@@ -59,15 +71,6 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         }
         priority = priorityMapper.selectByPrimaryKey(priority);
         return modelMapper.map(priority, PriorityDTO.class);
-    }
-
-    @Override
-    public Boolean delete(Long organizationId, Long priorityId) {
-        int isDelete = priorityMapper.deleteByPrimaryKey(priorityId);
-        if (isDelete != 1) {
-            throw new CommonException("error.priority.delete");
-        }
-        return true;
     }
 
     private Boolean checkNameUpdate(Long organizationId, Long priorityId, String name) {
@@ -247,5 +250,44 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     private void updateOtherDefault(Long organizationId) {
         priorityMapper.cancelDefaultPriority(organizationId);
         priorityMapper.updateMinIdAsDefault(organizationId);
+    }
+
+    @Override
+    public Long checkDelete(Long organizationId, Long id) {
+        //查询出组织下的所有项目
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
+        List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
+        Long count;
+        if (projectIds == null || projectIds.isEmpty()) {
+            count = 0L;
+        } else {
+            count = agileFeignClient.checkPriorityDelete(organizationId, id, projectIds).getBody();
+        }
+        return count;
+    }
+
+    @Override
+    public Boolean delete(Long organizationId, Long priorityId, Long changePriorityId) {
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
+        List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
+        Long count;
+        if (projectIds == null || projectIds.isEmpty()) {
+            count = 0L;
+        } else {
+            count = agileFeignClient.checkPriorityDelete(organizationId, priorityId, projectIds).getBody();
+        }
+        //执行优先级转换
+        if (!count.equals(0L)) {
+            if (changePriorityId == null) {
+                throw new CommonException(DELETE_ILLEGAL);
+            }
+            CustomUserDetails customUserDetails = DetailsHelper.getUserDetails();
+            agileFeignClient.batchChangeIssuePriority(organizationId, priorityId, changePriorityId, customUserDetails.getUserId(), projectIds);
+        }
+        int isDelete = priorityMapper.deleteByPrimaryKey(priorityId);
+        if (isDelete != 1) {
+            throw new CommonException("error.priority.delete");
+        }
+        return true;
     }
 }

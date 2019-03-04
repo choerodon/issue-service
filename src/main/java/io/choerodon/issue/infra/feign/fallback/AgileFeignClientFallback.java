@@ -26,6 +26,15 @@ public class AgileFeignClientFallback implements AgileFeignClient {
         throw new CommonException("error.agileFeignClient.checkStateMachineSchemeChange");
     }
 
+    @Override
+    public ResponseEntity<Long> checkPriorityDelete(Long organizationId, Long priorityId, List<Long> projectIds) {
+        throw new CommonException("error.agileFeignClient.checkPriorityDelete");
+    }
+
+    @Override
+    public ResponseEntity batchChangeIssuePriority(Long organizationId, Long priorityId, Long changePriorityId, Long userId, List<Long> projectIds) {
+        throw new CommonException("error.agileFeignClient.batchChangeIssuePriority");
+    }
 }
 
 
