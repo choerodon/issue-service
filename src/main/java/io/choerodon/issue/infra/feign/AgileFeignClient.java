@@ -50,4 +50,38 @@ public interface AgileFeignClient {
                                                                   @PathVariable(name = "organization_id") Long organizationId,
                                                                   @RequestBody StateMachineSchemeDeployCheckIssue deployCheckIssue);
 
+    /**
+     * 校验删除优先级
+     *
+     * @param organizationId
+     * @param priorityId
+     * @param projectIds
+     * @return
+     */
+    @PostMapping("/v1/organizations/{organization_id}/issues/check_priority_delete")
+    ResponseEntity<Long> checkPriorityDelete(@ApiParam(value = "组织id", required = true)
+                                             @PathVariable(name = "organization_id") Long organizationId,
+                                             @ApiParam(value = "priorityId", required = true)
+                                             @RequestParam(value = "priority_id") Long priorityId,
+                                             @RequestBody List<Long> projectIds);
+
+    /**
+     * 批量更改Issue的优先级
+     *
+     * @param organizationId
+     * @param priorityId
+     * @param changePriorityId
+     * @param projectIds
+     * @return
+     */
+    @PostMapping("/v1/organizations/{organization_id}/issues/batch_change_issue_priority")
+    ResponseEntity batchChangeIssuePriority(@ApiParam(value = "组织id", required = true)
+                                            @PathVariable(name = "organization_id") Long organizationId,
+                                            @ApiParam(value = "priorityId", required = true)
+                                            @RequestParam(value = "priority_id") Long priorityId,
+                                            @ApiParam(value = "changePriorityId", required = true)
+                                            @RequestParam(value = "change_priority_id") Long changePriorityId,
+                                            @RequestParam(value = "user_id") Long userId,
+                                            @RequestBody List<Long> projectIds);
+
 }

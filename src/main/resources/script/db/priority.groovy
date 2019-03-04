@@ -44,4 +44,10 @@ databaseChangeLog(logicalFilePath: 'priority.groovy') {
             column(name: "is_default", type: "TINYINT UNSIGNED")
         }
     }
+
+    changeSet(id: '2019-03-04-add-column-is-enable', author: 'shinan.chenX@gmail.com') {
+        addColumn(tableName: 'priority') {
+            column(name: 'is_enable', type: 'TINYINT UNSIGNED', defaultValue: "1", remarks: 'is enable flag')
+        }
+    }
 }

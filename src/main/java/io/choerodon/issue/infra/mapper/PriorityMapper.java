@@ -22,6 +22,7 @@ public interface PriorityMapper extends BaseMapper<Priority> {
      * @return 优先级列表
      */
     List<Priority> fulltextSearch(@Param("priority") Priority priority, @Param("param") String param);
+
     /**
      * 得到下一个顺序号
      *
@@ -29,6 +30,7 @@ public interface PriorityMapper extends BaseMapper<Priority> {
      * @return 顺序号
      */
     BigDecimal getNextSequence(@Param("organizationId") Long organizationId);
+
     /**
      * 根据id更新优先级的顺序
      *
@@ -36,16 +38,23 @@ public interface PriorityMapper extends BaseMapper<Priority> {
      * @return 更新是否成功
      */
     int updateSequenceById(@Param("priority") Priority priority);
-    /**
-     * 更新非插入非更新优先级默认为0，不生效
-     * @param organizationId 组织id
-     */
-    void updateDefaultPriority(@Param("organizationId") Long organizationId);
 
     /**
+     * 取消默认优先级
      *
-     * @param  organizationId organizationId
+     * @param organizationId 组织id
+     */
+    void cancelDefaultPriority(@Param("organizationId") Long organizationId);
+
+    /**
+     * 更新最小的id为默认优先级
+     * @param organizationId
+     */
+    void updateMinIdAsDefault(@Param("organizationId") Long organizationId);
+
+    /**
+     * @param organizationId organizationId
      * @return int
      */
-    int selectDefaultCount(@Param("organizationId")Long organizationId);
+    int selectDefaultCount(@Param("organizationId") Long organizationId);
 }

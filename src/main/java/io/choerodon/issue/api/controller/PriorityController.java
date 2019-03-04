@@ -61,13 +61,6 @@ public class PriorityController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "删除优先级")
-    @DeleteMapping(value = "/{priority_id}")
-    public ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId, @PathVariable("priority_id") Long priorityId) {
-        return new ResponseEntity<>(priorityService.delete(organizationId, priorityId), HttpStatus.OK);
-    }
-
-    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "更新优先级")
     @PutMapping(value = "/organizations/{organization_id}/priority/{priority_id}")
     public ResponseEntity<PriorityDTO> update(@PathVariable("organization_id") Long organizationId, @PathVariable("priority_id") Long priorityId,
@@ -139,8 +132,33 @@ public class PriorityController {
         return Optional.ofNullable(priorityService.queryById(organizationId, id))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.CREATED))
                 .orElseThrow(() -> new CommonException("error.priority.get"));
-
     }
 
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "生效/失效优先级")
+    @GetMapping("/organizations/{organization_id}/priority/enable/{id}")
+    public ResponseEntity<PriorityDTO> enablePriority(@PathVariable("organization_id") Long organizationId,
+                                                      @ApiParam(value = "id", required = true)
+                                                      @PathVariable Long id,
+                                                      @RequestParam(required = false) Boolean enable) {
+        return new ResponseEntity<>(priorityService.enablePriority(organizationId, id, enable), HttpStatus.OK);
+    }
 
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "校验删除优先级")
+    @GetMapping("/organizations/{organization_id}/priority/check_delete/{id}")
+    public ResponseEntity<Long> checkDelete(@PathVariable("organization_id") Long organizationId,
+                                            @ApiParam(value = "id", required = true)
+                                            @PathVariable Long id) {
+        return new ResponseEntity<>(priorityService.checkDelete(organizationId, id), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "删除优先级")
+    @DeleteMapping("/organizations/{organization_id}/priority/delete/{id}")
+    public ResponseEntity delete(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long priorityId,
+                                 @RequestParam(required = false) Long changePriorityId) {
+        priorityService.delete(organizationId, priorityId, changePriorityId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

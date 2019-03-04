@@ -4,6 +4,7 @@ import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -27,6 +28,16 @@ public class Priority extends AuditDomain {
     private Long organizationId;
     private Boolean isDefault;
     private BigDecimal sequence;
+    @Column(name = "is_enable")
+    private Boolean enable;
+
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
+    }
 
     public BigDecimal getSequence() {
         return sequence;

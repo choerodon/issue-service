@@ -25,7 +25,7 @@
             OR P.colour LIKE concat('%',#{param},'%')
             )
         </if>
-        ORDER BY P.sequence
+        ORDER BY P.enable,P.sequence
     </select>
 
     <select id="getNextSequence" resultType="decimal">
@@ -37,9 +37,20 @@
         WHERE id= #{priority.id}
     </update>
 
-    <update id="updateDefaultPriority">
+    <update id="cancelDefaultPriority">
         UPDATE priority SET is_default = 0
         WHERE organization_id=#{organizationId} AND is_default = 1
+    </update>
+
+    <update id="updateMinIdAsDefault">
+        UPDATE priority SET is_default = 1
+        AND id = (
+         select t.id from(
+             select min(p.id) as id from priority p
+             WHERE p.organization_id=#{organizationId}
+             AND p.is_enable = 1
+         ) t
+        )
     </update>
 
     <select id="selectDefaultCount" resultType="java.lang.Integer">
