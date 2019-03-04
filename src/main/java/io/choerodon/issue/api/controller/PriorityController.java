@@ -139,7 +139,16 @@ public class PriorityController {
         return Optional.ofNullable(priorityService.queryById(organizationId, id))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.CREATED))
                 .orElseThrow(() -> new CommonException("error.priority.get"));
+    }
 
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "生效/失效优先级")
+    @GetMapping("/organizations/{organization_id}/priority/{id}/enable")
+    public ResponseEntity<PriorityDTO> enablePriority(@PathVariable("organization_id") Long organizationId,
+                                                      @ApiParam(value = "id", required = true)
+                                                      @PathVariable Long id,
+                                                      @RequestParam(required = false) Boolean enable) {
+        return new ResponseEntity<>(priorityService.enablePriority(organizationId, id, enable), HttpStatus.OK);
     }
 
 

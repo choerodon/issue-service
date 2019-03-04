@@ -28,6 +28,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     private PriorityMapper priorityMapper;
 
     private ModelMapper modelMapper = new ModelMapper();
+    private static final String NOT_FOUND = "error.priority.notFound";
 
     @Override
     public List<PriorityDTO> selectAll(PriorityDTO priorityDTO, String param) {
@@ -47,7 +48,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priorityDTO.setOrganizationId(organizationId);
         //若设置为默认值，则清空其他默认值
         if (priorityDTO.getDefault() != null && priorityDTO.getDefault()) {
-            priorityMapper.updateDefaultPriority(organizationId);
+            priorityMapper.cancelDefaultPriority(organizationId);
         } else {
             priorityDTO.setDefault(false);
         }
@@ -89,7 +90,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         Priority priority = modelMapper.map(priorityDTO, Priority.class);
         //若设置为默认值，则清空其他默认值
         if (priorityDTO.getDefault() != null && priorityDTO.getDefault()) {
-            priorityMapper.updateDefaultPriority(priorityDTO.getOrganizationId());
+            priorityMapper.cancelDefaultPriority(priorityDTO.getOrganizationId());
         } else {
             //如果只有一个默认优先级时，无法取消当前默认优先级
             if (priorityMapper.selectDefaultCount(priorityDTO.getOrganizationId()) > 1) {
@@ -157,7 +158,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priority.setDefault(true);
         Priority result = priorityMapper.selectOne(priority);
         if (result == null) {
-            throw new CommonException("error.priority.get");
+            throw new CommonException(NOT_FOUND);
         }
         return modelMapper.map(result, new TypeToken<PriorityDTO>() {
         }.getType());
@@ -223,5 +224,28 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             result.put(organizationId, initPrority(organizationId));
         }
         return result;
+    }
+
+    @Override
+    public PriorityDTO enablePriority(Long organizationId, Long id, Boolean enable) {
+        Priority priority = priorityMapper.selectByPrimaryKey(id);
+        if (priority == null) {
+            throw new CommonException(NOT_FOUND);
+        }
+        priority.setEnable(enable);
+        updateOptional(priority, "enable");
+        //失效的是默认优先级，则要设置第一个为默认优先级
+        if (!enable && priority.getDefault()) {
+            updateOtherDefault(organizationId);
+        }
+        return queryById(organizationId, id);
+    }
+
+    /**
+     * 取消当前默认优先级，设置第一个为默认优先级
+     */
+    private void updateOtherDefault(Long organizationId) {
+        priorityMapper.cancelDefaultPriority(organizationId);
+        priorityMapper.updateMinIdAsDefault(organizationId);
     }
 }

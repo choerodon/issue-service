@@ -70,4 +70,13 @@ public interface PriorityService extends BaseService<Priority> {
     PriorityDTO queryById(Long organizationId, Long id);
 
     Map<Long, Map<String, Long>> initProrityByOrganization(List<Long> organizationIds);
+
+    /**
+     * 生效/失效优先级
+     * @param organizationId
+     * @param id
+     * @param enable
+     * @return
+     */
+    PriorityDTO enablePriority(Long organizationId, Long id, Boolean enable);
 }
