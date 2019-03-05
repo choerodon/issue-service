@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @Date 2018/8/21
  */
 @Service
-@RefreshScope
+@Transactional(rollbackFor = Exception.class)
 public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements PriorityService {
 
     @Autowired
@@ -52,7 +52,6 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     }
 
     @Override
-    @Transactional
     public PriorityDTO create(Long organizationId, PriorityDTO priorityDTO) {
         if (checkName(organizationId, priorityDTO.getName())) {
             throw new CommonException("error.priority.create.name.same");
@@ -66,6 +65,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             priorityDTO.setDefault(false);
         }
         Priority priority = modelMapper.map(priorityDTO, Priority.class);
+        priority.setEnable(true);
         int isInsert = priorityMapper.insert(priority);
         if (isInsert != 1) {
             throw new CommonException("error.priority.create");
@@ -86,7 +86,6 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     }
 
     @Override
-    @Transactional
     public PriorityDTO update(PriorityDTO priorityDTO) {
         if (checkNameUpdate(priorityDTO.getOrganizationId(), priorityDTO.getId(), priorityDTO.getName())) {
             throw new CommonException("error.priority.update.name.same");
@@ -97,10 +96,12 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             priorityMapper.cancelDefaultPriority(priorityDTO.getOrganizationId());
         } else {
             //如果只有一个默认优先级时，无法取消当前默认优先级
-            if (priorityMapper.selectDefaultCount(priorityDTO.getOrganizationId()) > 1) {
-                priority.setDefault(false);
-            } else {
-                priority.setDefault(true);
+            Priority select = new Priority();
+            select.setDefault(true);
+            select.setOrganizationId(priorityDTO.getOrganizationId());
+            Priority result = priorityMapper.selectOne(select);
+            if (result.getId().equals(priority.getId())) {
+                throw new CommonException("error.priority.illegal");
             }
         }
         int isUpdate = priorityMapper.updateByPrimaryKeySelective(priority);
@@ -124,7 +125,6 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     }
 
     @Override
-    @Transactional
     public List<PriorityDTO> updateByList(List<PriorityDTO> list, Long organizationId) {
         int seq = 1;
         for (PriorityDTO priorityDTO : list) {
@@ -241,19 +241,11 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         }
         priority.setEnable(enable);
         updateOptional(priority, "enable");
-        //失效的是默认优先级，则要设置第一个为默认优先级
+        //失效之后再进行默认优先级的重置
         if (!enable && priority.getDefault()) {
             updateOtherDefault(organizationId);
         }
         return queryById(organizationId, id);
-    }
-
-    /**
-     * 取消当前默认优先级，设置第一个为默认优先级
-     */
-    private void updateOtherDefault(Long organizationId) {
-        priorityMapper.cancelDefaultPriority(organizationId);
-        priorityMapper.updateMinIdAsDefault(organizationId);
     }
 
     @Override
@@ -272,7 +264,11 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Override
     public Boolean delete(Long organizationId, Long priorityId, Long changePriorityId) {
+        if(priorityId.equals(changePriorityId)){
+            throw new CommonException(DELETE_ILLEGAL);
+        }
         checkLastPriority(organizationId, priorityId);
+        Priority priority = priorityMapper.selectByPrimaryKey(priorityId);
         List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
@@ -293,6 +289,9 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         if (isDelete != 1) {
             throw new CommonException("error.priority.delete");
         }
+        if (priority.getDefault()) {
+            updateOtherDefault(organizationId);
+        }
         return true;
     }
 
@@ -309,5 +308,15 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         if (priorities.size() == 1 && priorityId.equals(priorities.get(0).getId())) {
             throw new CommonException(LAST_ILLEGAL);
         }
+    }
+
+    /**
+     * 当执行失效/删除时，若当前是默认优先级，则取消当前默认优先级，并设置第一个为默认优先级，要放在方法最后执行
+     *
+     * @param organizationId
+     */
+    private synchronized void updateOtherDefault(Long organizationId) {
+        priorityMapper.cancelDefaultPriority(organizationId);
+        priorityMapper.updateMinIdAsDefault(organizationId);
     }
 }
