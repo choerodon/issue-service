@@ -26,7 +26,7 @@
             OR P.colour LIKE concat('%',#{param},'%')
             )
         </if>
-        ORDER BY P.is_enable,P.sequence
+        ORDER BY P.is_enable DESC,P.sequence
     </select>
 
     <select id="getNextSequence" resultType="decimal">

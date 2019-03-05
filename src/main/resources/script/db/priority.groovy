@@ -11,16 +11,16 @@ databaseChangeLog(logicalFilePath: 'priority.groovy') {
                 constraints(nullable: 'false')
             }
             column(name: 'description', type: 'VARCHAR(255)', remarks: '描述')
-            column(name: 'colour', type: 'VARCHAR(20)', remarks: '颜色'){
+            column(name: 'colour', type: 'VARCHAR(20)', remarks: '颜色') {
                 constraints(nullable: 'false')
             }
             column(name: 'organization_id', type: 'BIGINT UNSIGNED', remarks: '组织id') {
                 constraints(nullable: 'false')
             }
-            column(name: 'is_default', type: 'TINYINT UNSIGNED', defaultValue: "0", remarks: '是否默认'){
+            column(name: 'is_default', type: 'TINYINT UNSIGNED', defaultValue: "0", remarks: '是否默认') {
                 constraints(nullable: 'false')
             }
-            column(name: 'sequence', type: 'DECIMAL', defaultValue: "0", remarks: '排序'){
+            column(name: 'sequence', type: 'DECIMAL', defaultValue: "0", remarks: '排序') {
                 constraints(nullable: 'false')
             }
 
@@ -47,7 +47,9 @@ databaseChangeLog(logicalFilePath: 'priority.groovy') {
 
     changeSet(id: '2019-03-04-add-column-is-enable', author: 'shinan.chenX@gmail.com') {
         addColumn(tableName: 'priority') {
-            column(name: 'is_enable', type: 'TINYINT UNSIGNED', defaultValue: "1", remarks: 'is enable flag')
+            column(name: 'is_enable', type: 'TINYINT UNSIGNED', defaultValue: "1", remarks: 'is enable flag') {
+                constraints(nullable: 'false')
+            }
         }
     }
 }
