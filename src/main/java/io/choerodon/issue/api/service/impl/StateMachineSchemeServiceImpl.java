@@ -76,7 +76,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
 
         List<StateMachineScheme> schemes = page.getContent();
         List<StateMachineScheme> schemesWithConfig = new ArrayList<>();
-        if(!schemes.isEmpty()){
+        if (!schemes.isEmpty()) {
             schemesWithConfig = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
         }
         List<StateMachineSchemeDTO> schemeDTOS = ConvertUtils.convertStateMachineSchemesToDTOs(schemesWithConfig, projectMap);
@@ -286,6 +286,13 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         initScheme(projectCode + "默认状态机方案【敏捷】", SchemeApplyType.AGILE, projectEvent);
         //创建测试状态机方案
         initScheme(projectCode + "默认状态机方案【测试】", SchemeApplyType.TEST, projectEvent);
+    }
+
+    @Override
+    public void initByConsumeCreateProgram(ProjectEvent projectEvent) {
+        String projectCode = projectEvent.getProjectCode();
+        //创建项目群状态机方案
+        initScheme(projectCode + "默认状态机方案【项目群】", SchemeApplyType.PROGRAM, projectEvent);
     }
 
     /**

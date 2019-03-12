@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
@@ -36,7 +37,6 @@ public class IssueEventHandler {
     @Autowired
     private PriorityService priorityService;
 
-
     /**
      * 创建项目事件
      *
@@ -49,22 +49,33 @@ public class IssueEventHandler {
     public String handleProjectInitByConsumeSagaTask(String data) {
         ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
         LOGGER.info("接受创建项目消息{}", data);
-        String type = "program";
-        if (type.equals("program")) {
-            //创建项目时创建默认状态机方案
-            stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
-            //创建项目群时创建默认问题类型方案
-            issueTypeSchemeService.initByConsumeCreateProgram(projectEvent.getProjectId(), projectEvent.getProjectCode());
-            //创建项目信息
-            projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-        } else {
-            //创建项目时创建默认状态机方案
-            stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
-            //创建项目时创建默认问题类型方案
-            issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-            //创建项目信息
-            projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-        }
+        //创建项目时创建默认状态机方案
+        stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
+        //创建项目时创建默认问题类型方案
+        issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        //创建项目信息
+        projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        return data;
+    }
+
+    /**
+     * 创建项目群事件
+     *
+     * @param data data
+     */
+    @SagaTask(code = "issue-create-program",
+            description = "创建项目群事件",
+            sagaCode = "iam-create-program",
+            seq = 3)
+    public String handleProgramInitByConsumeSagaTask(String data) {
+        ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
+        LOGGER.info("接受创建项目群消息{}", data);
+        //创建项目群时创建默认状态机方案
+        stateMachineSchemeService.initByConsumeCreateProgram(projectEvent);
+        //创建项目群时创建默认问题类型方案
+        issueTypeSchemeService.initByConsumeCreateProgram(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        //创建项目信息
+        projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
         return data;
     }
 

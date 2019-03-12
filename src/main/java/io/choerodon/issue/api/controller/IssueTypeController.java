@@ -8,6 +8,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
+import io.choerodon.issue.api.eventhandler.IssueEventHandler;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -37,6 +39,8 @@ public class IssueTypeController extends BaseController {
 
     @Autowired
     private IssueTypeService issueTypeService;
+    @Autowired
+    private IssueEventHandler issueEventHandler;
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据id查询问题类型")
@@ -131,6 +135,15 @@ public class IssueTypeController extends BaseController {
     public ResponseEntity<Map<Long, Map<String, Long>>> initIssueTypeData(@PathVariable("organization_id") Long organizationId,
                                                                           @RequestBody List<Long> orgIds) {
         return new ResponseEntity<>(issueTypeService.initIssueTypeData(organizationId, orgIds), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "测试消费创建项目群")
+    @GetMapping(value = "/createProgram")
+    @Transactional
+    public ResponseEntity createProgram(@PathVariable("organization_id") Long organizationId) {
+        String data = "{\"projectId\":203,\"projectCode\":\"hfq4\",\"projectName\":\"hfq4\",\"organizationCode\":\"choerodon\",\"organizationName\":\"Choerodon\",\"userName\":\"admin\",\"userId\":1,\"imageUrl\":null,\"roleLabels\":[\"project.deploy.admin\",\"project.owner\",\"project.wiki.admin\",\"project.gitlab.owner\"]}";
+        return new ResponseEntity<>(issueEventHandler.handleProgramInitByConsumeSagaTask(data), HttpStatus.OK);
     }
 
 }
