@@ -17,6 +17,10 @@ public class SchemeApplyType {
      */
     public static final String TEST = "test";
     /**
+     * 项目群方案
+     */
+    public static final String PROGRAM = "program";
+    /**
      * 运维方案
      */
     public static final String CLOOPM = "cloopm";

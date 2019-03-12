@@ -18,7 +18,6 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
-import io.choerodon.issue.infra.utils.ListChangeUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 /**
@@ -232,9 +230,23 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         initScheme(projectId, organizationId, projectCode + "默认类型方案【测试】", issueTypeMap.get(InitIssueType.TEST.getTypeCode()).getId(), SchemeApplyType.TEST, issueTypeMap);
     }
 
+    @Override
+    public void initByConsumeCreateProgram(Long projectId, String projectCode) {
+        Long organizationId = projectUtil.getOrganizationId(projectId);
+        IssueType query = new IssueType();
+        query.setOrganizationId(organizationId);
+        query.setInitialize(true);
+        List<IssueType> issueTypes = issueTypeMapper.select(query);
+        //处理老的组织没有创建的数据
+        issueTypes = initOrganizationIssueType(organizationId, issueTypes);
+        Map<String, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
+        //初始化项目群问题类型方案
+        initScheme(projectId, organizationId, projectCode + "默认类型方案【项目群】", issueTypeMap.get(InitIssueType.FEATURE.getTypeCode()).getId(), SchemeApplyType.PROGRAM, issueTypeMap);
+    }
+
     private List<IssueType> initOrganizationIssueType(Long organizationId, List<IssueType> issueTypes) {
         if (issueTypes == null || issueTypes.isEmpty()) {
-            //注册组织初始化七种问题类型
+            //注册组织初始化问题类型
             issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
             //注册组织初始化优先级
             priorityService.initProrityByOrganization(Collections.singletonList(organizationId));

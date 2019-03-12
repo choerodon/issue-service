@@ -9,11 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
-import static io.choerodon.issue.infra.utils.SagaTopic.Organization.*;
-import static io.choerodon.issue.infra.utils.SagaTopic.Project.*;
+import static io.choerodon.issue.infra.utils.SagaTopic.Organization.ORG_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Organization.TASK_ORG_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Project.PROJECT_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Project.TASK_PROJECT_UPDATE;
 
 /**
  * @author shinan.chen
@@ -34,7 +37,6 @@ public class IssueEventHandler {
     @Autowired
     private PriorityService priorityService;
 
-
     /**
      * 创建项目事件
      *
@@ -51,7 +53,28 @@ public class IssueEventHandler {
         stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
         //创建项目时创建默认问题类型方案
         issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-        //创建项目信息及配置默认方案
+        //创建项目信息
+        projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        return data;
+    }
+
+    /**
+     * 创建项目群事件
+     *
+     * @param data data
+     */
+    @SagaTask(code = "issue-create-program",
+            description = "创建项目群事件",
+            sagaCode = "iam-create-program",
+            seq = 3)
+    public String handleProgramInitByConsumeSagaTask(String data) {
+        ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
+        LOGGER.info("接受创建项目群消息{}", data);
+        //创建项目群时创建默认状态机方案
+        stateMachineSchemeService.initByConsumeCreateProgram(projectEvent);
+        //创建项目群时创建默认问题类型方案
+        issueTypeSchemeService.initByConsumeCreateProgram(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        //创建项目信息
         projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
         return data;
     }
@@ -65,7 +88,7 @@ public class IssueEventHandler {
         LOGGER.info("消费创建组织消息{}", data);
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
         Long orgId = organizationEventPayload.getId();
-        //注册组织初始化六种问题类型
+        //注册组织初始化问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));
