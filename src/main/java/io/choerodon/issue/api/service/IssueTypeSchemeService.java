@@ -98,5 +98,14 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      */
     void initByConsumeCreateProject(Long projectId, String projectCode);
 
+    /**
+     * 创建项目群初始化问题类型方案
+     *
+     * @param projectId
+     * @param projectCode
+     * @return
+     */
+    void initByConsumeCreateProgram(Long projectId, String projectCode);
+
     Page<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeDTO);
 }

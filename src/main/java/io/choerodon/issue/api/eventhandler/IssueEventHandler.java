@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
-import static io.choerodon.issue.infra.utils.SagaTopic.Organization.*;
-import static io.choerodon.issue.infra.utils.SagaTopic.Project.*;
+import static io.choerodon.issue.infra.utils.SagaTopic.Organization.ORG_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Organization.TASK_ORG_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Project.PROJECT_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Project.TASK_PROJECT_UPDATE;
 
 /**
  * @author shinan.chen
@@ -47,12 +49,22 @@ public class IssueEventHandler {
     public String handleProjectInitByConsumeSagaTask(String data) {
         ProjectEvent projectEvent = JSONObject.parseObject(data, ProjectEvent.class);
         LOGGER.info("接受创建项目消息{}", data);
-        //创建项目时创建默认状态机方案
-        stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
-        //创建项目时创建默认问题类型方案
-        issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
-        //创建项目信息及配置默认方案
-        projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        String type = "program";
+        if (type.equals("program")) {
+            //创建项目时创建默认状态机方案
+            stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
+            //创建项目群时创建默认问题类型方案
+            issueTypeSchemeService.initByConsumeCreateProgram(projectEvent.getProjectId(), projectEvent.getProjectCode());
+            //创建项目信息
+            projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        } else {
+            //创建项目时创建默认状态机方案
+            stateMachineSchemeService.initByConsumeCreateProject(projectEvent);
+            //创建项目时创建默认问题类型方案
+            issueTypeSchemeService.initByConsumeCreateProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+            //创建项目信息
+            projectInfoService.createProject(projectEvent.getProjectId(), projectEvent.getProjectCode());
+        }
         return data;
     }
 
