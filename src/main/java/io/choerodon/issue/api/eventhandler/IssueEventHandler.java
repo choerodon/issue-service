@@ -65,7 +65,7 @@ public class IssueEventHandler {
         LOGGER.info("消费创建组织消息{}", data);
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
         Long orgId = organizationEventPayload.getId();
-        //注册组织初始化六种问题类型
+        //注册组织初始化问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));

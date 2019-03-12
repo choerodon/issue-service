@@ -49,7 +49,7 @@ public class DemoEventHandler {
         LOGGER.info("demo消费创建组织消息{}", data);
         OrganizationRegisterEventPayload organizationRegisterEventPayload = JSONObject.parseObject(data, OrganizationRegisterEventPayload.class);
         Long orgId = organizationRegisterEventPayload.getOrganization().getId();
-        //注册组织初始化六种问题类型
+        //注册组织初始化问题类型
         issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
         //注册组织初始化优先级
         priorityService.initProrityByOrganization(Arrays.asList(orgId));
