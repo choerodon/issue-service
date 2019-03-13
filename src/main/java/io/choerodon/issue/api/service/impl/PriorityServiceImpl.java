@@ -14,7 +14,6 @@ import io.choerodon.mybatis.service.BaseServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -197,6 +196,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priority.setColour(colour);
         priority.setDescription(name);
         priority.setDefault(isDefault);
+        priority.setEnable(true);
         //保证幂等性
         List<Priority> list = priorityMapper.select(priority);
         if (list.isEmpty()) {
@@ -264,7 +264,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
 
     @Override
     public Boolean delete(Long organizationId, Long priorityId, Long changePriorityId) {
-        if(priorityId.equals(changePriorityId)){
+        if (priorityId.equals(changePriorityId)) {
             throw new CommonException(DELETE_ILLEGAL);
         }
         checkLastPriority(organizationId, priorityId);
