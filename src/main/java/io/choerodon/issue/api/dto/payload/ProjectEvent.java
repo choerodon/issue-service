@@ -9,20 +9,22 @@ import java.util.List;
 public class ProjectEvent {
 
     private Long projectId;
-
     private String projectCode;
-
     private String projectName;
-
+    private String projectCategory;
     private String organizationCode;
-
     private String organizationName;
-
     private String userName;
-
     private Long userId;
-
     private List<String> roleLabels;
+
+    public String getProjectCategory() {
+        return projectCategory;
+    }
+
+    public void setProjectCategory(String projectCategory) {
+        this.projectCategory = projectCategory;
+    }
 
     public Long getProjectId() {
         return projectId;
