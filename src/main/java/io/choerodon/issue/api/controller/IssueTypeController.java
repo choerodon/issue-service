@@ -136,14 +136,4 @@ public class IssueTypeController extends BaseController {
                                                                           @RequestBody List<Long> orgIds) {
         return new ResponseEntity<>(issueTypeService.initIssueTypeData(organizationId, orgIds), HttpStatus.OK);
     }
-
-    @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "测试消费创建项目群")
-    @GetMapping(value = "/createProgram")
-    @Transactional
-    public ResponseEntity createProgram(@PathVariable("organization_id") Long organizationId) {
-        String data = "{\"projectId\":203,\"projectCode\":\"hfq4\",\"projectName\":\"hfq4\",\"organizationCode\":\"choerodon\",\"organizationName\":\"Choerodon\",\"userName\":\"admin\",\"userId\":1,\"imageUrl\":null,\"roleLabels\":[\"project.deploy.admin\",\"project.owner\",\"project.wiki.admin\",\"project.gitlab.owner\"]}";
-        return new ResponseEntity<>(issueEventHandler.handleProgramInitByConsumeSagaTask(data), HttpStatus.OK);
-    }
-
 }
