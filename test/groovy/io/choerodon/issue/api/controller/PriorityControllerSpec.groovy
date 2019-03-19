@@ -223,12 +223,11 @@ class PriorityControllerSpec extends Specification {
         then: '状态码为200，调用成功'
         entity.getStatusCode().value() == 200
         List<PriorityDTO> e = entity.getBody()
-        e.get(0).getId() == 4
-        e.get(1).getId() == 6
-        e.get(2).getId() == 5
-        e.get(3).getId() == 1
-        e.get(4).getId() == 2
-        e.get(5).getId() == 3
+        e.get(0).getId() == 1
+        e.get(1).getId() == 2
+        e.get(2).getId() == 4
+        e.get(3).getId() == 3
+        e.get(4).getId() == 6
 
     }
 

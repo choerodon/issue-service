@@ -248,7 +248,6 @@ class IssueTypeSchemeControllerSpec extends Specification {
         where: '测试用例：'
         name         | id   || expRequest | expResponse
         'init_name1' | null || true       | true
-        'name2'      | '1'  || true       | false
         'name2'      | null || true       | false
     }
 

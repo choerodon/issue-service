@@ -241,7 +241,7 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
         issueTypes = initOrganizationIssueType(organizationId, issueTypes);
         Map<String, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
         //初始化项目群问题类型方案
-        initScheme(projectId, organizationId, projectCode + "默认类型方案【项目群】", issueTypeMap.get(InitIssueType.FEATURE.getTypeCode()).getId(), SchemeApplyType.PROGRAM, issueTypeMap);
+//        initScheme(projectId, organizationId, projectCode + "默认类型方案【项目群】", issueTypeMap.get(InitIssueType.FEATURE.getTypeCode()).getId(), SchemeApplyType.PROGRAM, issueTypeMap);
     }
 
     private List<IssueType> initOrganizationIssueType(Long organizationId, List<IssueType> issueTypes) {

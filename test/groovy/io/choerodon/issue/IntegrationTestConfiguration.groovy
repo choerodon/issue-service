@@ -6,6 +6,7 @@ import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
 import io.choerodon.issue.api.dto.payload.ProjectEvent
 import io.choerodon.issue.api.eventhandler.IssueEventHandler
 import io.choerodon.core.oauth.CustomUserDetails
+import io.choerodon.issue.infra.enums.ProjectCategory
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
@@ -67,6 +68,7 @@ class IntegrationTestConfiguration {
         ProjectEvent projectEvent = new ProjectEvent()
         projectEvent.projectId = 1
         projectEvent.projectCode = "test"
+        projectEvent.projectCategory = ProjectCategory.AGILE
         issueEventHandler.handleProjectInitByConsumeSagaTask(JSON.toJSONString(projectEvent))
         System.out.print("初始化数据成功")
     }
