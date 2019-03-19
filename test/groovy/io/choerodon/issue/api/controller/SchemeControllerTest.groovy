@@ -43,7 +43,7 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body.size() == 6
+        entity.body.size() == 5
     }
 
     def "queryIssueTypesWithStateMachineIdByProjectId"() {
@@ -54,7 +54,7 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body.size() == 6
+        entity.body.size() == 5
     }
 
     def "queryTransformsByProjectId"() {

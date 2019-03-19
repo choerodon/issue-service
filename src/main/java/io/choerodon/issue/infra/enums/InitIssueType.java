@@ -35,11 +35,11 @@ public enum InitIssueType {
     /**
      * 自动化测试
      */
-    AUTO_TEST("auto_test", "自动化测试", "自动化测试", "#00BFA5", "issue_auto_test"),
-    /**
-     * 特性
-     */
-    FEATURE("agile_feature", "特性", "特性", "#29B6F6", "feature");
+    AUTO_TEST("auto_test", "自动化测试", "自动化测试", "#00BFA5", "issue_auto_test");
+//    /**
+//     * 特性
+//     */
+//    FEATURE("agile_feature", "特性", "特性", "#29B6F6", "feature");
 
     private String icon;
     private String name;
@@ -99,7 +99,7 @@ public enum InitIssueType {
         List<InitIssueType> result = new ArrayList<>();
         switch (applyType) {
             case SchemeApplyType.AGILE:
-                result.add(InitIssueType.FEATURE);
+//                result.add(InitIssueType.FEATURE);
                 result.add(InitIssueType.EPIC);
                 result.add(InitIssueType.STORY);
                 result.add(InitIssueType.BUG);
@@ -112,7 +112,7 @@ public enum InitIssueType {
                 break;
             case SchemeApplyType.PROGRAM:
                 result.add(InitIssueType.EPIC);
-                result.add(InitIssueType.FEATURE);
+//                result.add(InitIssueType.FEATURE);
                 break;
         }
         return result;
