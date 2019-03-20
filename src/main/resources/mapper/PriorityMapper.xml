@@ -43,11 +43,11 @@
         WHERE organization_id=#{organizationId} AND is_default = 1
     </update>
 
-    <update id="updateMinIdAsDefault">
+    <update id="updateMinSeqAsDefault">
         UPDATE priority SET is_default = 1
         WHERE id = (
          select t.id from(
-             select min(p.id) as id from priority p
+             select min(p.sequence),p.id as id from priority p
              WHERE p.organization_id=#{organizationId}
              AND p.is_enable = 1
          ) t
