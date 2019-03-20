@@ -290,11 +290,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             throw new CommonException("error.priority.delete");
         }
         if (priority.getDefault()) {
-            if (changePriorityId != null) {
-                updateChoiceDefault(organizationId, changePriorityId);
-            } else {
-                updateOtherDefault(organizationId);
-            }
+            updateOtherDefault(organizationId);
         }
         return true;
     }
@@ -322,18 +318,5 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     private synchronized void updateOtherDefault(Long organizationId) {
         priorityMapper.cancelDefaultPriority(organizationId);
         priorityMapper.updateMinSeqAsDefault(organizationId);
-    }
-
-    /**
-     * 当执行删除时，若选择了转换的优先级，则更新选择的优先级为默认优先级
-     *
-     * @param organizationId
-     * @param priorityId
-     */
-    private synchronized void updateChoiceDefault(Long organizationId, Long priorityId) {
-        priorityMapper.cancelDefaultPriority(organizationId);
-        Priority priority = priorityMapper.selectByPrimaryKey(priorityId);
-        priority.setDefault(true);
-        priorityMapper.updateByPrimaryKeySelective(priority);
     }
 }
