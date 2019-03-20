@@ -50,7 +50,7 @@ public interface PriorityMapper extends BaseMapper<Priority> {
      * 更新最小的id为默认优先级
      * @param organizationId
      */
-    void updateMinIdAsDefault(@Param("organizationId") Long organizationId);
+    void updateMinSeqAsDefault(@Param("organizationId") Long organizationId);
 
     /**
      * @param organizationId organizationId
