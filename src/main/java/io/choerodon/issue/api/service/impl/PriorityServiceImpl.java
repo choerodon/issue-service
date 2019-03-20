@@ -332,9 +332,8 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
      */
     private synchronized void updateChoiceDefault(Long organizationId, Long priorityId) {
         priorityMapper.cancelDefaultPriority(organizationId);
-        Priority priority = new Priority();
+        Priority priority = priorityMapper.selectByPrimaryKey(priorityId);
         priority.setDefault(true);
-        priority.setId(priorityId);
         priorityMapper.updateByPrimaryKeySelective(priority);
     }
 }
