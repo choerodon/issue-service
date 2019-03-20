@@ -51,10 +51,4 @@ public interface PriorityMapper extends BaseMapper<Priority> {
      * @param organizationId
      */
     void updateMinSeqAsDefault(@Param("organizationId") Long organizationId);
-
-    /**
-     * @param organizationId organizationId
-     * @return int
-     */
-    int selectDefaultCount(@Param("organizationId") Long organizationId);
 }

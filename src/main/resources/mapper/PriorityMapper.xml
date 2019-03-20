@@ -53,10 +53,4 @@
          ) t
         )
     </update>
-
-    <select id="selectDefaultCount" resultType="java.lang.Integer">
-      SELECT count(*) FROM priority
-      WHERE organization_id = #{organizationId}
-      and is_default = 1
-    </select>
 </mapper>
