@@ -47,9 +47,9 @@
         UPDATE priority SET is_default = 1
         WHERE id = (
          select t.id from(
-             select min(p.sequence),p.id as id from priority p
+             select p.id as id from priority p
              WHERE p.organization_id=#{organizationId}
-             AND p.is_enable = 1
+             AND p.is_enable = 1 order by p.sequence asc LIMIT 1
          ) t
         )
     </update>
