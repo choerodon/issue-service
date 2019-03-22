@@ -15,9 +15,9 @@
             pi.project_id = #{projectId}
     </update>
 
-    <delete id="demoProjectClean">
-        delete from project_config where project_id = #{projectId};
-        delete from project_info where project_id = #{projectId};
-    </delete>
+    <!--<delete id="demoProjectClean">-->
+        <!--delete from project_config where project_id = #{projectId};-->
+        <!--delete from project_info where project_id = #{projectId};-->
+    <!--</delete>-->
 
 </mapper>
