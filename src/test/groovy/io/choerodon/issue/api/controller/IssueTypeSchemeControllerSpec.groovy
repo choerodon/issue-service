@@ -6,14 +6,11 @@ import io.choerodon.issue.api.dto.IssueTypeSchemeDTO
 import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO
 import io.choerodon.issue.api.service.IssueTypeSchemeService
 import io.choerodon.issue.api.service.IssueTypeService
-import io.choerodon.issue.domain.IssueType
-import io.choerodon.issue.domain.IssueTypeScheme
 import io.choerodon.core.domain.Page
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Import
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.test.context.ActiveProfiles

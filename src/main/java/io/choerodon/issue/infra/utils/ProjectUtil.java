@@ -19,7 +19,7 @@ public class ProjectUtil {
     @Autowired
     private UserFeignClient iamServiceFeign;
 
-    public static final Map<Long, ProjectDTO> map = new HashMap<>();
+    protected static final Map<Long, ProjectDTO> map = new HashMap<>();
 
     public Long getOrganizationId(Long projectId) {
         return queryProject(projectId).getOrganizationId();
