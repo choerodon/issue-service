@@ -115,12 +115,11 @@ public class StateMachineServiceImpl implements StateMachineService {
         //找到与状态机关联的状态机方案
         List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
         List<ProjectConfig> projectConfigs = new ArrayList<>();
-        schemeIds.forEach(schemeId -> {
-            //获取当前方案配置的项目列表
-            projectConfigs.addAll(projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId));
-        });
-        Map<String, Object> result = agileFeignClient.checkDeleteNode(organizationId, statusId, projectConfigs).getBody();
-        return result;
+        schemeIds.forEach(schemeId ->
+                //获取当前方案配置的项目列表
+                projectConfigs.addAll(projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId))
+        );
+        return agileFeignClient.checkDeleteNode(organizationId, statusId, projectConfigs).getBody();
     }
 
     @Override
@@ -137,7 +136,7 @@ public class StateMachineServiceImpl implements StateMachineService {
                 }
             });
             //使活跃的状态机变更为未活跃
-            logger.info("notActiveStateMachine: {}", stateMachineIds.toString());
+            logger.info("notActiveStateMachine: {}", stateMachineIds);
             if (!stateMachineIds.isEmpty()) {
                 stateMachineClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
             }

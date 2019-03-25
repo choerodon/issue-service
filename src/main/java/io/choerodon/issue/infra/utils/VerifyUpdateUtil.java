@@ -40,7 +40,7 @@ public class VerifyUpdateUtil {
     }
 
     private Boolean handleFieldType(Field field, Object objectUpdate, Object v) throws
-            IllegalAccessException, ParseException, ClassNotFoundException {
+            IllegalAccessException, ParseException {
         if (field.getType() == String.class) {
             field.set(objectUpdate, v);
         } else if (field.getType() == Long.class) {

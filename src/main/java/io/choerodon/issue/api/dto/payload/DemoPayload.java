@@ -1,7 +1,5 @@
 package io.choerodon.issue.api.dto.payload;
 
-import java.util.List;
-
 /**
  * Created by HuangFuqiang@choerodon.io on 2019/2/15.
  * Email: fuqianghuang01@gmail.com

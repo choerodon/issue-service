@@ -116,18 +116,6 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
             throw new CommonException("error.issueTypeScheme.update");
         }
         //更新方案配置,等待校验[toDo]
-//        List<IssueType> newIssueTypes = modelMapper.map(issueTypeSchemeDTO.getIssueTypes(), new TypeToken<List<IssueType>>() {
-//        }.getType());
-//        List<IssueType> oldIssueTypes = issueTypeMapper.queryBySchemeId(issueTypeSchemeDTO.getOrganizationId(), issueTypeSchemeDTO.getId());
-//
-//        BiPredicate<IssueType, IssueType> myEquals = (IssueType x1, IssueType x2) -> {
-//            if (x1.getId() != null && !x1.getId().equals(x2.getId())) {
-//                return false;
-//            }
-//            return true;
-//        };
-//        List<IssueType> add = ListChangeUtil.getAddList(newIssueTypes, oldIssueTypes, myEquals);
-//        List<IssueType> reduce = ListChangeUtil.getReduceList(newIssueTypes, oldIssueTypes, myEquals);
 
         issueTypeSchemeConfigMapper.deleteBySchemeId(organizationId, issueTypeSchemeDTO.getId());
         createConfig(organizationId, issueTypeScheme.getId(), issueTypeSchemeDTO.getIssueTypes());

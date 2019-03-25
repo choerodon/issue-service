@@ -31,7 +31,7 @@ public interface StateMachineFeignClient {
      * @param stateMachineId 状态机Id
      * @return 状态机
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}")
     ResponseEntity<StateMachineDTO> queryStateMachineById(@PathVariable(value = "organization_id") Long organizationId,
                                                           @PathVariable(value = "state_machine_id") Long stateMachineId);
 
@@ -41,7 +41,7 @@ public interface StateMachineFeignClient {
      * @param organizationId 组织id
      * @return 状态机
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/default", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/state_machines/default")
     ResponseEntity<StateMachineDTO> queryDefaultStateMachine(@PathVariable(value = "organization_id") Long organizationId);
 
     /**
@@ -53,7 +53,7 @@ public interface StateMachineFeignClient {
      * @param param
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/state_machines")
     ResponseEntity<Page<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size,
@@ -69,7 +69,7 @@ public interface StateMachineFeignClient {
      * @param stateMachineId 状态机Id
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/v1/organizations/{organization_id}/state_machines/{state_machine_id}")
     ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId,
                                    @PathVariable("state_machine_id") Long stateMachineId);
 
@@ -80,7 +80,7 @@ public interface StateMachineFeignClient {
      * @param statusId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/status/{status_id}", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/status/{status_id}")
     ResponseEntity<StatusDTO> queryStatusById(@PathVariable("organization_id") Long organizationId, @PathVariable("status_id") Long statusId);
 
     /**
@@ -89,16 +89,18 @@ public interface StateMachineFeignClient {
      * @param organizationId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/status/query_all", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/status/query_all")
     ResponseEntity<List<StatusDTO>> queryAllStatus(@PathVariable("organization_id") Long organizationId);
 
     /**
      * 【初始化项目】创建项目时创建该项目的状态机，返回状态机id
      *
      * @param organizationId
+     * @param applyType
+     * @param projectEvent
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project", method = RequestMethod.POST)
+    @PostMapping(value = "/v1/organizations/{organization_id}/state_machines/create_with_create_project")
     ResponseEntity<Long> createStateMachineWithCreateProject(@PathVariable("organization_id") Long organizationId,
                                                              @RequestParam("applyType") String applyType,
                                                              @RequestBody ProjectEvent projectEvent);
@@ -113,7 +115,7 @@ public interface StateMachineFeignClient {
      * @param currentStatusId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/transform_list", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/instances/transform_list")
     ResponseEntity<List<TransformDTO>> transformList(@PathVariable("organization_id") Long organizationId,
                                                      @RequestParam("service_code") String serviceCode,
                                                      @RequestParam("state_machine_id") Long stateMachineId,
