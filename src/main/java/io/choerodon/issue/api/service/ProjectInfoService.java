@@ -8,6 +8,6 @@ public interface ProjectInfoService {
 
     void createProject(Long projectId, String projectCode);
 
-    void demoProjectClean(Long projectId);
+//    void demoProjectClean(Long projectId);
 
 }

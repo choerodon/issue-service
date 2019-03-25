@@ -317,6 +317,6 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
      */
     private synchronized void updateOtherDefault(Long organizationId) {
         priorityMapper.cancelDefaultPriority(organizationId);
-        priorityMapper.updateMinIdAsDefault(organizationId);
+        priorityMapper.updateMinSeqAsDefault(organizationId);
     }
 }

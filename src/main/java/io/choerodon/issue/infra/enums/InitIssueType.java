@@ -31,11 +31,11 @@ public enum InitIssueType {
     /**
      * 测试
      */
-    TEST("table_chart", "测试", "测试", "#4D90FE", "issue_test"),
+    TEST("test-case", "测试", "测试", "#4D90FE", "issue_test"),
     /**
      * 自动化测试
      */
-    AUTO_TEST("auto_test", "自动化测试", "自动化测试", "#00BFA5", "issue_auto_test");
+    AUTO_TEST("test-automation", "自动化测试", "自动化测试", "#FA8C16", "issue_auto_test");
 //    /**
 //     * 特性
 //     */
