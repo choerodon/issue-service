@@ -191,7 +191,7 @@ class IssueTypeControllerSpec extends Specification {
 
         where: '测试用例：'
         name         | description         | param  || expRequest | expResponseSize
-        null         | null                | null   || true       | 10
+        null         | null                | null   || true       | 11
         'init_name1' | null                | null   || true       | 1
         null         | 'init_description1' | null   || true       | 0
         null         | null                | 'init' || true       | 1
@@ -255,7 +255,7 @@ class IssueTypeControllerSpec extends Specification {
 
         where: '测试用例：'
         expRequest | expResponseSize
-        true       | 10
+        true       | 11
     }
 
     def "queryIssueTypeById"() {
@@ -300,7 +300,7 @@ class IssueTypeControllerSpec extends Specification {
         List<IssueTypeDTO> issueTypeDTOList = entity.body
 
         expect: '设置期望值'
-        issueTypeDTOList.size() == 10
+        issueTypeDTOList.size() == 11
     }
 
     def "listIssueTypeMap"() {
