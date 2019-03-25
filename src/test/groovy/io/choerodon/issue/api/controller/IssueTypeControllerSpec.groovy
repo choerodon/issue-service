@@ -4,7 +4,6 @@ import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.IssueTypeDTO
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO
 import io.choerodon.issue.api.service.IssueTypeService
-import io.choerodon.issue.domain.IssueType
 import io.choerodon.core.domain.Page
 import io.choerodon.issue.infra.mapper.IssueTypeMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,8 +17,6 @@ import org.springframework.test.context.ActiveProfiles
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
-
-import java.util.stream.Collectors
 
 /**
  * @author shinan.chen

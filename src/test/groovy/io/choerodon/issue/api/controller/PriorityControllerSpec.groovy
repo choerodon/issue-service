@@ -3,7 +3,6 @@ package io.choerodon.issue.api.controller
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.PriorityDTO
 import io.choerodon.issue.api.service.PriorityService
-import io.choerodon.issue.domain.Priority
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
