@@ -78,10 +78,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priority.setOrganizationId(organizationId);
         priority.setName(name);
         Priority res = priorityMapper.selectOne(priority);
-        if (res != null && !priorityId.equals(res.getId())) {
-            return true;
-        }
-        return false;
+        return res != null && !priorityId.equals(res.getId());
     }
 
     @Override
@@ -117,10 +114,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         priority.setOrganizationId(organizationId);
         priority.setName(name);
         Priority res = priorityMapper.selectOne(priority);
-        if (res == null) {
-            return false;
-        }
-        return true;
+        return res != null;
     }
 
     @Override
@@ -251,7 +245,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     @Override
     public Long checkDelete(Long organizationId, Long id) {
         //查询出组织下的所有项目
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999).getBody().getContent();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
         if (projectIds == null || projectIds.isEmpty()) {
@@ -269,7 +263,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         }
         checkLastPriority(organizationId, priorityId);
         Priority priority = priorityMapper.selectByPrimaryKey(priorityId);
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999, new String[]{}, null, null, null, new String[]{}).getBody().getContent();
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999).getBody().getContent();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
         if (projectIds == null || projectIds.isEmpty()) {

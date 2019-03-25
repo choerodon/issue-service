@@ -7,7 +7,6 @@ import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.asgard.saga.feign.SagaClientCallback;
 import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.ProjectDTO;
-import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
@@ -54,25 +53,13 @@ public class FeignConfigure {
         projectDTO.setName("test");
         projectDTO.setOrganizationId(1L);
         Mockito.when(userFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectDTO, HttpStatus.OK));
-        UserDTO userDTO = new UserDTO();
-        userDTO.setAdmin(false);
-        userDTO.setEmail("XX");
-        userDTO.setEnabled(true);
-        userDTO.setId(1L);
-        userDTO.setImageUrl("XX");
-        userDTO.setLanguage("XX");
-        userDTO.setLdap(true);
-        userDTO.setObjectVersionNumber(1L);
-        userDTO.setRealName("XX");
-        userDTO.setLoginName("XX");
-        Mockito.when(userFeignClient.queryInfo(Matchers.anyLong())).thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
         Page<ProjectDTO> projectDTOS = new Page<>();
         List<ProjectDTO> projectDTOList = new ArrayList<>(1);
         projectDTOList.add(projectDTO);
         projectDTOS.setContent(projectDTOList);
         projectDTOS.setTotalPages(1);
         projectDTOS.setSize(1);
-        Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt(), Matchers.any(String[].class), Matchers.anyString(), Matchers.anyString(), Matchers.anyBoolean(), Matchers.any(String[].class))).thenReturn(new ResponseEntity<>(projectDTOS, HttpStatus.OK));
+        Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(new ResponseEntity<>(projectDTOS, HttpStatus.OK));
         return userFeignClient;
     }
 

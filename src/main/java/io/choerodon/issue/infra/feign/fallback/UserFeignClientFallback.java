@@ -36,17 +36,7 @@ public class UserFeignClientFallback implements UserFeignClient {
     }
 
     @Override
-    public ResponseEntity<UserDTO> create(CreateUserWithRolesDTO userWithRoles) {
-        throw new CommonException("error.iamServiceFeignFallback.create");
-    }
-
-    @Override
-    public ResponseEntity<UserDTO> queryInfo(Long id) {
-        throw new CommonException("error.iamServiceFeignFallback.queryInfo");
-    }
-
-    @Override
-    public ResponseEntity<Page<ProjectDTO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size, String[] sort, String name, String code, Boolean enabled, String[] params) {
+    public ResponseEntity<Page<ProjectDTO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size) {
         throw new CommonException("error.iamServiceFeignFallback.queryProjectsByOrgId");
     }
 }

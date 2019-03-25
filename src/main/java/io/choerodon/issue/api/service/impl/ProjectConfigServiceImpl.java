@@ -57,6 +57,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private static final String STATEMACHINEID = "stateMachineId";
     private static final String ERROR_ISSUE_STATE_MACHINE_NOT_FOUND = "error.issueStateMachine.notFound";
     private static final String ERROR_ISSUE_STATUS_NOT_FOUND = "error.createIssue.issueStatusNotFound";
+    private static final String ERROR_APPLYTYPE_ILLEGAL = "error.applyType.illegal";
+    private static final String ERROR_STATEMACHINESCHEMEID_NULL = "error.stateMachineSchemeId.null";
 
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
@@ -91,7 +93,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException("error.schemeType.illegal");
         }
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
-            throw new CommonException("error.applyType.illegal");
+            throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         ProjectConfig projectConfig = new ProjectConfig(projectId, schemeId, schemeType, applyType);
         //保证幂等性
@@ -144,7 +146,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public List<IssueTypeDTO> queryIssueTypesByProjectId(Long projectId, String applyType) {
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
-            throw new CommonException("error.applyType.illegal");
+            throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType);
@@ -162,7 +164,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public List<IssueTypeWithStateMachineIdDTO> queryIssueTypesWithStateMachineIdByProjectId(Long projectId, String applyType) {
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
-            throw new CommonException("error.applyType.illegal");
+            throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long issueTypeSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType).getSchemeId();
@@ -171,7 +173,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException("error.issueTypeSchemeId.null");
         }
         if (stateMachineSchemeId == null) {
-            throw new CommonException("error.stateMachineSchemeId.null");
+            throw new CommonException(ERROR_STATEMACHINESCHEMEID_NULL);
         }
         //根据方案配置表获取 问题类型
         List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
@@ -197,7 +199,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
         if (stateMachineSchemeId == null) {
-            throw new CommonException("error.stateMachineSchemeId.null");
+            throw new CommonException(ERROR_STATEMACHINESCHEMEID_NULL);
         }
         //获取状态机
         Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
@@ -209,7 +211,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
         if (stateMachineSchemeId == null) {
-            throw new CommonException("error.stateMachineSchemeId.null");
+            throw new CommonException(ERROR_STATEMACHINESCHEMEID_NULL);
         }
         //获取状态机ids
         List<Long> stateMachineIds = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, stateMachineSchemeId)
@@ -220,7 +222,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public List<TransformDTO> queryTransformsByProjectId(Long projectId, Long currentStatusId, Long issueId, Long issueTypeId, String applyType) {
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
-            throw new CommonException("error.applyType.illegal");
+            throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         Long organizationId = projectUtil.getOrganizationId(projectId);
         ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType);
@@ -253,7 +255,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public Map<Long, Map<Long, List<TransformDTO>>> queryTransformsMapByProjectId(Long projectId, String applyType) {
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
-            throw new CommonException("error.applyType.illegal");
+            throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         //获取状态机方案
         Long organizationId = projectUtil.getOrganizationId(projectId);
@@ -277,9 +279,9 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //获取组织所有状态
         List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
         Map<Long, StatusDTO> sMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
-        statusMap.entrySet().forEach(x->x.getValue().entrySet().forEach(y->y.getValue().forEach(transformDTO -> {
+        statusMap.entrySet().forEach(x -> x.getValue().entrySet().forEach(y -> y.getValue().forEach(transformDTO -> {
             StatusDTO statusDTO = sMap.get(transformDTO.getEndStatusId());
-            if(statusDTO!=null){
+            if (statusDTO != null) {
                 transformDTO.setStatusType(statusDTO.getType());
             }
         })));
@@ -289,7 +291,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //匹配状态机的问题类型映射
         for (IssueType issueType : issueTypes) {
             Long stateMachineId = idMap.get(issueType.getId());
-            if(stateMachineId!=null){
+            if (stateMachineId != null) {
                 resultMap.put(issueType.getId(), statusMap.get(stateMachineId));
             }
         }
@@ -299,7 +301,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public Long queryStateMachineId(Long projectId, String applyType, Long issueTypeId) {
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
-            throw new CommonException("error.applyType.illegal");
+            throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long issueTypeSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType).getSchemeId();
@@ -415,8 +417,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
         if (!schemeIds.isEmpty()) {
             List<ProjectConfig> projectConfigs = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE);
-            Map<String, List<Long>> projectIdsMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getApplyType, Collectors.mapping(ProjectConfig::getProjectId, Collectors.toList())));
-            return projectIdsMap;
+            return projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getApplyType, Collectors.mapping(ProjectConfig::getProjectId, Collectors.toList())));
         }
         return Collections.emptyMap();
     }

@@ -4,7 +4,9 @@ import io.choerodon.issue.infra.feign.dto.ExecuteResult;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author peng.jiang
@@ -20,11 +22,12 @@ public interface InstanceFeignClient {
      * @param organizationId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/start_instance", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/instances/start_instance")
     ResponseEntity<ExecuteResult> startInstance(@PathVariable("organization_id") Long organizationId,
                                                 @RequestParam("service_code") String serviceCode,
                                                 @RequestParam("state_machine_id") Long stateMachineId,
                                                 @RequestParam("instance_id") Long instanceId);
+
     /**
      * 执行转换
      *
@@ -36,7 +39,7 @@ public interface InstanceFeignClient {
      * @param transformId
      * @return
      */
-    @RequestMapping(value = "/v1/organizations/{organization_id}/instances/execute_transform", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/organizations/{organization_id}/instances/execute_transform")
     ResponseEntity<ExecuteResult> executeTransform(@PathVariable("organization_id") Long organizationId,
                                                    @RequestParam("service_code") String serviceCode,
                                                    @RequestParam("state_machine_id") Long stateMachineId,
