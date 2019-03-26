@@ -1,13 +1,19 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author shinan.chen
  * @date 2018/11/1
  */
 public class ProjectConfigDTO {
+    @ApiModelProperty(value = "项目配置id")
     private Long id;
+    @ApiModelProperty(value = "项目id")
     private Long projectId;
+    @ApiModelProperty(value = "方案类型（scheme_state_machine/scheme_issue_type）")
     private String schemeType;
+    @ApiModelProperty(value = "应用类型（agile/test/program）")
     private String applyType;
 
     public Long getId() {

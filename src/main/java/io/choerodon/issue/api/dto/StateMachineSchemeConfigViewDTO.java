@@ -1,6 +1,7 @@
 package io.choerodon.issue.api.dto;
 
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
@@ -8,8 +9,9 @@ import java.util.List;
  * @author peng.jiang@hand-china.com
  */
 public class StateMachineSchemeConfigViewDTO {
-
+    @ApiModelProperty(value = "状态机DTO")
     private StateMachineDTO stateMachineDTO;
+    @ApiModelProperty(value = "问题类型列表")
     private List<IssueTypeDTO> issueTypeDTOs;
 
     public StateMachineDTO getStateMachineDTO() {

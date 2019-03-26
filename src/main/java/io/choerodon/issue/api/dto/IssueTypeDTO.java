@@ -1,6 +1,7 @@
 package io.choerodon.issue.api.dto;
 
 import com.google.common.base.MoreObjects;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
 
@@ -9,20 +10,32 @@ import javax.validation.constraints.NotNull;
  * @date 2018/8/8
  */
 public class IssueTypeDTO {
+    @ApiModelProperty(value = "问题类型id")
     private Long id;
-
+    @ApiModelProperty(value = "名称")
     @NotNull(message = "error.name.null")
     private String name;
+    @ApiModelProperty(value = "图标")
     private String icon;
+    @ApiModelProperty(value = "描述")
     private String description;
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
+    @ApiModelProperty(value = "颜色")
     private String colour;
+    @ApiModelProperty(value = "类型编码")
     private String typeCode;
+    @ApiModelProperty(value = "是否初始化")
     private Boolean initialize;
+    @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
 
-    //用于做状态机方案的配置时
+    /**
+     * 用于做状态机方案的配置时
+     */
+    @ApiModelProperty(value = "状态机名称")
     private String stateMachineName;
+    @ApiModelProperty(value = "状态机id")
     private Long stateMachineId;
 
     public Long getId() {

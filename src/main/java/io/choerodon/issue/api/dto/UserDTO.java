@@ -2,8 +2,8 @@ package io.choerodon.issue.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.choerodon.issue.infra.feign.validator.UserValidator;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.infra.feign.validator.UserValidator;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 

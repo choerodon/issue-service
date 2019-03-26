@@ -1,15 +1,17 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Created by HuangFuqiang@choerodon.io on 2018/11/29.
  * Email: fuqianghuang01@gmail.com
  */
 public class IssueTypeSearchDTO {
-
+    @ApiModelProperty(value = "查询名称")
     private String name;
-
+    @ApiModelProperty(value = "查询描述")
     private String description;
-
+    @ApiModelProperty(value = "其他参数")
     private String param;
 
     public String getName() {
