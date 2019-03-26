@@ -78,7 +78,7 @@ databaseChangeLog(logicalFilePath: 'issue_type.groovy') {
     changeSet(id: '2019-03-12-fix-add-default-feature', author: 'shinan.chenX@gmail') {
         sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
             "insert into issue_type(name,description,colour,icon,type_code,is_initialize,organization_id) " +
-                    "select '特性' as name,'特性' as description,'#29B6F6' as colour,'agile_feature' as icon,'feature' as type_code,'1' as is_initialize, organization_id " +
+                    "select '特性' as name,'特性' as description,'#29B6F6' as colour,'agile-feature' as icon,'feature' as type_code,'1' as is_initialize, organization_id " +
                     "from issue_type where type_code='issue_test'"
         }
     }

@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.math.BigDecimal;
 
 /**
@@ -8,15 +10,23 @@ import java.math.BigDecimal;
  */
 
 public class PriorityDTO {
-
+    @ApiModelProperty(value = "优先级id")
     private Long id;
+    @ApiModelProperty(value = "名称")
     private String name;
+    @ApiModelProperty(value = "描述")
     private String description;
+    @ApiModelProperty(value = "颜色")
     private String colour;
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
+    @ApiModelProperty(value = "是否默认")
     private Boolean isDefault;
+    @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
+    @ApiModelProperty(value = "排序")
     private BigDecimal sequence;
+    @ApiModelProperty(value = "是否启用")
     private Boolean enable;
 
     public Boolean getEnable() {

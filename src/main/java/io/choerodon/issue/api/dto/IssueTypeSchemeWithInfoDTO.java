@@ -2,6 +2,7 @@ package io.choerodon.issue.api.dto;
 
 import io.choerodon.issue.domain.IssueTypeWithInfo;
 import io.choerodon.issue.domain.ProjectWithInfo;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
@@ -10,23 +11,23 @@ import java.util.List;
  * Email: fuqianghuang01@gmail.com
  */
 public class IssueTypeSchemeWithInfoDTO {
-
+    @ApiModelProperty(value = "问题类型方案id")
     private Long id;
-
+    @ApiModelProperty(value = "名称")
     private String name;
-
+    @ApiModelProperty(value = "描述")
     private String description;
-
+    @ApiModelProperty(value = "默认问题类型id")
     private Long defaultIssueTypeId;
-
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
-
+    @ApiModelProperty(value = "应用类型（agile/test/program）")
     private String applyType;
-
+    @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
-
+    @ApiModelProperty(value = "问题类型列表")
     private List<IssueTypeWithInfo> issueTypeWithInfoList;
-
+    @ApiModelProperty(value = "关联的项目列表")
     private List<ProjectWithInfo> projectWithInfoList;
 
     public Long getId() {

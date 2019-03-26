@@ -19,6 +19,7 @@ import io.choerodon.issue.domain.StateMachineSchemeConfig;
 import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
 import io.choerodon.issue.infra.annotation.ChangeSchemeStatus;
 import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.enums.StateMachineSchemeDeployStatus;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
@@ -322,7 +323,7 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //发布后，再进行状态增加与减少的判断，并发送saga
         ChangeStatus changeStatus = new ChangeStatus(addStatusIds, deleteStatusIds);
         //发布之前，更新deployStatus为doing
-        schemeMapper.updateDeployStatus(organizationId, schemeId, "doing");
+        schemeMapper.updateDeployStatus(organizationId, schemeId, StateMachineSchemeDeployStatus.DOING);
         sagaService.deployStateMachineScheme(organizationId, schemeId, changeItems, changeStatus);
         //新增的状态机ids和删除的状态机ids
         List<Long> deleteStateMachineIds = changeMap.get("deleteStateMachineIds");

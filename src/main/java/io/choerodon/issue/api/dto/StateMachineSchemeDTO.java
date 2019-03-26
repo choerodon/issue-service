@@ -1,24 +1,32 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
 /**
  * @author peng.jiang@hand-china.com
  */
 public class StateMachineSchemeDTO {
-
+    @ApiModelProperty(value = "状态机方案id")
     private Long id;
+    @ApiModelProperty(value = "名称")
     private String name;
+    @ApiModelProperty(value = "描述")
     private String description;
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
+    @ApiModelProperty(value = "状态机的状态（draft/active/create）")
     private String status;
+    @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
+    @ApiModelProperty(value = "发布的状态（doing/done）")
     private String deployStatus;
-
+    @ApiModelProperty(value = "关联的项目列表")
     private List<ProjectDTO> projectDTOs;
-
+    @ApiModelProperty(value = "方案配置列表")
     private List<StateMachineSchemeConfigDTO> configDTOs;
-
+    @ApiModelProperty(value = "方案配置列表（用于列表）")
     private List<StateMachineSchemeConfigViewDTO> viewDTOs;
 
     public String getStatus() {

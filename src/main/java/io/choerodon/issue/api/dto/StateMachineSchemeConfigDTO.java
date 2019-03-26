@@ -1,23 +1,35 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author shinan.chen
  * @since 2018/11/25
  */
 public class StateMachineSchemeConfigDTO {
-
+    @ApiModelProperty(value = "状态机方案配置id")
     private Long id;
+    @ApiModelProperty(value = "状态机方案id")
     private Long schemeId;
+    @ApiModelProperty(value = "问题类型id")
     private Long issueTypeId;
+    @ApiModelProperty(value = "状态机id")
     private Long stateMachineId;
+    @ApiModelProperty(value = "是否默认配置")
     private Boolean isDefault;
+    @ApiModelProperty(value = "排序")
     private int sequence;
+    @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
-
+    @ApiModelProperty(value = "状态机名称")
     private String stateMachineName;
+    @ApiModelProperty(value = "问题类型名称")
     private String issueTypeName;
+    @ApiModelProperty(value = "问题类型图标")
     private String issueTypeIcon;
+    @ApiModelProperty(value = "问题类型颜色")
     private String issueTypeColour;
 
     public Long getId() {

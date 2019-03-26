@@ -1,5 +1,6 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Pattern;
@@ -10,17 +11,16 @@ import javax.validation.constraints.Size;
  * @date 2018/9/7
  */
 public class ProjectDTO {
-    private static final String CODE_REGULAR_EXPRESSION =
-            "[a-zA-Z0-9_\\.][a-zA-Z0-9_\\-\\.]*[a-zA-Z0-9_\\-]|[a-zA-Z0-9_]";
-
+    private static final String CODE_REGULAR_EXPRESSION = "[a-zA-Z0-9_\\.][a-zA-Z0-9_\\-\\.]*[a-zA-Z0-9_\\-]|[a-zA-Z0-9_]";
+    @ApiModelProperty(value = "项目id")
     private Long id;
-
+    @ApiModelProperty(value = "名称")
     @NotEmpty(message = "error.project.name.empty")
     @Size(min = 1, max = 32, message = "error.project.code.size")
     private String name;
-
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
-
+    @ApiModelProperty(value = "项目编码")
     @NotEmpty(message = "error.project.code.empty")
     @Size(min = 1, max = 14, message = "error.project.code.size")
     @Pattern(regexp = CODE_REGULAR_EXPRESSION, message = "error.project.code.illegal")

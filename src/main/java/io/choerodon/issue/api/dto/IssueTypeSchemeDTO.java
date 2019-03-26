@@ -1,5 +1,7 @@
 package io.choerodon.issue.api.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -8,21 +10,28 @@ import java.util.List;
  * @date 2018/8/10
  */
 public class IssueTypeSchemeDTO {
+    @ApiModelProperty(value = "问题类型方案id")
     private Long id;
-
+    @ApiModelProperty(value = "名称")
     @NotNull(message = "error.name.null")
     private String name;
+    @ApiModelProperty(value = "描述")
     private String description;
 
-    @NotNull(message = "error.defaultIssueTypeId.null")
     /**
      * 若无默认问题类型，传0L
      */
+    @NotNull(message = "error.defaultIssueTypeId.null")
+    @ApiModelProperty(value = "默认问题类型id")
     private Long defaultIssueTypeId;
+    @ApiModelProperty(value = "组织id")
     private Long organizationId;
+    @ApiModelProperty(value = "应用类型（agile/test/program）")
     private String applyType;
+    @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
 
+    @ApiModelProperty(value = "问题类型列表")
     private List<IssueTypeDTO> issueTypes;
 
     public Long getId() {

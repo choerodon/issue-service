@@ -11,6 +11,7 @@ import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
+import io.choerodon.issue.infra.enums.StateMachineSchemeDeployStatus;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
@@ -354,7 +355,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         if (update == 1) {
             //若已完成，更新发布状态
             if (deployProgress.equals(100)) {
-                schemeMapper.updateDeployStatus(organizationId, schemeId, "done");
+                schemeMapper.updateDeployStatus(organizationId, schemeId, StateMachineSchemeDeployStatus.DONE);
             }
             return true;
         } else {
