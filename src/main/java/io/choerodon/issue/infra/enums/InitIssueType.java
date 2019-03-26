@@ -39,7 +39,7 @@ public enum InitIssueType {
     /**
      * 特性
      */
-    FEATURE("agile_feature", "特性", "特性", "#29B6F6", "feature");
+    FEATURE("agile-feature", "特性", "特性", "#29B6F6", "feature");
 
     private String icon;
     private String name;
