@@ -105,23 +105,26 @@ public class SchemeController extends BaseController {
     @ApiOperation(value = "【敏捷】新增状态")
     @PostMapping(value = "/schemes/create_status_for_agile")
     public ResponseEntity<StatusDTO> createStatusForAgile(@PathVariable("project_id") Long projectId,
+                                                          @RequestParam String applyType,
                                                           @RequestBody StatusDTO statusDTO) {
-        return new ResponseEntity<>(projectConfigService.createStatusForAgile(projectId, statusDTO), HttpStatus.OK);
+        return new ResponseEntity<>(projectConfigService.createStatusForAgile(projectId, applyType, statusDTO), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "【敏捷】校验是否能新增状态")
     @GetMapping(value = "/schemes/check_create_status_for_agile")
-    public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId) {
-        return new ResponseEntity<>((Boolean) projectConfigService.checkCreateStatusForAgile(projectId).get("flag"), HttpStatus.OK);
+    public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId,
+                                                             @RequestParam String applyType) {
+        return new ResponseEntity<>((Boolean) projectConfigService.checkCreateStatusForAgile(projectId, applyType).get("flag"), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "【敏捷】移除状态")
     @DeleteMapping(value = "/schemes/remove_status_for_agile")
     public ResponseEntity removeStatusForAgile(@PathVariable("project_id") Long projectId,
-                                               @RequestParam("status_id") Long statusId) {
-        projectConfigService.removeStatusForAgile(projectId, statusId);
+                                               @RequestParam("status_id") Long statusId,
+                                               @RequestParam String applyType) {
+        projectConfigService.removeStatusForAgile(projectId, statusId, applyType);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -129,8 +132,9 @@ public class SchemeController extends BaseController {
     @ApiOperation(value = "【敏捷】校验是否能删除状态")
     @GetMapping(value = "/schemes/check_remove_status_for_agile")
     public ResponseEntity<Boolean> checkRemoveStatusForAgile(@PathVariable("project_id") Long projectId,
-                                                             @RequestParam("status_id") Long statusId) {
-        return new ResponseEntity<>(projectConfigService.checkRemoveStatusForAgile(projectId, statusId), HttpStatus.OK);
+                                                             @RequestParam("status_id") Long statusId,
+                                                             @RequestParam String applyType) {
+        return new ResponseEntity<>(projectConfigService.checkRemoveStatusForAgile(projectId, statusId, applyType), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})

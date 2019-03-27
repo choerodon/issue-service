@@ -101,7 +101,7 @@ public interface ProjectConfigService {
      * @param statusDTO
      * @return
      */
-    StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO);
+    StatusDTO createStatusForAgile(Long projectId, String applyType, StatusDTO statusDTO);
 
     /**
      * 【敏捷】校验是否能新增状态
@@ -109,7 +109,7 @@ public interface ProjectConfigService {
      * @param projectId
      * @return
      */
-    Map<String, Object> checkCreateStatusForAgile(Long projectId);
+    Map<String, Object> checkCreateStatusForAgile(Long projectId, String applyType);
 
     /**
      * 【敏捷】校验是否能删除状态
@@ -117,14 +117,14 @@ public interface ProjectConfigService {
      * @param projectId
      * @return
      */
-    void removeStatusForAgile(Long projectId, Long statusId);
+    void removeStatusForAgile(Long projectId, Long statusId, String applyType);
 
     /**
      * @param projectId
      * @param statusId
      * @return
      */
-    Boolean checkRemoveStatusForAgile(Long projectId, Long statusId);
+    Boolean checkRemoveStatusForAgile(Long projectId, Long statusId, String applyType);
 
     /**
      * 查询状态机关联的项目id列表
