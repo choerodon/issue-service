@@ -316,10 +316,10 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public StatusDTO createStatusForAgile(Long projectId, StatusDTO statusDTO) {
+    public StatusDTO createStatusForAgile(Long projectId, String applyType, StatusDTO statusDTO) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         statusDTO.setOrganizationId(organizationId);
-        Map<String, Object> result = checkCreateStatusForAgile(projectId);
+        Map<String, Object> result = checkCreateStatusForAgile(projectId, applyType);
         if ((Boolean) result.get(FLAG)) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
@@ -330,11 +330,11 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public Map<String, Object> checkCreateStatusForAgile(Long projectId) {
+    public Map<String, Object> checkCreateStatusForAgile(Long projectId, String applyType) {
         Map<String, Object> result = new HashMap<>(3);
         result.put(FLAG, true);
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, SchemeApplyType.AGILE).getSchemeId();
+        Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
         //校验状态机方案是否只关联一个项目
         ProjectConfig select = new ProjectConfig();
         select.setSchemeId(stateMachineSchemeId);
@@ -370,8 +370,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
 
     @Saga(code = "agile-remove-status", description = "移除状态", inputSchemaClass = StatusPayload.class)
     @Override
-    public void removeStatusForAgile(Long projectId, Long statusId) {
-        Map<String, Object> result = checkCreateStatusForAgile(projectId);
+    public void removeStatusForAgile(Long projectId, Long statusId, String applyType) {
+        Map<String, Object> result = checkCreateStatusForAgile(projectId, applyType);
         Boolean flag = (Boolean) result.get(FLAG);
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
@@ -397,8 +397,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public Boolean checkRemoveStatusForAgile(Long projectId, Long statusId) {
-        Map<String, Object> result = checkCreateStatusForAgile(projectId);
+    public Boolean checkRemoveStatusForAgile(Long projectId, Long statusId, String applyType) {
+        Map<String, Object> result = checkCreateStatusForAgile(projectId, applyType);
         Boolean flag = (Boolean) result.get(FLAG);
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
