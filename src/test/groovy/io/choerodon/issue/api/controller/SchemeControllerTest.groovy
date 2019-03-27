@@ -127,7 +127,7 @@ class SchemeControllerTest extends Specification {
         statusDTO.code = "XX"
         statusDTO.canDelete = false
         when: '查询项目的问题类型对应的状态机id'
-        def entity = restTemplate.postForEntity("/v1/projects/{project_id}/schemes/create_status_for_agile",
+        def entity = restTemplate.postForEntity("/v1/projects/{project_id}/schemes/create_status_for_agile?applyType=agile",
                 statusDTO, StatusDTO, projectId)
 
         then: '返回结果'
@@ -140,7 +140,7 @@ class SchemeControllerTest extends Specification {
 
     def "checkCreateStatusForAgile"() {
         when: '查询项目的问题类型对应的状态机id'
-        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/schemes/check_create_status_for_agile",
+        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/schemes/check_create_status_for_agile?applyType=agile",
                 Boolean, projectId)
 
         then: '返回结果'
@@ -151,7 +151,7 @@ class SchemeControllerTest extends Specification {
 
     def "removeStatusForAgile"() {
         given: '查询项目的问题类型对应的状态机id'
-        def entity = restTemplate.delete("/v1/projects/{project_id}/schemes/remove_status_for_agile?status_id={status_id}",
+        def entity = restTemplate.delete("/v1/projects/{project_id}/schemes/remove_status_for_agile?status_id={status_id}&applyType=agile",
                 projectId, 1L)
 
         expect: '返回结果'
