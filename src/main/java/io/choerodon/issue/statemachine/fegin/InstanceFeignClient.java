@@ -1,7 +1,7 @@
 package io.choerodon.issue.statemachine.fegin;
 
 import io.choerodon.issue.infra.feign.dto.ExecuteResult;
-import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
