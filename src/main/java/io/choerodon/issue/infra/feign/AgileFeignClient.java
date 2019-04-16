@@ -4,7 +4,7 @@ import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.swagger.annotations.ApiParam;
-import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;

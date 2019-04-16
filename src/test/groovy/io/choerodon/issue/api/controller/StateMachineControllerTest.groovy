@@ -32,16 +32,16 @@ class StateMachineControllerTest extends Specification {
     @Shared
     Long organizationId = 1L
 
-    def "pagingQuery"() {
-        when: '查询项目的问题类型列表'
-        def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine?page={page}&size={size}", Page, organizationId, 1, 1000)
-
-        then: '返回结果'
-        entity.getStatusCode().is2xxSuccessful()
-        Page<StateMachineDTO> stateMachineDTOPage = entity.body
-        expect: '期望验证'
-        stateMachineDTOPage.content.size() == 1
-    }
+//    def "pagingQuery"() {
+//        when: '查询项目的问题类型列表'
+//        def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine?page={page}&size={size}", Page, organizationId, 1, 1000)
+//
+//        then: '返回结果'
+//        entity.getStatusCode().is2xxSuccessful()
+//        Page<StateMachineDTO> stateMachineDTOPage = entity.body
+//        expect: '期望验证'
+//        stateMachineDTOPage.content.size() == 1
+//    }
 
     def "queryProjectIdsMap"() {
         when: '【内部调用】查询状态机关联的项目id列表的Map'
