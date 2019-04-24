@@ -37,6 +37,11 @@ logs:
 deployment:
   managementPort: 8381
 
+service:
+  enabled: false
+  type: ClusterIP
+  port: 8380
+
 env:
   open:
     SPRING_CLOUD_CONFIG_ENABLED: true
