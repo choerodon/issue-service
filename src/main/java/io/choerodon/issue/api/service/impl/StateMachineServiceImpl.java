@@ -45,8 +45,6 @@ public class StateMachineServiceImpl implements StateMachineService {
     @Value("${spring.application.name:default}")
     private String serverCode;
     @Autowired
-    private StateMachineFeignClient stateMachineClient;
-    @Autowired
     private StateMachineSchemeService schemeService;
     @Autowired
     private StateMachineSchemeConfigService stateMachineSchemeConfigService;
@@ -61,7 +59,7 @@ public class StateMachineServiceImpl implements StateMachineService {
 
     @Override
     public ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
-        ResponseEntity<Page<StateMachineDTO>> responseEntity = stateMachineClient.pagingQuery(organizationId, page, size, sort, name, description, param);
+        ResponseEntity<Page<StateMachineDTO>> responseEntity = stateMachineFeignClient.pagingQuery(organizationId, page, size, sort, name, description, param);
         if (responseEntity != null && responseEntity.getBody() != null && responseEntity.getBody().getContent() != null) {
             for (StateMachineDTO stateMachineDTO : responseEntity.getBody().getContent()) {
                 List<StateMachineSchemeDTO> list = schemeService.querySchemeByStateMachineId(organizationId, stateMachineDTO.getId());
@@ -84,17 +82,17 @@ public class StateMachineServiceImpl implements StateMachineService {
         }
         //删除草稿的已关联当前状态机【todo】
 
-        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
+        ResponseEntity<StateMachineDTO> responseEntity = stateMachineFeignClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             throw new CommonException("error.stateMachine.delete.noFound");
         }
-        return stateMachineClient.delete(organizationId, stateMachineId);
+        return stateMachineFeignClient.delete(organizationId, stateMachineId);
     }
 
     @Override
     public Map<String, Object> checkDelete(Long organizationId, Long stateMachineId) {
         Map<String, Object> map = new HashMap<>();
-        ResponseEntity<StateMachineDTO> responseEntity = stateMachineClient.queryStateMachineById(organizationId, stateMachineId);
+        ResponseEntity<StateMachineDTO> responseEntity = stateMachineFeignClient.queryStateMachineById(organizationId, stateMachineId);
         if (responseEntity == null || responseEntity.getBody() == null) {
             map.put(CloopmCommonString.CAN_DELETE, false);
             map.put("reason", "noFound");
@@ -138,7 +136,7 @@ public class StateMachineServiceImpl implements StateMachineService {
             //使活跃的状态机变更为未活跃
             logger.info("notActiveStateMachine: {}", stateMachineIds);
             if (!stateMachineIds.isEmpty()) {
-                stateMachineClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
+                stateMachineFeignClient.notActiveStateMachines(organizationId, notActiveStateMachineIds);
             }
         }
     }

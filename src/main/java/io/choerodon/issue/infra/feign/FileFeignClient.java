@@ -2,7 +2,7 @@ package io.choerodon.issue.infra.feign;
 
 import io.choerodon.issue.infra.feign.config.FeignMultipartSupportConfig;
 import io.choerodon.issue.infra.feign.fallback.FileFeignClientFallback;
-import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

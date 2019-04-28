@@ -1,6 +1,14 @@
 # Changelog
 All notable changes about issue-service will be documented in this file.
 
+## [0.16.0] - 2019-04-19
+
+### Added
+
+- Added 'feature' issueType 
+- Added program issueType scheme
+- Added program stateMachine scheme
+
 ## [0.13.0] - 2019-01-11
 
 ### Changed
