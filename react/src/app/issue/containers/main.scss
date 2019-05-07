@@ -1,0 +1,86 @@
+.issue-region article,
+aside,
+blockquote,
+body,
+button,
+code,
+dd,
+details,
+div,
+dl,
+dt,
+fieldset,
+figcaption,
+figure,
+footer,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+header,
+hgroup,
+hr,
+input,
+legend,
+li,
+menu,
+nav,
+ol,
+p,
+pre,
+section,
+td,
+textarea,
+th,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+.issue-sidebar-form {
+  max-width: 520px;
+}
+
+.issue-region p + p {
+  margin-bottom: 0;
+}
+
+.issue-delete-content {
+  margin-top: 8px;
+  & span {
+    font-size: 14px;
+    color: #000000;
+    font-weight: 500;
+    margin-left: 2px;
+  }
+}
+
+.issue-error-msg {
+  color: red;
+}
+
+// 列表字段限制宽度
+.issue-table-ellipsis {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.issue-btn-raised-cancel {
+  color: #3f51b5;
+}
+
+.issue-del-space {
+  width: 24px;
+  display: inline-block;
+}
+
+.page-head-title {
+  margin-right: 40px;
+  // min-width: 141px;
+  width: auto;
+}

@@ -1,0 +1,9 @@
+"issue": "问题设置"
+# organization
+"issue.issue-type": "问题类型"
+"issue.issue-type-schemes": "问题类型方案"
+"issue.state-machine-schemes": "状态机方案"
+"issue.issue-type-screen-schemes": "问题类型页面方案"
+"issue.priorities": "优先级"
+"issue.state": "状态"
+"issue.state-machine": "状态机"

@@ -41,6 +41,10 @@ public class SagaServiceImpl {
     @Autowired
     private ProjectConfigMapper projectConfigMapper;
 
+    public void setSagaClient(SagaClient sagaClient) {
+        this.sagaClient = sagaClient;
+    }
+
     @Saga(code = DEPLOY_STATE_MACHINE_SCHEME, description = "issue服务发布状态机方案", inputSchemaClass = StateMachineSchemeDeployUpdateIssue.class)
     public void deployStateMachineScheme(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems, ChangeStatus changeStatus) {
         //获取当前方案配置的项目列表
@@ -72,7 +76,7 @@ public class SagaServiceImpl {
         deployUpdateIssue.setSchemeId(schemeId);
         deployUpdateIssue.setOrganizationId(organizationId);
         deployUpdateIssue.setUserId(DetailsHelper.getUserDetails().getUserId());
-        sagaClient.startSaga(DEPLOY_STATE_MACHINE_SCHEME, new StartInstanceDTO(JSON.toJSONString(deployUpdateIssue), "", "", ResourceLevel.ORGANIZATION.value(),organizationId));
+        sagaClient.startSaga(DEPLOY_STATE_MACHINE_SCHEME, new StartInstanceDTO(JSON.toJSONString(deployUpdateIssue), "", "", ResourceLevel.ORGANIZATION.value(), organizationId));
         logger.info("startSaga deploy-state-machine-scheme addStatusIds: {}, deleteStatusIds: {}", changeStatus.getAddStatusIds(), changeStatus.getDeleteStatusIds());
     }
 }

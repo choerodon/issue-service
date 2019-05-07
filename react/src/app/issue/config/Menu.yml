@@ -1,0 +1,40 @@
+"issue":
+  icon: home
+  sort: 1
+  organization:
+    - "issue-type":
+        icon: style
+        Routes: /issue/issue-type
+        sort: 1
+        permission:
+          - 'issue-service.issue-type.queryIssueTypeList'
+    - "issue-type-schemes":
+        icon: assignment_late
+        Routes: /issue/issue-type-schemes
+        sort: 2
+        permission:
+          - 'issue-service.issue-type-scheme.queryIssueTypeSchemeList'
+    - "state-machine":
+        icon: transform
+        Routes: /issue/state-machines
+        sort: 3
+        permission:
+          - 'issue-service.state-machine.pagingQuery'
+    - "state-machine-schemes":
+        icon: flip_to_back
+        Routes: /issue/state-machine-schemes
+        sort: 4
+        permission:
+          - 'issue-service.state-machine-scheme.pagingQuery'
+    - "state":
+        icon: hdr_strong
+        Routes: /issue/states
+        sort: 5
+        permission:
+          - 'state-machine-service.status.queryStatusList'
+    - "priorities":
+        icon: format_list_numbered
+        Routes: /issue/priorities
+        sort: 6
+        permission:
+          - 'issue-service.priority.selectAll'

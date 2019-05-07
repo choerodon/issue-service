@@ -1,10 +1,11 @@
 package io.choerodon.issue.api.controller;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.base.BaseController;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
@@ -14,7 +15,6 @@ import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,24 +38,22 @@ public class IssueTypeController extends BaseController {
 
     @Autowired
     private IssueTypeService issueTypeService;
-    @Autowired
-    private IssueEventHandler issueEventHandler;
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据id查询问题类型")
     @GetMapping(value = "/{id}")
     public ResponseEntity<IssueTypeDTO> queryIssueTypeById(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId) {
         return new ResponseEntity<>(issueTypeService.queryById(organizationId, issueTypeId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "创建问题类型")
     @PostMapping
     public ResponseEntity<IssueTypeDTO> create(@PathVariable("organization_id") Long organizationId, @RequestBody @Valid IssueTypeDTO issueTypeDTO) {
         return new ResponseEntity<>(issueTypeService.create(organizationId, issueTypeDTO), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "修改问题类型")
     @PutMapping(value = "/{id}")
     public ResponseEntity<IssueTypeDTO> update(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId,
@@ -65,14 +63,14 @@ public class IssueTypeController extends BaseController {
         return new ResponseEntity<>(issueTypeService.update(issueTypeDTO), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "删除问题类型")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId) {
         return new ResponseEntity<>(issueTypeService.delete(organizationId, issueTypeId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.ORGANIZATION_ADMINISTRATOR, InitRoleCode.ORGANIZATION_MEMBER})
+    @Permission(type = ResourceType.ORGANIZATION, roles = {InitRoleCode.ORGANIZATION_ADMINISTRATOR, InitRoleCode.ORGANIZATION_MEMBER})
     @ApiOperation(value = "分页查询问题类型列表")
     @CustomPageRequest
     @PostMapping("/list")
@@ -88,14 +86,14 @@ public class IssueTypeController extends BaseController {
 
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "校验问题类型是否可以删除")
     @GetMapping(value = "/check_delete/{id}")
     public ResponseEntity<Map<String, Object>> checkDelete(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long issueTypeId) {
         return new ResponseEntity<>(issueTypeService.checkDelete(organizationId, issueTypeId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "校验问题类型名字是否未被使用")
     @GetMapping(value = "/check_name")
     public ResponseEntity<Boolean> checkName(@PathVariable("organization_id") Long organizationId,
@@ -104,7 +102,7 @@ public class IssueTypeController extends BaseController {
         return new ResponseEntity<>(issueTypeService.checkName(organizationId, name, id), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation("获取问题类型列表")
     @GetMapping(value = "/types")
     public ResponseEntity<List<IssueTypeDTO>> queryByOrgId(@PathVariable("organization_id") Long organizationId) {
@@ -113,7 +111,7 @@ public class IssueTypeController extends BaseController {
                 .orElseThrow(() -> new CommonException("error.issue.queryByOrgId"));
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "查询所有问题类型及关联的方案")
     @GetMapping(value = "/query_issue_type_with_state_machine")
     public ResponseEntity<List<IssueTypeDTO>> queryIssueTypeByStateMachineSchemeId(@PathVariable("organization_id") Long organizationId,
@@ -121,14 +119,14 @@ public class IssueTypeController extends BaseController {
         return new ResponseEntity<>(issueTypeService.queryIssueTypeByStateMachineSchemeId(organizationId, schemeId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据组织id查询类型，map")
     @GetMapping(value = "/type_map")
     public ResponseEntity<Map<Long, IssueTypeDTO>> listIssueTypeMap(@PathVariable("organization_id") Long organizationId) {
         return new ResponseEntity<>(issueTypeService.listIssueTypeMap(organizationId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "迁移组织层问题类型数据")
     @PostMapping(value = "/init_data")
     public ResponseEntity<Map<Long, Map<String, Long>>> initIssueTypeData(@PathVariable("organization_id") Long organizationId,

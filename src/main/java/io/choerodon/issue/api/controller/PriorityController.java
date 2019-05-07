@@ -1,13 +1,13 @@
 package io.choerodon.issue.api.controller;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.PriorityDTO;
 import io.choerodon.issue.api.service.PriorityService;
 import io.choerodon.issue.api.validator.PriorityValidator;
 import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class PriorityController {
     @Autowired
     private PriorityValidator priorityValidator;
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "展示页面")
     @CustomPageRequest
     @GetMapping("/organizations/{organization_id}/priority")
@@ -52,7 +52,7 @@ public class PriorityController {
         return new ResponseEntity<>(priorityService.selectAll(priorityDTO, ParamUtils.arrToStr(param)), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "创建优先级")
     @PostMapping("/organizations/{organization_id}/priority")
     public ResponseEntity<PriorityDTO> create(@PathVariable("organization_id") Long organizationId, @RequestBody PriorityDTO priorityDTO) {
@@ -60,7 +60,7 @@ public class PriorityController {
         return new ResponseEntity<>(priorityService.create(organizationId, priorityDTO), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "更新优先级")
     @PutMapping(value = "/organizations/{organization_id}/priority/{priority_id}")
     public ResponseEntity<PriorityDTO> update(@PathVariable("organization_id") Long organizationId, @PathVariable("priority_id") Long priorityId,
@@ -71,7 +71,7 @@ public class PriorityController {
         return new ResponseEntity<>(priorityService.update(priorityDTO), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "校验优先级名字是否未被使用")
     @GetMapping(value = "/organizations/{organization_id}/priority/check_name")
     public ResponseEntity<Boolean> checkName(@PathVariable("organization_id") Long organizationId,
@@ -81,7 +81,7 @@ public class PriorityController {
                 .orElseThrow(() -> new CommonException("error.priorityName.check"));
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "更新展示顺序")
     @PutMapping(value = "/organizations/{organization_id}/priority/sequence")
     public ResponseEntity<List<PriorityDTO>> updateByList(@PathVariable("organization_id") Long organizationId,
@@ -90,7 +90,7 @@ public class PriorityController {
         return new ResponseEntity<>(priorityService.updateByList(list, organizationId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据组织id查询优先级,map")
     @GetMapping("/organizations/{organization_id}/priority/list")
     public ResponseEntity<Map<Long, PriorityDTO>> queryByOrganizationId(@ApiParam(value = "组织id", required = true)
@@ -101,7 +101,7 @@ public class PriorityController {
 
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据组织id查询默认优先级")
     @GetMapping("/organizations/{organization_id}/priority/default")
     public ResponseEntity<PriorityDTO> queryDefaultByOrganizationId(@ApiParam(value = "组织id", required = true)
@@ -112,7 +112,7 @@ public class PriorityController {
 
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据组织id查询优先级,list")
     @GetMapping("/organizations/{organization_id}/priority/list_by_org")
     public ResponseEntity<List<PriorityDTO>> queryByOrganizationIdList(@ApiParam(value = "组织id", required = true)
@@ -122,7 +122,7 @@ public class PriorityController {
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据id查询优先级")
     @GetMapping("/organizations/{organization_id}/priority/{id}")
     public ResponseEntity<PriorityDTO> queryById(@ApiParam(value = "组织id", required = true)
@@ -134,7 +134,7 @@ public class PriorityController {
                 .orElseThrow(() -> new CommonException("error.priority.get"));
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "生效/失效优先级")
     @GetMapping("/organizations/{organization_id}/priority/enable/{id}")
     public ResponseEntity<PriorityDTO> enablePriority(@PathVariable("organization_id") Long organizationId,
@@ -144,7 +144,7 @@ public class PriorityController {
         return new ResponseEntity<>(priorityService.enablePriority(organizationId, id, enable), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "校验删除优先级")
     @GetMapping("/organizations/{organization_id}/priority/check_delete/{id}")
     public ResponseEntity<Long> checkDelete(@PathVariable("organization_id") Long organizationId,
@@ -153,7 +153,7 @@ public class PriorityController {
         return new ResponseEntity<>(priorityService.checkDelete(organizationId, id), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "删除优先级")
     @DeleteMapping("/organizations/{organization_id}/priority/delete/{id}")
     public ResponseEntity delete(@PathVariable("organization_id") Long organizationId, @PathVariable("id") Long priorityId,

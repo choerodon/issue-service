@@ -5,10 +5,12 @@ import io.choerodon.asgard.saga.dto.SagaInstanceDTO;
 import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.asgard.saga.feign.SagaClientCallback;
+import io.choerodon.core.convertor.ApplicationContextHelper;
 import io.choerodon.core.domain.Page;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.api.service.impl.SagaServiceImpl;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.FileFeignClient;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
@@ -112,11 +114,11 @@ public class FeignConfigure {
     }
 
     @Bean
-    @Primary
     SagaClient sagaClient() {
-
-        SagaClient sagaClient = Mockito.mock(SagaClientCallback.class);
+        SagaClient sagaClient = Mockito.mock(SagaClient.class);
         Mockito.when(sagaClient.startSaga(Matchers.anyString(), Matchers.any(StartInstanceDTO.class))).thenReturn(new SagaInstanceDTO());
+        SagaServiceImpl sagaService = ApplicationContextHelper.getSpringFactory().getBean(SagaServiceImpl.class);
+        sagaService.setSagaClient(sagaClient);
         return sagaClient;
     }
 
