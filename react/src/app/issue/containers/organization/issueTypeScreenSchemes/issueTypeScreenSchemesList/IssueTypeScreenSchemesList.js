@@ -1,6 +1,6 @@
 import {
   Content, Header, Page, stores,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import {
   Button, Icon, Table, Tooltip, Modal, message,
 } from 'choerodon-ui';

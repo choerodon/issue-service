@@ -4,7 +4,7 @@ import { Select, Button, Divider } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import {
   Page, Header, Content, stores,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import './RelateIssueTypeScheme.scss';
 
 const { Option } = Select;

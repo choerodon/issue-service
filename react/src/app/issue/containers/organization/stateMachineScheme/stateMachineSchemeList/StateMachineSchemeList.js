@@ -19,7 +19,7 @@ import {
   Page,
   Permission,
   stores,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import '../../../main.scss';
 import './StateMachineSchemeList.scss';
 import TypeTag from '../../../../components/TypeTag/TypeTag';

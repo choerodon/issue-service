@@ -1,6 +1,6 @@
 import {
   Content, Header, Page, stores,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import {
   Form, Input, message, Modal, Checkbox,
 } from 'choerodon-ui';

@@ -1,5 +1,5 @@
 import { observable, computed, action, runInAction, autorun  } from 'mobx';
-import { axios, store } from 'choerodon-front-boot';
+import { axios, store } from '@choerodon/boot';
 
 @store('PriorityStore')
 class PriorityStore {

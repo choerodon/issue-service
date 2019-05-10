@@ -7,7 +7,7 @@ import {
 import { injectIntl, FormattedMessage } from 'react-intl';
 import {
   Content, Header, Page, Permission, stores,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import '../../../main.scss';
 import './IssueTypeList.scss';
 import IssueTypeCreate from '../issueTypeCreate';

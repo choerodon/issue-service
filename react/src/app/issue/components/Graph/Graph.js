@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Form } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import _ from 'lodash';
-import { Content, Header, Page, Permission, stores } from 'choerodon-front-boot';
+import { Content, Header, Page, Permission, stores } from '@choerodon/boot';
 import {
   mxEditor,
   mxGraphHandler,

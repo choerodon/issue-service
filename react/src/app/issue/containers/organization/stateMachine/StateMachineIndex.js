@@ -3,7 +3,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
-import { asyncRouter, nomatch } from 'choerodon-front-boot';
+import { asyncRouter, nomatch } from '@choerodon/boot';
 
 const StateMachineList = asyncRouter(() => import('./stateMachineList'), () => import('../../../stores/organization/stateMachine'));
 const EditStateMachine = asyncRouter(() => import('./editStateMachine'), () => import('../../../stores/organization/stateMachine'));

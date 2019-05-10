@@ -5,7 +5,7 @@ import {
   asyncLocaleProvider,
   asyncRouter,
   nomatch,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import './main.scss';
 
 const IssueTypeIndex = asyncRouter(() => import('./organization/issueType'));

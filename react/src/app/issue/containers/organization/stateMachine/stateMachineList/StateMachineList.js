@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { Table, Button, Modal, Form, Select, Input, Tooltip, message } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { Content, Header, Page, Permission, stores } from 'choerodon-front-boot';
+import { Content, Header, Page, Permission, stores } from '@choerodon/boot';
 import '../../../main.scss';
 import './StateMachineList.scss';
 

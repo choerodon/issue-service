@@ -1,4 +1,4 @@
-import { Content, Header, Page, stores } from 'choerodon-front-boot';
+import { Content, Header, Page, stores } from '@choerodon/boot';
 import { Button, Card, Form, Icon, Input, message, Modal, Spin, Table, Tooltip, Checkbox } from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';

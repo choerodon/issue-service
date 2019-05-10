@@ -1,7 +1,7 @@
 import {
   observable, computed, action, runInAction,
 } from 'mobx';
-import { axios, store } from 'choerodon-front-boot';
+import { axios, store } from '@choerodon/boot';
 import querystring from 'query-string';
 
 const { height } = window.screen;

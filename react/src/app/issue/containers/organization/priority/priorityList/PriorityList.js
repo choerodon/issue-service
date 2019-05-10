@@ -7,7 +7,7 @@ import {
 import { injectIntl, FormattedMessage } from 'react-intl';
 import {
   Content, Header, Page, Permission, stores, axios,
-} from 'choerodon-front-boot';
+} from '@choerodon/boot';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import update from 'immutability-helper';

@@ -3,7 +3,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
-import { asyncRouter, nomatch } from 'choerodon-front-boot';
+import { asyncRouter, nomatch } from '@choerodon/boot';
 import { injectIntl } from 'react-intl';
 
 const IssueTypeSchemeList = asyncRouter(() => import('./issueTypeSchemeList'), () => import('../../../stores/organization/issueTypeScheme'));
