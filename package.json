@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "description": "",
   "main": "./react/src/app/issue/containers/ISSUEIndex.js",
+  "files": [
+    "lib"
+  ],
   "dependencies": {
     "@choerodon/boot": "0.1.x",
     "@choerodon/master": "0.1.x",
