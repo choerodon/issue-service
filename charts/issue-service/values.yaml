@@ -10,7 +10,7 @@ image:
 
 preJob:
   timeout: 300
-  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/dbtool:0.6.2
+  image: registry.cn-hangzhou.aliyuncs.com/choerodon-tools/dbtool:0.6.4
   preConfig:
     enable: true
     configFile: application.yml
@@ -58,6 +58,14 @@ env:
 #      -Dskywalking.agent.application_code=iam-service
 #      -Dskywalking.agent.sample_n_per_3_secs=-1
 #      -Dskywalking.collector.backend_service=oap.skywalking:11800
+    # 前端环境变量
+    PRO_API_HOST: api.example.com.cn
+    PRO_CLIENT_ID: issue
+    PRO_LOCAL: true
+    PRO_TITLE_NAME: Choerodon
+    PRO_HEADER_TITLE_NAME: Choerodon
+    PRO_COOKIE_SERVER: example.com.cn
+    PRO_HTTP: http
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious

@@ -33,3 +33,11 @@ gitlabci/.generated
 /bin
 src/main/resources/application-default.yml
 init-local-database-csn.sh
+
+# frontend
+lib
+node_modules
+package-lock.json
+**/lib/dist/
+**/lib/assets/
+**/lib/fonts/

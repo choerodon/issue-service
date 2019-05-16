@@ -1,0 +1,48 @@
+{
+  "name": "@choerodon/issue",
+  "routeName": "issue",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./lib/src/app/issue/containers/ISSUEIndex.js",
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "@choerodon/boot": "0.1.x",
+    "@choerodon/master": "0.1.x",
+    "choerodon-front-boot": "0.10.10",
+    "immutability-helper": "^2.7.1",
+    "mxgraph-js": "^1.0.1",
+    "react-beautiful-dnd": "9.0.2",
+    "react-color": "^2.14.1",
+    "react-dnd": "^5.0.0",
+    "react-dnd-html5-backend": "^5.0.1"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.7.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "through2": "^2.0.3"
+  },
+  "scripts": {
+    "start": "choerodon-front-boot start --config ./react/config.js",
+    "dist": "choerodon-front-boot dist --config ./react/config.js",
+    "compile": "gulp compile",
+    "lint-staged": "lint-staged",
+    "lint-staged:es": "eslint"
+  },
+  "author": "",
+  "license": "ISC",
+  "lint-staged": {
+    "react/**/*.{js,jsx}": [
+      "npm run lint-staged:es"
+    ],
+    "react/**/*.scss": "stylelint --syntax scss"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "peerDependencies": {}
+}

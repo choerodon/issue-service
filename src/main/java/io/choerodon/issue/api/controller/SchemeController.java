@@ -1,9 +1,10 @@
 package io.choerodon.issue.api.controller;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.base.BaseController;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithStateMachineIdDTO;
 import io.choerodon.issue.api.dto.PriorityDTO;
@@ -12,7 +13,6 @@ import io.choerodon.issue.api.service.ProjectConfigService;
 import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,21 +42,21 @@ public class SchemeController extends BaseController {
     @Autowired
     private ProjectUtil projectUtil;
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目的问题类型列表")
     @GetMapping(value = "/schemes/query_issue_types")
     public ResponseEntity<List<IssueTypeDTO>> queryIssueTypesByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("apply_type") String applyType) {
         return new ResponseEntity<>(projectConfigService.queryIssueTypesByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目的问题类型列表，带对应的状态机id")
     @GetMapping(value = "/schemes/query_issue_types_with_sm_id")
     public ResponseEntity<List<IssueTypeWithStateMachineIdDTO>> queryIssueTypesWithStateMachineIdByProjectId(@PathVariable("project_id") Long projectId, @RequestParam("apply_type") String applyType) {
         return new ResponseEntity<>(projectConfigService.queryIssueTypesWithStateMachineIdByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目下某个问题类型拥有的转换（包含可以转换到的状态）")
     @GetMapping(value = "/schemes/query_transforms")
     public ResponseEntity<List<TransformDTO>> queryTransformsByProjectId(@PathVariable("project_id") Long projectId,
@@ -67,7 +67,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.queryTransformsByProjectId(projectId, currentStatusId, issueId, issueTypeId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目下所有问题类型所有状态对应的转换")
     @GetMapping(value = "/schemes/query_transforms_map")
     public ResponseEntity<Map<Long, Map<Long, List<TransformDTO>>>> queryTransformsMapByProjectId(@PathVariable("project_id") Long projectId,
@@ -75,7 +75,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.queryTransformsMapByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目下某个问题类型的所有状态")
     @GetMapping(value = "/schemes/query_status_by_issue_type_id")
     public ResponseEntity<List<StatusDTO>> queryStatusByIssueTypeId(@PathVariable("project_id") Long projectId,
@@ -84,7 +84,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.queryStatusByIssueTypeId(projectId, issueTypeId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目下的所有状态")
     @GetMapping(value = "/schemes/query_status_by_project_id")
     public ResponseEntity<List<StatusDTO>> queryStatusByProjectId(@PathVariable("project_id") Long projectId,
@@ -92,7 +92,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.queryStatusByProjectId(projectId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询项目的问题类型对应的状态机id")
     @GetMapping(value = "/schemes/query_state_machine_id")
     public ResponseEntity<Long> queryStateMachineId(@PathVariable("project_id") Long projectId,
@@ -101,7 +101,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.queryStateMachineId(projectId, applyType, issueTypeId), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "【敏捷】新增状态")
     @PostMapping(value = "/schemes/create_status_for_agile")
     public ResponseEntity<StatusDTO> createStatusForAgile(@PathVariable("project_id") Long projectId,
@@ -110,7 +110,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.createStatusForAgile(projectId, applyType, statusDTO), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "【敏捷】校验是否能新增状态")
     @GetMapping(value = "/schemes/check_create_status_for_agile")
     public ResponseEntity<Boolean> checkCreateStatusForAgile(@PathVariable("project_id") Long projectId,
@@ -118,7 +118,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>((Boolean) projectConfigService.checkCreateStatusForAgile(projectId, applyType).get("flag"), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "【敏捷】移除状态")
     @DeleteMapping(value = "/schemes/remove_status_for_agile")
     public ResponseEntity removeStatusForAgile(@PathVariable("project_id") Long projectId,
@@ -128,7 +128,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "【敏捷】校验是否能删除状态")
     @GetMapping(value = "/schemes/check_remove_status_for_agile")
     public ResponseEntity<Boolean> checkRemoveStatusForAgile(@PathVariable("project_id") Long projectId,
@@ -137,7 +137,7 @@ public class SchemeController extends BaseController {
         return new ResponseEntity<>(projectConfigService.checkRemoveStatusForAgile(projectId, statusId, applyType), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "根据项目id查询组织默认优先级")
     @GetMapping("/priority/default")
     public ResponseEntity<PriorityDTO> queryDefaultByOrganizationId(@ApiParam(value = "项目id", required = true)
@@ -148,7 +148,7 @@ public class SchemeController extends BaseController {
                 .orElseThrow(() -> new CommonException("error.priority.get"));
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "根据项目id查询组织优先级列表")
     @GetMapping("/priority/list_by_org")
     public ResponseEntity<List<PriorityDTO>> queryByOrganizationIdList(@ApiParam(value = "项目id", required = true)
@@ -159,7 +159,7 @@ public class SchemeController extends BaseController {
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
     }
 
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "查询工作流第一个状态")
     @GetMapping("/status/query_first_status")
     public ResponseEntity<Long> queryWorkFlowFirstStatus(@ApiParam(value = "项目id", required = true)

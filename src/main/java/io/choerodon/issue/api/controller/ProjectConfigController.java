@@ -1,14 +1,17 @@
 package io.choerodon.issue.api.controller;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
 import io.choerodon.issue.api.service.ProjectConfigService;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author shinan.chen
@@ -21,7 +24,7 @@ public class ProjectConfigController {
     @Autowired
     ProjectConfigService projectConfigService;
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "获取项目配置方案信息")
     @GetMapping
     public ResponseEntity<ProjectConfigDetailDTO> queryById(@PathVariable("project_id") Long projectId) {
