@@ -1,11 +1,10 @@
 package io.choerodon.issue.infra.feign.fallback;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.infra.feign.UserFeignClient;
-import io.choerodon.issue.infra.feign.dto.CreateUserWithRolesDTO;
 import io.choerodon.issue.infra.feign.dto.UserSearchDTO;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class UserFeignClientFallback implements UserFeignClient {
 
 
     @Override
-    public ResponseEntity<Page<UserDTO>> queryUserInOrg(Long organizationId, PageRequest pageRequest, UserSearchDTO user) {
+    public ResponseEntity<PageInfo<UserDTO>> queryUserInOrg(Long organizationId, PageRequest pageRequest, UserSearchDTO user) {
         throw new CommonException("error.userFeign.queryUserInOrg");
     }
 
@@ -36,7 +35,7 @@ public class UserFeignClientFallback implements UserFeignClient {
     }
 
     @Override
-    public ResponseEntity<Page<ProjectDTO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size) {
+    public ResponseEntity<PageInfo<ProjectDTO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size) {
         throw new CommonException("error.iamServiceFeignFallback.queryProjectsByOrgId");
     }
 }

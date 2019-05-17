@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.feign;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.infra.feign.dto.UserSearchDTO;
@@ -30,8 +30,8 @@ public interface UserFeignClient {
      * @return
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/users/search")
-    ResponseEntity<Page<UserDTO>> queryUserInOrg(@PathVariable("organization_id") Long organizationId, @RequestParam("pageRequest") PageRequest pageRequest,
-                                                 @RequestBody UserSearchDTO user);
+    ResponseEntity<PageInfo<UserDTO>> queryUserInOrg(@PathVariable("organization_id") Long organizationId, @RequestParam("pageRequest") PageRequest pageRequest,
+                                                     @RequestBody UserSearchDTO user);
 
     /**
      * 根据id列表获取用户信息
@@ -60,7 +60,7 @@ public interface UserFeignClient {
      * @return
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/projects")
-    ResponseEntity<Page<ProjectDTO>> queryProjectsByOrgId(@PathVariable("organization_id") Long organizationId,
-                                                          @RequestParam(value = "page", required = false) Integer page,
-                                                          @RequestParam(value = "size", required = false) Integer size);
+    ResponseEntity<PageInfo<ProjectDTO>> queryProjectsByOrgId(@PathVariable("organization_id") Long organizationId,
+                                                              @RequestParam(value = "page", required = false) Integer page,
+                                                              @RequestParam(value = "size", required = false) Integer size);
 }

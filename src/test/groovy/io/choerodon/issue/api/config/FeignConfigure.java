@@ -1,6 +1,7 @@
 package io.choerodon.issue.api.config;
 
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.asgard.saga.dto.SagaInstanceDTO;
 import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
@@ -55,11 +56,11 @@ public class FeignConfigure {
         projectDTO.setName("test");
         projectDTO.setOrganizationId(1L);
         Mockito.when(userFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectDTO, HttpStatus.OK));
-        Page<ProjectDTO> projectDTOS = new Page<>();
+        PageInfo<ProjectDTO> projectDTOS = new PageInfo<>();
         List<ProjectDTO> projectDTOList = new ArrayList<>(1);
         projectDTOList.add(projectDTO);
-        projectDTOS.setContent(projectDTOList);
-        projectDTOS.setTotalPages(1);
+        projectDTOS.setList(projectDTOList);
+        projectDTOS.setPageSize(1);
         projectDTOS.setSize(1);
         Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(new ResponseEntity<>(projectDTOS, HttpStatus.OK));
         return userFeignClient;
