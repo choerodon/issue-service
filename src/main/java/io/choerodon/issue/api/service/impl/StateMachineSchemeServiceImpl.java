@@ -62,7 +62,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     @Override
     public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
         //查询出组织下的所有项目
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999).getBody().getContent();
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId, x -> x));
         //查询组织下的所有问题类型
         List<IssueType> issueTypes = issueTypeMapper.queryByOrgId(organizationId);

@@ -245,7 +245,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
     @Override
     public Long checkDelete(Long organizationId, Long id) {
         //查询出组织下的所有项目
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999).getBody().getContent();
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
         if (projectIds == null || projectIds.isEmpty()) {
@@ -263,7 +263,7 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
         }
         checkLastPriority(organizationId, priorityId);
         Priority priority = priorityMapper.selectByPrimaryKey(priorityId);
-        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 0, 999).getBody().getContent();
+        List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         List<Long> projectIds = projectDTOs.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
         if (projectIds == null || projectIds.isEmpty()) {
