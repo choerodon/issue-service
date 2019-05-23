@@ -230,6 +230,7 @@ const enUS = {
   'stateMachine.node.deleteInfo': 'Unable to delete status',
   'stateMachine.node.deleteDes': 'There are {count} issues using this state, and to delete the state, you need to convert the issues to a different state.',
   'stateMachine.transfer.deleteTip': 'Please select the transform you want to delete.',
+  'stateMachine.transfer.deleteConfirm': 'Confirm delete transfer？',
   'stateMachine.draft': 'Draft',
   'stateMachine.publish': 'Publish',
   'stateMachine.publish.success': 'Publish Success!',

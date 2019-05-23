@@ -10,7 +10,7 @@ class TypeTag extends Component {
       data, showName, style, iconStyle,
     } = this.props;
     return (
-      <div className="c7n-typeTag" style={style}>
+      <div className="c7n-issue-typeTag" style={style}>
         <Icon
           style={{
             fontSize: '26px',

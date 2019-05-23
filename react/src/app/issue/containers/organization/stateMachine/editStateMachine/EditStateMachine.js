@@ -1469,7 +1469,7 @@ class EditStateMachine extends Component {
                 type="primary"
                 onClick={() => this.handleConfig(this.state.selectedCell)}
               ><FormattedMessage id="stateMachine.config" /></Button>
-              <Popconfirm title={<FormattedMessage id="pageScheme.related.deleteTip" />} onConfirm={() => this.removeCell(this.state.selectedCell)}>
+              <Popconfirm title={<FormattedMessage id="stateMachine.transfer.deleteConfirm" />} onConfirm={() => this.removeCell(this.state.selectedCell)}>
                 <Button
                   disabled={selectedCell && selectedCell.status !== 'transform_custom'}
                   className="graph-card-btn"
