@@ -1,15 +1,15 @@
 {
   "name": "@choerodon/issue",
   "routeName": "issue",
-  "version": "0.1.0",
+  "version": "0.17.0",
   "description": "",
   "main": "./react/src/app/issue/containers/ISSUEIndex.js",
   "files": [
     "lib"
   ],
   "dependencies": {
-    "@choerodon/boot": "0.1.x",
-    "@choerodon/master": "0.1.x",
+    "@choerodon/boot": "0.17.x",
+    "@choerodon/master": "0.17.x",
     "immutability-helper": "^2.7.1",
     "mxgraph-js": "^1.0.1",
     "react-beautiful-dnd": "9.0.2",

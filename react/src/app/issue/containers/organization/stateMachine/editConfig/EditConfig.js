@@ -840,7 +840,7 @@ class EditConfig extends Component {
                                 targetData.conditions.map(item => (
                                   <div key={item.id} className={`${prefixCls}-tab-list`}>
                                     {item.codeDescription || ''}
-                                    <Popconfirm title={<FormattedMessage id="pageScheme.related.deleteTip" />} onConfirm={() => this.onDelete(item.id)}>
+                                    <Popconfirm title={<FormattedMessage id="stateMachine.transfer.deleteConfirm" />} onConfirm={() => this.onDelete(item.id)}>
                                       <Button className="action" shape="circle" size={'small'}>
                                         <span className="icon icon-delete" />
                                       </Button>
@@ -884,7 +884,7 @@ class EditConfig extends Component {
                               targetData.validators.map(item => (
                                 <div key={item.id} className={`${prefixCls}-tab-list`}>
                                   {item.codeDescription || ''}
-                                  <Popconfirm title={<FormattedMessage id="pageScheme.related.deleteTip" />} onConfirm={() => this.onDelete(item.id)}>
+                                  <Popconfirm title={<FormattedMessage id="stateMachine.transfer.deleteConfirm" />} onConfirm={() => this.onDelete(item.id)}>
                                     <Button className="action" shape="circle" size={'small'}>
                                       <span className="icon icon-delete" />
                                     </Button>
@@ -928,7 +928,7 @@ class EditConfig extends Component {
                               targetData.postpositions.map(item => (
                                 <div key={item.id} className={`${prefixCls}-tab-list`}>
                                   {item.codeDescription || ''}
-                                  <Popconfirm title={<FormattedMessage id="pageScheme.related.deleteTip" />} onConfirm={() => this.onDelete(item.id)}>
+                                  <Popconfirm title={<FormattedMessage id="stateMachine.transfer.deleteConfirm" />} onConfirm={() => this.onDelete(item.id)}>
                                     <Button className="action" shape="circle" size={'small'}>
                                       <span className="icon icon-delete" />
                                     </Button>
