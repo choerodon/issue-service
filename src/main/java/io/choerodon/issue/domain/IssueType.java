@@ -1,23 +1,20 @@
 package io.choerodon.issue.domain;
 
 import com.google.common.base.MoreObjects;
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+
+import io.choerodon.mybatis.entity.BaseDTO;
 
 /**
  * @author shinan.chen
  * @date 2018/8/8
  */
-@ModifyAudit
-@VersionAudit
 @Table(name = "issue_type")
-public class IssueType extends AuditDomain {
+public class IssueType extends BaseDTO {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String icon;

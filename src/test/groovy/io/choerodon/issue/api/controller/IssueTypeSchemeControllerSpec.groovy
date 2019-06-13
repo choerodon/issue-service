@@ -6,7 +6,7 @@ import io.choerodon.issue.api.dto.IssueTypeSchemeDTO
 import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO
 import io.choerodon.issue.api.service.IssueTypeSchemeService
 import io.choerodon.issue.api.service.IssueTypeService
-import io.choerodon.core.domain.Page
+import com.github.pagehelper.PageInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -188,7 +188,7 @@ class IssueTypeSchemeControllerSpec extends Specification {
 //            url = url + "&param=" + param
 //        }
 //        when: '分页查询'
-//        ParameterizedTypeReference<Page<IssueTypeSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<IssueTypeSchemeDTO>>() {
+//        ParameterizedTypeReference<PageInfo<IssueTypeSchemeDTO>> typeRef = new ParameterizedTypeReference<PageInfo<IssueTypeSchemeDTO>>() {
 //        }
 //        def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 //
@@ -287,7 +287,7 @@ class IssueTypeSchemeControllerSpec extends Specification {
         issueTypeSchemeSearchDTO.param = "XX"
         HttpEntity<IssueTypeSchemeSearchDTO> httpEntity = new HttpEntity<>(issueTypeSchemeSearchDTO)
         when: '分页查询问题类型方案列表'
-        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type_scheme/list?page={page}&&size={size}", HttpMethod.POST, httpEntity, Page, organizationId, 1, 1000)
+        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type_scheme/list?page={page}&&size={size}", HttpMethod.POST, httpEntity, PageInfo, organizationId, 1, 1000)
 
         then: '状态码为200，调用成功'
         entity.statusCode.is2xxSuccessful()

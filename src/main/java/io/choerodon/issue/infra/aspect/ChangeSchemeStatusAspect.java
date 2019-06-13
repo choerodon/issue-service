@@ -5,6 +5,8 @@ import io.choerodon.issue.api.service.StateMachineSchemeService;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
+import io.choerodon.mybatis.entity.Criteria;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -53,7 +55,9 @@ public class ChangeSchemeStatusAspect {
         }
         if (scheme.getStatus().equals(StateMachineSchemeStatus.ACTIVE)) {
             scheme.setStatus(StateMachineSchemeStatus.DRAFT);
-            stateMachineSchemeService.updateOptional(scheme, "status");
+            Criteria criteria = new Criteria();
+            criteria.update("status");
+            schemeMapper.updateByPrimaryKeyOptions(scheme, criteria);
         }
 
         try {

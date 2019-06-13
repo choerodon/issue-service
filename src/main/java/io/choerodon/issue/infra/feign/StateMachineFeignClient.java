@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.feign;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
@@ -54,7 +54,7 @@ public interface StateMachineFeignClient {
      * @return
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/state_machines")
-    ResponseEntity<Page<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
+    ResponseEntity<PageInfo<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size,
                                                       @RequestParam(value = "sort", required = false) String[] sort,

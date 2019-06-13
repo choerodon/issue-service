@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.controller
 
-import io.choerodon.core.domain.Page
+import com.github.pagehelper.PageInfo
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO
@@ -66,7 +66,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         if (param != null) {
             url = url + "&param=" + param
         }
-        ParameterizedTypeReference<Page<StateMachineSchemeDTO>> typeRef = new ParameterizedTypeReference<Page<StateMachineSchemeDTO>>() {
+        ParameterizedTypeReference<PageInfo<StateMachineSchemeDTO>> typeRef = new ParameterizedTypeReference<PageInfo<StateMachineSchemeDTO>>() {
         }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 

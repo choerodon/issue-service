@@ -2,7 +2,7 @@ package io.choerodon.issue.api.controller;
 
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.enums.ResourceType;
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.payload.ChangeStatus;
 import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
@@ -34,7 +34,7 @@ public class StateMachineController {
     @ApiOperation(value = "分页查询状态机列表")
     @CustomPageRequest
     @GetMapping
-    public ResponseEntity<Page<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
+    public ResponseEntity<PageInfo<StateMachineDTO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
                                                              @RequestParam(required = false) Integer page,
                                                              @RequestParam(required = false) Integer size,
                                                              @RequestParam(required = false) String[] sort,

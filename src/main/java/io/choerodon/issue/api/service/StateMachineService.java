@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.issue.api.dto.payload.ChangeStatus;
 import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
@@ -27,7 +27,7 @@ public interface StateMachineService {
      * @param param          模糊查询参数
      * @return 状态机列表
      */
-    ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param);
+    ResponseEntity<PageInfo<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param);
 
     /**
      * 删除状态机

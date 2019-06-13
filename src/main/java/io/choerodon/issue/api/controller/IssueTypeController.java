@@ -1,19 +1,18 @@
 package io.choerodon.issue.api.controller;
 
 import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.domain.PageRequest;
+import io.choerodon.base.domain.Sort;
 import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.base.BaseController;
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
-import io.choerodon.issue.api.eventhandler.IssueEventHandler;
 import io.choerodon.issue.api.service.IssueTypeService;
-import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.choerodon.mybatis.annotation.SortDefault;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -74,7 +73,7 @@ public class IssueTypeController extends BaseController {
     @ApiOperation(value = "分页查询问题类型列表")
     @CustomPageRequest
     @PostMapping("/list")
-    public ResponseEntity<Page<IssueTypeWithInfoDTO>> queryIssueTypeList(@ApiIgnore
+    public ResponseEntity<PageInfo<IssueTypeWithInfoDTO>> queryIssueTypeList(@ApiIgnore
                                                                          @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                          @ApiParam(value = "组织id", required = true)
                                                                          @PathVariable("organization_id") Long organizationId,

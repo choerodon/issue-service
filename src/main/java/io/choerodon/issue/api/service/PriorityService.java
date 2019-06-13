@@ -1,8 +1,6 @@
 package io.choerodon.issue.api.service;
 
 import io.choerodon.issue.api.dto.PriorityDTO;
-import io.choerodon.issue.domain.Priority;
-import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +9,7 @@ import java.util.Map;
  * @author cong.cheng
  * @Date 2018/8/21
  */
-public interface PriorityService extends BaseService<Priority> {
+public interface PriorityService {
     /**
      * 查询组织下优先级列表
      *

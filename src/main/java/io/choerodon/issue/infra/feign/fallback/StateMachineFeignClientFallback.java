@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.feign.fallback;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
@@ -32,7 +32,7 @@ public class StateMachineFeignClientFallback implements StateMachineFeignClient 
     }
 
     @Override
-    public ResponseEntity<Page<StateMachineDTO>> pagingQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
+    public ResponseEntity<PageInfo<StateMachineDTO>> pagingQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
         throw new CommonException("error.stateMachineFeignClient.pagingQuery");
     }
 

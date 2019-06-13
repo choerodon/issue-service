@@ -1,10 +1,9 @@
 package io.choerodon.issue.domain;
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
+import io.choerodon.mybatis.entity.BaseDTO;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,12 +11,10 @@ import javax.persistence.Table;
  * @author shinan.chen
  * @date 2018/9/4
  */
-@ModifyAudit
-@VersionAudit
 @Table(name = "project_config")
-public class ProjectConfig extends AuditDomain {
+public class ProjectConfig extends BaseDTO {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long projectId;

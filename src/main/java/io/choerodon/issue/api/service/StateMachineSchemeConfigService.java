@@ -3,8 +3,6 @@ package io.choerodon.issue.api.service;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
-import io.choerodon.issue.domain.StateMachineSchemeConfigDraft;
-import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
 
@@ -12,7 +10,7 @@ import java.util.List;
  * @author shinan.chen
  * @Date 2018/8/2
  */
-public interface StateMachineSchemeConfigService extends BaseService<StateMachineSchemeConfigDraft> {
+public interface StateMachineSchemeConfigService {
 
     /**
      * 根据状态机id删除配置

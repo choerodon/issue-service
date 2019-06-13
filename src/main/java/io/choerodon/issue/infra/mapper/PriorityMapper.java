@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.mapper;
 
 import io.choerodon.issue.domain.Priority;
-import io.choerodon.mybatis.common.BaseMapper;
+import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @Date 2018/8/21
  */
 @Component
-public interface PriorityMapper extends BaseMapper<Priority> {
+public interface PriorityMapper extends Mapper<Priority> {
     /**
      * 查询优先级表
      *

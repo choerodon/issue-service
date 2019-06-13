@@ -4,7 +4,7 @@ import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.IssueTypeDTO
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO
 import io.choerodon.issue.api.service.IssueTypeService
-import io.choerodon.core.domain.Page
+import com.github.pagehelper.PageInfo
 import io.choerodon.issue.infra.mapper.IssueTypeMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -168,7 +168,7 @@ class IssueTypeControllerSpec extends Specification {
         issueTypeSearchDTO.description = description
         issueTypeSearchDTO.param = param
         when: '分页查询'
-        ParameterizedTypeReference<Page<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<Page<IssueTypeDTO>>() {}
+        ParameterizedTypeReference<PageInfo<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<PageInfo<IssueTypeDTO>>() {}
         HttpEntity<IssueTypeSearchDTO> issueTypeSearchDTOHttpEntity = new HttpEntity<>(issueTypeSearchDTO)
         def entity = restTemplate.exchange(url, HttpMethod.POST, issueTypeSearchDTOHttpEntity, typeRef, organizationId, 0, 10000)
 

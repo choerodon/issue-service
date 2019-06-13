@@ -7,7 +7,7 @@ import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.asgard.saga.feign.SagaClientCallback;
 import io.choerodon.core.convertor.ApplicationContextHelper;
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
@@ -136,7 +136,7 @@ public class FeignConfigure {
         stateMachineDTO.setId(1L);
         Mockito.when(stateMachineFeignClient.queryStateMachineById(Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(stateMachineDTO, HttpStatus.OK));
         Mockito.when(stateMachineFeignClient.queryDefaultStateMachine(Matchers.anyLong())).thenReturn(new ResponseEntity<>(stateMachineDTO, HttpStatus.OK));
-        Page<StateMachineDTO> page = new Page<>();
+        PageInfo<StateMachineDTO> page = new PageInfo<>();
         page.setNumber(1);
         page.setSize(1);
         page.setTotalPages(1);

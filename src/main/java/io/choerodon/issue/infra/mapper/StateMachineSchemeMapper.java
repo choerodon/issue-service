@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.mapper;
 
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.mybatis.common.BaseMapper;
+import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @author peng.jiang@hand-china.com
  */
 @Component
-public interface StateMachineSchemeMapper extends BaseMapper<StateMachineScheme> {
+public interface StateMachineSchemeMapper extends Mapper<StateMachineScheme> {
 
     /**
      * 分页查询状态方案

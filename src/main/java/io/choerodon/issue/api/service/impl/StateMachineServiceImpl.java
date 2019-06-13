@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.AddStatusWithProject;
@@ -58,10 +58,10 @@ public class StateMachineServiceImpl implements StateMachineService {
     private StateMachineFeignClient stateMachineFeignClient;
 
     @Override
-    public ResponseEntity<Page<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
-        ResponseEntity<Page<StateMachineDTO>> responseEntity = stateMachineFeignClient.pagingQuery(organizationId, page, size, sort, name, description, param);
-        if (responseEntity != null && responseEntity.getBody() != null && responseEntity.getBody().getContent() != null) {
-            for (StateMachineDTO stateMachineDTO : responseEntity.getBody().getContent()) {
+    public ResponseEntity<PageInfo<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param) {
+        ResponseEntity<PageInfo<StateMachineDTO>> responseEntity = stateMachineFeignClient.pagingQuery(organizationId, page, size, sort, name, description, param);
+        if (responseEntity != null && responseEntity.getBody() != null && responseEntity.getBody().getList() != null) {
+            for (StateMachineDTO stateMachineDTO : responseEntity.getBody().getList()) {
                 List<StateMachineSchemeDTO> list = schemeService.querySchemeByStateMachineId(organizationId, stateMachineDTO.getId());
                 //列表去重
                 List<StateMachineSchemeDTO> unique = list.stream().collect(
