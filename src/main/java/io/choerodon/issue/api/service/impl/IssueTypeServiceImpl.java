@@ -16,6 +16,8 @@ import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
+import io.choerodon.issue.infra.utils.PageUtil;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,14 +126,8 @@ public class IssueTypeServiceImpl implements IssueTypeService {
             issueTypeWithInfoDTOList.addAll(modelMapper.map(issueTypeMapper.queryIssueTypeList(organizationId, issuetypeIdsPage.getList()), new TypeToken<List<IssueTypeWithInfoDTO>>() {
             }.getType()));
         }
-//        PageInfo<IssueTypeWithInfoDTO> returnPage = new PageInfo<>();
-//        returnPage.setContent(issueTypeWithInfoDTOList);
-//        returnPage.setNumber(issuetypeIdsPage.getNumber());
-//        returnPage.setNumberOfElements(issuetypeIdsPage.getNumberOfElements());
-//        returnPage.setSize(issuetypeIdsPage.getSize());
-//        returnPage.setTotalElements(issuetypeIdsPage.getTotalElements());
-//        returnPage.setTotalPages(issuetypeIdsPage.getTotalPages());
-        return new PageInfo<>(issueTypeWithInfoDTOList);
+
+        return PageUtil.buildPageInfoWithPageInfoList(issuetypeIdsPage, issueTypeWithInfoDTOList);
     }
 
     @Override

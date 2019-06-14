@@ -21,6 +21,7 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
+import io.choerodon.issue.infra.utils.PageUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 
 import org.modelmapper.ModelMapper;
@@ -263,14 +264,8 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
                 }
             }
         }
-//        PageInfo<IssueTypeSchemeWithInfoDTO> returnPage = new PageInfo<>(issueTypeSchemeWithInfoDTOList);
-//        returnPage.setContent(issueTypeSchemeWithInfoDTOList);
-//        returnPage.setNumber(issueTypeSchemeIdsPage.getNumber());
-//        returnPage.setNumberOfElements(issueTypeSchemeIdsPage.getNumberOfElements());
-//        returnPage.setSize(issueTypeSchemeIdsPage.getSize());
-//        returnPage.setTotalElements(issueTypeSchemeIdsPage.getTotalElements());
-//        returnPage.setTotalPages(issueTypeSchemeIdsPage.getTotalPages());
-        return new PageInfo<>(issueTypeSchemeWithInfoDTOList);
+
+        return PageUtil.buildPageInfoWithPageInfoList(issueTypeSchemeIdsPage, issueTypeSchemeWithInfoDTOList);
     }
 
     /**

@@ -22,6 +22,7 @@ import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
+import io.choerodon.issue.infra.utils.PageUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.entity.Criteria;
 
@@ -87,14 +88,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
             handleSchemeConfig(schemeDTOS, issueTypeMap, stateMachineDTOMap);
         }
 
-//        PageInfo<StateMachineSchemeDTO> returnPage = new PageInfo<>();
-//        returnPage.setContent(schemeDTOS);
-//        returnPage.setNumber(page.getNumber());
-//        returnPage.setNumberOfElements(page.getNumberOfElements());
-//        returnPage.setSize(page.getSize());
-//        returnPage.setTotalElements(page.getTotalElements());
-//        returnPage.setTotalPages(page.getTotalPages());
-        return new PageInfo<>(schemeDTOS);
+        return PageUtil.buildPageInfoWithPageInfoList(page, schemeDTOS);
     }
 
     @Override
