@@ -239,17 +239,17 @@ class StateMachineSchemeStore {
   loadStateMachineSchemeList = (orgId, pagination = this.pagination, sort = { field: 'id', order: 'desc' }, map = {}) => {
     this.setIsLoading(true);
     const { current, pageSize } = pagination;
-    return axios.get(`/issue/v1/organizations/${orgId}/state_machine_scheme?page=${current - 1}&size=${pageSize}&${querystring.stringify(map)}&sort=${sort.field},${sort.order}`)
+    return axios.get(`/issue/v1/organizations/${orgId}/state_machine_scheme?page=${current}&size=${pageSize}&${querystring.stringify(map)}&sort=${sort.field},${sort.order}`)
       .then(
         action((data) => {
           this.setIsLoading(false);
           if (data && data.failed) {
             return Promise.reject(data.message);
           } else {
-            this.setStateMachineSchemeList(data.content);
+            this.setStateMachineSchemeList(data.list);
             this.pagination = {
               ...pagination,
-              total: data.totalElements,
+              total: data.total,
             };
             return Promise.resolve(data);
           }
@@ -261,21 +261,19 @@ class StateMachineSchemeStore {
       });
   };
 
-  createStateMachineScheme = (stateMachineScheme, organizationId) => {
-    returnaxios
-      .post(
-        `/issue/v1/organizations/${organizationId}/state_machine_scheme`,
-        JSON.stringify(stateMachineScheme),
-      )
-      .then(
-        action(() => {
-          this.loadStateMachineSchemeList(organizationId);
-        }),
-      )
-      .catch(() => {
-        Choerodon.prompt('保存失败');
-      });
-  };
+  createStateMachineScheme = (stateMachineScheme, organizationId) => axios
+    .post(
+      `/issue/v1/organizations/${organizationId}/state_machine_scheme`,
+      JSON.stringify(stateMachineScheme),
+    )
+    .then(
+      action(() => {
+        this.loadStateMachineSchemeList(organizationId);
+      }),
+    )
+    .catch(() => {
+      Choerodon.prompt('保存失败');
+    });
 
   editStateMachineScheme = (orgId, schemeId, data) => axios
     .put(`/issue/v1/organizations/${orgId}/state_machine_scheme/${schemeId}`, JSON.stringify(data));

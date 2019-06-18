@@ -17,9 +17,9 @@ class IssueTypeStore {
   };
 
   @action setPageInfo(page) {
-    this.pageInfo.current = page.number + 1;
-    this.pageInfo.total = page.totalElements;
-    this.pageInfo.pageSize = page.size;
+    this.pageInfo.current = page.pageNum;
+    this.pageInfo.total = page.total;
+    this.pageInfo.pageSize = page.pageSize;
   }
 
   @computed get getPageInfo() {
@@ -60,7 +60,7 @@ class IssueTypeStore {
 
   loadIssueType = (
     orgId,
-    page = this.pageInfo.current - 1,
+    page = this.pageInfo.current,
     pageSize = this.pageInfo.pageSize,
     sort = { field: 'id', order: 'desc' },
     param = {},
@@ -72,9 +72,8 @@ class IssueTypeStore {
     ).then((data) => {
       const res = this.handleProptError(data);
       if (res) {
-        this.setIssueTypes(data.content);
-        const { number, size, totalElements } = data;
-        this.setPageInfo({ number, size, totalElements });
+        this.setIssueTypes(data.list);
+        this.setPageInfo(data);
       }
       this.setIsLoading(false);
     });

@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Table, Button, Modal, Form, Select, Input, Tooltip, message } from 'choerodon-ui';
+import {
+  Table, Button, Modal, Form, Select, Input, Tooltip, message, 
+} from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { Content, Header, Page, Permission, stores } from '@choerodon/boot';
+import {
+  Content, Header, Page, Permission, stores, 
+} from '@choerodon/boot';
 import '../../../main.scss';
 import './StateMachineList.scss';
 
 const { AppState } = stores;
-const Sidebar = Modal.Sidebar;
+const { Sidebar } = Modal;
 const FormItem = Form.Item;
-const TextArea = Input.TextArea;
-const Option = Select.Option;
+const { TextArea } = Input;
+const { Option } = Select;
 const prefixCls = 'issue-state-machine';
 const formItemLayout = {
   labelCol: {
@@ -30,7 +34,7 @@ class StateMachineList extends Component {
     const menu = AppState.currentMenuType;
     super(props);
     this.state = {
-      page: 0,
+      page: 1,
       pageSize: 10,
       id: '',
       organizationId: menu.organizationId,
@@ -82,11 +86,13 @@ class StateMachineList extends Component {
         </Tooltip>
         {!(record && record.stateMachineSchemeDTOs && record.stateMachineSchemeDTOs.length)
         && !record.default
-          ? <Tooltip placement="top" title={<FormattedMessage id="delete" />}>
-            <Button shape="circle" size="small" onClick={this.confirmDelete.bind(this, record)}>
-              <i className="icon icon-delete" />
-            </Button>
-          </Tooltip> : <div className="issue-del-space" />
+          ? (
+            <Tooltip placement="top" title={<FormattedMessage id="delete" />}>
+              <Button shape="circle" size="small" onClick={this.confirmDelete.bind(this, record)}>
+                <i className="icon icon-delete" />
+              </Button>
+            </Tooltip>
+          ) : <div className="issue-del-space" />
         }
       </div>
     ),
@@ -120,14 +126,14 @@ class StateMachineList extends Component {
     history.push(`/issue/state-machine-schemes/edit/${schemeId}?type=organization&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}&fromMachine=true`);
   };
 
-  loadStateMachine = (page = 0, size = 10, sort = { field: 'id', order: 'desc' }, param = {}) => {
+  loadStateMachine = (page = 1, size = 10, sort = { field: 'id', order: 'desc' }, param = {}) => {
     const { StateMachineStore } = this.props;
     const { organizationId } = this.state;
     StateMachineStore.loadStateMachineList(organizationId, sort, { page, size, ...param })
       .then((data) => {
         this.setState({
-          statesMachineList: data.content,
-          total: data.totalElements,
+          statesMachineList: data.list,
+          total: data.total,
         });
       });
   };
@@ -148,12 +154,12 @@ class StateMachineList extends Component {
       param: param.toString(),
     };
     this.setState({
-      page: pagination.current - 1,
+      page: pagination.current,
       pageSize: pagination.pageSize,
       sorter: sorter.column ? sorter : undefined,
       tableParam: postData,
     });
-    this.loadStateMachine(pagination.current - 1, pagination.pageSize, sorter.column ? sorter : undefined, postData);
+    this.loadStateMachine(pagination.current, pagination.pageSize, sorter.column ? sorter : undefined, postData);
   };
 
   handleSubmit = () => {
@@ -204,7 +210,9 @@ class StateMachineList extends Component {
 
   handleDelete = () => {
     const { StateMachineStore, intl } = this.props;
-    const { organizationId, deleteId, page, pageSize, sorter, tableParam } = this.state;
+    const {
+      organizationId, deleteId, page, pageSize, sorter, tableParam, 
+    } = this.state;
     StateMachineStore.deleteStateMachine(organizationId, deleteId)
       .then((data) => {
         if (data) {
@@ -299,7 +307,8 @@ class StateMachineList extends Component {
             )}
           </FormItem>
         </Form>
-      </div>);
+      </div>
+    );
     const pageInfo = {
       defaultCurrent: page,
       defaultPageSize: pageSize,
@@ -309,20 +318,24 @@ class StateMachineList extends Component {
       <Page>
         <Header title={<FormattedMessage id="stateMachine.title" />}>
           {statesMachineList && statesMachineList.length === 0
-            ? <Tooltip placement="bottom" title="请创建项目后再创建状态机">
+            ? (
+              <Tooltip placement="bottom" title="请创建项目后再创建状态机">
+                <Button
+                  disabled
+                >
+                  <i className="icon-add icon" />
+                  <FormattedMessage id="stateMachine.create" />
+                </Button>
+              </Tooltip>
+            )
+            : (
               <Button
-                disabled
+                onClick={() => this.showSideBar('create')}
               >
                 <i className="icon-add icon" />
                 <FormattedMessage id="stateMachine.create" />
               </Button>
-            </Tooltip>
-            : <Button
-              onClick={() => this.showSideBar('create')}
-            >
-              <i className="icon-add icon" />
-              <FormattedMessage id="stateMachine.create" />
-            </Button>
+            )
           }
           <Button onClick={this.refresh}>
             <i className="icon-refresh icon" />
@@ -344,7 +357,8 @@ class StateMachineList extends Component {
             className="issue-table"
           />
         </Content>
-        {this.state.show && <Sidebar
+        {this.state.show && (
+        <Sidebar
           title={<FormattedMessage id={this.state.type === 'create' ? 'stateMachine.create' : 'stateMachine.edit'} />}
           visible={this.state.show}
           onOk={this.handleSubmit}
@@ -354,7 +368,8 @@ class StateMachineList extends Component {
           onCancel={this.hideSidebar}
         >
           {formContent}
-        </Sidebar>}
+        </Sidebar>
+        )}
         <Modal
           title={<FormattedMessage id="stateMachine.delete" />}
           visible={this.state.deleteVisible}
