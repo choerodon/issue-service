@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/issue",
   "routeName": "issue",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "",
   "main": "./react/src/app/issue/containers/ISSUEIndex.js",
   "files": [
