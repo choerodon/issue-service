@@ -1,11 +1,11 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
+
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
 import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @author shinan.chen
  * @Date 2018/8/2
  */
-public interface StateMachineSchemeService extends BaseService<StateMachineScheme> {
+public interface StateMachineSchemeService {
 
     /**
      * 分页查询状态机方案
@@ -23,7 +23,7 @@ public interface StateMachineSchemeService extends BaseService<StateMachineSchem
      * @param params      模糊查询参数
      * @return 状态机方案列表
      */
-    Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params);
+    PageInfo<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params);
 
     /**
      * 创建状态机方案

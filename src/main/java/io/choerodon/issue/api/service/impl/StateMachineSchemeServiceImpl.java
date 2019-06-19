@@ -1,6 +1,9 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.ProjectEvent;
@@ -19,10 +22,10 @@ import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.issue.infra.utils.ConvertUtils;
+import io.choerodon.issue.infra.utils.PageUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.service.BaseServiceImpl;
+import io.choerodon.mybatis.entity.Criteria;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,7 @@ import java.util.stream.Collectors;
  * @Date 2018/8/2
  */
 @Component
-public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineScheme> implements StateMachineSchemeService {
+public class StateMachineSchemeServiceImpl implements StateMachineSchemeService {
 
     private static final String WITHOUT_CONFIG_ISSUE_TYPE_NAME = "未分配类型";
     private static final String WITHOUT_CONFIG_ISSUE_TYPE_ICON = "style";
@@ -60,7 +63,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
     private ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public Page<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
+    public PageInfo<StateMachineSchemeDTO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeDTO schemeDTO, String params) {
         //查询出组织下的所有项目
         List<ProjectDTO> projectDTOs = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         Map<Long, ProjectDTO> projectMap = projectDTOs.stream().collect(Collectors.toMap(ProjectDTO::getId, x -> x));
@@ -72,10 +75,10 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         Map<Long, StateMachineDTO> stateMachineDTOMap = stateMachineDTOS.stream().collect(Collectors.toMap(StateMachineDTO::getId, x -> x));
 
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
-        Page<StateMachineScheme> page = PageHelper.doPageAndSort(pageRequest,
-                () -> schemeMapper.fulltextSearch(scheme, params));
+        PageInfo<StateMachineScheme> page = PageHelper.startPage(pageRequest.getPage(),
+                pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(() -> schemeMapper.fulltextSearch(scheme, params));
 
-        List<StateMachineScheme> schemes = page.getContent();
+        List<StateMachineScheme> schemes = page.getList();
         List<StateMachineScheme> schemesWithConfigs = new ArrayList<>();
         if (!schemes.isEmpty()) {
             schemesWithConfigs = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
@@ -85,14 +88,7 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
             handleSchemeConfig(schemeDTOS, issueTypeMap, stateMachineDTOMap);
         }
 
-        Page<StateMachineSchemeDTO> returnPage = new Page<>();
-        returnPage.setContent(schemeDTOS);
-        returnPage.setNumber(page.getNumber());
-        returnPage.setNumberOfElements(page.getNumberOfElements());
-        returnPage.setSize(page.getSize());
-        returnPage.setTotalElements(page.getTotalElements());
-        returnPage.setTotalPages(page.getTotalPages());
-        return returnPage;
+        return PageUtil.buildPageInfoWithPageInfoList(page, schemeDTOS);
     }
 
     @Override
@@ -337,7 +333,9 @@ public class StateMachineSchemeServiceImpl extends BaseServiceImpl<StateMachineS
         //活跃状态机方案
         if (scheme.getStatus().equals(StateMachineSchemeStatus.CREATE)) {
             scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-            int result = updateOptional(scheme, "status");
+            Criteria criteria = new Criteria();
+            criteria.update("status");
+            int result = schemeMapper.updateByPrimaryKeyOptions(scheme, criteria);
             if (result != 1) {
                 throw new CommonException("error.stateMachineScheme.activeScheme");
             }

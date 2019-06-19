@@ -1,12 +1,11 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.core.domain.Page;
+import io.choerodon.base.domain.PageRequest;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
 import io.choerodon.issue.domain.IssueType;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.Map;
  * @author shinan.chen
  * @Date 2018/8/8
  */
-public interface IssueTypeService extends BaseService<IssueType> {
+public interface IssueTypeService {
 
 
     IssueTypeDTO queryById(Long organizationId, Long issueTypeId);
@@ -28,7 +27,7 @@ public interface IssueTypeService extends BaseService<IssueType> {
 
     Map<String, Object> checkDelete(Long organizationId, Long issueTypeId);
 
-    Page<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO);
+    PageInfo<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO);
 
     Boolean checkName(Long organizationId, String name, Long id);
 

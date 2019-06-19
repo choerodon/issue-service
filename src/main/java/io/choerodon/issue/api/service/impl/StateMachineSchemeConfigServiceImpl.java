@@ -29,7 +29,8 @@ import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
-import io.choerodon.mybatis.service.BaseServiceImpl;
+import io.choerodon.mybatis.entity.Criteria;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Transactional(rollbackFor = Exception.class)
-public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMachineSchemeConfigDraft> implements StateMachineSchemeConfigService {
+public class StateMachineSchemeConfigServiceImpl implements StateMachineSchemeConfigService {
 
     @Autowired
     private StateMachineSchemeConfigMapper configMapper;
@@ -150,7 +151,9 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //更新草稿
         StateMachineSchemeConfigDraft defaultConfig = configDraftMapper.selectDefault(organizationId, schemeId);
         defaultConfig.setStateMachineId(stateMachineId);
-        updateOptional(defaultConfig, "stateMachineId");
+        Criteria criteria = new Criteria();
+        criteria.update("stateMachineId");
+        configDraftMapper.updateByPrimaryKeyOptions(defaultConfig, criteria);
     }
 
     @Override
@@ -319,7 +322,9 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //更新状态机方案状态为：活跃
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-        stateMachineSchemeService.updateOptional(scheme, "status");
+        Criteria criteria = new Criteria();
+        criteria.update("status");
+        schemeMapper.updateByPrimaryKeyOptions(scheme, criteria);
         //发布后，再进行状态增加与减少的判断，并发送saga
         ChangeStatus changeStatus = new ChangeStatus(addStatusIds, deleteStatusIds);
         //发布之前，更新deployStatus为doing
@@ -431,7 +436,9 @@ public class StateMachineSchemeConfigServiceImpl extends BaseServiceImpl<StateMa
         //更新状态机方案状态为：活跃
         StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
         scheme.setStatus(StateMachineSchemeStatus.ACTIVE);
-        stateMachineSchemeService.updateOptional(scheme, "status");
+        Criteria criteria = new Criteria();
+        criteria.update("status");
+        schemeMapper.updateByPrimaryKeyOptions(scheme, criteria);
         return stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, schemeId);
     }
 

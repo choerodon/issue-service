@@ -1,6 +1,9 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
@@ -13,9 +16,8 @@ import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.feign.StateMachineFeignClient;
 import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.service.BaseServiceImpl;
+import io.choerodon.issue.infra.utils.PageUtil;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @RefreshScope
-public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements IssueTypeService {
+public class IssueTypeServiceImpl implements IssueTypeService {
 
     @Autowired
     private IssueTypeMapper issueTypeMapper;
@@ -117,21 +119,15 @@ public class IssueTypeServiceImpl extends BaseServiceImpl<IssueType> implements 
     }
 
     @Override
-    public Page<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO) {
-        Page<Long> issuetypeIdsPage = PageHelper.doPageAndSort(pageRequest, () -> issueTypeMapper.selectIssueTypeIds(organizationId, issueTypeSearchDTO));
-        List<IssueTypeWithInfoDTO> issueTypeWithInfoDTOList = new ArrayList<>(issuetypeIdsPage.getContent().size());
-        if (issuetypeIdsPage.getContent() != null && !issuetypeIdsPage.getContent().isEmpty()) {
-            issueTypeWithInfoDTOList.addAll(modelMapper.map(issueTypeMapper.queryIssueTypeList(organizationId, issuetypeIdsPage.getContent()), new TypeToken<List<IssueTypeWithInfoDTO>>() {
+    public PageInfo<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO) {
+        PageInfo<Long> issuetypeIdsPage = PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(() -> issueTypeMapper.selectIssueTypeIds(organizationId, issueTypeSearchDTO));
+        List<IssueTypeWithInfoDTO> issueTypeWithInfoDTOList = new ArrayList<>(issuetypeIdsPage.getList().size());
+        if (issuetypeIdsPage.getList() != null && !issuetypeIdsPage.getList().isEmpty()) {
+            issueTypeWithInfoDTOList.addAll(modelMapper.map(issueTypeMapper.queryIssueTypeList(organizationId, issuetypeIdsPage.getList()), new TypeToken<List<IssueTypeWithInfoDTO>>() {
             }.getType()));
         }
-        Page<IssueTypeWithInfoDTO> returnPage = new Page<>();
-        returnPage.setContent(issueTypeWithInfoDTOList);
-        returnPage.setNumber(issuetypeIdsPage.getNumber());
-        returnPage.setNumberOfElements(issuetypeIdsPage.getNumberOfElements());
-        returnPage.setSize(issuetypeIdsPage.getSize());
-        returnPage.setTotalElements(issuetypeIdsPage.getTotalElements());
-        returnPage.setTotalPages(issuetypeIdsPage.getTotalPages());
-        return returnPage;
+
+        return PageUtil.buildPageInfoWithPageInfoList(issuetypeIdsPage, issueTypeWithInfoDTOList);
     }
 
     @Override

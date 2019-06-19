@@ -1,13 +1,12 @@
 package io.choerodon.issue.api.service;
 
-import io.choerodon.core.domain.Page;
+import io.choerodon.base.domain.PageRequest;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeWithInfoDTO;
 import io.choerodon.issue.domain.IssueTypeScheme;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.service.BaseService;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,7 @@ import java.util.Map;
  * @author shinan.chen
  * @Date 2018/8/10
  */
-public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
+public interface IssueTypeSchemeService {
 
     /**
      * 查询方案
@@ -107,5 +106,5 @@ public interface IssueTypeSchemeService extends BaseService<IssueTypeScheme> {
      */
     void initByConsumeCreateProgram(Long projectId, String projectCode);
 
-    Page<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeDTO);
+    PageInfo<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeDTO);
 }

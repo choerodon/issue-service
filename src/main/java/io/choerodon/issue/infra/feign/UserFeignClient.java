@@ -1,11 +1,12 @@
 package io.choerodon.issue.infra.feign;
 
 import com.github.pagehelper.PageInfo;
+
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.UserDTO;
 import io.choerodon.issue.infra.feign.dto.UserSearchDTO;
 import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

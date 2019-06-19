@@ -10,7 +10,8 @@ import io.choerodon.issue.domain.Priority;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
-import io.choerodon.mybatis.service.BaseServiceImpl;
+import io.choerodon.mybatis.entity.Criteria;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements PriorityService {
+public class PriorityServiceImpl implements PriorityService {
 
     @Autowired
     private PriorityMapper priorityMapper;
@@ -234,7 +235,9 @@ public class PriorityServiceImpl extends BaseServiceImpl<Priority> implements Pr
             throw new CommonException(NOT_FOUND);
         }
         priority.setEnable(enable);
-        updateOptional(priority, "enable");
+        Criteria criteria = new Criteria();
+        criteria.update("enable");
+        priorityMapper.updateByPrimaryKeyOptions(priority, criteria);
         //失效之后再进行默认优先级的重置
         if (!enable && priority.getDefault()) {
             updateOtherDefault(organizationId);

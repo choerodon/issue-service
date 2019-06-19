@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.controller
 
-import io.choerodon.core.domain.Page
+import com.github.pagehelper.PageInfo
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.payload.ChangeStatus
 import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload
@@ -34,11 +34,11 @@ class StateMachineControllerTest extends Specification {
 
 //    def "pagingQuery"() {
 //        when: '查询项目的问题类型列表'
-//        def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine?page={page}&size={size}", Page, organizationId, 1, 1000)
+//        def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine?page={page}&size={size}", PageInfo, organizationId, 1, 1000)
 //
 //        then: '返回结果'
 //        entity.getStatusCode().is2xxSuccessful()
-//        Page<StateMachineDTO> stateMachineDTOPage = entity.body
+//        PageInfo<StateMachineDTO> stateMachineDTOPage = entity.body
 //        expect: '期望验证'
 //        stateMachineDTOPage.content.size() == 1
 //    }

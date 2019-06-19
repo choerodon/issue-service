@@ -1,6 +1,9 @@
 package io.choerodon.issue.api.service.impl;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
@@ -18,10 +21,9 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
+import io.choerodon.issue.infra.utils.PageUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.service.BaseServiceImpl;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @RefreshScope
-public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme> implements IssueTypeSchemeService {
+public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
 
     private IssueTypeSchemeMapper issueTypeSchemeMapper;
 
@@ -248,11 +250,12 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
     }
 
     @Override
-    public Page<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO) {
-        Page<Long> issueTypeSchemeIdsPage = PageHelper.doPageAndSort(pageRequest, () -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchDTO));
-        List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoDTOList = new ArrayList<>(issueTypeSchemeIdsPage.getContent().size());
-        if (issueTypeSchemeIdsPage.getContent() != null && !issueTypeSchemeIdsPage.getContent().isEmpty()) {
-            List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getContent());
+    public PageInfo<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO) {
+        PageInfo<Long> issueTypeSchemeIdsPage = PageHelper.startPage(pageRequest.getPage(),
+                pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(() -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchDTO));
+        List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoDTOList = new ArrayList<>(issueTypeSchemeIdsPage.getList().size());
+        if (issueTypeSchemeIdsPage.getList() != null && !issueTypeSchemeIdsPage.getList().isEmpty()) {
+            List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getList());
             issueTypeSchemeWithInfoDTOList = modelMapper.map(issueTypeSchemeWithInfoList, new TypeToken<List<IssueTypeSchemeWithInfoDTO>>() {
             }.getType());
             for (IssueTypeSchemeWithInfoDTO type : issueTypeSchemeWithInfoDTOList) {
@@ -261,14 +264,8 @@ public class IssueTypeSchemeServiceImpl extends BaseServiceImpl<IssueTypeScheme>
                 }
             }
         }
-        Page<IssueTypeSchemeWithInfoDTO> returnPage = new Page<>();
-        returnPage.setContent(issueTypeSchemeWithInfoDTOList);
-        returnPage.setNumber(issueTypeSchemeIdsPage.getNumber());
-        returnPage.setNumberOfElements(issueTypeSchemeIdsPage.getNumberOfElements());
-        returnPage.setSize(issueTypeSchemeIdsPage.getSize());
-        returnPage.setTotalElements(issueTypeSchemeIdsPage.getTotalElements());
-        returnPage.setTotalPages(issueTypeSchemeIdsPage.getTotalPages());
-        return returnPage;
+
+        return PageUtil.buildPageInfoWithPageInfoList(issueTypeSchemeIdsPage, issueTypeSchemeWithInfoDTOList);
     }
 
     /**

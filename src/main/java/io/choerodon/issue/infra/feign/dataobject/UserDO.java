@@ -1,23 +1,19 @@
 package io.choerodon.issue.infra.feign.dataobject;
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
-
 import javax.persistence.*;
 import java.util.Date;
+
+import io.choerodon.mybatis.entity.BaseDTO;
 
 /**
  * @author wuguokai
  */
 
-@ModifyAudit
-@VersionAudit
 @Table(name = "iam_user")
-public class UserDO extends AuditDomain {
+public class UserDO extends BaseDTO {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String loginName;
     private String email;

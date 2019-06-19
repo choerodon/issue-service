@@ -3,7 +3,8 @@ package io.choerodon.issue.infra.mapper;
 import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.IssueTypeWithInfo;
-import io.choerodon.mybatis.common.BaseMapper;
+import io.choerodon.mybatis.common.Mapper;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @date 2018/8/8
  */
 @Component
-public interface IssueTypeMapper extends BaseMapper<IssueType> {
+public interface IssueTypeMapper extends Mapper<IssueType> {
 
     List<IssueType> queryBySchemeId(@Param("organizationId") Long organizationId, @Param("schemeId") Long schemeId);
 
