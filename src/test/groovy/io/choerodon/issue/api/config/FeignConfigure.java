@@ -137,12 +137,10 @@ public class FeignConfigure {
         Mockito.when(stateMachineFeignClient.queryStateMachineById(Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(stateMachineDTO, HttpStatus.OK));
         Mockito.when(stateMachineFeignClient.queryDefaultStateMachine(Matchers.anyLong())).thenReturn(new ResponseEntity<>(stateMachineDTO, HttpStatus.OK));
         PageInfo<StateMachineDTO> page = new PageInfo<>();
-        page.setNumber(1);
         page.setSize(1);
-        page.setTotalPages(1);
         List<StateMachineDTO> stateMachineDTOS = new ArrayList<>(1);
         stateMachineDTOS.add(stateMachineDTO);
-        page.setContent(stateMachineDTOS);
+        page.setList(stateMachineDTOS);
         Mockito.when(stateMachineFeignClient.pagingQuery(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt(), Matchers.any(String[].class),
                 Matchers.anyString(), Matchers.anyString(), Matchers.any(String[].class))).thenReturn(new ResponseEntity<>(page, HttpStatus.OK));
         Mockito.when(stateMachineFeignClient.delete(Matchers.anyLong(), Matchers.anyLong())).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
