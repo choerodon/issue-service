@@ -30,7 +30,7 @@ class StateStore {
       `/state/v1/organizations/${orgId}/status/list?page=${page}&size=${size}&sort=${sort.field},${sort.order}`,
       JSON.stringify(param),
     ).then((data) => {
-      this.setStateList(data.content);
+      this.setStateList(data.list);
       if (data && data.failed) {
         Choerodon.prompt(data.message);
         return Promise.reject(data);

@@ -39,7 +39,7 @@ class StateList extends Component {
     const menu = AppState.currentMenuType;
     super(props);
     this.state = {
-      page: 0,
+      page: 1,
       pageSize: 10,
       total: 0,
       id: '',
@@ -83,11 +83,14 @@ class StateList extends Component {
     render: (text, record) => (
       <div>
         {record.stateMachineInfoList && record.stateMachineInfoList.length
-          ? <a
-            onClick={() => this.showStateMachines(record)}
-          >
-            {record.stateMachineInfoList.length}个关联的状态机
-          </a>
+          ? (
+            <a
+              onClick={() => this.showStateMachines(record)}
+            >
+              {record.stateMachineInfoList.length}
+个关联的状态机
+            </a>
+          )
           : '-'
         }
       </div>
@@ -105,11 +108,13 @@ class StateList extends Component {
         </Tooltip>
         {record.code || (record.stateMachineInfoList && record.stateMachineInfoList.length)
           ? <div className="issue-del-space" />
-          : <Tooltip placement="top" title={<FormattedMessage id="delete" />}>
-            <Button shape="circle" size="small" onClick={this.confirmDelete.bind(this, record)}>
-              <i className="icon icon-delete" />
-            </Button>
-          </Tooltip>
+          : (
+            <Tooltip placement="top" title={<FormattedMessage id="delete" />}>
+              <Button shape="circle" size="small" onClick={this.confirmDelete.bind(this, record)}>
+                <i className="icon icon-delete" />
+              </Button>
+            </Tooltip>
+          )
         }
       </div>
     ),
@@ -210,13 +215,13 @@ class StateList extends Component {
     });
   };
 
-  loadState = (page = 0, size = 10, sort = { field: 'id', order: 'desc' }, param = {}) => {
+  loadState = (page = 1, size = 10, sort = { field: 'id', order: 'desc' }, param = {}) => {
     const { StateStore } = this.props;
     const orgId = AppState.currentMenuType.organizationId;
     StateStore.loadStateList(orgId, page, size, sort, param).then((data) => {
       this.setState({
-        statesList: data.content,
-        total: data.totalElements,
+        statesList: data.list,
+        total: data.total,
       });
     });
   };
@@ -314,12 +319,12 @@ class StateList extends Component {
       };
     }
     this.setState({
-      page: pagination.current - 1,
+      page: pagination.current,
       pageSize: pagination.pageSize,
       sorter: sorter.column ? sorter : undefined,
       tableParam: searchParam,
     });
-    this.loadState(pagination.current - 1,
+    this.loadState(pagination.current,
       pagination.pageSize, sorter.column ? sorter : undefined, searchParam);
   };
 
@@ -433,7 +438,8 @@ class StateList extends Component {
             </div>
           </div>
         </Form>
-      </div>);
+      </div>
+    );
 
     const pageInfo = {
       defaultCurrent: page,
@@ -444,16 +450,20 @@ class StateList extends Component {
       <Page>
         <Header title={<FormattedMessage id="state.title" />}>
           {statesList && statesList.length === 0
-            ? <Tooltip placement="bottom" title="请创建项目后再创建状态机">
-              <Button disabled>
+            ? (
+              <Tooltip placement="bottom" title="请创建项目后再创建状态机">
+                <Button disabled>
+                  <i className="icon-add icon" />
+                  <FormattedMessage id="state.create" />
+                </Button>
+              </Tooltip>
+            )
+            : (
+              <Button onClick={() => this.showSideBar('create')}>
                 <i className="icon-add icon" />
                 <FormattedMessage id="state.create" />
               </Button>
-            </Tooltip>
-            : <Button onClick={() => this.showSideBar('create')}>
-              <i className="icon-add icon" />
-              <FormattedMessage id="state.create" />
-            </Button>
+            )
           }
           <Button onClick={this.refreshData}>
             <i className="icon-refresh icon" />
@@ -472,7 +482,8 @@ class StateList extends Component {
             className="issue-table"
           />
         </Content>
-        {this.state.show && <Sidebar
+        {this.state.show && (
+        <Sidebar
           title={<FormattedMessage id={this.state.type === 'create' ? 'state.create' : 'state.edit'} />}
           visible={this.state.show}
           onOk={this.handleSubmit}
@@ -482,7 +493,8 @@ class StateList extends Component {
           onCancel={this.hideSidebar}
         >
           {formContent}
-        </Sidebar>}
+        </Sidebar>
+        )}
         <Modal
           title={<FormattedMessage id="state.delete" />}
           visible={this.state.deleteVisible}

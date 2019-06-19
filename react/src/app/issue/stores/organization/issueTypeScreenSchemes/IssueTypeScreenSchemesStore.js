@@ -25,9 +25,9 @@ class IssueTypeScreenSchemesStore {
   };
 
   @action setPageInfo(page) {
-    this.pageInfo.current = page.number + 1;
-    this.pageInfo.total = page.totalElements;
-    this.pageInfo.pageSize = page.size;
+    this.pageInfo.current = page.pageNum;
+    this.pageInfo.total = page.total;
+    this.pageInfo.pageSize = page.pageSize;
   }
 
   @computed get getPageInfo() {
@@ -82,16 +82,15 @@ class IssueTypeScreenSchemesStore {
     this.createShow = data;
   }
 
-  loadSchemeList = (orgId, page = this.pageInfo.current - 1, pageSize = this.pageInfo.pageSize, sort = { field: 'id', order: 'desc' }, map = {
+  loadSchemeList = (orgId, page = this.pageInfo.current, pageSize = this.pageInfo.pageSize, sort = { field: 'id', order: 'desc' }, map = {
     param: '',
   }) => {
     this.setIsLoading(true);
     return axios.get(`/issue/v1/organizations/${orgId}/page_issue?${querystring.stringify(map)}&page=${page}&size=${pageSize}&sort=${sort.field},${sort.order}`).then((data) => {
       const res = this.handleProptError(data);
       if (res) {
-        this.setSchemeList(data.content);
-        const { number, size, totalElements } = data;
-        this.setPageInfo({ number, size, totalElements });
+        this.setSchemeList(data.list);        
+        this.setPageInfo(data);
       }
       this.setIsLoading(false);
     });

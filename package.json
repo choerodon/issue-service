@@ -15,7 +15,8 @@
     "react-beautiful-dnd": "9.0.2",
     "react-color": "^2.14.1",
     "react-dnd": "^5.0.0",
-    "react-dnd-html5-backend": "^5.0.1"
+    "react-dnd-html5-backend": "^5.0.1",
+    "rxjs-compat": "^6.5.2"
   },
   "devDependencies": {
     "babel-preset-env": "^1.7.0",
