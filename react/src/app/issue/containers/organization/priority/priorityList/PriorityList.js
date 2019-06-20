@@ -35,18 +35,18 @@ const ColorBlock = ({ color }) => (
 @injectIntl
 @observer
 class PriorityList extends Component {
+  components = {
+    body: {
+      row: BodyRow,
+    },
+  };
+
   constructor(props) {
     super(props);
     this.state = {
       priorityId: false,
     };
   }
-
-  components = {
-    body: {
-      row: BodyRow,
-    },
-  };
 
   componentDidMount() {
     this.refresh();
@@ -79,7 +79,7 @@ class PriorityList extends Component {
   };
 
   getColumns = () => {
-    const { PriorityStore } = this.props;
+    const { PriorityStore, intl } = this.props;
     const enableList = PriorityStore.getPriorityList.filter(item => item.enable);
     return [
       {
@@ -87,9 +87,11 @@ class PriorityList extends Component {
         dataIndex: 'name',
         key: 'name',
         width: 170,
+        filters: [],
+        onFilter: (value, record) => record.name.toString().indexOf(value) !== -1,
         render: (text, record) => {
           if (record.default) {
-            return `${text} ${this.props.intl.formatMessage({ id: 'priority.default' })}`;
+            return `${text} ${intl.formatMessage({ id: 'priority.default' })}`;
           } else {
             return text;
           }
@@ -100,6 +102,8 @@ class PriorityList extends Component {
         dataIndex: 'description',
         key: 'des',
         width: 650,
+        filters: [],
+        onFilter: (value, record) => record.description.toString().indexOf(value) !== -1,
       },
       {
         title: <FormattedMessage id="priority.color" />,
@@ -171,46 +175,51 @@ class PriorityList extends Component {
     const priorityList = PriorityStore.getPriorityList.filter(item => item.id !== priority.id);
     confirm({
       title: intl.formatMessage({ id: 'priority.delete.title' }),
-      content: <div>
-        <div style={{ marginBottom: 10 }}>
-          {`${intl.formatMessage({ id: 'priority.delete.title' })}：${priority.name}`}
-        </div>
-        {count !== 0
-          && <div style={{ marginBottom: 10 }}>
-          <Icon
-            type="error"
-            style={{
-              verticalAlign: 'top',
-              color: 'red',
-              marginRight: 5,
-            }}
-          />
-          {intl.formatMessage({ id: 'priority.delete.used.tip.prefix' })}
-          <span style={{ color: 'red' }}>{count}</span>
-          {intl.formatMessage({ id: 'priority.delete.used.tip.suffix' })}
-        </div>
+      content: (
+        <div>
+          <div style={{ marginBottom: 10 }}>
+            {`${intl.formatMessage({ id: 'priority.delete.title' })}：${priority.name}`}
+          </div>
+          {count !== 0
+          && (
+          <div style={{ marginBottom: 10 }}>
+            <Icon
+              type="error"
+              style={{
+                verticalAlign: 'top',
+                color: 'red',
+                marginRight: 5,
+              }}
+            />
+            {intl.formatMessage({ id: 'priority.delete.used.tip.prefix' })}
+            <span style={{ color: 'red' }}>{count}</span>
+            {intl.formatMessage({ id: 'priority.delete.used.tip.suffix' })}
+          </div>
+          )
         }
-        <div style={{ marginBottom: 15 }}>
-          {intl.formatMessage({ id: 'priority.delete.notice' })}
-          {count !== 0 && intl.formatMessage({ id: 'priority.delete.used.notice' })}
-        </div>
-        {count !== 0
-          && <div>
-          <Select
-            label={intl.formatMessage({ id: 'priority.title' })}
-            placeholder={intl.formatMessage({ id: 'priority.delete.chooseNewPriority.placeholder' })}
-            onChange={this.handleSelectChange}
-            style={{ width: 470 }}
-            defaultValue={priorityList[0].id}
-          >
-            {priorityList.map(
-              item => <Option value={item.id} key={String(item.id)}>{item.name}</Option>,
-            )
+          <div style={{ marginBottom: 15 }}>
+            {intl.formatMessage({ id: 'priority.delete.notice' })}
+            {count !== 0 && intl.formatMessage({ id: 'priority.delete.used.notice' })}
+          </div>
+          {count !== 0
+          && (
+          <div>
+            <Select
+              label={intl.formatMessage({ id: 'priority.title' })}
+              placeholder={intl.formatMessage({ id: 'priority.delete.chooseNewPriority.placeholder' })}
+              onChange={this.handleSelectChange}
+              style={{ width: 470 }}
+              defaultValue={priorityList[0].id}
+            >
+              {priorityList.map(
+                item => <Option value={item.id} key={String(item.id)}>{item.name}</Option>,
+              )
             }
-          </Select>
-        </div>
+            </Select>
+          </div>
+          )
         }
-      </div>,
+        </div>),
       width: 520,
       onOk() {
         that.deletePriority(priority.id, priorityList[0].id);
@@ -246,10 +255,16 @@ class PriorityList extends Component {
       const that = this;
       confirm({
         title: intl.formatMessage({ id: 'priority.disable.title' }),
-        content: <div>
-          <div style={{ marginBottom: 10 }}>{intl.formatMessage({ id: 'priority.disable.title' })}: {priority.name}</div>
-          <div>{intl.formatMessage({ id: 'priority.disable.notice' })}</div>
-        </div>,
+        content: (
+          <div>
+            <div style={{ marginBottom: 10 }}>
+              {intl.formatMessage({ id: 'priority.disable.title' })}
+:
+              {' '}
+              {priority.name}
+            </div>
+            <div>{intl.formatMessage({ id: 'priority.disable.notice' })}</div>
+          </div>),
         onOk() {
           that.enablePriority(priority);
         },
