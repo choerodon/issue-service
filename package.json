@@ -8,8 +8,6 @@
     "lib"
   ],
   "dependencies": {
-    "@choerodon/boot": "0.17.x",
-    "@choerodon/master": "0.17.x",
     "immutability-helper": "^2.7.1",
     "mxgraph-js": "^1.0.1",
     "react-beautiful-dnd": "9.0.2",
@@ -19,6 +17,8 @@
     "rxjs-compat": "^6.5.2"
   },
   "devDependencies": {
+    "@choerodon/boot": "0.18.x",
+    "@choerodon/master": "0.18.x",
     "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
@@ -46,5 +46,8 @@
       "pre-commit": "lint-staged"
     }
   },
-  "peerDependencies": {}
+  "peerDependencies": {
+    "@choerodon/boot": "0.18.x",
+    "@choerodon/master": "0.18.x"
+  }
 }
