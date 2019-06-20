@@ -42,7 +42,6 @@ class StateList extends Component {
       page: 1,
       pageSize: 10,
       total: 0,
-      id: '',
       show: false,
       submitting: false,
       deleteVisible: false,
@@ -85,6 +84,7 @@ class StateList extends Component {
         {record.stateMachineInfoList && record.stateMachineInfoList.length
           ? (
             <a
+              role="none"
               onClick={() => this.showStateMachines(record)}
             >
               {record.stateMachineInfoList.length}
@@ -137,6 +137,7 @@ class StateList extends Component {
             data.stateMachineInfoList.map(stateMachine => (
               <li key={stateMachine.stateMachineId}>
                 <a
+                  role="none"
                   onClick={() => this.linkToStateMachine(
                     stateMachine.stateMachineId, stateMachine.stateMachineStatus,
                   )}
@@ -244,6 +245,7 @@ class StateList extends Component {
           StateStore.createState(orgId, postData)
             .then((res) => {
               if (res && res.failed) {
+                // eslint-disable-next-line no-console
                 console.log(res.message);
               } else {
                 this.loadState(page, pageSize, sorter, tableParam);
@@ -329,8 +331,9 @@ class StateList extends Component {
   };
 
   checkName = async (rule, value, callback) => {
-    if (!value) {
+    if (!value || !value.trim()) {
       callback();
+      return;
     }
     const { type, editState } = this.state;
     const { StateStore, intl } = this.props;
@@ -354,11 +357,11 @@ class StateList extends Component {
   };
 
   render() {
-    const { StateStore, intl } = this.props;
+    const { StateStore, intl, form } = this.props;
     const {
-      statesList = [], deleteName, editState, page, pageSize, total,
+      statesList = [], deleteName, editState, page, pageSize, total, show, submitting, type, deleteVisible,
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator } = form;
     const formContent = (
       <div className="issue-region">
         <Form layout="vertical" className="issue-sidebar-form">
@@ -482,14 +485,14 @@ class StateList extends Component {
             className="issue-table"
           />
         </Content>
-        {this.state.show && (
+        {show && (
         <Sidebar
-          title={<FormattedMessage id={this.state.type === 'create' ? 'state.create' : 'state.edit'} />}
-          visible={this.state.show}
+          title={<FormattedMessage id={type === 'create' ? 'state.create' : 'state.edit'} />}
+          visible={show}
           onOk={this.handleSubmit}
-          okText={<FormattedMessage id={this.state.type === 'create' ? 'create' : 'save'} />}
+          okText={<FormattedMessage id={type === 'create' ? 'create' : 'save'} />}
           cancelText={<FormattedMessage id="cancel" />}
-          confirmLoading={this.state.submitting}
+          confirmLoading={submitting}
           onCancel={this.hideSidebar}
         >
           {formContent}
@@ -497,7 +500,7 @@ class StateList extends Component {
         )}
         <Modal
           title={<FormattedMessage id="state.delete" />}
-          visible={this.state.deleteVisible}
+          visible={deleteVisible}
           onOk={this.handleDelete}
           onCancel={this.handleCancel}
         >
