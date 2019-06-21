@@ -120,7 +120,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
 
     @Override
     public PageInfo<IssueTypeWithInfoDTO> queryIssueTypeList(PageRequest pageRequest, Long organizationId, IssueTypeSearchDTO issueTypeSearchDTO) {
-        PageInfo<Long> issuetypeIdsPage = PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(() -> issueTypeMapper.selectIssueTypeIds(organizationId, issueTypeSearchDTO));
+        PageInfo<Long> issuetypeIdsPage = PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(() -> issueTypeMapper.selectIssueTypeIds(organizationId, issueTypeSearchDTO));
         List<IssueTypeWithInfoDTO> issueTypeWithInfoDTOList = new ArrayList<>(issuetypeIdsPage.getList().size());
         if (issuetypeIdsPage.getList() != null && !issuetypeIdsPage.getList().isEmpty()) {
             issueTypeWithInfoDTOList.addAll(modelMapper.map(issueTypeMapper.queryIssueTypeList(organizationId, issuetypeIdsPage.getList()), new TypeToken<List<IssueTypeWithInfoDTO>>() {
