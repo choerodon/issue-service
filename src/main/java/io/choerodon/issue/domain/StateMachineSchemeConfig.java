@@ -20,7 +20,7 @@ public class StateMachineSchemeConfig extends BaseDTO {
     private Long issueTypeId;
     private Long stateMachineId;
     private Boolean isDefault;
-    private int sequence;
+    private Integer sequence;
     private Long organizationId;
 
     public Long getId() {
@@ -55,20 +55,20 @@ public class StateMachineSchemeConfig extends BaseDTO {
         this.stateMachineId = stateMachineId;
     }
 
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
-
     public Boolean getDefault() {
         return isDefault;
     }
 
     public void setDefault(Boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    public Integer getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(Integer sequence) {
+        this.sequence = sequence;
     }
 
     public Long getOrganizationId() {

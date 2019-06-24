@@ -76,7 +76,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
 
         StateMachineScheme scheme = modelMapper.map(schemeDTO, StateMachineScheme.class);
         PageInfo<StateMachineScheme> page = PageHelper.startPage(pageRequest.getPage(),
-                pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(() -> schemeMapper.fulltextSearch(scheme, params));
+                pageRequest.getSize(), PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(() -> schemeMapper.fulltextSearch(scheme, params));
 
         List<StateMachineScheme> schemes = page.getList();
         List<StateMachineScheme> schemesWithConfigs = new ArrayList<>();

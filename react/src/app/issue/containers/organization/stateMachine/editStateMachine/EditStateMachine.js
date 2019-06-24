@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
@@ -1392,7 +1393,7 @@ class EditStateMachine extends Component {
     this.setState({
       [code]: newName,
     });
-    if (name !== newName) {
+    if (name !== newName && code === 'name') {
       const res = await StateMachineStore.checkName(orgId, newName);
       if (res) {
         error = intl.formatMessage({ id: 'priority.create.name.error' });

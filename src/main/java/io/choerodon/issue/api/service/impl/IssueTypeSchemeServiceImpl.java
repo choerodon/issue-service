@@ -252,7 +252,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
     @Override
     public PageInfo<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(PageRequest pageRequest, Long organizationId, IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO) {
         PageInfo<Long> issueTypeSchemeIdsPage = PageHelper.startPage(pageRequest.getPage(),
-                pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(() -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchDTO));
+                pageRequest.getSize(), PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(() -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchDTO));
         List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoDTOList = new ArrayList<>(issueTypeSchemeIdsPage.getList().size());
         if (issueTypeSchemeIdsPage.getList() != null && !issueTypeSchemeIdsPage.getList().isEmpty()) {
             List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getList());
