@@ -178,8 +178,8 @@ class IssueTypeControllerSpec extends Specification {
         if (entity != null) {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 actRequest = true
-                if (entity.getBody() != null) {
-                    actResponseSize = entity.getBody().size()
+                if (entity.getBody().getList() != null) {
+                    actResponseSize = entity.getBody().getList().size()
                 }
             }
         }

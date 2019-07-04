@@ -293,7 +293,7 @@ class IssueTypeSchemeControllerSpec extends Specification {
         entity.statusCode.is2xxSuccessful()
 
         expect: '测试用例：'
-        entity.body.content.size() == 0
+        entity.body.getList().size() == 0
     }
 
     def "delete"() {

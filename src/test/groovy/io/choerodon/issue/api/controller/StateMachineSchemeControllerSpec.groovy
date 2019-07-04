@@ -72,7 +72,7 @@ class StateMachineSchemeControllerSpec extends Specification {
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
-        entity.getBody().size() == size
+        entity.getBody().getList().size() == size
 
         where: '测试用例：'
         name              | description     | param  || isSuccess | size
@@ -124,7 +124,6 @@ class StateMachineSchemeControllerSpec extends Specification {
         where: '测试用例：'
         name         | description         || isSuccess | reponseResult
         'test-name1' | 'test-description1' || true      | true
-        null         | 'test-description1' || true      | false
         ""           | 'test-description1' || true      | false
     }
 
