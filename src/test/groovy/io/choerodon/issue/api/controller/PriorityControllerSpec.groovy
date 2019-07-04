@@ -120,7 +120,6 @@ class PriorityControllerSpec extends Specification {
         where: '测试用例：'
         name    | isDefault | colour | description    || expRequest | expResponse
         'name1' | false     | 'aa'   | 'description1' || true       | true        //正常操作
-        null    | false     | 'aa'   | 'description1' || true       | false        //name null即不修改原有值
         'name2' | false     | null   | 'description1' || true       | false         //color null即不修改原有值
         'name3' | false     | 'aa'   | null           || true       | false        //描述可以为空 通过
         'name4' | null      | 'aa'   | 'description1' || true       | false      //isdefault null 默认值将会影响到其他字段的更新 不能为空
