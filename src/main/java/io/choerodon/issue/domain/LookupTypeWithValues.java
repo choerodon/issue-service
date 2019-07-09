@@ -3,8 +3,8 @@ package io.choerodon.issue.domain;
 import java.util.List;
 
 /**
- * Created by HuangFuqiang@choerodon.io on 2018/5/19.
- * Email: fuqianghuang01@gmail.com
+ * @author shinan.chen
+ * @date 2019/7/9
  */
 public class LookupTypeWithValues {
 

@@ -1,8 +1,8 @@
 package script.db
 
-databaseChangeLog(logicalFilePath: 'state_machine_lookup_type.groovy') {
-    changeSet(id: '2018-09-26-state-machine-lookup-type', author: 'fuqianghuang01@gmail.com') {
-        createTable(tableName: "state_machine_lookup_type", remarks: '快码类型表') {
+databaseChangeLog(logicalFilePath: 'lookup_type.groovy') {
+    changeSet(id: '2019-07-09-lookup-type', author: 'shinan.chenX@gmail.com') {
+        createTable(tableName: "lookup_type", remarks: '快码类型表') {
             column(name: 'type_code', type: 'VARCHAR(255)', remarks: '主键') {
                 constraints(primaryKey: true)
             }

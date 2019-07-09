@@ -8,10 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * Created by HuangFuqiang@choerodon.io on 2018/09/27.
- * Email: fuqianghuang01@gmail.com
+ * @author shinan.chen
+ * @date 2019/7/9
  */
-@Table(name = "state_machine_lookup_type")
+@Table(name = "lookup_type")
 public class LookupType extends BaseDTO {
 
     @Id

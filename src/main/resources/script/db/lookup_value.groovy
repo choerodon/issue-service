@@ -1,8 +1,11 @@
 package script.db
 
-databaseChangeLog(logicalFilePath: 'state_machine_lookup_value.groovy') {
-    changeSet(id: '2018-09-26-state-machine-lookup-value', author: 'fuqianghuang01@gmail.com') {
-        createTable(tableName: "state_machine_lookup_value", remarks: '快码表') {
+databaseChangeLog(logicalFilePath: 'lookup_value.groovy') {
+    changeSet(id: '2019-07-09-lookup-value', author: 'shinan.chenX@gmail.com') {
+        createTable(tableName: "lookup_value", remarks: '快码表') {
+            column(name: 'id', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: 'ID') {
+                constraints(primaryKey: true)
+            }
             column(name: 'value_code', type: 'VARCHAR(255)', remarks: '主键') {
                 constraints(primaryKey: true)
             }
@@ -20,7 +23,7 @@ databaseChangeLog(logicalFilePath: 'state_machine_lookup_value.groovy') {
             column(name: "last_update_date", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
 
-        createIndex(indexName: 'uk_value_code_type_code', tableName: 'state_machine_lookup_value', unique: true) {
+        createIndex(indexName: 'uk_value_code_type_code', tableName: 'lookup_value', unique: true) {
             column(name: 'value_code')
             column(name: 'type_code')
         }
