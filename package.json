@@ -3,7 +3,7 @@
   "routeName": "issue",
   "version": "0.19.0",
   "description": "",
-  "main": "./react/src/app/issue/containers/ISSUEIndex.js",
+  "main": "./lib/src/app/issue/containers/ISSUEIndex.js",
   "files": [
     "lib"
   ],

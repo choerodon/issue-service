@@ -139,10 +139,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@choerodon/boot@0.17.x", "@choerodon/boot@^0.17.2":
-  version "0.17.4"
-  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/@choerodon/boot/-/boot-0.17.4.tgz#e13b2b814fb8dad42458365969c900577daefb64"
-  integrity sha1-4TsrgU+42tQkWDZZackAV32u+2Q=
+"@choerodon/boot@0.19.x":
+  version "0.19.0"
+  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/@choerodon/boot/-/boot-0.19.0.tgz#f31269662237a911b6948d498b4288c461a23bd1"
+  integrity sha512-f0JIx58B+KsLF0MiI65YVzxEnWEHkdCjxrbO6jeChvriRKBJE0T6+hBfqPoVq9Dyj1Eu0XmxHn8/xCvBpg3qzA==
   dependencies:
     "@babel/parser" "^7.4.3"
     add-asset-html-webpack-plugin "^2.1.2"
@@ -172,12 +172,13 @@
     case-sensitive-paths-webpack-plugin "^2.1.2"
     chalk "^2.4.1"
     change-case "^3.0.1"
-    choerodon-ui "0.6.x"
+    choerodon-ui "0.8.x"
     classnames "^2.2.5"
     commander "^2.9.0"
     component-classes "^1.x"
     cross-spawn "^6.0.5"
     css-loader "^0.25.0"
+    dotenv "^8.0.0"
     eslint "^5.5.0"
     eslint-config-airbnb latest
     eslint-plugin-babel "^5.1.0"
@@ -242,12 +243,11 @@
     webpack "^3.12.0"
     webpack-dev-server "^2.11.3"
 
-"@choerodon/master@0.17.x":
-  version "0.17.3"
-  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/@choerodon/master/-/master-0.17.3.tgz#2f986b175d0aa04d859c2f2a134d211e708eac3e"
-  integrity sha1-L5hrF10KoE2FnC8qE00hHnCOrD4=
+"@choerodon/master@0.18.x":
+  version "0.18.1"
+  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/@choerodon/master/-/master-0.18.1.tgz#ec8dca2ba59bd5af714e409144e9a9206ee6b17d"
+  integrity sha512-UyIjnmrwi6d78fBSU4sx05Tdep+fvmr6jsbLMjhfBnM0aExeh3nIkq90V/VCpdUeNn6wZciCInyBfspQq5H5fg==
   dependencies:
-    "@choerodon/boot" "^0.17.2"
     react-onclickoutside "^6.8.0"
 
 "@icons/material@^0.2.4":
@@ -2218,21 +2218,21 @@ chardet@^0.7.0:
   resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/chardet/-/chardet-0.7.0.tgz#90094849f0937f2eedc2425d0d28a9e5f0cbad9e"
   integrity sha1-kAlISfCTfy7twkJdDSip5fDLrZ4=
 
-choerodon-ui-font@~0.1.1:
-  version "0.1.2"
-  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/choerodon-ui-font/-/choerodon-ui-font-0.1.2.tgz#0bb059208ac6a69398ae8c5d0ac46777ceadbbef"
-  integrity sha1-C7BZIIrGppOYroxdCsRnd86tu+8=
+choerodon-ui-font@0.2.x:
+  version "0.2.0"
+  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/choerodon-ui-font/-/choerodon-ui-font-0.2.0.tgz#1de694174f63fea5c8d9c7cfc37c51e51bad2558"
+  integrity sha1-HeaUF09j/qXI2cfPw3xR5RutJVg=
 
-choerodon-ui@0.6.x:
-  version "0.6.2"
-  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/choerodon-ui/-/choerodon-ui-0.6.2.tgz#676637bb6ba8b5f8580d6e5fece7804822b9aa13"
-  integrity sha1-Z2Y3u2uotfhYDW5f7OeASCK5qhM=
+choerodon-ui@0.8.x:
+  version "0.8.0"
+  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/choerodon-ui/-/choerodon-ui-0.8.0.tgz#fa8c2a1707130c66544c1d486d07270cc65be982"
+  integrity sha512-GITXdPu7bD0kDlShq7Jchcq8bmbMTfDgRw4kPiU3OQvFhpBP6E7SmVV5FUOFBOsZI0ts7fSXv2v5/2s/UvaC/g==
   dependencies:
     add-dom-event-listener "1.x"
     array-tree-filter "^2.0.0"
     async-validator "1.x"
     babel-runtime "6.x"
-    choerodon-ui-font "~0.1.1"
+    choerodon-ui-font "0.2.x"
     classnames "~2.2.0"
     codemirror "5.44.0"
     component-classes "1.x"
@@ -2261,6 +2261,7 @@ choerodon-ui@0.6.x:
     react-slick "~0.22.3"
     resize-observer-polyfill "^1.5.1"
     rmc-feedback "^1.0.0"
+    tslib "^1.9.3"
     warning "~3.0.0"
 
 chokidar@^2.0.0, chokidar@^2.0.2, chokidar@^2.1.2:
@@ -3348,6 +3349,11 @@ dot-prop@^4.1.1:
   integrity sha1-HxngwuGqDjJ5fEl5nyg3rGr2nFc=
   dependencies:
     is-obj "^1.0.0"
+
+dotenv@^8.0.0:
+  version "8.0.0"
+  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/dotenv/-/dotenv-8.0.0.tgz#ed310c165b4e8a97bb745b0a9d99c31bda566440"
+  integrity sha1-7TEMFltOipe7dFsKnZnDG9pWZEA=
 
 draft-js@^0.10.0, draft-js@^0.10.5:
   version "0.10.5"
@@ -10788,6 +10794,11 @@ tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.9.3"
   resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
   integrity sha1-1+TdeSRdhUKMTX5IIqeZF5VMooY=
+
+tslib@^1.9.3:
+  version "1.10.0"
+  resolved "https://nexus.choerodon.com.cn/repository/choerodon-npm/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
+  integrity sha1-w8GflZc/sKYpc/sJ2Q2WHuQ+XIo=
 
 tslint-loader@^3.5.3:
   version "3.5.4"
