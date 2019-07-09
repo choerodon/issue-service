@@ -6,12 +6,15 @@ import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.oauth.DetailsHelper;
+import io.choerodon.issue.api.dto.StatusDTO;
 import io.choerodon.issue.api.dto.payload.*;
+import io.choerodon.issue.api.service.StatusService;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.domain.Status;
 import io.choerodon.issue.infra.enums.SchemeType;
-import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +34,17 @@ import java.util.stream.Collectors;
 public class SagaServiceImpl {
     private static final Logger logger = LoggerFactory.getLogger(SagaServiceImpl.class);
     private static final String DEPLOY_STATE_MACHINE_SCHEME = "deploy-state-machine-scheme";
-
+    private static final String DEPLOY_STATE_MACHINE = "deploy-state-machine";
     @Autowired
     private SagaClient sagaClient;
     @Autowired
     private StateMachineServiceImpl stateMachineService;
     @Autowired
-    private StateMachineFeignClient stateMachineFeignClient;
-    @Autowired
     private ProjectConfigMapper projectConfigMapper;
+    @Autowired
+    private StatusService statusService;
+
+    private ModelMapper modelMapper = new ModelMapper();
 
     public void setSagaClient(SagaClient sagaClient) {
         this.sagaClient = sagaClient;
@@ -50,7 +55,7 @@ public class SagaServiceImpl {
         //获取当前方案配置的项目列表
         List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
         //获取所有状态
-        List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+        List<StatusDTO> statusDTOS = statusService.queryAllStatus(organizationId);
         Map<Long, StatusDTO> statusDTOMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
         //将要增加和减少的状态进行判断，确定哪些项目要增加哪些状态与减少哪些状态
         DeployStateMachinePayload deployStateMachinePayload = stateMachineService.handleStateMachineChangeStatusBySchemeIds(organizationId, null, schemeId, Arrays.asList(schemeId), changeStatus);
@@ -78,5 +83,35 @@ public class SagaServiceImpl {
         deployUpdateIssue.setUserId(DetailsHelper.getUserDetails().getUserId());
         sagaClient.startSaga(DEPLOY_STATE_MACHINE_SCHEME, new StartInstanceDTO(JSON.toJSONString(deployUpdateIssue), "", "", ResourceLevel.ORGANIZATION.value(), organizationId));
         logger.info("startSaga deploy-state-machine-scheme addStatusIds: {}, deleteStatusIds: {}", changeStatus.getAddStatusIds(), changeStatus.getDeleteStatusIds());
+    }
+
+    @Saga(code = DEPLOY_STATE_MACHINE, description = "发布状态机", inputSchemaClass = DeployStateMachinePayload.class)
+    public void deployStateMachine(Long organizationId, Long stateMachineId, Map<String, List<Status>> changeMap) {
+        //新增的状态
+        List<Status> addList = changeMap.get("addList");
+        List<StatusDTO> addListDto = modelMapper.map(addList, new TypeToken<List<StatusDTO>>() {
+        }.getType());
+        Map<Long, StatusDTO> statusMap = addListDto.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
+        //移除的状态
+        List<Status> deleteList = changeMap.get("deleteList");
+        List<Long> addStatusIds = addListDto.stream().map(StatusDTO::getId).collect(Collectors.toList());
+        List<Long> deleteStatusIds = deleteList.stream().map(Status::getId).collect(Collectors.toList());
+        ChangeStatus changeStatus = new ChangeStatus(addStatusIds, deleteStatusIds);
+        DeployStateMachinePayload deployStateMachinePayload = stateMachineService.handleStateMachineChangeStatusByStateMachineId(organizationId, stateMachineId, changeStatus);
+        deployStateMachinePayload.setUserId(DetailsHelper.getUserDetails().getUserId());
+        //新增的状态赋予实体
+        deployStateMachinePayload.getAddStatusWithProjects().forEach(addStatusWithProject -> {
+            List<StatusDTO> statuses = new ArrayList<>(addStatusWithProject.getAddStatusIds().size());
+            addStatusWithProject.getAddStatusIds().forEach(addStatusId -> {
+                StatusDTO status = statusMap.get(addStatusId);
+                if (status != null) {
+                    statuses.add(status);
+                }
+            });
+            addStatusWithProject.setAddStatuses(statuses);
+        });
+        //发送saga，
+        sagaClient.startSaga(DEPLOY_STATE_MACHINE, new StartInstanceDTO(JSON.toJSONString(deployStateMachinePayload), "", "", ResourceLevel.ORGANIZATION.value(), organizationId));
+        logger.info("startSaga deploy-state-machine addStatusIds: {}, deleteStatusIds: {}", changeStatus.getAddStatusIds(), changeStatus.getDeleteStatusIds());
     }
 }

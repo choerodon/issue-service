@@ -3,9 +3,9 @@ package io.choerodon.issue.api.service;
 import io.choerodon.issue.api.dto.IssueTypeDTO;
 import io.choerodon.issue.api.dto.IssueTypeWithStateMachineIdDTO;
 import io.choerodon.issue.api.dto.ProjectConfigDetailDTO;
+import io.choerodon.issue.api.dto.StatusDTO;
 import io.choerodon.issue.domain.ProjectConfig;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
-import io.choerodon.issue.infra.feign.dto.TransformDTO;
+import io.choerodon.issue.api.dto.payload.TransformDTO;
 
 import java.util.List;
 import java.util.Map;

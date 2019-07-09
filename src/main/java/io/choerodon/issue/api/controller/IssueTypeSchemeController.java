@@ -1,11 +1,11 @@
 package io.choerodon.issue.api.controller;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.base.domain.Sort;
 import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.base.BaseController;
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.issue.api.dto.IssueTypeSchemeDTO;
@@ -80,11 +80,11 @@ public class IssueTypeSchemeController extends BaseController {
     @CustomPageRequest
     @PostMapping("/list")
     public ResponseEntity<PageInfo<IssueTypeSchemeWithInfoDTO>> queryIssueTypeSchemeList(@ApiIgnore
-                                                                                     @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                                                     @ApiParam(value = "组织id", required = true)
-                                                                                     @PathVariable("organization_id") Long organizationId,
-                                                                                     @ApiParam(value = "组织id", required = true)
-                                                                                     @RequestBody IssueTypeSchemeSearchDTO issueTypeSchemeDTO) {
+                                                                                         @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                                         @ApiParam(value = "组织id", required = true)
+                                                                                         @PathVariable("organization_id") Long organizationId,
+                                                                                         @ApiParam(value = "组织id", required = true)
+                                                                                         @RequestBody IssueTypeSchemeSearchDTO issueTypeSchemeDTO) {
         return Optional.ofNullable(issueTypeSchemeService.queryIssueTypeSchemeList(pageRequest, organizationId, issueTypeSchemeDTO))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.issueTypeSchemeList.get"));

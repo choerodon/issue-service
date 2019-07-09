@@ -29,9 +29,5 @@ eureka:
 #logging:
 #  level:
 #    root: debug
-
-services:
-  attachment:
-    url: example.com
 testScanIgnore:
   enabled: true

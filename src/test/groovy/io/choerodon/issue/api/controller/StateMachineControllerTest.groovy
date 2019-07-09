@@ -1,10 +1,8 @@
 package io.choerodon.issue.api.controller
 
-import com.github.pagehelper.PageInfo
+
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.payload.ChangeStatus
-import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -63,26 +61,6 @@ class StateMachineControllerTest extends Specification {
         Map<String, Object> map = entity.body
         expect: '期望验证'
         map.get("XX") != null
-    }
-
-    def "handleStateMachineChangeStatusByStateMachineId"() {
-        given: "准备数据"
-        ChangeStatus changeStatus = new ChangeStatus()
-        List<Long> addIds = new ArrayList<>(1)
-        addIds.add(1L)
-        List<Long> deleteIds = new ArrayList<>(1)
-        addIds.add(2L)
-        changeStatus.setAddStatusIds(addIds)
-        changeStatus.setDeleteStatusIds(deleteIds)
-        when: '【内部调用】发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态'
-        def entity = restTemplate.postForEntity("/v1/organizations/{organization_id}/state_machine/handle_state_machine_change_status_by_state_machine_id?stateMachineId={stateMachineId}", changeStatus, DeployStateMachinePayload, organizationId, 1L)
-
-        then: '返回结果'
-        entity.getStatusCode().is2xxSuccessful()
-        DeployStateMachinePayload deployStateMachinePayload = entity.body
-        expect: '期望验证'
-        deployStateMachinePayload.addStatusWithProjects.size() == 1
-        deployStateMachinePayload.removeStatusWithProjects.size() == 0
     }
 
     def "delete"() {

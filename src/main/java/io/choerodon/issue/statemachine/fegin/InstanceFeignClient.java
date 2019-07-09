@@ -1,6 +1,6 @@
 package io.choerodon.issue.statemachine.fegin;
 
-import io.choerodon.issue.infra.feign.dto.ExecuteResult;
+import io.choerodon.issue.api.dto.ExecuteResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

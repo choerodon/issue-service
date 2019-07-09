@@ -11,7 +11,6 @@ import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
 import io.choerodon.mybatis.entity.Criteria;
-
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;

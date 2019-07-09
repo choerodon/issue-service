@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.dto.payload;
 
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
+import io.choerodon.issue.api.dto.StatusDTO;
 
 import java.util.List;
 

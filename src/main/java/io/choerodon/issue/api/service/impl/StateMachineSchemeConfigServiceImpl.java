@@ -2,9 +2,7 @@ package io.choerodon.issue.api.service.impl;
 
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.ChangeStatus;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
@@ -22,15 +20,11 @@ import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeDeployStatus;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
-import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.entity.Criteria;
-
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +53,6 @@ public class StateMachineSchemeConfigServiceImpl implements StateMachineSchemeCo
     private StateMachineSchemeService stateMachineSchemeService;
     @Autowired
     private StateMachineSchemeMapper schemeMapper;
-    @Autowired
-    private StateMachineFeignClient stateMachineFeignClient;
     @Autowired
     private IssueTypeService issueTypeService;
     @Autowired
@@ -260,7 +252,7 @@ public class StateMachineSchemeConfigServiceImpl implements StateMachineSchemeCo
      */
     private Map<String, List<Long>> queryStatusIdsBySchemeId(Long organizationId, Long schemeId) {
         Map<String, List<Long>> changeMap = new HashMap<>(2);
-        List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineFeignClient.queryAllWithStatus(organizationId).getBody();
+        List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineService.queryAllWithStatus(organizationId);
         Map<Long, List<StatusDTO>> smMap = stateMachineWithStatusDTOs.stream().collect(Collectors.toMap(StateMachineWithStatusDTO::getId, StateMachineWithStatusDTO::getStatusDTOS));
         //获取发布配置
         List<Long> oldStatusIds = new ArrayList<>();
@@ -335,7 +327,7 @@ public class StateMachineSchemeConfigServiceImpl implements StateMachineSchemeCo
         List<Long> addStateMachineIds = changeMap.get("addStateMachineIds");
         //活跃方案下的新增的状态机（状态为create的改成active）
         if (!addStateMachineIds.isEmpty()) {
-            stateMachineFeignClient.activeStateMachines(organizationId, addStateMachineIds);
+            stateMachineService.activeStateMachines(organizationId, addStateMachineIds);
         }
         //使删除的状态机变成未活跃（状态为active和draft的改成create）
         if (!deleteStateMachineIds.isEmpty()) {
@@ -387,7 +379,7 @@ public class StateMachineSchemeConfigServiceImpl implements StateMachineSchemeCo
             }
         }
         //获取所有状态机及状态机的状态列表
-        List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineFeignClient.queryAllWithStatus(organizationId).getBody();
+        List<StateMachineWithStatusDTO> stateMachineWithStatusDTOs = stateMachineService.queryAllWithStatus(organizationId);
         Map<Long, StateMachineWithStatusDTO> stateMachineMap = stateMachineWithStatusDTOs.stream().collect(Collectors.toMap(StateMachineWithStatusDTO::getId, x -> x));
         //获取所有问题类型
         List<IssueTypeDTO> issueTypeDTOs = issueTypeService.queryByOrgId(organizationId);

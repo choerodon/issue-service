@@ -20,26 +20,22 @@ import java.util.Arrays;
 public class DemoEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DemoEventHandler.class);
-
     private static final String REGISTER_ISSUE_INIT_ORG = "register-issue-init-org";
     private static final String REGISTER_ISSUE_INIT_PROJECT = "register-issue-init-project";
     private static final String REGISTER_ORG = "register-org";
 
     @Autowired
+    private InitService initService;
+    @Autowired
     private IssueTypeService issueTypeService;
-
     @Autowired
     private PriorityService priorityService;
-
     @Autowired
     private ProjectInfoService projectInfoService;
-
     @Autowired
     private StateMachineSchemeService stateMachineSchemeService;
-
     @Autowired
     private IssueTypeSchemeService issueTypeSchemeService;
-
 
     @SagaTask(code = REGISTER_ISSUE_INIT_ORG,
             description = "demo创建组织事件",
@@ -48,11 +44,15 @@ public class DemoEventHandler {
     public OrganizationRegisterEventPayload orgCreateForDemoInit(String data) {
         LOGGER.info("demo消费创建组织消息{}", data);
         OrganizationRegisterEventPayload organizationRegisterEventPayload = JSONObject.parseObject(data, OrganizationRegisterEventPayload.class);
-        Long orgId = organizationRegisterEventPayload.getOrganization().getId();
+        Long organizationId = organizationRegisterEventPayload.getOrganization().getId();
         //注册组织初始化问题类型
-        issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
+        issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
         //注册组织初始化优先级
-        priorityService.initProrityByOrganization(Arrays.asList(orgId));
+        priorityService.initProrityByOrganization(Arrays.asList(organizationId));
+        //初始化状态
+        initService.initStatus(organizationId);
+        //初始化默认状态机
+        initService.initDefaultStateMachine(organizationId);
         return organizationRegisterEventPayload;
     }
 

@@ -7,7 +7,6 @@ import io.choerodon.issue.api.dto.StateMachineSchemeDTO
 import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem
 import io.choerodon.issue.api.service.StateMachineSchemeService
 import io.choerodon.issue.domain.StateMachineSchemeConfig
-import io.choerodon.issue.infra.feign.StateMachineFeignClient
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -29,24 +28,16 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     @Autowired
     TestRestTemplate restTemplate
-
     @Autowired
     StateMachineSchemeService schemeService
     @Autowired
     StateMachineSchemeConfigMapper stateMachineSchemeConfigMapper
-
-    @Autowired
-    private StateMachineFeignClient stateMachineServiceFeign
-
     @Shared
     Long organizationId = 1L
-
     @Shared
     Long stateMachineId = 1L
-
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/state_machine_scheme'
-
     @Shared
     List<StateMachineSchemeDTO> list = new ArrayList<>()
     @Shared
@@ -75,11 +66,11 @@ class StateMachineSchemeControllerSpec extends Specification {
         entity.getBody().getList().size() == size
 
         where: '测试用例：'
-        name              | description     | param  || isSuccess | size
-        null              | null            | null   || true      | 2
-        'test默认状态机方案【测试】' | null            | null   || true      | 1
-        null              | null            | 'test' || true      | 2
-        null              | null            | 'xx'   || true      | 0
+        name              | description | param  || isSuccess | size
+        null              | null        | null   || true      | 2
+        'test默认状态机方案【测试】' | null        | null   || true      | 1
+        null              | null        | 'test' || true      | 2
+        null              | null        | 'xx'   || true      | 0
     }
 
     def "create"() {

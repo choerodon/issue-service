@@ -1,48 +1,21 @@
 package io.choerodon.issue.infra.feign;
 
 import com.github.pagehelper.PageInfo;
-
-import io.choerodon.base.domain.PageRequest;
 import io.choerodon.issue.api.dto.ProjectDTO;
-import io.choerodon.issue.api.dto.UserDTO;
-import io.choerodon.issue.infra.feign.dto.UserSearchDTO;
 import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author peng.jiang
  */
-@FeignClient(value = "iam-service",
-        fallback = UserFeignClientFallback.class)
+@FeignClient(value = "iam-service", fallback = UserFeignClientFallback.class)
 @Component
 public interface UserFeignClient {
-
-    /**
-     * 模糊查询组织下的用户
-     *
-     * @param organizationId
-     * @param pageRequest
-     * @param user
-     * @return
-     */
-    @GetMapping(value = "/v1/organizations/{organization_id}/users/search")
-    ResponseEntity<PageInfo<UserDTO>> queryUserInOrg(@PathVariable("organization_id") Long organizationId, @RequestParam("pageRequest") PageRequest pageRequest,
-                                                     @RequestBody UserSearchDTO user);
-
-    /**
-     * 根据id列表获取用户信息
-     *
-     * @param ids
-     * @return
-     */
-    @PostMapping(value = "/v1/users/ids")
-    ResponseEntity<List<UserDTO>> listUsersByIds(@RequestBody Long[] ids);
-
     /**
      * 按照id查询项目
      *

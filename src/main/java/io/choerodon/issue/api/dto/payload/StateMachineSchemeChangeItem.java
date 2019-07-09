@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.dto.payload;
 
 import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.infra.feign.dto.StateMachineWithStatusDTO;
+import io.choerodon.issue.api.dto.StateMachineWithStatusDTO;
 
 import java.util.List;
 

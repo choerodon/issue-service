@@ -2,7 +2,7 @@ package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.dto.PriorityDTO
-import io.choerodon.issue.infra.feign.dto.StatusDTO
+import io.choerodon.issue.api.dto.StatusDTO
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

@@ -2,22 +2,16 @@ package io.choerodon.issue.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.IssueTypeDTO;
-import io.choerodon.issue.api.dto.IssueTypeSearchDTO;
-import io.choerodon.issue.api.dto.IssueTypeWithInfoDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
+import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.service.IssueTypeService;
 import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
+import io.choerodon.issue.api.service.StateMachineService;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.infra.enums.InitIssueType;
-import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.utils.PageUtil;
-
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +37,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
     @Autowired
     private StateMachineSchemeConfigService stateMachineSchemeConfigService;
     @Autowired
-    private StateMachineFeignClient stateMachineServiceFeign;
+    private StateMachineService stateMachineService;
 
 
     private final ModelMapper modelMapper = new ModelMapper();
@@ -158,7 +152,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
         for (IssueTypeDTO issueTypeDTO : issueTypeDTOS) {
             StateMachineSchemeConfigDTO configDTO = configMap.get(issueTypeDTO.getId());
             if (configDTO != null) {
-                StateMachineDTO stateMachineDTO = stateMachineServiceFeign.queryStateMachineById(organizationId, configDTO.getStateMachineId()).getBody();
+                StateMachineDTO stateMachineDTO = stateMachineService.queryStateMachineById(organizationId, configDTO.getStateMachineId());
                 issueTypeDTO.setStateMachineName(stateMachineDTO.getName());
                 issueTypeDTO.setStateMachineId(stateMachineDTO.getId());
             }

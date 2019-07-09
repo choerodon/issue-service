@@ -1,10 +1,13 @@
 package io.choerodon.issue.api.service;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.base.domain.PageRequest;
+import io.choerodon.issue.api.dto.StateMachineDTO;
+import io.choerodon.issue.api.dto.StateMachineListDTO;
+import io.choerodon.issue.api.dto.StateMachineWithStatusDTO;
 import io.choerodon.issue.api.dto.payload.ChangeStatus;
 import io.choerodon.issue.api.dto.payload.DeployStateMachinePayload;
-import io.choerodon.issue.infra.feign.dto.StateMachineDTO;
-import org.springframework.http.ResponseEntity;
+import io.choerodon.issue.domain.StateMachine;
 
 import java.util.List;
 import java.util.Map;
@@ -19,15 +22,40 @@ public interface StateMachineService {
      * 分页查询状态机
      *
      * @param organizationId 组织id
-     * @param page           分页数
-     * @param size           分页大小
-     * @param sort           排序字段
      * @param name           名称
      * @param description    描述
      * @param param          模糊查询参数
      * @return 状态机列表
      */
-    ResponseEntity<PageInfo<StateMachineDTO>> pageQuery(Long organizationId, Integer page, Integer size, String[] sort, String name, String description, String[] param);
+    PageInfo<StateMachineListDTO> pageQuery(Long organizationId, PageRequest pageRequest, String name, String description, String[] param);
+
+    /**
+     * 创建状态机及配置
+     *
+     * @param organizationId  组织id
+     * @param stateMachineDTO 状态机及配置对象
+     * @return 状态机
+     */
+    StateMachineDTO create(Long organizationId, StateMachineDTO stateMachineDTO);
+
+    /**
+     * 更新状态机
+     *
+     * @param organizationId  组织id
+     * @param stateMachineId  状态机id
+     * @param stateMachineDTO 状态机对象
+     * @return 更新状态机
+     */
+    StateMachineDTO update(Long organizationId, Long stateMachineId, StateMachineDTO stateMachineDTO);
+
+    /**
+     * 发布状态机
+     *
+     * @param organizationId 组织id
+     * @param stateMachineId 状态机id
+     * @return 发布状态机对象
+     */
+    Boolean deploy(Long organizationId, Long stateMachineId, Boolean isStartSaga);
 
     /**
      * 删除状态机
@@ -36,7 +64,7 @@ public interface StateMachineService {
      * @param stateMachineId 状态机id
      * @return
      */
-    ResponseEntity<Boolean> delete(Long organizationId, Long stateMachineId);
+    void delete(Long organizationId, Long stateMachineId);
 
     /**
      * 删除校验
@@ -68,21 +96,113 @@ public interface StateMachineService {
      * 发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态
      *
      * @param organizationId
-     * @param stateMachineId
-     * @param changeStatus
-     * @return
-     */
-    DeployStateMachinePayload handleStateMachineChangeStatusByStateMachineId(Long organizationId, Long stateMachineId, ChangeStatus changeStatus);
-
-    /**
-     * 发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态
-     *
-     * @param organizationId
      * @param ignoreStateMachineId 忽略当前修改的状态机
-     * @param ignoreSchemeId 忽略当前修改的状态机方案
+     * @param ignoreSchemeId       忽略当前修改的状态机方案
      * @param schemeIds
      * @param changeStatus
      * @return
      */
     DeployStateMachinePayload handleStateMachineChangeStatusBySchemeIds(Long organizationId, Long ignoreStateMachineId, Long ignoreSchemeId, List<Long> schemeIds, ChangeStatus changeStatus);
+
+    /**
+     * 获取状态机及配置（草稿、活跃）
+     *
+     * @param organizationId
+     * @param stateMachineId
+     * @param isDraft        是否为草稿
+     * @return
+     */
+    StateMachineDTO queryStateMachineWithConfigById(Long organizationId, Long stateMachineId, Boolean isDraft);
+
+    /**
+     * 获取状态机及配置，用于内部状态机实例构建
+     *
+     * @param stateMachineId 状态机id
+     * @return
+     */
+    StateMachine queryDeployForInstance(Long organizationId, Long stateMachineId);
+
+    /**
+     * 删除草稿
+     *
+     * @param stateMachineId 状态机Id
+     * @return 状态机对象
+     */
+    StateMachineDTO deleteDraft(Long organizationId, Long stateMachineId);
+
+    /**
+     * 获取状态机
+     *
+     * @param stateMachineId 状态机id
+     * @return
+     */
+    StateMachineDTO queryStateMachineById(Long organizationId, Long stateMachineId);
+
+    /**
+     * 获取组织默认状态机
+     *
+     * @param organizationId
+     * @return
+     */
+    StateMachineDTO queryDefaultStateMachine(Long organizationId);
+
+    /**
+     * 校验问题状态机名字是否未被使用
+     *
+     * @param organizationId 组织id
+     * @param name           名称
+     * @return
+     */
+    Boolean checkName(Long organizationId, String name);
+
+    /**
+     * 获取所有状态机
+     *
+     * @param organizationId 组织id
+     * @return 状态机列表
+     */
+    List<StateMachineDTO> queryAll(Long organizationId);
+
+    /**
+     * 修改状态机状态
+     * 活跃 -> 草稿
+     *
+     * @param organizationId organizationId
+     * @param stateMachineId stateMachineId
+     */
+    void updateStateMachineStatus(Long organizationId, Long stateMachineId);
+
+    /**
+     * 批量活跃状态机
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     * @return
+     */
+    Boolean activeStateMachines(Long organizationId, List<Long> stateMachineIds);
+
+    /**
+     * 批量使活跃状态机变成未活跃
+     *
+     * @param organizationId
+     * @param stateMachineIds
+     * @return
+     */
+    Boolean notActiveStateMachines(Long organizationId, List<Long> stateMachineIds);
+
+    /**
+     * 获取组织下所有状态机，附带状态
+     *
+     * @param organizationId 组织id
+     * @return 状态机列表
+     */
+    List<StateMachineWithStatusDTO> queryAllWithStatus(Long organizationId);
+
+    /**
+     * 获取组织下所有状态机
+     *
+     * @param organizationId
+     * @return
+     */
+    List<StateMachineDTO> queryByOrgId(Long organizationId);
 }

@@ -9,18 +9,14 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.dto.*;
 import io.choerodon.issue.api.dto.payload.StatusPayload;
-import io.choerodon.issue.api.service.IssueTypeSchemeService;
-import io.choerodon.issue.api.service.ProjectConfigService;
-import io.choerodon.issue.api.service.StateMachineSchemeConfigService;
-import io.choerodon.issue.api.service.StateMachineSchemeService;
+import io.choerodon.issue.api.service.*;
 import io.choerodon.issue.domain.IssueType;
 import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.api.dto.payload.TransformDTO;
+import io.choerodon.issue.api.dto.payload.TransformInfo;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.exception.RemoveStatusException;
-import io.choerodon.issue.infra.feign.StateMachineFeignClient;
-import io.choerodon.issue.infra.feign.dto.StatusDTO;
-import io.choerodon.issue.infra.feign.dto.TransformDTO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
@@ -32,8 +28,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -75,8 +69,6 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Autowired
     private StateMachineSchemeService stateMachineSchemeService;
     @Autowired
-    private StateMachineFeignClient stateMachineFeignClient;
-    @Autowired
     private ProjectUtil projectUtil;
     @Autowired
     private ProjectConfigService projectConfigService;
@@ -84,6 +76,12 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private InstanceFeignClient instanceFeignClient;
     @Autowired
     private SagaClient sagaClient;
+    @Autowired
+    private StatusService statusService;
+    @Autowired
+    private InstanceService instanceService;
+    @Autowired
+    private StateMachineTransformService transformService;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -203,7 +201,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         }
         //获取状态机
         Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, stateMachineSchemeId, issueTypeId);
-        return stateMachineFeignClient.queryByStateMachineIds(organizationId, Collections.singletonList(stateMachineId)).getBody();
+        return statusService.queryByStateMachineIds(organizationId, Collections.singletonList(stateMachineId));
     }
 
     @Override
@@ -216,7 +214,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         //获取状态机ids
         List<Long> stateMachineIds = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, stateMachineSchemeId)
                 .stream().map(StateMachineSchemeConfigDTO::getStateMachineId).collect(Collectors.toList());
-        return stateMachineFeignClient.queryByStateMachineIds(organizationId, stateMachineIds).getBody();
+        return statusService.queryByStateMachineIds(organizationId, stateMachineIds);
     }
 
     @Override
@@ -231,9 +229,11 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             //获取状态机
             Long stateMachineId = stateMachineSchemeConfigService.queryStateMachineIdBySchemeIdAndIssueTypeId(false, organizationId, projectConfig.getSchemeId(), issueTypeId);
             //获取当前状态拥有的转换
-            List<TransformDTO> transformDTOS = stateMachineFeignClient.transformList(organizationId, AGILE_SERVICE, stateMachineId, issueId, currentStatusId).getBody();
+            List<TransformInfo> transformInfos = instanceService.queryListTransform(organizationId, AGILE_SERVICE, stateMachineId, issueId, currentStatusId);
+            List<TransformDTO> transformDTOS = modelMapper.map(transformInfos, new TypeToken<List<TransformDTO>>() {
+            }.getType());
             //获取组织中所有状态
-            List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+            List<StatusDTO> statusDTOS = statusService.queryAllStatus(organizationId);
             Map<Long, StatusDTO> statusMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
             transformDTOS.forEach(transformDTO -> {
                 StatusDTO statusDTO = statusMap.get(transformDTO.getEndStatusId());
@@ -272,12 +272,12 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, itProjectConfig.getSchemeId());
         List<Long> stateMachineIds = smsConfigDTO.stream().map(StateMachineSchemeConfigDTO::getStateMachineId).collect(Collectors.toList());
         //状态机id->状态id->转换列表
-        Map<Long, Map<Long, List<TransformDTO>>> statusMap = stateMachineFeignClient.queryStatusTransformsMap(organizationId, stateMachineIds).getBody();
+        Map<Long, Map<Long, List<TransformDTO>>> statusMap = transformService.queryStatusTransformsMap(organizationId, stateMachineIds);
         Map<Long, Long> idMap = smsConfigDTO.stream().collect(Collectors.toMap(StateMachineSchemeConfigDTO::getIssueTypeId, StateMachineSchemeConfigDTO::getStateMachineId));
         //问题类型id->状态id->转换列表
         Map<Long, Map<Long, List<TransformDTO>>> resultMap = new HashMap<>(issueTypes.size());
         //获取组织所有状态
-        List<StatusDTO> statusDTOS = stateMachineFeignClient.queryAllStatus(organizationId).getBody();
+        List<StatusDTO> statusDTOS = statusService.queryAllStatus(organizationId);
         Map<Long, StatusDTO> sMap = statusDTOS.stream().collect(Collectors.toMap(StatusDTO::getId, x -> x));
         statusMap.entrySet().forEach(x -> x.getValue().entrySet().forEach(y -> y.getValue().forEach(transformDTO -> {
             StatusDTO statusDTO = sMap.get(transformDTO.getEndStatusId());
@@ -322,7 +322,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Map<String, Object> result = checkCreateStatusForAgile(projectId, applyType);
         if ((Boolean) result.get(FLAG)) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
-            statusDTO = stateMachineFeignClient.createStatusForAgile(organizationId, stateMachineId, statusDTO).getBody();
+            statusDTO = statusService.createStatusForAgile(organizationId, stateMachineId, statusDTO);
         } else {
             throw new CommonException((String) result.get(MESSAGE));
         }
@@ -376,18 +376,16 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             Long organizationId = projectUtil.getOrganizationId(projectId);
-            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId, stateMachineId).getBody();
+            Long initStatusId = instanceService.queryInitStatusId(organizationId, stateMachineId);
             if (statusId.equals(initStatusId)) {
                 throw new CommonException("error.initStatus.illegal");
             }
             try {
-                ResponseEntity responseEntity = stateMachineFeignClient.removeStateMachineNode(organizationId, stateMachineId, statusId);
-                if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                    StatusPayload statusPayload = new StatusPayload();
-                    statusPayload.setProjectId(projectId);
-                    statusPayload.setStatusId(statusId);
-                    sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload), "", "", ResourceLevel.PROJECT.value(), projectId));
-                }
+                statusService.removeStatusForAgile(organizationId, stateMachineId, statusId);
+                StatusPayload statusPayload = new StatusPayload();
+                statusPayload.setProjectId(projectId);
+                statusPayload.setStatusId(statusId);
+                sagaClient.startSaga("agile-remove-status", new StartInstanceDTO(JSON.toJSONString(statusPayload), "", "", ResourceLevel.PROJECT.value(), projectId));
             } catch (Exception e) {
                 throw new RemoveStatusException("error.status.remove");
             }
@@ -403,7 +401,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         if (flag) {
             Long stateMachineId = (Long) result.get(STATEMACHINEID);
             Long organizationId = projectUtil.getOrganizationId(projectId);
-            Long initStatusId = stateMachineFeignClient.queryInitStatusId(organizationId, stateMachineId).getBody();
+            Long initStatusId = instanceService.queryInitStatusId(organizationId, stateMachineId);
             return !statusId.equals(initStatusId);
         } else {
             throw new RemoveStatusException((String) result.get(MESSAGE));

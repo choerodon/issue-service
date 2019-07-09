@@ -29,9 +29,4 @@ public class ProjectInfoServiceImpl implements ProjectInfoService {
             projectInfoMapper.insert(info);
         }
     }
-
-//    @Override
-//    public void demoProjectClean(Long projectId) {
-//        projectInfoMapper.demoProjectClean(projectId);
-//    }
 }

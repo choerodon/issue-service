@@ -36,6 +36,8 @@ public class IssueEventHandler {
     private IssueTypeSchemeService issueTypeSchemeService;
     @Autowired
     private PriorityService priorityService;
+    @Autowired
+    private InitService initService;
 
     /**
      * 创建项目事件
@@ -73,11 +75,15 @@ public class IssueEventHandler {
     public String handleOrgaizationCreateByConsumeSagaTask(String data) {
         LOGGER.info("消费创建组织消息{}", data);
         OrganizationCreateEventPayload organizationEventPayload = JSONObject.parseObject(data, OrganizationCreateEventPayload.class);
-        Long orgId = organizationEventPayload.getId();
+        Long organizationId = organizationEventPayload.getId();
         //注册组织初始化问题类型
-        issueTypeService.initIssueTypeByConsumeCreateOrganization(orgId);
+        issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
         //注册组织初始化优先级
-        priorityService.initProrityByOrganization(Arrays.asList(orgId));
+        priorityService.initProrityByOrganization(Arrays.asList(organizationId));
+        //初始化状态
+        initService.initStatus(organizationId);
+        //初始化默认状态机
+        initService.initDefaultStateMachine(organizationId);
         return data;
     }
 }
