@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.issue.infra.mapper.PageMapper">
+
+    <resultMap id="pageMap" type="io.choerodon.issue.domain.Page">
+        <id property="id" column="id"/>
+        <id property="name" column="name"/>
+        <id property="description" column="description"/>
+        <id property="schemeCode" column="scheme_code"/>
+        <id property="schemeName" column="scheme_name"/>
+        <id property="pageCode" column="page_code"/>
+        <id property="organizationId" column="organization_id"/>
+        <id property="creationDate" column="creation_date"/>
+        <id property="createdBy" column="created_by"/>
+        <id property="lastUpdateDate" column="last_update_date"/>
+        <id property="lastUpdatedBy" column="last_updated_by"/>
+        <id property="objectVersionNumber" column="object_version_number"/>
+    </resultMap>
+
+    <select id="fulltextSearch" resultMap="pageMap">
+        SELECT p.*,
+        os.name AS scheme_name
+        FROM page p
+        LEFT JOIN object_scheme os ON p.scheme_code = os.scheme_code
+        WHERE (p.is_system = 1 OR p.organization_id = #{organizationId})
+        <if test="searchDTO.name != null">
+            AND p.name LIKE concat('%',#{searchDTO.name},'%')
+        </if>
+        <if test="searchDTO.description != null">
+            AND p.description LIKE concat('%',#{searchDTO.description},'%')
+        </if>
+        <if test="searchDTO.schemeCode != null">
+            AND p.scheme_code = #{searchDTO.schemeCode}
+        </if>
+        <if test="searchDTO.pageCode != null">
+            AND p.page_code = #{searchDTO.pageCode}
+        </if>
+        <if test="searchDTO.param != null">
+            AND ( p.name LIKE concat('%',#{searchDTO.param},'%')
+            OR p.description LIKE concat('%',#{searchDTO.param},'%')
+            )
+        </if>
+    </select>
+
+</mapper>

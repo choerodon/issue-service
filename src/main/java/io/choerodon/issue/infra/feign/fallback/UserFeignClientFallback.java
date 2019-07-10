@@ -2,8 +2,8 @@ package io.choerodon.issue.infra.feign.fallback;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.infra.feign.UserFeignClient;
+import io.choerodon.issue.infra.feign.dto.ProjectDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

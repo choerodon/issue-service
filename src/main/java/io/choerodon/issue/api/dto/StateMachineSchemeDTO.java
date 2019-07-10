@@ -1,5 +1,6 @@
 package io.choerodon.issue.api.dto;
 
+import io.choerodon.issue.infra.feign.dto.ProjectDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;

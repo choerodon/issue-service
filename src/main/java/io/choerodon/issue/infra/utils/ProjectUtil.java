@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.utils;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.infra.feign.UserFeignClient;
+import io.choerodon.issue.infra.feign.dto.ProjectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

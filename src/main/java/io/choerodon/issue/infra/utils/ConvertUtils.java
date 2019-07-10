@@ -1,11 +1,11 @@
 package io.choerodon.issue.infra.utils;
 
-import io.choerodon.issue.api.dto.ProjectDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.domain.ProjectConfig;
 import io.choerodon.issue.domain.StateMachineScheme;
 import io.choerodon.issue.domain.StateMachineSchemeConfig;
+import io.choerodon.issue.infra.feign.dto.ProjectDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
