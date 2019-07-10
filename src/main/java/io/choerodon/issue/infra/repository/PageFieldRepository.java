@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.repository;
 
-import io.choerodon.issue.domain.PageField;
+import io.choerodon.issue.infra.dto.PageField;
 
 /**
  * @author shinan.chen

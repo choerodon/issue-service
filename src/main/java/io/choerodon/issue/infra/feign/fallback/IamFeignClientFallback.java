@@ -2,8 +2,8 @@ package io.choerodon.issue.infra.feign.fallback;
 
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.issue.infra.feign.IamFeignClient;
-import io.choerodon.issue.infra.feign.dto.ProjectDTO;
-import io.choerodon.issue.infra.feign.dto.UserDO;
+import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.UserVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +19,12 @@ public class IamFeignClientFallback implements IamFeignClient {
     private static final String PROJECT_INFO_ERROR = "error.UserFeign.queryProjectInfo";
 
     @Override
-    public ResponseEntity<List<UserDO>> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
+    public ResponseEntity<List<UserVO>> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
         throw new FeignException(BATCH_QUERY_ERROR);
     }
 
     @Override
-    public ResponseEntity<ProjectDTO> queryProjectInfo(Long projectId) {
+    public ResponseEntity<ProjectVO> queryProjectInfo(Long projectId) {
         throw new FeignException(PROJECT_INFO_ERROR);
     }
 }

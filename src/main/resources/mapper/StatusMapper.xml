@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.StatusMapper">
 
-    <select id="queryById" resultType="io.choerodon.issue.domain.Status">
+    <select id="queryById" resultType="io.choerodon.issue.infra.dto.Status">
         SELECT *
         FROM status
         WHERE organization_id = #{organizationId}
         and id = #{id}
     </select>
 
-    <resultMap id="statusListMap" type="io.choerodon.issue.domain.StatusWithInfo">
+    <resultMap id="statusListMap" type="io.choerodon.issue.infra.dto.StatusWithInfo">
         <id property="id" column="st_id"/>
         <id property="name" column="st_name"/>
         <id property="description" column="st_description"/>
@@ -18,7 +18,7 @@
         <id property="organizationId" column="st_organization_id"/>
         <id property="objectVersionNumber" column="st_object_version_number"/>
         <collection property="stateMachineInfoList" autoMapping="true"
-                    ofType="io.choerodon.issue.domain.StateMachineInfo">
+                    ofType="io.choerodon.issue.infra.dto.StateMachineInfo">
             <id property="stateMachineId" column="smddn_state_machine_id"/>
             <id property="stateMachineName" column="smddn_name"/>
             <id property="stateMachineStatus" column="smddn_status"/>
@@ -30,18 +30,18 @@
         st.id
         from status st
         where st.organization_id = #{organizationId}
-        <if test="statusSearchDTO.name != null">
-            AND st.name LIKE concat('%',#{statusSearchDTO.name},'%')
+        <if test="statusSearchVO.name != null">
+            AND st.name LIKE concat('%',#{statusSearchVO.name},'%')
         </if>
-        <if test="statusSearchDTO.type != null">
-            AND st.type LIKE concat('%',#{statusSearchDTO.type},'%')
+        <if test="statusSearchVO.type != null">
+            AND st.type LIKE concat('%',#{statusSearchVO.type},'%')
         </if>
-        <if test="statusSearchDTO.description != null">
-            AND st.description LIKE concat('%',#{statusSearchDTO.description},'%')
+        <if test="statusSearchVO.description != null">
+            AND st.description LIKE concat('%',#{statusSearchVO.description},'%')
         </if>
-        <if test="statusSearchDTO.param != null">
-            AND ( st.name LIKE concat('%',#{statusSearchDTO.param},'%')
-            OR st.description LIKE concat('%',#{statusSearchDTO.param},'%')
+        <if test="statusSearchVO.param != null">
+            AND ( st.name LIKE concat('%',#{statusSearchVO.param},'%')
+            OR st.description LIKE concat('%',#{statusSearchVO.param},'%')
             )
         </if>
     </select>
@@ -97,7 +97,7 @@
     <!--</if>-->
     <!--</select>-->
 
-    <select id="batchStatusGet" resultType="io.choerodon.issue.domain.Status">
+    <select id="batchStatusGet" resultType="io.choerodon.issue.infra.dto.Status">
         select * from status where id in
         <foreach collection="ids" item="id"
                  open="(" close=")" separator=",">
@@ -106,7 +106,7 @@
         order by id
     </select>
 
-    <select id="queryByStateMachineIds" resultType="io.choerodon.issue.domain.Status">
+    <select id="queryByStateMachineIds" resultType="io.choerodon.issue.infra.dto.Status">
         SELECT *
         FROM status
         WHERE organization_id = #{organizationId}

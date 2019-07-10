@@ -1,0 +1,125 @@
+package io.choerodon.issue.app.service.impl;
+
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.app.service.ConfigCodeService;
+import io.choerodon.issue.app.service.StateMachineConfigService;
+import io.choerodon.issue.api.vo.ConfigCodeVO;
+import io.choerodon.issue.api.vo.StateMachineConfigVO;
+import io.choerodon.issue.infra.dto.StateMachineConfig;
+import io.choerodon.issue.infra.dto.StateMachineConfigDraft;
+import io.choerodon.issue.infra.enums.ConfigType;
+import io.choerodon.issue.infra.mapper.StateMachineConfigDraftMapper;
+import io.choerodon.issue.infra.mapper.StateMachineConfigMapper;
+import io.choerodon.issue.infra.util.EnumUtil;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * @author peng.jiang, dinghuang123@gmail.com
+ */
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class StateMachineConfigServiceImpl implements StateMachineConfigService {
+
+    @Autowired
+    private StateMachineConfigDraftMapper configDraftMapper;
+    @Autowired
+    private StateMachineConfigMapper configDeployMapper;
+    @Autowired
+    private ConfigCodeService configCodeService;
+
+    private ModelMapper modelMapper = new ModelMapper();
+
+    @PostConstruct
+    public void init() {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+    }
+
+    private static final String ERROR_STATUS_TYPE_ILLEGAL = "error.status.type.illegal";
+
+    @Override
+    public StateMachineConfigVO create(Long organizationId, Long stateMachineId, Long transformId, StateMachineConfigVO configDTO) {
+        if (!EnumUtil.contain(ConfigType.class, configDTO.getType())) {
+            throw new CommonException(ERROR_STATUS_TYPE_ILLEGAL);
+        }
+        //验证configCode
+        checkCode(transformId, configDTO.getType(), configDTO.getCode());
+
+        configDTO.setTransformId(transformId);
+        configDTO.setOrganizationId(organizationId);
+        StateMachineConfigDraft config = modelMapper.map(configDTO, StateMachineConfigDraft.class);
+        config.setStateMachineId(stateMachineId);
+        int isInsert = configDraftMapper.insert(config);
+        if (isInsert != 1) {
+            throw new CommonException("error.stateMachineConfig.create");
+        }
+        config = configDraftMapper.queryById(organizationId, config.getId());
+        return modelMapper.map(config, StateMachineConfigVO.class);
+    }
+
+    @Override
+    public Boolean delete(Long organizationId, Long configId) {
+        StateMachineConfigDraft config = new StateMachineConfigDraft();
+        config.setId(configId);
+        config.setOrganizationId(organizationId);
+        int isDelete = configDraftMapper.delete(config);
+        if (isDelete != 1) {
+            throw new CommonException("error.stateMachineConfig.delete");
+        }
+        return true;
+    }
+
+    @Override
+    public List<StateMachineConfigVO> queryByTransformId(Long organizationId, Long transformId, String type, Boolean isDraft) {
+        if (type != null && !EnumUtil.contain(ConfigType.class, type)) {
+            throw new CommonException(ERROR_STATUS_TYPE_ILLEGAL);
+        }
+        List<StateMachineConfigVO> configVOS;
+        if (isDraft) {
+            List<StateMachineConfigDraft> configs = configDraftMapper.queryWithCodeInfo(organizationId, transformId, type);
+            configVOS = modelMapper.map(configs, new TypeToken<List<StateMachineConfigVO>>() {
+            }.getType());
+        } else {
+            List<StateMachineConfig> configs = configDeployMapper.queryWithCodeInfo(organizationId, transformId, type);
+            configVOS = modelMapper.map(configs, new TypeToken<List<StateMachineConfigVO>>() {
+            }.getType());
+        }
+        return configVOS;
+    }
+
+    @Override
+    public List<StateMachineConfigVO> queryDeployByTransformIds(Long organizationId, String type, List<Long> transformIds) {
+        if (!EnumUtil.contain(ConfigType.class, type)) {
+            throw new CommonException(ERROR_STATUS_TYPE_ILLEGAL);
+        }
+        if (transformIds != null && !transformIds.isEmpty()) {
+            List<StateMachineConfig> configs = configDeployMapper.queryWithCodeInfoByTransformIds(organizationId, type, transformIds);
+            return modelMapper.map(configs, new TypeToken<List<StateMachineConfigVO>>() {
+            }.getType());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public void checkCode(Long transformId, String type, String code) {
+        List<ConfigCodeVO> configCodeVOS = configCodeService.queryByType(type);
+        if (configCodeVOS.stream().noneMatch(configCodeDTO -> configCodeDTO.getCode().equals(code))) {
+            throw new CommonException("error.configCode.illegal");
+        }
+        StateMachineConfigDraft configDraft = new StateMachineConfigDraft();
+        configDraft.setTransformId(transformId);
+        configDraft.setCode(code);
+        if (!configDraftMapper.select(configDraft).isEmpty()) {
+            throw new CommonException("error.configCode.exist");
+        }
+
+    }
+}

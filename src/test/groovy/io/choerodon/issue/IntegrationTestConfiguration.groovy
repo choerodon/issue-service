@@ -2,9 +2,9 @@ package io.choerodon.issue
 
 import com.alibaba.fastjson.JSON
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
-import io.choerodon.issue.api.dto.payload.ProjectEvent
-import io.choerodon.issue.api.eventhandler.IssueEventHandler
+import io.choerodon.issue.api.vo.payload.OrganizationCreateEventPayload
+import io.choerodon.issue.api.vo.payload.ProjectEvent
+import io.choerodon.issue.app.eventhandler.IssueEventHandler
 import io.choerodon.core.oauth.CustomUserDetails
 import io.choerodon.issue.infra.enums.ProjectCategory
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper

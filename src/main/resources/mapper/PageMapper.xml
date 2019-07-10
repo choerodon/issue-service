@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.PageMapper">
 
-    <resultMap id="pageMap" type="io.choerodon.issue.domain.Page">
+    <resultMap id="pageMap" type="io.choerodon.issue.infra.dto.Page">
         <id property="id" column="id"/>
         <id property="name" column="name"/>
         <id property="description" column="description"/>
@@ -23,21 +23,21 @@
         FROM page p
         LEFT JOIN object_scheme os ON p.scheme_code = os.scheme_code
         WHERE (p.is_system = 1 OR p.organization_id = #{organizationId})
-        <if test="searchDTO.name != null">
-            AND p.name LIKE concat('%',#{searchDTO.name},'%')
+        <if test="searchVO.name != null">
+            AND p.name LIKE concat('%',#{searchVO.name},'%')
         </if>
-        <if test="searchDTO.description != null">
-            AND p.description LIKE concat('%',#{searchDTO.description},'%')
+        <if test="searchVO.description != null">
+            AND p.description LIKE concat('%',#{searchVO.description},'%')
         </if>
-        <if test="searchDTO.schemeCode != null">
-            AND p.scheme_code = #{searchDTO.schemeCode}
+        <if test="searchVO.schemeCode != null">
+            AND p.scheme_code = #{searchVO.schemeCode}
         </if>
-        <if test="searchDTO.pageCode != null">
-            AND p.page_code = #{searchDTO.pageCode}
+        <if test="searchVO.pageCode != null">
+            AND p.page_code = #{searchVO.pageCode}
         </if>
-        <if test="searchDTO.param != null">
-            AND ( p.name LIKE concat('%',#{searchDTO.param},'%')
-            OR p.description LIKE concat('%',#{searchDTO.param},'%')
+        <if test="searchVO.param != null">
+            AND ( p.name LIKE concat('%',#{searchVO.param},'%')
+            OR p.description LIKE concat('%',#{searchVO.param},'%')
             )
         </if>
     </select>

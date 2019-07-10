@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.api.dto.StatusSearchDTO;
-import io.choerodon.issue.domain.Status;
-import io.choerodon.issue.domain.StatusWithInfo;
+import io.choerodon.issue.api.vo.StatusSearchVO;
+import io.choerodon.issue.infra.dto.Status;
+import io.choerodon.issue.infra.dto.StatusWithInfo;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface StatusMapper extends Mapper<Status> {
 
-    List<Long> selectStatusIds(@Param("organizationId") Long organizationId, @Param("statusSearchDTO") StatusSearchDTO statusSearchDTO);
+    List<Long> selectStatusIds(@Param("organizationId") Long organizationId, @Param("statusSearchVO") StatusSearchVO statusSearchVO);
 
     List<StatusWithInfo> queryStatusList(@Param("organizationId") Long organizationId, @Param("statusIds") List<Long> statusIds);
 

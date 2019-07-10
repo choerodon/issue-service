@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.domain.IssueTypeSchemeConfig;
+import io.choerodon.issue.infra.dto.IssueTypeSchemeConfig;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;

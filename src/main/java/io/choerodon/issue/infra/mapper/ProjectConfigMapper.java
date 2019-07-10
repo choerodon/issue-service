@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.infra.dto.ProjectConfig;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
@@ -18,6 +18,7 @@ public interface ProjectConfigMapper extends Mapper<ProjectConfig> {
     ProjectConfig queryBySchemeTypeAndApplyType(@Param("projectId") Long projectId, @Param("schemeType") String schemeType, @Param("applyType") String applyType);
 
     List<ProjectConfig> queryBySchemeIds(@Param("schemeIds") List<Long> schemeIds, @Param("schemeType") String schemeType);
+
     /**
      * 通过方案ids查询出关联的项目（项目关联的状态机方案）
      *

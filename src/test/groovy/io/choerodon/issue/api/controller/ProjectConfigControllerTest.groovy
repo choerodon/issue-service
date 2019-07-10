@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.ProjectConfigDetailDTO
+import io.choerodon.issue.api.vo.ProjectConfigDetailVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -26,11 +26,11 @@ class ProjectConfigControllerTest extends Specification {
 
     def "queryById"() {
         when: '获取项目配置方案信息'
-        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/project_configs", ProjectConfigDetailDTO, 1L)
+        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/project_configs", ProjectConfigDetailVO, 1L)
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().is2xxSuccessful()
-        ProjectConfigDetailDTO projectConfigDetailDTO = entity.body
+        ProjectConfigDetailVO projectConfigDetailDTO = entity.body
 
         expect: "期望值"
         projectConfigDetailDTO != null

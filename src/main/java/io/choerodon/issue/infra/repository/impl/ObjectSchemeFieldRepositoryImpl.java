@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.ObjectSchemeFieldSearchDTO;
-import io.choerodon.issue.domain.ObjectSchemeField;
+import io.choerodon.issue.api.vo.ObjectSchemeFieldSearchVO;
+import io.choerodon.issue.infra.dto.ObjectSchemeField;
 import io.choerodon.issue.infra.enums.FieldCode;
 import io.choerodon.issue.infra.mapper.ObjectSchemeFieldMapper;
 import io.choerodon.issue.infra.repository.ObjectSchemeFieldRepository;
@@ -66,7 +66,7 @@ public class ObjectSchemeFieldRepositoryImpl implements ObjectSchemeFieldReposit
     }
 
     @Override
-    public List<ObjectSchemeField> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchDTO searchDTO) {
+    public List<ObjectSchemeField> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchVO searchDTO) {
         List<ObjectSchemeField> fields = objectSchemeFieldMapper.listQuery(organizationId, projectId, searchDTO);
         return FieldCode.objectSchemeFieldsFilter(organizationId, projectId, fields);
     }

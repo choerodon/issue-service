@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.domain.FieldOption;
+import io.choerodon.issue.infra.dto.FieldOption;
 import io.choerodon.issue.infra.mapper.FieldOptionMapper;
 import io.choerodon.issue.infra.repository.FieldOptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;

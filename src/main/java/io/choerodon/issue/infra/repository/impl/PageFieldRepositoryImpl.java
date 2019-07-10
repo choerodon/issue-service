@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.domain.PageField;
+import io.choerodon.issue.infra.dto.PageField;
 import io.choerodon.issue.infra.mapper.PageFieldMapper;
 import io.choerodon.issue.infra.repository.PageFieldRepository;
 import org.springframework.beans.factory.annotation.Autowired;

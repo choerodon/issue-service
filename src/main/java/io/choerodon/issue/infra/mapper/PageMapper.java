@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.api.dto.PageSearchDTO;
-import io.choerodon.issue.domain.Page;
+import io.choerodon.issue.api.vo.PageSearchVO;
+import io.choerodon.issue.infra.dto.Page;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,8 +16,8 @@ public interface PageMapper extends Mapper<Page> {
      * 分页查询页面
      *
      * @param organizationId
-     * @param searchDTO
+     * @param searchVO
      * @return
      */
-    List<Page> fulltextSearch(@Param("organizationId") Long organizationId, @Param("searchDTO") PageSearchDTO searchDTO);
+    List<Page> fulltextSearch(@Param("organizationId") Long organizationId, @Param("searchVO") PageSearchVO searchVO);
 }

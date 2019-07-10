@@ -3,7 +3,7 @@ package io.choerodon.issue.infra.feign.fallback;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.infra.feign.UserFeignClient;
-import io.choerodon.issue.infra.feign.dto.ProjectDTO;
+import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 public class UserFeignClientFallback implements UserFeignClient {
 
     @Override
-    public ResponseEntity<ProjectDTO> queryProject(Long projectId) {
+    public ResponseEntity<ProjectVO> queryProject(Long projectId) {
         throw new CommonException("error.userFeign.queryProject");
     }
 
     @Override
-    public ResponseEntity<PageInfo<ProjectDTO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size) {
+    public ResponseEntity<PageInfo<ProjectVO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size) {
         throw new CommonException("error.iamServiceFeignFallback.queryProjectsByOrgId");
     }
 }

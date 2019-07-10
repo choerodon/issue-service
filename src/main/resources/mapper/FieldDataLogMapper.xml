@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.FieldDataLogMapper">
 
-    <resultMap id="fieldDataLogMap" type="io.choerodon.issue.domain.FieldDataLog">
+    <resultMap id="fieldDataLogMap" type="io.choerodon.issue.infra.dto.FieldDataLog">
         <id property="id" column="id"/>
         <id property="fieldId" column="field_id"/>
         <id property="instanceId" column="instance_id"/>

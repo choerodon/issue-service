@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.aspect;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.service.StateMachineSchemeService;
-import io.choerodon.issue.domain.StateMachineScheme;
+import io.choerodon.issue.app.service.StateMachineSchemeService;
+import io.choerodon.issue.infra.dto.StateMachineScheme;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.entity.Criteria;

@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.validator;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.StateMachineTransformDTO;
+import io.choerodon.issue.api.vo.StateMachineTransformVO;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -11,17 +11,17 @@ import org.springframework.util.StringUtils;
 @Component
 public class StateMachineTransformValidator {
 
-    public void createValidate(StateMachineTransformDTO transformDTO) {
-        if (StringUtils.isEmpty(transformDTO.getStateMachineId())) {
+    public void createValidate(StateMachineTransformVO transformVO) {
+        if (StringUtils.isEmpty(transformVO.getStateMachineId())) {
             throw new CommonException("error.stateMachineNode.stateMachineId.empty");
         }
-        if (StringUtils.isEmpty(transformDTO.getName())) {
+        if (StringUtils.isEmpty(transformVO.getName())) {
             throw new CommonException("error.stateMachineNode.name.empty");
         }
     }
 
-    public void updateValidate(StateMachineTransformDTO transformDTO) {
-        if (transformDTO.getName() != null && transformDTO.getName().length() == 0) {
+    public void updateValidate(StateMachineTransformVO transformVO) {
+        if (transformVO.getName() != null && transformVO.getName().length() == 0) {
             throw new CommonException("error.stateMachineNode.name.empty");
         }
     }

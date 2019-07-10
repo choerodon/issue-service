@@ -1,8 +1,8 @@
 package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.PriorityDTO
-import io.choerodon.issue.api.dto.StatusDTO
+import io.choerodon.issue.api.vo.PriorityVO
+import io.choerodon.issue.api.vo.StatusVO
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -119,7 +119,7 @@ class SchemeControllerTest extends Specification {
 
     def "createStatusForAgile"() {
         given: "准备数据"
-        StatusDTO statusDTO = new StatusDTO()
+        StatusVO statusDTO = new StatusVO()
         statusDTO.organizationId = organizationId
         statusDTO.type = "XX2"
         statusDTO.name = "XX2"
@@ -128,7 +128,7 @@ class SchemeControllerTest extends Specification {
         statusDTO.canDelete = false
         when: '查询项目的问题类型对应的状态机id'
         def entity = restTemplate.postForEntity("/v1/projects/{project_id}/schemes/create_status_for_agile?applyType=agile",
-                statusDTO, StatusDTO, projectId)
+                statusDTO, StatusVO, projectId)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful()
@@ -163,11 +163,11 @@ class SchemeControllerTest extends Specification {
     def "queryDefaultByOrganizationId"() {
         when: '根据项目id查询组织默认优先级'
         def entity = restTemplate.getForEntity("/v1/projects/{project_id}/priority/default",
-                PriorityDTO, projectId)
+                PriorityVO, projectId)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful()
-        PriorityDTO priorityDTO = entity.body
+        PriorityVO priorityDTO = entity.body
 
         expect: '期望验证'
         priorityDTO != null

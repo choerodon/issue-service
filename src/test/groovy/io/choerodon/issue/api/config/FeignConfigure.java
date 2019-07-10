@@ -6,15 +6,15 @@ import io.choerodon.asgard.saga.dto.SagaInstanceDTO;
 import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.convertor.ApplicationContextHelper;
-import io.choerodon.issue.api.dto.ExecuteResult;
-import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
-import io.choerodon.issue.api.service.impl.SagaServiceImpl;
+import io.choerodon.issue.api.vo.ExecuteResult;
+import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.app.service.impl.SagaServiceImpl;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
-import io.choerodon.issue.infra.feign.dto.ProjectDTO;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
-import io.choerodon.issue.infra.utils.ProjectUtil;
+import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.util.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClientFallback;
 import org.mockito.Matchers;
@@ -40,18 +40,18 @@ public class FeignConfigure {
     @Primary
     UserFeignClient userFeignClient() {
         UserFeignClient userFeignClient = Mockito.mock(UserFeignClientFallback.class);
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setId(1L);
-        projectDTO.setName("test");
-        projectDTO.setOrganizationId(1L);
-        Mockito.when(userFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectDTO, HttpStatus.OK));
-        PageInfo<ProjectDTO> projectDTOS = new PageInfo<>();
-        List<ProjectDTO> projectDTOList = new ArrayList<>(1);
-        projectDTOList.add(projectDTO);
-        projectDTOS.setList(projectDTOList);
-        projectDTOS.setPageSize(1);
-        projectDTOS.setSize(1);
-        Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(new ResponseEntity<>(projectDTOS, HttpStatus.OK));
+        ProjectVO projectVO = new ProjectVO();
+        projectVO.setId(1L);
+        projectVO.setName("test");
+        projectVO.setOrganizationId(1L);
+        Mockito.when(userFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectVO, HttpStatus.OK));
+        PageInfo<ProjectVO> projectVOS = new PageInfo<>();
+        List<ProjectVO> projectVOList = new ArrayList<>(1);
+        projectVOList.add(projectVO);
+        projectVOS.setList(projectVOList);
+        projectVOS.setPageSize(1);
+        projectVOS.setSize(1);
+        Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(new ResponseEntity<>(projectVOS, HttpStatus.OK));
         return userFeignClient;
     }
 

@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.domain.ConfigCode;
+import io.choerodon.issue.infra.dto.ConfigCode;
 import io.choerodon.mybatis.common.Mapper;
 
 /**

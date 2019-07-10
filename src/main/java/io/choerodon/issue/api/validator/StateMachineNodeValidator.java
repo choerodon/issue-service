@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.validator;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.StateMachineNodeDTO;
+import io.choerodon.issue.api.vo.StateMachineNodeVO;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -11,23 +11,23 @@ import org.springframework.util.StringUtils;
 @Component
 public class StateMachineNodeValidator {
 
-    public void createValidate(StateMachineNodeDTO nodeDTO) {
-        if (StringUtils.isEmpty(nodeDTO.getStateMachineId())) {
+    public void createValidate(StateMachineNodeVO nodeVO) {
+        if (StringUtils.isEmpty(nodeVO.getStateMachineId())) {
             throw new CommonException("error.stateMachineNode.stateMachineId.empty");
         }
-        if (StringUtils.isEmpty(nodeDTO.getStatusId()) && nodeDTO.getStatusDTO() == null) {
+        if (StringUtils.isEmpty(nodeVO.getStatusId()) && nodeVO.getStatusVO() == null) {
             throw new CommonException("error.stateMachineNode.state.null");
         }
-        if (StringUtils.isEmpty(nodeDTO.getStatusId()) && nodeDTO.getStatusDTO() != null && StringUtils.isEmpty(nodeDTO.getStatusDTO().getName())) {
+        if (StringUtils.isEmpty(nodeVO.getStatusId()) && nodeVO.getStatusVO() != null && StringUtils.isEmpty(nodeVO.getStatusVO().getName())) {
             throw new CommonException("error.stateMachineNode.state.name.empty");
         }
     }
 
-    public void updateValidate(StateMachineNodeDTO nodeDTO) {
-        if (StringUtils.isEmpty(nodeDTO.getStatusId()) && nodeDTO.getStatusDTO() == null) {
+    public void updateValidate(StateMachineNodeVO nodeVO) {
+        if (StringUtils.isEmpty(nodeVO.getStatusId()) && nodeVO.getStatusVO() == null) {
             throw new CommonException("error.stateMachineNode.state.null");
         }
-        if (nodeDTO.getStatusDTO() != null && StringUtils.isEmpty(nodeDTO.getStatusDTO().getName())) {
+        if (nodeVO.getStatusVO() != null && StringUtils.isEmpty(nodeVO.getStatusVO().getName())) {
             throw new CommonException("error.stateMachineNode.state.name.empty");
         }
     }

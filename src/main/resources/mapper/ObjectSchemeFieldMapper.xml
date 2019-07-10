@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.ObjectSchemeFieldMapper">
 
-    <resultMap id="objectSchemeFieldMap" type="io.choerodon.issue.domain.ObjectSchemeField">
+    <resultMap id="objectSchemeFieldMap" type="io.choerodon.issue.infra.dto.ObjectSchemeField">
         <id property="id" column="id"/>
         <id property="code" column="code"/>
         <id property="name" column="name"/>
@@ -36,17 +36,17 @@
             OR osf.project_id = #{projectId}
         </if>
         ))
-        <if test="searchDTO.context != null">
-            AND osf.context = #{searchDTO.context}
+        <if test="searchVO.context != null">
+            AND osf.context = #{searchVO.context}
         </if>
-        <if test="searchDTO.schemeCode != null">
-            AND osf.scheme_code = #{searchDTO.schemeCode}
+        <if test="searchVO.schemeCode != null">
+            AND osf.scheme_code = #{searchVO.schemeCode}
         </if>
-        <if test="searchDTO.name != null">
-            AND osf.name = #{searchDTO.name}
+        <if test="searchVO.name != null">
+            AND osf.name = #{searchVO.name}
         </if>
-        <if test="searchDTO.code != null">
-            AND osf.code = #{searchDTO.code}
+        <if test="searchVO.code != null">
+            AND osf.code = #{searchVO.code}
         </if>
     </select>
 

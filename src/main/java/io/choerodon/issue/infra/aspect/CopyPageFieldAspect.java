@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.aspect;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.service.PageFieldService;
+import io.choerodon.issue.app.service.PageFieldService;
 import io.choerodon.issue.infra.mapper.PageFieldMapper;
 import io.choerodon.issue.infra.mapper.ProjectPageFieldMapper;
 import org.aspectj.lang.ProceedingJoinPoint;

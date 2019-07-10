@@ -1,9 +1,9 @@
 package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.IssueTypeDTO
-import io.choerodon.issue.api.dto.IssueTypeSearchDTO
-import io.choerodon.issue.api.service.IssueTypeService
+import io.choerodon.issue.api.vo.IssueTypeVO
+import io.choerodon.issue.api.vo.IssueTypeSearchVO
+import io.choerodon.issue.app.service.IssueTypeService
 import com.github.pagehelper.PageInfo
 import io.choerodon.issue.infra.mapper.IssueTypeMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +41,7 @@ class IssueTypeControllerSpec extends Specification {
     Long organizationId = 1L
 
     @Shared
-    List<IssueTypeDTO> list = new ArrayList<>()
+    List<IssueTypeVO> list = new ArrayList<>()
 
     /**
      * 测试编写说明：
@@ -54,7 +54,7 @@ class IssueTypeControllerSpec extends Specification {
 
     def "create"() {
         given: '准备工作'
-        IssueTypeDTO issueTypeDTO = new IssueTypeDTO()
+        IssueTypeVO issueTypeDTO = new IssueTypeVO()
         issueTypeDTO.setName(name)
         issueTypeDTO.setTypeCode(name)
         issueTypeDTO.setIcon(icon)
@@ -62,8 +62,8 @@ class IssueTypeControllerSpec extends Specification {
         issueTypeDTO.setOrganizationId(organizationId)
 
         when: '创建问题类型'
-        HttpEntity<IssueTypeDTO> httpEntity = new HttpEntity<>(issueTypeDTO)
-        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type", HttpMethod.POST, httpEntity, IssueTypeDTO, organizationId)
+        HttpEntity<IssueTypeVO> httpEntity = new HttpEntity<>(issueTypeDTO)
+        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type", HttpMethod.POST, httpEntity, IssueTypeVO, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -93,7 +93,7 @@ class IssueTypeControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        IssueTypeDTO issueTypeDTO = list.get(0)
+        IssueTypeVO issueTypeDTO = list.get(0)
         issueTypeDTO.setName(name)
         issueTypeDTO.setIcon(icon)
         issueTypeDTO.setDescription(description)
@@ -101,8 +101,8 @@ class IssueTypeControllerSpec extends Specification {
         issueTypeDTO.setObjectVersionNumber(objectVersionNumber)
 
         when: '更新问题类型'
-        HttpEntity<IssueTypeDTO> httpEntity = new HttpEntity<>(issueTypeDTO)
-        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + '/{id}', HttpMethod.PUT, httpEntity, IssueTypeDTO, organizationId, issueTypeDTO.getId())
+        HttpEntity<IssueTypeVO> httpEntity = new HttpEntity<>(issueTypeDTO)
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + '/{id}', HttpMethod.PUT, httpEntity, IssueTypeVO, organizationId, issueTypeDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -163,13 +163,13 @@ class IssueTypeControllerSpec extends Specification {
     def "queryIssueTypeList"() {
         given: '准备工作'
         def url = '/v1/organizations/{organization_id}/issue_type/list?page={page}&&size={size}'
-        IssueTypeSearchDTO issueTypeSearchDTO = new IssueTypeSearchDTO()
+        IssueTypeSearchVO issueTypeSearchDTO = new IssueTypeSearchVO()
         issueTypeSearchDTO.name = name
         issueTypeSearchDTO.description = description
         issueTypeSearchDTO.param = param
         when: '分页查询'
-        ParameterizedTypeReference<PageInfo<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<PageInfo<IssueTypeDTO>>() {}
-        HttpEntity<IssueTypeSearchDTO> issueTypeSearchDTOHttpEntity = new HttpEntity<>(issueTypeSearchDTO)
+        ParameterizedTypeReference<PageInfo<IssueTypeVO>> typeRef = new ParameterizedTypeReference<PageInfo<IssueTypeVO>>() {}
+        HttpEntity<IssueTypeSearchVO> issueTypeSearchDTOHttpEntity = new HttpEntity<>(issueTypeSearchDTO)
         def entity = restTemplate.exchange(url, HttpMethod.POST, issueTypeSearchDTOHttpEntity, typeRef, organizationId, 0, 10000)
 
         then: '返回结果'
@@ -231,7 +231,7 @@ class IssueTypeControllerSpec extends Specification {
 
     def "queryByOrgId"() {
         when: '获取问题类型列表'
-        ParameterizedTypeReference<List<IssueTypeDTO>> typeRef = new ParameterizedTypeReference<List<IssueTypeDTO>>() {
+        ParameterizedTypeReference<List<IssueTypeVO>> typeRef = new ParameterizedTypeReference<List<IssueTypeVO>>() {
         }
         def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/types", HttpMethod.GET, null, typeRef, organizationId)
 
@@ -260,7 +260,7 @@ class IssueTypeControllerSpec extends Specification {
         def issueTypeId = id
 
         when: '根据id查询问题类型'
-        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/{id}", HttpMethod.GET, null, IssueTypeDTO, organizationId, issueTypeId)
+        def entity = restTemplate.exchange('/v1/organizations/{organization_id}/issue_type' + "/{id}", HttpMethod.GET, null, IssueTypeVO, organizationId, issueTypeId)
 
         then: '状态码为200，调用成功'
 
@@ -294,7 +294,7 @@ class IssueTypeControllerSpec extends Specification {
         entity.statusCode.is2xxSuccessful()
         and: '设置值'
 
-        List<IssueTypeDTO> issueTypeDTOList = entity.body
+        List<IssueTypeVO> issueTypeDTOList = entity.body
 
         expect: '设置期望值'
         issueTypeDTOList.size() == 11
@@ -308,7 +308,7 @@ class IssueTypeControllerSpec extends Specification {
         entity.statusCode.is2xxSuccessful()
         and: '设置值'
 
-        Map<Long, IssueTypeDTO> issueTypeDTOMap = entity.body
+        Map<Long, IssueTypeVO> issueTypeDTOMap = entity.body
 
         expect: '设置期望值'
         issueTypeDTOMap.get("1") != null

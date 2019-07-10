@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.api.dto.payload.StatusPayload;
-import io.choerodon.issue.domain.StateMachine;
+import io.choerodon.issue.api.vo.payload.StatusPayload;
+import io.choerodon.issue.infra.dto.StateMachine;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 

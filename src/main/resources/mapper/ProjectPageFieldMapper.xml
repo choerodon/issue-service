@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.ProjectPageFieldMapper">
 
-    <resultMap id="projectPageFieldMap" type="io.choerodon.issue.domain.ProjectPageField">
+    <resultMap id="projectPageFieldMap" type="io.choerodon.issue.infra.dto.ProjectPageField">
         <id property="id" column="id"/>
         <id property="projectId" column="project_id"/>
         <id property="organizationId" column="organization_id"/>

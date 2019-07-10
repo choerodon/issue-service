@@ -3,7 +3,7 @@
 
 <mapper namespace="io.choerodon.issue.infra.mapper.StateMachineSchemeConfigDraftMapper">
 
-    <select id="selectDefault" resultType="io.choerodon.issue.domain.StateMachineSchemeConfigDraft">
+    <select id="selectDefault" resultType="io.choerodon.issue.infra.dto.StateMachineSchemeConfigDraft">
         SELECT
         smscd.*
         FROM

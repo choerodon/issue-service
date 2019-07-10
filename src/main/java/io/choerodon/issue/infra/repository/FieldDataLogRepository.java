@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.repository;
 
-import io.choerodon.issue.domain.FieldDataLog;
+import io.choerodon.issue.infra.dto.FieldDataLog;
 
 /**
  * @author shinan.chen

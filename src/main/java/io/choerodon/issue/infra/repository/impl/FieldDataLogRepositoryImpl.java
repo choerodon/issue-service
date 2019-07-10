@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.domain.FieldDataLog;
+import io.choerodon.issue.infra.dto.FieldDataLog;
 import io.choerodon.issue.infra.mapper.FieldDataLogMapper;
 import io.choerodon.issue.infra.repository.FieldDataLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,11 +1,11 @@
 package io.choerodon.issue.infra.enums;
 
-import io.choerodon.issue.domain.ObjectSchemeField;
-import io.choerodon.issue.domain.PageField;
+import io.choerodon.issue.infra.dto.ObjectSchemeField;
+import io.choerodon.issue.infra.dto.PageField;
 import io.choerodon.issue.infra.feign.IamFeignClient;
-import io.choerodon.issue.infra.feign.dto.ProjectCategoryDTO;
-import io.choerodon.issue.infra.feign.dto.ProjectDTO;
-import io.choerodon.issue.infra.utils.SpringBeanUtil;
+import io.choerodon.issue.infra.feign.vo.ProjectCategoryVO;
+import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.util.SpringBeanUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,9 +53,9 @@ public class FieldCode {
     public static List<ObjectSchemeField> objectSchemeFieldsFilter(Long organizationId, Long projectId, List<ObjectSchemeField> fields) {
         if (projectId != null) {
             IamFeignClient iamFeignClient = SpringBeanUtil.getBean(IamFeignClient.class);
-            ProjectDTO project = iamFeignClient.queryProjectInfo(projectId).getBody();
+            ProjectVO project = iamFeignClient.queryProjectInfo(projectId).getBody();
             if (project != null) {
-                List<String> categoryCodes = project.getCategories().stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList());
+                List<String> categoryCodes = project.getCategories().stream().map(ProjectCategoryVO::getCode).collect(Collectors.toList());
                 if (categoryCodes.contains(ProjectCategoryCode.PROGRAM)) {
                     //项目群
                     return fields;
@@ -82,9 +82,9 @@ public class FieldCode {
     public static List<PageField> pageFieldsFilter(Long organizationId, Long projectId, List<PageField> fields) {
         if (projectId != null) {
             IamFeignClient iamFeignClient = SpringBeanUtil.getBean(IamFeignClient.class);
-            ProjectDTO project = iamFeignClient.queryProjectInfo(projectId).getBody();
+            ProjectVO project = iamFeignClient.queryProjectInfo(projectId).getBody();
             if (project != null) {
-                List<String> categoryCodes = project.getCategories().stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList());
+                List<String> categoryCodes = project.getCategories().stream().map(ProjectCategoryVO::getCode).collect(Collectors.toList());
                 if (categoryCodes.contains(ProjectCategoryCode.PROGRAM)) {
                     //项目群
                     return fields;

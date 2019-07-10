@@ -2,11 +2,11 @@ package io.choerodon.issue.api.controller
 
 import com.github.pagehelper.PageInfo
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO
-import io.choerodon.issue.api.dto.StateMachineSchemeDTO
-import io.choerodon.issue.api.dto.payload.StateMachineSchemeChangeItem
-import io.choerodon.issue.api.service.StateMachineSchemeService
-import io.choerodon.issue.domain.StateMachineSchemeConfig
+import io.choerodon.issue.api.vo.StateMachineSchemeConfigVO
+import io.choerodon.issue.api.vo.StateMachineSchemeVO
+import io.choerodon.issue.api.vo.payload.StateMachineSchemeChangeItem
+import io.choerodon.issue.app.service.StateMachineSchemeService
+import io.choerodon.issue.infra.dto.StateMachineSchemeConfig
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -39,7 +39,7 @@ class StateMachineSchemeControllerSpec extends Specification {
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/state_machine_scheme'
     @Shared
-    List<StateMachineSchemeDTO> list = new ArrayList<>()
+    List<StateMachineSchemeVO> list = new ArrayList<>()
     @Shared
     List<StateMachineSchemeChangeItem> stateMachineSchemeChangeItemList = new ArrayList<>()
     @Shared
@@ -57,7 +57,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         if (param != null) {
             url = url + "&param=" + param
         }
-        ParameterizedTypeReference<PageInfo<StateMachineSchemeDTO>> typeRef = new ParameterizedTypeReference<PageInfo<StateMachineSchemeDTO>>() {
+        ParameterizedTypeReference<PageInfo<StateMachineSchemeVO>> typeRef = new ParameterizedTypeReference<PageInfo<StateMachineSchemeVO>>() {
         }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
@@ -75,13 +75,13 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "create"() {
         given: '创建状态机方案'
-        StateMachineSchemeDTO schemeDTO = new StateMachineSchemeDTO()
+        StateMachineSchemeVO schemeDTO = new StateMachineSchemeVO()
         schemeDTO.setName(name)
         schemeDTO.setDescription(description)
 
         when: '状态机方案写入数据库'
-        HttpEntity<StateMachineSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, StateMachineSchemeDTO, organizationId)
+        HttpEntity<StateMachineSchemeVO> httpEntity = new HttpEntity<>(schemeDTO)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, StateMachineSchemeVO, organizationId)
 
         then: '状态码为200，创建成功'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -100,13 +100,13 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "update"() {
         given: '更新状态机方案'
-        StateMachineSchemeDTO schemeDTO = list.get(0)
+        StateMachineSchemeVO schemeDTO = list.get(0)
         schemeDTO.setName(name)
         schemeDTO.setDescription(description)
         schemeDTO.setOrganizationId(organizationId)
         when: '状态机方案写入数据库'
-        HttpEntity<StateMachineSchemeDTO> httpEntity = new HttpEntity<>(schemeDTO)
-        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.PUT, httpEntity, StateMachineSchemeDTO, organizationId, schemeDTO.id)
+        HttpEntity<StateMachineSchemeVO> httpEntity = new HttpEntity<>(schemeDTO)
+        def entity = restTemplate.exchange(baseUrl + "/{scheme_id}", HttpMethod.PUT, httpEntity, StateMachineSchemeVO, organizationId, schemeDTO.id)
 
         then: '更新成功判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -120,7 +120,7 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "querySchemeWithConfigById"() {
         when: '根据id查询状态机方案对象'
-        def entity = restTemplate.exchange(baseUrl + "/query_scheme_with_config/{scheme_id}?isDraft={isDraft}", HttpMethod.GET, null, StateMachineSchemeDTO, organizationId, schemeId, isDraft)
+        def entity = restTemplate.exchange(baseUrl + "/query_scheme_with_config/{scheme_id}?isDraft={isDraft}", HttpMethod.GET, null, StateMachineSchemeVO, organizationId, schemeId, isDraft)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -135,14 +135,14 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "createConfig"() {
         given: '设置feign mock'
-        StateMachineSchemeConfigDTO configDTO = new StateMachineSchemeConfigDTO()
+        StateMachineSchemeConfigVO configDTO = new StateMachineSchemeConfigVO()
         configDTO.setIssueTypeId(1L)
-        List<StateMachineSchemeConfigDTO> configDTOS = new ArrayList<>()
+        List<StateMachineSchemeConfigVO> configDTOS = new ArrayList<>()
         configDTOS.add(configDTO)
 
         when: '创建方案配置'
-        HttpEntity<List<StateMachineSchemeConfigDTO>> httpEntity = new HttpEntity<>(configDTOS)
-        def entity = restTemplate.exchange(baseUrl + "/create_config/{scheme_id}/{state_machine_id}", HttpMethod.POST, httpEntity, StateMachineSchemeDTO, organizationId, schemeId, stateMachineId)
+        HttpEntity<List<StateMachineSchemeConfigVO>> httpEntity = new HttpEntity<>(configDTOS)
+        def entity = restTemplate.exchange(baseUrl + "/create_config/{scheme_id}/{state_machine_id}", HttpMethod.POST, httpEntity, StateMachineSchemeVO, organizationId, schemeId, stateMachineId)
 
         then: '结果判断'
         entity.getStatusCode().is2xxSuccessful() == isSuccess
@@ -226,17 +226,17 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "deleteDraft"() {
         when: '删除状态机方案草稿'
-        def entity = restTemplate.exchange(baseUrl + "/delete_draft/{scheme_id}", HttpMethod.DELETE, null, StateMachineSchemeDTO, organizationId, list.get(0).id)
+        def entity = restTemplate.exchange(baseUrl + "/delete_draft/{scheme_id}", HttpMethod.DELETE, null, StateMachineSchemeVO, organizationId, list.get(0).id)
 
         then: '结果判断'
-        StateMachineSchemeDTO schemeDTO = entity.body
+        StateMachineSchemeVO schemeDTO = entity.body
         expect: '测试用例：'
         schemeDTO != null
     }
 
     def "deleteConfig"() {
         when: '删除方案配置'
-        def entity = restTemplate.exchange(baseUrl + "/delete_config/{scheme_id}/{state_machine_id}", HttpMethod.DELETE, null, StateMachineSchemeDTO, organizationId, id, 1L)
+        def entity = restTemplate.exchange(baseUrl + "/delete_config/{scheme_id}/{state_machine_id}", HttpMethod.DELETE, null, StateMachineSchemeVO, organizationId, id, 1L)
 
         then: '结果判断'
         entity.body

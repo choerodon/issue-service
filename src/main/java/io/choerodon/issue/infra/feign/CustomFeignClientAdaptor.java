@@ -1,10 +1,10 @@
 package io.choerodon.issue.infra.feign;
 
 import feign.RequestLine;
-import io.choerodon.issue.api.dto.ExecuteResult;
-import io.choerodon.issue.api.dto.InputDTO;
+import io.choerodon.issue.api.vo.ExecuteResult;
+import io.choerodon.issue.api.vo.InputVO;
 import io.choerodon.issue.infra.config.FeignConfiguration;
-import io.choerodon.issue.api.dto.payload.TransformInfo;
+import io.choerodon.issue.api.vo.payload.TransformInfo;
 import io.choerodon.issue.infra.feign.fallback.CustomFeignClientAdaptorFallBack;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +36,9 @@ public interface CustomFeignClientAdaptor {
      * 调用对应服务，执行条件，验证，后置处理
      *
      * @param baseUri
-     * @param inputDTO
+     * @param inputVO
      * @return
      */
     @RequestLine("POST")
-    ResponseEntity<ExecuteResult> executeConfig(URI baseUri, InputDTO inputDTO);
+    ResponseEntity<ExecuteResult> executeConfig(URI baseUri, InputVO inputVO);
 }

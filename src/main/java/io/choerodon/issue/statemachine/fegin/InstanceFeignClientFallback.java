@@ -1,7 +1,7 @@
 package io.choerodon.issue.statemachine.fegin;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.ExecuteResult;
+import io.choerodon.issue.api.vo.ExecuteResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

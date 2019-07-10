@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.StateMachineNodeMapper">
 
-    <resultMap id="nodeDeployWithState" type="io.choerodon.issue.domain.StateMachineNode">
+    <resultMap id="nodeDeployWithState" type="io.choerodon.issue.infra.dto.StateMachineNode">
         <id property="id" column="id"/>
         <result property="stateMachineId" column="state_machine_id"/>
         <result property="statusId" column="status_id"/>
@@ -16,7 +16,7 @@
         <result property="lastUpdateDate" column="last_update_date"/>
         <result property="lastUpdatedBy" column="last_updated_by"/>
         <result property="objectVersionNumber" column="object_version_number"/>
-        <association property="status" javaType="io.choerodon.issue.domain.Status">
+        <association property="status" javaType="io.choerodon.issue.infra.dto.Status">
             <id property="id" column="s_id"/>
             <result property="name" column="s_name"/>
             <result property="description" column="s_description"/>
@@ -30,7 +30,7 @@
         </association>
     </resultMap>
 
-    <select id="queryById" resultType="io.choerodon.issue.domain.StateMachineNode">
+    <select id="queryById" resultType="io.choerodon.issue.infra.dto.StateMachineNode">
         SELECT *
         FROM state_machine_node
         WHERE organization_id = #{organizationId}
@@ -92,7 +92,7 @@
         WHERE SMN.state_machine_id = #{stateMachineId}
     </select>
 
-    <select id="queryInitByStateMachineIds" resultType="io.choerodon.issue.domain.StateMachineNode">
+    <select id="queryInitByStateMachineIds" resultType="io.choerodon.issue.infra.dto.StateMachineNode">
         SELECT
         *
         FROM state_machine_node smn
@@ -114,7 +114,7 @@
         AND SM.organization_id = #{organizationId}
     </select>
 
-    <select id="selectMaxPositionY" resultType="io.choerodon.issue.domain.StateMachineNode">
+    <select id="selectMaxPositionY" resultType="io.choerodon.issue.infra.dto.StateMachineNode">
         SELECT *
         FROM state_machine_node
         WHERE position_y = (
@@ -132,7 +132,7 @@
         AND id = #{id}
     </update>
 
-    <select id="queryByStateMachineIds" resultType="io.choerodon.issue.domain.StateMachineNode">
+    <select id="queryByStateMachineIds" resultType="io.choerodon.issue.infra.dto.StateMachineNode">
         SELECT
         *
         FROM state_machine_node smn

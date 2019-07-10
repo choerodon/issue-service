@@ -1,11 +1,11 @@
 package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.IssueTypeDTO
-import io.choerodon.issue.api.dto.IssueTypeSchemeDTO
-import io.choerodon.issue.api.dto.IssueTypeSchemeSearchDTO
-import io.choerodon.issue.api.service.IssueTypeSchemeService
-import io.choerodon.issue.api.service.IssueTypeService
+import io.choerodon.issue.api.vo.IssueTypeVO
+import io.choerodon.issue.api.vo.IssueTypeSchemeVO
+import io.choerodon.issue.api.vo.IssueTypeSchemeSearchVO
+import io.choerodon.issue.app.service.IssueTypeSchemeService
+import io.choerodon.issue.app.service.IssueTypeService
 import com.github.pagehelper.PageInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -42,14 +42,14 @@ class IssueTypeSchemeControllerSpec extends Specification {
     Long organizationId = 1L
 
     @Shared
-    List<IssueTypeSchemeDTO> list = new ArrayList<>()
+    List<IssueTypeSchemeVO> list = new ArrayList<>()
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/issue_type_scheme'
 
     def "issueTypeSchemeInitData"() {
         given: '初始化数据'
-        IssueTypeSchemeDTO issueTypeSchemeDTO = new IssueTypeSchemeDTO()
+        IssueTypeSchemeVO issueTypeSchemeDTO = new IssueTypeSchemeVO()
         issueTypeSchemeDTO.setName("init_name")
         issueTypeSchemeDTO.setDefaultIssueTypeId(1L)
         issueTypeSchemeDTO.setDescription("init_description")
@@ -61,20 +61,20 @@ class IssueTypeSchemeControllerSpec extends Specification {
 
     def "create"() {
         given: '准备工作'
-        IssueTypeSchemeDTO issueTypeSchemeDTO = new IssueTypeSchemeDTO()
+        IssueTypeSchemeVO issueTypeSchemeDTO = new IssueTypeSchemeVO()
         issueTypeSchemeDTO.setName(name)
         issueTypeSchemeDTO.setDefaultIssueTypeId(defaultIssueTypeId)
         issueTypeSchemeDTO.setDescription(description)
         issueTypeSchemeDTO.setOrganizationId(organizationId)
 
-        IssueTypeDTO issueTypeDTO = new IssueTypeDTO()
+        IssueTypeVO issueTypeDTO = new IssueTypeVO()
         issueTypeDTO.setName(configName)
         issueTypeDTO.setId(configId)
         issueTypeSchemeDTO.setIssueTypes(Arrays.asList(issueTypeDTO))
 
         when: '创建问题类型方案'
-        HttpEntity<IssueTypeSchemeDTO> httpEntity = new HttpEntity<>(issueTypeSchemeDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, IssueTypeSchemeDTO, organizationId)
+        HttpEntity<IssueTypeSchemeVO> httpEntity = new HttpEntity<>(issueTypeSchemeDTO)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, IssueTypeSchemeVO, organizationId)
 
         then: '状态码为200，调用成功'
 
@@ -105,18 +105,18 @@ class IssueTypeSchemeControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        IssueTypeSchemeDTO issueTypeSchemeDTO = list.get(0)
+        IssueTypeSchemeVO issueTypeSchemeDTO = list.get(0)
         issueTypeSchemeDTO.setName(name)
         issueTypeSchemeDTO.setDefaultIssueTypeId(defaultIssueTypeId)
         issueTypeSchemeDTO.setOrganizationId(organizationId)
         issueTypeSchemeDTO.setObjectVersionNumber(1L)
-        IssueTypeDTO issueTypeDTO = new IssueTypeDTO()
+        IssueTypeVO issueTypeDTO = new IssueTypeVO()
         issueTypeDTO.setId(configId)
         issueTypeSchemeDTO.setIssueTypes(Arrays.asList(issueTypeDTO))
 
         when: '更新问题类型方案'
-        HttpEntity<IssueTypeSchemeDTO> httpEntity = new HttpEntity<>(issueTypeSchemeDTO)
-        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, IssueTypeSchemeDTO, organizationId, issueTypeSchemeDTO.getId())
+        HttpEntity<IssueTypeSchemeVO> httpEntity = new HttpEntity<>(issueTypeSchemeDTO)
+        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, IssueTypeSchemeVO, organizationId, issueTypeSchemeDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -253,7 +253,7 @@ class IssueTypeSchemeControllerSpec extends Specification {
         def issueTypeSchemeId = id
 
         when: '根据id查询问题类型方案'
-        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, IssueTypeSchemeDTO, organizationId, issueTypeSchemeId)
+        def entity = restTemplate.exchange(baseUrl + "/{id}", HttpMethod.GET, null, IssueTypeSchemeVO, organizationId, issueTypeSchemeId)
 
         then: '状态码为200，调用成功'
 
@@ -281,11 +281,11 @@ class IssueTypeSchemeControllerSpec extends Specification {
 
     def "queryIssueTypeSchemeList"() {
         given: '准备数据'
-        IssueTypeSchemeSearchDTO issueTypeSchemeSearchDTO = new IssueTypeSchemeSearchDTO()
+        IssueTypeSchemeSearchVO issueTypeSchemeSearchDTO = new IssueTypeSchemeSearchVO()
         issueTypeSchemeSearchDTO.description = "XX"
         issueTypeSchemeSearchDTO.name = "XX"
         issueTypeSchemeSearchDTO.param = "XX"
-        HttpEntity<IssueTypeSchemeSearchDTO> httpEntity = new HttpEntity<>(issueTypeSchemeSearchDTO)
+        HttpEntity<IssueTypeSchemeSearchVO> httpEntity = new HttpEntity<>(issueTypeSchemeSearchDTO)
         when: '分页查询问题类型方案列表'
         def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type_scheme/list?page={page}&&size={size}", HttpMethod.POST, httpEntity, PageInfo, organizationId, 1, 1000)
 

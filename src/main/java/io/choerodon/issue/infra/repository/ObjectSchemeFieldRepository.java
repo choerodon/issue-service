@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository;
 
-import io.choerodon.issue.api.dto.ObjectSchemeFieldSearchDTO;
-import io.choerodon.issue.domain.ObjectSchemeField;
+import io.choerodon.issue.api.vo.ObjectSchemeFieldSearchVO;
+import io.choerodon.issue.infra.dto.ObjectSchemeField;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface ObjectSchemeFieldRepository {
 
     ObjectSchemeField queryById(Long organizationId, Long projectId, Long fieldId);
 
-    List<ObjectSchemeField> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchDTO searchDTO);
+    List<ObjectSchemeField> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchVO searchDTO);
 
     ObjectSchemeField queryByFieldCode(Long organizationId, Long projectId, String fieldCode);
 }

@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.repository;
 
-import io.choerodon.issue.domain.FieldOption;
+import io.choerodon.issue.infra.dto.FieldOption;
 
 /**
  * @author shinan.chen

@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.StateMachineMapper">
 
-    <select id="queryById" resultType="io.choerodon.issue.domain.StateMachine">
+    <select id="queryById" resultType="io.choerodon.issue.infra.dto.StateMachine">
         SELECT *
         FROM state_machine
         WHERE organization_id = #{organizationId}
         and id = #{id}
     </select>
 
-    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.StateMachine">
+    <select id="fulltextSearch" resultType="io.choerodon.issue.infra.dto.StateMachine">
         SELECT * FROM state_machine
         WHERE 1=1
         <if test="stateMachine.organizationId != null">
@@ -28,14 +28,14 @@
         </if>
     </select>
 
-    <select id="getStatusBySmId" resultType="io.choerodon.issue.api.dto.payload.StatusPayload">
+    <select id="getStatusBySmId" resultType="io.choerodon.issue.api.vo.payload.StatusPayload">
         select s.id as status_id, s.name as status_name, s.type, #{projectId} as project_id
         from state_machine_node smn
         left join status s on smn.status_id = s.id
         where smn.state_machine_id = #{stateMachineId} and smn.status_id != 0
     </select>
 
-    <select id="queryByIds" resultType="io.choerodon.issue.domain.StateMachine">
+    <select id="queryByIds" resultType="io.choerodon.issue.infra.dto.StateMachine">
         SELECT * FROM state_machine sm
         WHERE 1=1
         <if test="organizationId != null">

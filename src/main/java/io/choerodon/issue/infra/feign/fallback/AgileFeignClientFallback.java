@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.feign.fallback;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.payload.StateMachineSchemeDeployCheckIssue;
-import io.choerodon.issue.domain.ProjectConfig;
+import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.infra.dto.ProjectConfig;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
