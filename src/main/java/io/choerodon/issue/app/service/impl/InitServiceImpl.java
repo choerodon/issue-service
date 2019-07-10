@@ -6,11 +6,11 @@ import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.issue.app.service.InitService;
-import io.choerodon.issue.app.service.StateMachineService;
 import io.choerodon.issue.api.vo.payload.ProjectCreateAgilePayload;
 import io.choerodon.issue.api.vo.payload.ProjectEvent;
 import io.choerodon.issue.api.vo.payload.StatusPayload;
+import io.choerodon.issue.app.service.InitService;
+import io.choerodon.issue.app.service.StateMachineService;
 import io.choerodon.issue.infra.dto.StateMachineDTO;
 import io.choerodon.issue.infra.dto.StateMachineNodeDraftDTO;
 import io.choerodon.issue.infra.dto.StateMachineTransformDraftDTO;
@@ -21,12 +21,10 @@ import io.choerodon.issue.infra.mapper.StateMachineNodeDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineTransformDraftMapper;
 import io.choerodon.issue.infra.mapper.StatusMapper;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +39,7 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class InitServiceImpl implements InitService {
 
+    private static final String ERROR_STATEMACHINE_CREATE = "error.stateMachine.create";
     @Autowired
     private StatusMapper statusMapper;
     @Autowired
@@ -53,18 +52,11 @@ public class InitServiceImpl implements InitService {
     private StateMachineTransformDraftMapper transformDraftMapper;
     @Autowired
     private SagaClient sagaClient;
+    @Autowired
+    private ModelMapper modelMapper;
 
     public void setSagaClient(SagaClient sagaClient) {
         this.sagaClient = sagaClient;
-    }
-
-    private static final String ERROR_STATEMACHINE_CREATE = "error.stateMachine.create";
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     }
 
     @Override

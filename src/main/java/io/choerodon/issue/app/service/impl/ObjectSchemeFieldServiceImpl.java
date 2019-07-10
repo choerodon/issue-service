@@ -19,12 +19,10 @@ import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.FieldValueUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +33,13 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
+    private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
+    private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
+    private static final String ERROR_FIELDTYPE_ILLEGAL = "error.fieldType.illegal";
+    private static final String ERROR_FIELD_ILLEGAL = "error.field.illegal";
+    private static final String ERROR_FIELD_NAMEEXIST = "error.field.nameExist";
+    private static final String ERROR_FIELD_CODEEXIST = "error.field.codeExist";
+    private static final String ERROR_FIELD_REQUIRED_NEED_DEFAULT_VALUE = "error.field.requiredNeedDefaultValue";
     @Autowired
     private ObjectSchemeFieldMapper objectSchemeFieldMapper;
     @Autowired
@@ -51,21 +56,8 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
     private LookupValueMapper lookupValueMapper;
     @Autowired
     private FieldDataLogService fieldDataLogService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
-
-    private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
-    private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
-    private static final String ERROR_FIELDTYPE_ILLEGAL = "error.fieldType.illegal";
-    private static final String ERROR_FIELD_ILLEGAL = "error.field.illegal";
-    private static final String ERROR_FIELD_NAMEEXIST = "error.field.nameExist";
-    private static final String ERROR_FIELD_CODEEXIST = "error.field.codeExist";
-    private static final String ERROR_FIELD_REQUIRED_NEED_DEFAULT_VALUE = "error.field.requiredNeedDefaultValue";
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public Map<String, Object> listQuery(Long organizationId, Long projectId, String schemeCode) {

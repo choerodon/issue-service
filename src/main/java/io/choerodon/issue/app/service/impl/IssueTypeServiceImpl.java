@@ -4,22 +4,20 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.app.service.IssueTypeService;
 import io.choerodon.issue.app.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.app.service.StateMachineService;
-import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.infra.dto.IssueTypeDTO;
 import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.utils.PageUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +38,8 @@ public class IssueTypeServiceImpl implements IssueTypeService {
     private StateMachineSchemeConfigService stateMachineSchemeConfigService;
     @Autowired
     private StateMachineService stateMachineService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public IssueTypeVO queryById(Long organizationId, Long issueTypeId) {

@@ -12,13 +12,11 @@ import io.choerodon.issue.infra.enums.*;
 import io.choerodon.issue.infra.mapper.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +43,8 @@ public class StateMachineNodeServiceImpl implements StateMachineNodeService {
     private StateMachineMapper stateMachineMapper;
     @Autowired
     private StateMachineService stateMachineService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     @ChangeStateMachineStatus
@@ -158,7 +151,7 @@ public class StateMachineNodeServiceImpl implements StateMachineNodeService {
      * 状态机下新增状态
      *
      * @param organizationId 组织id
-     * @param nodeVO        节点
+     * @param nodeVO         节点
      */
     private void createStatus(Long organizationId, StateMachineNodeVO nodeVO) {
         if (nodeVO.getStatusId() == null && nodeVO.getStatusVO() != null && nodeVO.getStatusVO().getName() != null) {

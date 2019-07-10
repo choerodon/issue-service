@@ -8,7 +8,6 @@ import io.choerodon.issue.app.service.PageFieldService;
 import io.choerodon.issue.infra.annotation.CopyPageField;
 import io.choerodon.issue.infra.dto.*;
 import io.choerodon.issue.infra.enums.*;
-import io.choerodon.issue.infra.enums.LookupType;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.repository.PageFieldRepository;
 import io.choerodon.issue.infra.utils.EnumUtil;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +30,12 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class PageFieldServiceImpl implements PageFieldService {
+
+    private static final String ERROR_PAGECODE_ILLEGAL = "error.pageCode.illegal";
+    private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
+    private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
+    private static final String ERROR_FIELDCODE_ILLEGAL = "error.fieldCode.illegal";
+
     @Autowired
     private PageFieldMapper pageFieldMapper;
     @Autowired
@@ -48,17 +52,8 @@ public class PageFieldServiceImpl implements PageFieldService {
     private FieldValueService fieldValueService;
     @Autowired
     private LookupValueMapper lookupValueMapper;
-
-    private static final String ERROR_PAGECODE_ILLEGAL = "error.pageCode.illegal";
-    private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
-    private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
-    private static final String ERROR_FIELDCODE_ILLEGAL = "error.fieldCode.illegal";
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public Map<String, Object> listQuery(Long organizationId, Long projectId, String pageCode, String context) {

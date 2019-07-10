@@ -1,20 +1,20 @@
 package io.choerodon.issue.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.app.service.IssueTypeService;
-import io.choerodon.issue.app.service.StateMachineSchemeConfigService;
-import io.choerodon.issue.app.service.StateMachineSchemeService;
-import io.choerodon.issue.app.service.StateMachineService;
 import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.api.vo.payload.ChangeStatus;
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeStatusChangeItem;
+import io.choerodon.issue.app.service.IssueTypeService;
+import io.choerodon.issue.app.service.StateMachineSchemeConfigService;
+import io.choerodon.issue.app.service.StateMachineSchemeService;
+import io.choerodon.issue.app.service.StateMachineService;
+import io.choerodon.issue.infra.annotation.ChangeSchemeStatus;
 import io.choerodon.issue.infra.dto.ProjectConfigDTO;
-import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.infra.dto.StateMachineSchemeConfigDTO;
 import io.choerodon.issue.infra.dto.StateMachineSchemeConfigDraftDTO;
-import io.choerodon.issue.infra.annotation.ChangeSchemeStatus;
+import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeDeployStatus;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
@@ -26,12 +26,10 @@ import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.entity.Criteria;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,13 +62,8 @@ public class StateMachineSchemeConfigServiceImpl implements StateMachineSchemeCo
     private StateMachineService stateMachineService;
     @Autowired
     private SagaServiceImpl sagaService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     @ChangeSchemeStatus

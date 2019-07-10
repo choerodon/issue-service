@@ -1,21 +1,19 @@
 package io.choerodon.issue.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.app.service.FieldOptionService;
-import io.choerodon.issue.app.service.FieldValueService;
 import io.choerodon.issue.api.vo.FieldOptionUpdateVO;
 import io.choerodon.issue.api.vo.FieldOptionVO;
 import io.choerodon.issue.api.vo.PageFieldViewVO;
+import io.choerodon.issue.app.service.FieldOptionService;
+import io.choerodon.issue.app.service.FieldValueService;
 import io.choerodon.issue.infra.dto.FieldOptionDTO;
 import io.choerodon.issue.infra.mapper.FieldOptionMapper;
 import io.choerodon.issue.infra.repository.FieldOptionRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,21 +26,15 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FieldOptionServiceImpl implements FieldOptionService {
+    private static final String ERROR_OPTION_ILLEGAL = "error.fieldOption.illegal";
     @Autowired
     private FieldOptionMapper fieldOptionMapper;
     @Autowired
     private FieldOptionRepository fieldOptionRepository;
     @Autowired
     private FieldValueService fieldValueService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
-
-    private static final String ERROR_OPTION_ILLEGAL = "error.fieldOption.illegal";
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public synchronized String handleFieldOption(Long organizationId, Long fieldId, List<FieldOptionUpdateVO> newOptions) {

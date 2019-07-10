@@ -26,7 +26,6 @@ public class RegisterInstanceServiceImpl implements RegisterInstanceService {
     private ConfigCodeService configCodeService;
     @Value("${choerodon.eureka.event.target-services}")
     private String[] targetServices;
-
     @Override
     public void instanceDownConsumer(final EurekaEventPayload payload) {
         logger.info("服务下线：{}", payload.getAppName());

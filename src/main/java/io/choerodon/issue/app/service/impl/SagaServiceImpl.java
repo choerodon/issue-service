@@ -15,13 +15,11 @@ import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,13 +43,8 @@ public class SagaServiceImpl {
     private ProjectConfigMapper projectConfigMapper;
     @Autowired
     private StatusService statusService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     public void setSagaClient(SagaClient sagaClient) {
         this.sagaClient = sagaClient;

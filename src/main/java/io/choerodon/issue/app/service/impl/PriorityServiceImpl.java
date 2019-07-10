@@ -3,8 +3,8 @@ package io.choerodon.issue.app.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.CustomUserDetails;
 import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.issue.app.service.PriorityService;
 import io.choerodon.issue.api.vo.PriorityVO;
+import io.choerodon.issue.app.service.PriorityService;
 import io.choerodon.issue.infra.dto.PriorityDTO;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
@@ -13,12 +13,10 @@ import io.choerodon.issue.infra.mapper.PriorityMapper;
 import io.choerodon.mybatis.entity.Criteria;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,23 +29,17 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class PriorityServiceImpl implements PriorityService {
 
+    private static final String NOT_FOUND = "error.priority.notFound";
+    private static final String DELETE_ILLEGAL = "error.priority.deleteIllegal";
+    private static final String LAST_ILLEGAL = "error.priority.lastIllegal";
     @Autowired
     private PriorityMapper priorityMapper;
     @Autowired
     private UserFeignClient userFeignClient;
     @Autowired
     private AgileFeignClient agileFeignClient;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
-
-    private static final String NOT_FOUND = "error.priority.notFound";
-    private static final String DELETE_ILLEGAL = "error.priority.deleteIllegal";
-    private static final String LAST_ILLEGAL = "error.priority.lastIllegal";
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public List<PriorityVO> selectAll(PriorityVO priorityVO, String param) {

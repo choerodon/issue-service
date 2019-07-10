@@ -9,8 +9,8 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.api.vo.payload.StatusPayload;
-import io.choerodon.issue.api.vo.payload.TransformVO;
 import io.choerodon.issue.api.vo.payload.TransformInfo;
+import io.choerodon.issue.api.vo.payload.TransformVO;
 import io.choerodon.issue.app.service.*;
 import io.choerodon.issue.infra.dto.IssueTypeDTO;
 import io.choerodon.issue.infra.dto.ProjectConfigDTO;
@@ -26,12 +26,10 @@ import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -84,13 +82,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     private InstanceService instanceService;
     @Autowired
     private StateMachineTransformService transformService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public ProjectConfigDTO create(Long projectId, Long schemeId, String schemeType, String applyType) {

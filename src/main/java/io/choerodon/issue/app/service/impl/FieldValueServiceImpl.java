@@ -3,9 +3,9 @@ package io.choerodon.issue.app.service.impl;
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.base.domain.Sort;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.app.service.FieldValueService;
 import io.choerodon.issue.app.service.PageFieldService;
-import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.infra.dto.FieldValueDTO;
 import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
 import io.choerodon.issue.infra.dto.PageFieldDTO;
@@ -21,12 +21,10 @@ import io.choerodon.issue.infra.utils.FieldValueUtil;
 import io.choerodon.issue.infra.utils.PageUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,13 +35,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class FieldValueServiceImpl implements FieldValueService {
-    @Autowired
-    private FieldValueMapper fieldValueMapper;
-    @Autowired
-    private PageFieldService pageFieldService;
-    @Autowired
-    private ObjectSchemeFieldRepository objectSchemeFieldRepository;
-
     private static final String ERROR_PAGECODE_ILLEGAL = "error.pageCode.illegal";
     private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
     private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
@@ -51,12 +42,14 @@ public class FieldValueServiceImpl implements FieldValueService {
     private static final String ERROR_FIELDTYPE_ILLEGAL = "error.fieldType.illegal";
     private static final String ERROR_SYSTEM_ILLEGAL = "error.system.illegal";
 
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private FieldValueMapper fieldValueMapper;
+    @Autowired
+    private PageFieldService pageFieldService;
+    @Autowired
+    private ObjectSchemeFieldRepository objectSchemeFieldRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public void fillValues(Long organizationId, Long projectId, Long instanceId, String schemeCode, List<PageFieldViewVO> pageFieldViews) {

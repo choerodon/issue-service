@@ -24,13 +24,11 @@ import io.choerodon.issue.infra.utils.PageUtil;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,13 +57,8 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
     private IssueTypeService issueTypeService;
     @Autowired
     private PriorityService priorityService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public IssueTypeSchemeVO queryById(Long organizationId, Long issueTypeSchemeId) {

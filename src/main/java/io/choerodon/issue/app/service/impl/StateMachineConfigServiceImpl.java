@@ -1,10 +1,10 @@
 package io.choerodon.issue.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.app.service.ConfigCodeService;
-import io.choerodon.issue.app.service.StateMachineConfigService;
 import io.choerodon.issue.api.vo.ConfigCodeVO;
 import io.choerodon.issue.api.vo.StateMachineConfigVO;
+import io.choerodon.issue.app.service.ConfigCodeService;
+import io.choerodon.issue.app.service.StateMachineConfigService;
 import io.choerodon.issue.infra.dto.StateMachineConfigDTO;
 import io.choerodon.issue.infra.dto.StateMachineConfigDraftDTO;
 import io.choerodon.issue.infra.enums.ConfigType;
@@ -13,12 +13,10 @@ import io.choerodon.issue.infra.mapper.StateMachineConfigMapper;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,21 +27,15 @@ import java.util.List;
 @Transactional(rollbackFor = Exception.class)
 public class StateMachineConfigServiceImpl implements StateMachineConfigService {
 
+    private static final String ERROR_STATUS_TYPE_ILLEGAL = "error.status.type.illegal";
     @Autowired
     private StateMachineConfigDraftMapper configDraftMapper;
     @Autowired
     private StateMachineConfigMapper configDeployMapper;
     @Autowired
     private ConfigCodeService configCodeService;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
-
-    private static final String ERROR_STATUS_TYPE_ILLEGAL = "error.status.type.illegal";
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public StateMachineConfigVO create(Long organizationId, Long stateMachineId, Long transformId, StateMachineConfigVO configDTO) {

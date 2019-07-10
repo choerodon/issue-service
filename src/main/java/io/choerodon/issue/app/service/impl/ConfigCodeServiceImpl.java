@@ -12,13 +12,11 @@ import io.choerodon.issue.infra.mapper.StateMachineConfigDraftMapper;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +32,8 @@ public class ConfigCodeServiceImpl implements ConfigCodeService {
     private ConfigCodeMapper configCodeMapper;
     @Autowired
     private StateMachineConfigDraftMapper configDraftMapper;
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public List<ConfigCodeVO> queryByType(String type) {

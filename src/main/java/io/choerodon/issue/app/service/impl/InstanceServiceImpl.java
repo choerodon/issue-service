@@ -1,14 +1,14 @@
 package io.choerodon.issue.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.app.service.InstanceService;
-import io.choerodon.issue.app.service.StateMachineConfigService;
-import io.choerodon.issue.app.service.StateMachineTransformService;
 import io.choerodon.issue.api.vo.ExecuteResult;
 import io.choerodon.issue.api.vo.InputVO;
 import io.choerodon.issue.api.vo.StateMachineConfigVO;
 import io.choerodon.issue.api.vo.StateMachineTransformVO;
 import io.choerodon.issue.api.vo.payload.TransformInfo;
+import io.choerodon.issue.app.service.InstanceService;
+import io.choerodon.issue.app.service.StateMachineConfigService;
+import io.choerodon.issue.app.service.StateMachineTransformService;
 import io.choerodon.issue.infra.dto.StateMachineDTO;
 import io.choerodon.issue.infra.dto.StateMachineNodeDTO;
 import io.choerodon.issue.infra.dto.StateMachineTransformDTO;
@@ -20,7 +20,6 @@ import io.choerodon.issue.infra.mapper.StateMachineMapper;
 import io.choerodon.issue.infra.mapper.StateMachineNodeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineTransformMapper;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -43,6 +41,11 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class InstanceServiceImpl implements InstanceService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(InstanceServiceImpl.class);
+    private static final String EXCEPTION = "Exception:{}";
+    private static final String HTTP = "http://";
+    private static final String URI = "uri:{}";
+    private static final String AND_TARGET_STATUS_ID = "&target_status_id=";
     @Autowired
     private StateMachineNodeMapper nodeDeployMapper;
     @Autowired
@@ -57,19 +60,8 @@ public class InstanceServiceImpl implements InstanceService {
     private CustomFeignClientAdaptor customFeignClientAdaptor;
     @Autowired
     private StateMachineMapper stateMachineMapper;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(InstanceServiceImpl.class);
-    private static final String EXCEPTION = "Exception:{}";
-    private static final String HTTP = "http://";
-    private static final String URI = "uri:{}";
-    private static final String AND_TARGET_STATUS_ID = "&target_status_id=";
-
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @PostConstruct
-    public void init() {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public ExecuteResult startInstance(Long organizationId, String serviceCode, Long stateMachineId, InputVO inputVO) {
