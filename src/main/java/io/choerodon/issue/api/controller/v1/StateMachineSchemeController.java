@@ -12,7 +12,7 @@ import io.choerodon.issue.api.vo.payload.StateMachineSchemeChangeItem;
 import io.choerodon.issue.app.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.app.service.StateMachineSchemeService;
 import io.choerodon.issue.api.validator.StateMachineSchemeValidator;
-import io.choerodon.issue.infra.util.ParamUtils;
+import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.mybatis.annotation.SortDefault;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;

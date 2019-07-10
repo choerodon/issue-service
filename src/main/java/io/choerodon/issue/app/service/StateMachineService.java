@@ -7,7 +7,7 @@ import io.choerodon.issue.api.vo.StateMachineListVO;
 import io.choerodon.issue.api.vo.StateMachineWithStatusVO;
 import io.choerodon.issue.api.vo.payload.ChangeStatus;
 import io.choerodon.issue.api.vo.payload.DeployStateMachinePayload;
-import io.choerodon.issue.infra.dto.StateMachine;
+import io.choerodon.issue.infra.dto.StateMachineDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -120,7 +120,7 @@ public interface StateMachineService {
      * @param stateMachineId 状态机id
      * @return
      */
-    StateMachine queryDeployForInstance(Long organizationId, Long stateMachineId);
+    StateMachineDTO queryDeployForInstance(Long organizationId, Long stateMachineId);
 
     /**
      * 删除草稿

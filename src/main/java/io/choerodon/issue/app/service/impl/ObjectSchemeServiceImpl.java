@@ -6,9 +6,9 @@ import io.choerodon.base.domain.PageRequest;
 import io.choerodon.issue.app.service.ObjectSchemeService;
 import io.choerodon.issue.api.vo.ObjectSchemeSearchVO;
 import io.choerodon.issue.api.vo.ObjectSchemeVO;
-import io.choerodon.issue.infra.dto.ObjectScheme;
+import io.choerodon.issue.infra.dto.ObjectSchemeDTO;
 import io.choerodon.issue.infra.mapper.ObjectSchemeMapper;
-import io.choerodon.issue.infra.util.PageUtil;
+import io.choerodon.issue.infra.utils.PageUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -36,7 +36,7 @@ public class ObjectSchemeServiceImpl implements ObjectSchemeService {
 
     @Override
     public PageInfo<ObjectSchemeVO> pageQuery(Long organizationId, PageRequest pageRequest, ObjectSchemeSearchVO searchDTO) {
-        PageInfo<ObjectScheme> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(),
+        PageInfo<ObjectSchemeDTO> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(),
                 PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(() -> objectSchemeMapper.fulltextSearch(organizationId, searchDTO));
         return PageUtil.buildPageInfoWithPageInfoList(page,
                 modelMapper.map(page.getList(), new TypeToken<List<ObjectSchemeVO>>() {

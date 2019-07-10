@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.infra.dto.StateMachineNodeDraft;
+import io.choerodon.issue.infra.dto.StateMachineNodeDraftDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,15 +9,15 @@ import java.util.List;
 /**
  * @author peng.jiang, dinghuang123@gmail.com
  */
-public interface StateMachineNodeDraftMapper extends Mapper<StateMachineNodeDraft> {
+public interface StateMachineNodeDraftMapper extends Mapper<StateMachineNodeDraftDTO> {
 
-    StateMachineNodeDraft getNodeById(@Param("nodeId") Long nodeId);
+    StateMachineNodeDraftDTO getNodeById(@Param("nodeId") Long nodeId);
 
-    List<StateMachineNodeDraft> selectByStateMachineId(@Param("stateMachineId") Long stateMachineId);
+    List<StateMachineNodeDraftDTO> selectByStateMachineId(@Param("stateMachineId") Long stateMachineId);
 
     Long checkStateDelete(@Param("organizationId") Long organizationId, @Param("statusId") Long statusId);
 
-    StateMachineNodeDraft queryById(@Param("organizationId") Long organizationId, @Param("id") Long id);
+    StateMachineNodeDraftDTO queryById(@Param("organizationId") Long organizationId, @Param("id") Long id);
 
     /**
      * 获取最大的postionY
@@ -25,7 +25,7 @@ public interface StateMachineNodeDraftMapper extends Mapper<StateMachineNodeDraf
      * @param stateMachineId
      * @return
      */
-    StateMachineNodeDraft selectMaxPositionY(@Param("stateMachineId") Long stateMachineId);
+    StateMachineNodeDraftDTO selectMaxPositionY(@Param("stateMachineId") Long stateMachineId);
 
     /**
      * 单独写更新，版本号不变，否则前端处理复杂

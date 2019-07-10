@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.vo;
 
-import io.choerodon.issue.infra.dto.StateMachineInfo;
+import io.choerodon.issue.infra.dto.StateMachineInfoDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class StatusWithInfoVO {
     @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
     @ApiModelProperty(value = "用到该状态的状态机列表")
-    private List<StateMachineInfo> stateMachineInfoList;
+    private List<StateMachineInfoDTO> stateMachineInfoList;
 
     public Long getId() {
         return id;
@@ -67,7 +67,7 @@ public class StatusWithInfoVO {
         this.organizationId = organizationId;
     }
 
-    public void setStateMachineInfoList(List<StateMachineInfo> stateMachineInfoList) {
+    public void setStateMachineInfoList(List<StateMachineInfoDTO> stateMachineInfoList) {
         this.stateMachineInfoList = stateMachineInfoList;
     }
 
@@ -79,7 +79,7 @@ public class StatusWithInfoVO {
         this.code = code;
     }
 
-    public List<StateMachineInfo> getStateMachineInfoList() {
+    public List<StateMachineInfoDTO> getStateMachineInfoList() {
         return stateMachineInfoList;
     }
 

@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.infra.dto.FieldDataLog;
+import io.choerodon.issue.infra.dto.FieldDataLogDTO;
 import io.choerodon.issue.infra.mapper.FieldDataLogMapper;
 import io.choerodon.issue.infra.repository.FieldDataLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class FieldDataLogRepositoryImpl implements FieldDataLogRepository {
     private static final String ERROR_DATALOG_CREATE = "error.dataLog.create";
 
     @Override
-    public FieldDataLog create(FieldDataLog create) {
+    public FieldDataLogDTO create(FieldDataLogDTO create) {
         if (fieldDataLogMapper.insert(create) != 1) {
             throw new CommonException(ERROR_DATALOG_CREATE);
         }

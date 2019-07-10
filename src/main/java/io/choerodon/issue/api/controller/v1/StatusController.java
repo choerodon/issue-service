@@ -11,7 +11,7 @@ import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.app.service.StatusService;
 import io.choerodon.issue.api.validator.StateValidator;
-import io.choerodon.issue.infra.dto.Status;
+import io.choerodon.issue.infra.dto.StatusDTO;
 import io.choerodon.mybatis.annotation.SortDefault;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;
@@ -142,7 +142,7 @@ public class StatusController extends BaseController {
     @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "根据ids批量查询状态")
     @PostMapping(value = "/status/batch")
-    public ResponseEntity<Map<Long, Status>> batchStatusGet(@ApiParam(value = "状态ids", required = true)
+    public ResponseEntity<Map<Long, StatusDTO>> batchStatusGet(@ApiParam(value = "状态ids", required = true)
                                                             @RequestBody List<Long> ids) {
         return Optional.ofNullable(statusService.batchStatusGet(ids))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))

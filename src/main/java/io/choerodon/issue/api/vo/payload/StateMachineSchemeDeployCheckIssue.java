@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.vo.payload;
 
-import io.choerodon.issue.infra.dto.ProjectConfig;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 
 import java.util.List;
 
@@ -10,13 +10,13 @@ import java.util.List;
  */
 public class StateMachineSchemeDeployCheckIssue {
     private List<Long> issueTypeIds;
-    private List<ProjectConfig> projectConfigs;
+    private List<ProjectConfigDTO> projectConfigs;
 
-    public List<ProjectConfig> getProjectConfigs() {
+    public List<ProjectConfigDTO> getProjectConfigs() {
         return projectConfigs;
     }
 
-    public void setProjectConfigs(List<ProjectConfig> projectConfigs) {
+    public void setProjectConfigs(List<ProjectConfigDTO> projectConfigs) {
         this.projectConfigs = projectConfigs;
     }
 

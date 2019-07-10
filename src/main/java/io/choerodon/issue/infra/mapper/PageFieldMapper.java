@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.infra.dto.PageField;
+import io.choerodon.issue.infra.dto.PageFieldDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * @author shinan.chen
  * @since 2019/4/1
  */
-public interface PageFieldMapper extends Mapper<PageField> {
+public interface PageFieldMapper extends Mapper<PageFieldDTO> {
     /**
      * 组织层/项目层 根据页面编码和上下文获取页面字段列表
      *
@@ -20,7 +20,7 @@ public interface PageFieldMapper extends Mapper<PageField> {
      * @param context
      * @return
      */
-    List<PageField> listQuery(@Param("organizationId") Long organizationId, @Param("projectId") Long projectId, @Param("pageCode") String pageCode, @Param("context") String context);
+    List<PageFieldDTO> listQuery(@Param("organizationId") Long organizationId, @Param("projectId") Long projectId, @Param("pageCode") String pageCode, @Param("context") String context);
 
     /**
      * 递减的情况下，查询较小的rank值
@@ -52,7 +52,7 @@ public interface PageFieldMapper extends Mapper<PageField> {
      * @param fieldId
      * @return
      */
-    PageField queryByFieldId(@Param("organizationId") Long organizationId, @Param("projectId") Long projectId, @Param("pageCode") String pageCode, @Param("fieldId") Long fieldId);
+    PageFieldDTO queryByFieldId(@Param("organizationId") Long organizationId, @Param("projectId") Long projectId, @Param("pageCode") String pageCode, @Param("fieldId") Long fieldId);
 
     /**
      * 初始化页面字段：批量创建
@@ -60,7 +60,7 @@ public interface PageFieldMapper extends Mapper<PageField> {
      * @param organizationId
      * @param pageFields
      */
-    void batchInsert(@Param("organizationId") Long organizationId, @Param("projectId") Long projectId, @Param("pageFields") List<PageField> pageFields);
+    void batchInsert(@Param("organizationId") Long organizationId, @Param("projectId") Long projectId, @Param("pageFields") List<PageFieldDTO> pageFields);
 
     /**
      * 复制组织层（页面字段）到项目层

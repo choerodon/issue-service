@@ -1,17 +1,17 @@
 package io.choerodon.issue.infra.repository;
 
-import io.choerodon.issue.infra.dto.FieldOption;
+import io.choerodon.issue.infra.dto.FieldOptionDTO;
 
 /**
  * @author shinan.chen
  * @since 2019/4/1
  */
 public interface FieldOptionRepository {
-    FieldOption create(FieldOption option);
+    FieldOptionDTO create(FieldOptionDTO option);
 
     void delete(Long optionId);
 
-    void update(FieldOption option);
+    void update(FieldOptionDTO option);
 
-    FieldOption queryById(Long organizationId, Long optionId);
+    FieldOptionDTO queryById(Long organizationId, Long optionId);
 }

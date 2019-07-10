@@ -2,7 +2,7 @@ package io.choerodon.issue.infra.aspect;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.app.service.StateMachineService;
-import io.choerodon.issue.infra.dto.StateMachine;
+import io.choerodon.issue.infra.dto.StateMachineDTO;
 import io.choerodon.issue.infra.enums.StateMachineStatus;
 import io.choerodon.issue.infra.mapper.StateMachineMapper;
 import io.choerodon.mybatis.entity.Criteria;
@@ -44,7 +44,7 @@ public class ChangeStateMachineStatusAspect {
                 stateMachineId = Long.valueOf(args[i] + "");
             }
         }
-        StateMachine stateMachine = stateMachineMapper.selectByPrimaryKey(stateMachineId);
+        StateMachineDTO stateMachine = stateMachineMapper.selectByPrimaryKey(stateMachineId);
         if (stateMachine == null) {
             throw new CommonException("error.stateMachine.notFound");
         }

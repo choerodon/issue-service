@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.vo.payload;
 
-import io.choerodon.issue.infra.dto.ProjectConfig;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class StateMachineSchemeDeployUpdateIssue {
     private Long schemeId;
     private Long organizationId;
     private Long userId;
-    private List<ProjectConfig> projectConfigs;
+    private List<ProjectConfigDTO> projectConfigs;
     private List<StateMachineSchemeChangeItem> changeItems;
     private List<RemoveStatusWithProject> removeStatusWithProjects;
     private List<AddStatusWithProject> addStatusWithProjects;
@@ -65,11 +65,11 @@ public class StateMachineSchemeDeployUpdateIssue {
         this.addStatusWithProjects = addStatusWithProjects;
     }
 
-    public List<ProjectConfig> getProjectConfigs() {
+    public List<ProjectConfigDTO> getProjectConfigs() {
         return projectConfigs;
     }
 
-    public void setProjectConfigs(List<ProjectConfig> projectConfigs) {
+    public void setProjectConfigs(List<ProjectConfigDTO> projectConfigs) {
         this.projectConfigs = projectConfigs;
     }
 }

@@ -7,16 +7,16 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.app.service.StateMachineNodeService;
 import io.choerodon.issue.app.service.StatusService;
 import io.choerodon.issue.api.vo.*;
-import io.choerodon.issue.infra.dto.StateMachineNode;
-import io.choerodon.issue.infra.dto.Status;
-import io.choerodon.issue.infra.dto.StatusWithInfo;
+import io.choerodon.issue.infra.dto.StateMachineNodeDTO;
+import io.choerodon.issue.infra.dto.StatusDTO;
+import io.choerodon.issue.infra.dto.StatusWithInfoDTO;
 import io.choerodon.issue.infra.cache.InstanceCache;
 import io.choerodon.issue.infra.enums.NodeType;
 import io.choerodon.issue.infra.enums.StatusType;
 import io.choerodon.issue.infra.exception.RemoveStatusException;
 import io.choerodon.issue.infra.mapper.*;
-import io.choerodon.issue.infra.util.EnumUtil;
-import io.choerodon.issue.infra.util.PageUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
+import io.choerodon.issue.infra.utils.PageUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -62,7 +62,7 @@ public class StatusServiceImpl implements StatusService {
                 .doSelectPageInfo(() -> statusMapper.selectStatusIds(organizationId, statusSearchVO));
         List<StatusWithInfoVO> statusWithInfoVOList = new ArrayList<>();
         if (!statusIdsPage.getList().isEmpty()) {
-            List<StatusWithInfo> statuses = statusMapper.queryStatusList(organizationId, statusIdsPage.getList());
+            List<StatusWithInfoDTO> statuses = statusMapper.queryStatusList(organizationId, statusIdsPage.getList());
             statusWithInfoVOList = modelMapper.map(statuses, new TypeToken<List<StatusWithInfoVO>>() {
             }.getType());
         }
@@ -78,8 +78,8 @@ public class StatusServiceImpl implements StatusService {
             throw new CommonException("error.status.type.illegal");
         }
         statusVO.setOrganizationId(organizationId);
-        Status status = modelMapper.map(statusVO, Status.class);
-        List<Status> select = statusMapper.select(status);
+        StatusDTO status = modelMapper.map(statusVO, StatusDTO.class);
+        List<StatusDTO> select = statusMapper.select(status);
         if (select.isEmpty()) {
             int isInsert = statusMapper.insert(status);
             if (isInsert != 1) {
@@ -93,10 +93,10 @@ public class StatusServiceImpl implements StatusService {
     }
 
     private Boolean checkNameUpdate(Long organizationId, Long statusId, String name) {
-        Status status = new Status();
+        StatusDTO status = new StatusDTO();
         status.setOrganizationId(organizationId);
         status.setName(name);
-        Status res = statusMapper.selectOne(status);
+        StatusDTO res = statusMapper.selectOne(status);
         return res != null && !statusId.equals(res.getId());
     }
 
@@ -108,7 +108,7 @@ public class StatusServiceImpl implements StatusService {
         if (!EnumUtil.contain(StatusType.class, statusVO.getType())) {
             throw new CommonException("error.status.type.illegal");
         }
-        Status status = modelMapper.map(statusVO, Status.class);
+        StatusDTO status = modelMapper.map(statusVO, StatusDTO.class);
         int isUpdate = statusMapper.updateByPrimaryKeySelective(status);
         if (isUpdate != 1) {
             throw new CommonException("error.status.update");
@@ -119,7 +119,7 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public Boolean delete(Long organizationId, Long statusId) {
-        Status status = statusMapper.queryById(organizationId, statusId);
+        StatusDTO status = statusMapper.queryById(organizationId, statusId);
         if (status == null) {
             throw new CommonException("error.status.delete.nofound");
         }
@@ -140,7 +140,7 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public StatusInfoVO queryStatusById(Long organizationId, Long stateId) {
-        Status status = statusMapper.queryById(organizationId, stateId);
+        StatusDTO status = statusMapper.queryById(organizationId, stateId);
         if (status == null) {
             throw new CommonException("error.queryStatusById.notExist");
         }
@@ -149,20 +149,20 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public List<StatusVO> queryAllStatus(Long organizationId) {
-        Status status = new Status();
+        StatusDTO status = new StatusDTO();
         status.setOrganizationId(organizationId);
-        List<Status> statuses = statusMapper.select(status);
+        List<StatusDTO> statuses = statusMapper.select(status);
         return modelMapper.map(statuses, new TypeToken<List<StatusVO>>() {
         }.getType());
     }
 
     @Override
     public Map<Long, StatusMapVO> queryAllStatusMap(Long organizationId) {
-        Status status = new Status();
+        StatusDTO status = new StatusDTO();
         status.setOrganizationId(organizationId);
-        List<Status> statuses = statusMapper.select(status);
+        List<StatusDTO> statuses = statusMapper.select(status);
         Map<Long, StatusMapVO> statusMap = new HashMap<>();
-        for (Status sta : statuses) {
+        for (StatusDTO sta : statuses) {
             StatusMapVO statusMapVO = modelMapper.map(sta, new TypeToken<StatusMapVO>() {
             }.getType());
             statusMap.put(statusMapVO.getId(), statusMapVO);
@@ -172,10 +172,10 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public StatusCheckVO checkName(Long organizationId, String name) {
-        Status status = new Status();
+        StatusDTO status = new StatusDTO();
         status.setOrganizationId(organizationId);
         status.setName(name);
-        Status res = statusMapper.selectOne(status);
+        StatusDTO res = statusMapper.selectOne(status);
         StatusCheckVO statusCheckVO = new StatusCheckVO();
         if (res != null) {
             statusCheckVO.setStatusExist(true);
@@ -189,11 +189,11 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Map<Long, Status> batchStatusGet(List<Long> ids) {
+    public Map<Long, StatusDTO> batchStatusGet(List<Long> ids) {
         if (!ids.isEmpty()) {
-            List<Status> statuses = statusMapper.batchStatusGet(ids);
-            Map<Long, Status> map = new HashMap();
-            for (Status status : statuses) {
+            List<StatusDTO> statuses = statusMapper.batchStatusGet(ids);
+            Map<Long, StatusDTO> map = new HashMap();
+            for (StatusDTO status : statuses) {
                 map.put(status.getId(), status);
             }
             return map;
@@ -213,10 +213,10 @@ public class StatusServiceImpl implements StatusService {
         }
 
         String statusName = statusVO.getName();
-        Status select = new Status();
+        StatusDTO select = new StatusDTO();
         select.setName(statusName);
         select.setOrganizationId(organizationId);
-        Status status = statusMapper.selectOne(select);
+        StatusDTO status = statusMapper.selectOne(select);
         if (status == null) {
             statusVO = create(organizationId, statusVO);
         } else {
@@ -234,11 +234,11 @@ public class StatusServiceImpl implements StatusService {
         if (statusId == null) {
             throw new CommonException("error.statusId.notNull");
         }
-        StateMachineNode stateNode = new StateMachineNode();
+        StateMachineNodeDTO stateNode = new StateMachineNodeDTO();
         stateNode.setOrganizationId(organizationId);
         stateNode.setStateMachineId(stateMachineId);
         stateNode.setStatusId(statusId);
-        StateMachineNode res = nodeDeployMapper.selectOne(stateNode);
+        StateMachineNodeDTO res = nodeDeployMapper.selectOne(stateNode);
         if (res == null) {
             throw new RemoveStatusException("error.status.exist");
         }
@@ -262,7 +262,7 @@ public class StatusServiceImpl implements StatusService {
     @Override
     public List<StatusVO> queryByStateMachineIds(Long organizationId, List<Long> stateMachineIds) {
         if (!stateMachineIds.isEmpty()) {
-            List<Status> statuses = statusMapper.queryByStateMachineIds(organizationId, stateMachineIds);
+            List<StatusDTO> statuses = statusMapper.queryByStateMachineIds(organizationId, stateMachineIds);
             return modelMapper.map(statuses, new TypeToken<List<StatusVO>>() {
             }.getType());
         }

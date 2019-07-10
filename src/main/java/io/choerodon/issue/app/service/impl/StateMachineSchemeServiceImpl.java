@@ -7,8 +7,8 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.api.vo.payload.ProjectEvent;
 import io.choerodon.issue.app.service.*;
-import io.choerodon.issue.infra.dto.IssueType;
-import io.choerodon.issue.infra.dto.StateMachineScheme;
+import io.choerodon.issue.infra.dto.IssueTypeDTO;
+import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeDeployStatus;
@@ -17,9 +17,9 @@ import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
-import io.choerodon.issue.infra.util.ConvertUtils;
-import io.choerodon.issue.infra.util.PageUtil;
-import io.choerodon.issue.infra.util.ProjectUtil;
+import io.choerodon.issue.infra.utils.ConvertUtils;
+import io.choerodon.issue.infra.utils.PageUtil;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.mybatis.entity.Criteria;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -72,20 +72,20 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
         List<ProjectVO> projectVOS = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         Map<Long, ProjectVO> projectMap = projectVOS.stream().collect(Collectors.toMap(ProjectVO::getId, x -> x));
         //查询组织下的所有问题类型
-        List<IssueType> issueTypes = issueTypeMapper.queryByOrgId(organizationId);
-        Map<Long, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getId, x -> x));
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.queryByOrgId(organizationId);
+        Map<Long, IssueTypeDTO> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueTypeDTO::getId, x -> x));
         //查询组织下的所有状态机
         List<StateMachineVO> stateMachineVOS = stateMachineService.queryByOrgId(organizationId);
         Map<Long, StateMachineVO> stateMachineVOMap = stateMachineVOS.stream().collect(Collectors.toMap(StateMachineVO::getId, x -> x));
 
-        StateMachineScheme scheme = modelMapper.map(schemeVO, StateMachineScheme.class);
-        PageInfo<StateMachineScheme> page = PageHelper.startPage(pageRequest.getPage(),
+        StateMachineSchemeDTO scheme = modelMapper.map(schemeVO, StateMachineSchemeDTO.class);
+        PageInfo<StateMachineSchemeDTO> page = PageHelper.startPage(pageRequest.getPage(),
                 pageRequest.getSize(), PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(() -> schemeMapper.fulltextSearch(scheme, params));
 
-        List<StateMachineScheme> schemes = page.getList();
-        List<StateMachineScheme> schemesWithConfigs = new ArrayList<>();
+        List<StateMachineSchemeDTO> schemes = page.getList();
+        List<StateMachineSchemeDTO> schemesWithConfigs = new ArrayList<>();
         if (!schemes.isEmpty()) {
-            schemesWithConfigs = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineScheme::getId).collect(Collectors.toList()));
+            schemesWithConfigs = schemeMapper.queryByIdsWithConfig(organizationId, schemes.stream().map(StateMachineSchemeDTO::getId).collect(Collectors.toList()));
         }
         List<StateMachineSchemeVO> schemeVOS = ConvertUtils.convertStateMachineSchemesToVOS(schemesWithConfigs, projectMap);
         if (schemeVOS != null) {
@@ -101,7 +101,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
             throw new CommonException("error.stateMachineName.exist");
         }
         schemeVO.setStatus(StateMachineSchemeStatus.CREATE);
-        StateMachineScheme scheme = modelMapper.map(schemeVO, StateMachineScheme.class);
+        StateMachineSchemeDTO scheme = modelMapper.map(schemeVO, StateMachineSchemeDTO.class);
         scheme.setOrganizationId(organizationId);
         int isInsert = schemeMapper.insert(scheme);
         if (isInsert != 1) {
@@ -117,10 +117,10 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
     }
 
     private Boolean checkNameUpdate(Long organizationId, Long schemeId, String name) {
-        StateMachineScheme scheme = new StateMachineScheme();
+        StateMachineSchemeDTO scheme = new StateMachineSchemeDTO();
         scheme.setOrganizationId(organizationId);
         scheme.setName(name);
-        StateMachineScheme res = schemeMapper.selectOne(scheme);
+        StateMachineSchemeDTO res = schemeMapper.selectOne(scheme);
         return res != null && !schemeId.equals(res.getId());
     }
 
@@ -131,7 +131,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
         }
         schemeVO.setId(schemeId);
         schemeVO.setOrganizationId(organizationId);
-        StateMachineScheme scheme = modelMapper.map(schemeVO, StateMachineScheme.class);
+        StateMachineSchemeDTO scheme = modelMapper.map(schemeVO, StateMachineSchemeDTO.class);
         int isUpdate = schemeMapper.updateByPrimaryKeySelective(scheme);
         if (isUpdate != 1) {
             throw new CommonException("error.stateMachineScheme.update");
@@ -143,7 +143,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
     @Override
     @Transactional(rollbackFor = CommonException.class)
     public Boolean delete(Long organizationId, Long schemeId) {
-        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        StateMachineSchemeDTO scheme = schemeMapper.selectByPrimaryKey(schemeId);
         if (!scheme.getStatus().equals(StateMachineSchemeStatus.CREATE)) {
             throw new CommonException("error.stateMachineScheme.delete.illegal");
         }
@@ -161,27 +161,27 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
 
     @Override
     public StateMachineSchemeVO querySchemeWithConfigById(Boolean isDraft, Long organizationId, Long schemeId) {
-        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        StateMachineSchemeDTO scheme = schemeMapper.selectByPrimaryKey(schemeId);
         if (scheme == null) {
             throw new CommonException("error.stateMachineScheme.notFound");
         }
         StateMachineSchemeVO schemeVO = modelMapper.map(scheme, StateMachineSchemeVO.class);
         //处理配置信息
         List<StateMachineSchemeConfigVO> configs = configService.queryBySchemeId(isDraft, organizationId, schemeId);
-        Map<Long, List<IssueType>> map = new HashMap<>(configs.size());
+        Map<Long, List<IssueTypeDTO>> map = new HashMap<>(configs.size());
         //取默认配置到第一个
         Long defaultStateMachineId = null;
         for (StateMachineSchemeConfigVO config : configs) {
-            List<IssueType> issueTypes = map.get(config.getStateMachineId());
+            List<IssueTypeDTO> issueTypes = map.get(config.getStateMachineId());
             if (issueTypes == null) {
                 issueTypes = new ArrayList<>();
             }
-            IssueType issueType;
+            IssueTypeDTO issueType;
             if (!config.getDefault()) {
                 issueType = issueTypeMapper.selectByPrimaryKey(config.getIssueTypeId());
             } else {
                 //若为默认配置，则匹配的是所有为分配的问题类型
-                issueType = new IssueType();
+                issueType = new IssueTypeDTO();
                 issueType.setName(WITHOUT_CONFIG_ISSUE_TYPE_NAME);
                 issueType.setIcon(WITHOUT_CONFIG_ISSUE_TYPE_ICON);
                 issueType.setColour(WITHOUT_CONFIG_ISSUE_TYPE_COLOUR);
@@ -194,9 +194,9 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
         List<StateMachineSchemeConfigViewVO> viewVOS = new ArrayList<>();
         //处理默认配置
         viewVOS.add(handleDefaultConfig(organizationId, defaultStateMachineId, map));
-        for (Map.Entry<Long, List<IssueType>> entry : map.entrySet()) {
+        for (Map.Entry<Long, List<IssueTypeDTO>> entry : map.entrySet()) {
             Long stateMachineId = entry.getKey();
-            List<IssueType> issueTypes = entry.getValue();
+            List<IssueTypeDTO> issueTypes = entry.getValue();
             StateMachineVO stateMachineVO = stateMachineService.queryStateMachineById(organizationId, stateMachineId);
             StateMachineSchemeConfigViewVO viewVO = new StateMachineSchemeConfigViewVO();
             viewVO.setStateMachineVO(stateMachineVO);
@@ -217,7 +217,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
      * @param map
      * @return
      */
-    private StateMachineSchemeConfigViewVO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueType>> map) {
+    private StateMachineSchemeConfigViewVO handleDefaultConfig(Long organizationId, Long defaultStateMachineId, Map<Long, List<IssueTypeDTO>> map) {
         StateMachineSchemeConfigViewVO firstVO = new StateMachineSchemeConfigViewVO();
         StateMachineVO stateMachineVO = stateMachineService.queryStateMachineById(organizationId, defaultStateMachineId);
         firstVO.setStateMachineVO(stateMachineVO);
@@ -234,11 +234,11 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
      * @param issueTypeMap
      * @param stateMachineVOMap
      */
-    private void handleSchemeConfig(List<StateMachineSchemeVO> schemeVOS, Map<Long, IssueType> issueTypeMap, Map<Long, StateMachineVO> stateMachineVOMap) {
+    private void handleSchemeConfig(List<StateMachineSchemeVO> schemeVOS, Map<Long, IssueTypeDTO> issueTypeMap, Map<Long, StateMachineVO> stateMachineVOMap) {
         schemeVOS.stream().map(StateMachineSchemeVO::getConfigVOS).filter(Objects::nonNull).forEach(machineSchemeVOS -> {
             for (StateMachineSchemeConfigVO configVO : machineSchemeVOS) {
                 if (!configVO.getDefault()) {
-                    IssueType issueType = issueTypeMap.get(configVO.getIssueTypeId());
+                    IssueTypeDTO issueType = issueTypeMap.get(configVO.getIssueTypeId());
                     if (issueType != null) {
                         configVO.setIssueTypeName(issueType.getName());
                         configVO.setIssueTypeIcon(issueType.getIcon());
@@ -260,10 +260,10 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
 
     @Override
     public Boolean checkName(Long organizationId, String name) {
-        StateMachineScheme scheme = new StateMachineScheme();
+        StateMachineSchemeDTO scheme = new StateMachineSchemeDTO();
         scheme.setOrganizationId(organizationId);
         scheme.setName(name);
-        StateMachineScheme res = schemeMapper.selectOne(scheme);
+        StateMachineSchemeDTO res = schemeMapper.selectOne(scheme);
         return res != null;
     }
 
@@ -274,7 +274,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
         deploySchemeIds.addAll(draftSchemeIds);
         deploySchemeIds = deploySchemeIds.stream().distinct().collect(Collectors.toList());
         if (!deploySchemeIds.isEmpty()) {
-            List<StateMachineScheme> stateMachineSchemes = schemeMapper.queryByIds(organizationId, deploySchemeIds);
+            List<StateMachineSchemeDTO> stateMachineSchemes = schemeMapper.queryByIds(organizationId, deploySchemeIds);
             if (stateMachineSchemes != null && !stateMachineSchemes.isEmpty()) {
                 return modelMapper.map(stateMachineSchemes, new TypeToken<List<StateMachineSchemeVO>>() {
                 }.getType());
@@ -311,13 +311,13 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long stateMachineId = initService.createStateMachineWithCreateProject(organizationId, schemeApplyType, projectEvent);
 
-        StateMachineScheme scheme = new StateMachineScheme();
+        StateMachineSchemeDTO scheme = new StateMachineSchemeDTO();
         scheme.setStatus(StateMachineSchemeStatus.CREATE);
         scheme.setName(name);
         scheme.setDescription(name);
         scheme.setOrganizationId(organizationId);
         //保证幂等性
-        List<StateMachineScheme> stateMachines = schemeMapper.select(scheme);
+        List<StateMachineSchemeDTO> stateMachines = schemeMapper.select(scheme);
         if (stateMachines.isEmpty()) {
             int isInsert = schemeMapper.insert(scheme);
             if (isInsert != 1) {
@@ -332,7 +332,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
 
     @Override
     public void activeSchemeWithRefProjectConfig(Long schemeId) {
-        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        StateMachineSchemeDTO scheme = schemeMapper.selectByPrimaryKey(schemeId);
         //活跃状态机方案
         if (scheme.getStatus().equals(StateMachineSchemeStatus.CREATE)) {
             scheme.setStatus(StateMachineSchemeStatus.ACTIVE);

@@ -1,7 +1,7 @@
 package io.choerodon.issue.api.vo;
 
-import io.choerodon.issue.infra.dto.IssueTypeWithInfo;
-import io.choerodon.issue.infra.dto.ProjectWithInfo;
+import io.choerodon.issue.infra.dto.IssueTypeWithInfoDTO;
+import io.choerodon.issue.infra.dto.ProjectWithInfoDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -26,9 +26,9 @@ public class IssueTypeSchemeWithInfoVO {
     @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
     @ApiModelProperty(value = "问题类型列表")
-    private List<IssueTypeWithInfo> issueTypeWithInfoList;
+    private List<IssueTypeWithInfoDTO> issueTypeWithInfoList;
     @ApiModelProperty(value = "关联的项目列表")
-    private List<ProjectWithInfo> projectWithInfoList;
+    private List<ProjectWithInfoDTO> projectWithInfoList;
 
     public Long getId() {
         return id;
@@ -78,11 +78,11 @@ public class IssueTypeSchemeWithInfoVO {
         this.objectVersionNumber = objectVersionNumber;
     }
 
-    public void setIssueTypeWithInfoList(List<IssueTypeWithInfo> issueTypeWithInfoList) {
+    public void setIssueTypeWithInfoList(List<IssueTypeWithInfoDTO> issueTypeWithInfoList) {
         this.issueTypeWithInfoList = issueTypeWithInfoList;
     }
 
-    public List<IssueTypeWithInfo> getIssueTypeWithInfoList() {
+    public List<IssueTypeWithInfoDTO> getIssueTypeWithInfoList() {
         return issueTypeWithInfoList;
     }
 
@@ -94,11 +94,11 @@ public class IssueTypeSchemeWithInfoVO {
         this.applyType = applyType;
     }
 
-    public void setProjectWithInfoList(List<ProjectWithInfo> projectWithInfoList) {
+    public void setProjectWithInfoList(List<ProjectWithInfoDTO> projectWithInfoList) {
         this.projectWithInfoList = projectWithInfoList;
     }
 
-    public List<ProjectWithInfo> getProjectWithInfoList() {
+    public List<ProjectWithInfoDTO> getProjectWithInfoList() {
         return projectWithInfoList;
     }
 }

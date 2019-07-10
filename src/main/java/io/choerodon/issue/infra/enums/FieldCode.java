@@ -1,11 +1,11 @@
 package io.choerodon.issue.infra.enums;
 
-import io.choerodon.issue.infra.dto.ObjectSchemeField;
-import io.choerodon.issue.infra.dto.PageField;
+import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
+import io.choerodon.issue.infra.dto.PageFieldDTO;
 import io.choerodon.issue.infra.feign.IamFeignClient;
 import io.choerodon.issue.infra.feign.vo.ProjectCategoryVO;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
-import io.choerodon.issue.infra.util.SpringBeanUtil;
+import io.choerodon.issue.infra.utils.SpringBeanUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +50,7 @@ public class FieldCode {
      * @param fields
      * @return
      */
-    public static List<ObjectSchemeField> objectSchemeFieldsFilter(Long organizationId, Long projectId, List<ObjectSchemeField> fields) {
+    public static List<ObjectSchemeFieldDTO> objectSchemeFieldsFilter(Long organizationId, Long projectId, List<ObjectSchemeFieldDTO> fields) {
         if (projectId != null) {
             IamFeignClient iamFeignClient = SpringBeanUtil.getBean(IamFeignClient.class);
             ProjectVO project = iamFeignClient.queryProjectInfo(projectId).getBody();
@@ -79,7 +79,7 @@ public class FieldCode {
      * @param fields
      * @return
      */
-    public static List<PageField> pageFieldsFilter(Long organizationId, Long projectId, List<PageField> fields) {
+    public static List<PageFieldDTO> pageFieldsFilter(Long organizationId, Long projectId, List<PageFieldDTO> fields) {
         if (projectId != null) {
             IamFeignClient iamFeignClient = SpringBeanUtil.getBean(IamFeignClient.class);
             ProjectVO project = iamFeignClient.queryProjectInfo(projectId).getBody();

@@ -1,8 +1,8 @@
 package io.choerodon.issue.app.service;
 
 import io.choerodon.issue.api.vo.*;
-import io.choerodon.issue.infra.dto.ObjectSchemeField;
-import io.choerodon.issue.infra.dto.PageField;
+import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
+import io.choerodon.issue.infra.dto.PageFieldDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ public interface PageFieldService {
      * @param context
      * @return
      */
-    List<PageField> queryPageField(Long organizationId, Long projectId, String pageCode, String context);
+    List<PageFieldDTO> queryPageField(Long organizationId, Long projectId, String pageCode, String context);
 
     /**
      * 组织层/项目层 根据页面编码获取字段列表
@@ -68,7 +68,7 @@ public interface PageFieldService {
      * @param organizationId
      * @param field
      */
-    void createByFieldWithOrg(Long organizationId, ObjectSchemeField field);
+    void createByFieldWithOrg(Long organizationId, ObjectSchemeFieldDTO field);
 
     /**
      * 项目层 创建页面字段
@@ -77,7 +77,7 @@ public interface PageFieldService {
      * @param projectId
      * @param field
      */
-    void createByFieldWithPro(Long organizationId, Long projectId, ObjectSchemeField field);
+    void createByFieldWithPro(Long organizationId, Long projectId, ObjectSchemeFieldDTO field);
 
     /**
      * 删除字段

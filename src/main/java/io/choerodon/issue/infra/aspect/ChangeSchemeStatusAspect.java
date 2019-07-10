@@ -2,7 +2,7 @@ package io.choerodon.issue.infra.aspect;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.app.service.StateMachineSchemeService;
-import io.choerodon.issue.infra.dto.StateMachineScheme;
+import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
 import io.choerodon.mybatis.entity.Criteria;
@@ -49,7 +49,7 @@ public class ChangeSchemeStatusAspect {
             }
         }
         logger.info("schemeId:{}", schemeId);
-        StateMachineScheme scheme = schemeMapper.selectByPrimaryKey(schemeId);
+        StateMachineSchemeDTO scheme = schemeMapper.selectByPrimaryKey(schemeId);
         if (scheme == null) {
             throw new CommonException("error.scheme.notFound");
         }

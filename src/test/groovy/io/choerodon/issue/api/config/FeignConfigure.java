@@ -14,7 +14,7 @@ import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
-import io.choerodon.issue.infra.util.ProjectUtil;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClientFallback;
 import org.mockito.Matchers;

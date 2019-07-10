@@ -4,7 +4,7 @@ import io.choerodon.issue.api.vo.IssueTypeVO;
 import io.choerodon.issue.api.vo.IssueTypeWithStateMachineIdVO;
 import io.choerodon.issue.api.vo.ProjectConfigDetailVO;
 import io.choerodon.issue.api.vo.StatusVO;
-import io.choerodon.issue.infra.dto.ProjectConfig;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 import io.choerodon.issue.api.vo.payload.TransformVO;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public interface ProjectConfigService {
      * @param applyType
      * @return
      */
-    ProjectConfig create(Long projectId, Long schemeId, String schemeType, String applyType);
+    ProjectConfigDTO create(Long projectId, Long schemeId, String schemeType, String applyType);
 
     /**
      * 获取项目配置方案信息

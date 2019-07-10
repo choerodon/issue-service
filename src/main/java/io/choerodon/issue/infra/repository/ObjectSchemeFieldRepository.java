@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository;
 
 import io.choerodon.issue.api.vo.ObjectSchemeFieldSearchVO;
-import io.choerodon.issue.infra.dto.ObjectSchemeField;
+import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
 
 import java.util.List;
 
@@ -10,15 +10,15 @@ import java.util.List;
  * @since 2019/4/1
  */
 public interface ObjectSchemeFieldRepository {
-    ObjectSchemeField create(ObjectSchemeField field);
+    ObjectSchemeFieldDTO create(ObjectSchemeFieldDTO field);
 
     void delete(Long fieldId);
 
-    void update(ObjectSchemeField field);
+    void update(ObjectSchemeFieldDTO field);
 
-    ObjectSchemeField queryById(Long organizationId, Long projectId, Long fieldId);
+    ObjectSchemeFieldDTO queryById(Long organizationId, Long projectId, Long fieldId);
 
-    List<ObjectSchemeField> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchVO searchDTO);
+    List<ObjectSchemeFieldDTO> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchVO searchDTO);
 
-    ObjectSchemeField queryByFieldCode(Long organizationId, Long projectId, String fieldCode);
+    ObjectSchemeFieldDTO queryByFieldCode(Long organizationId, Long projectId, String fieldCode);
 }

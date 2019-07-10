@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.issue.infra.mapper.StateMachineMapper">
 
-    <select id="queryById" resultType="io.choerodon.issue.infra.dto.StateMachine">
+    <select id="queryById" resultType="io.choerodon.issue.infra.dto.StateMachineDTO">
         SELECT *
         FROM state_machine
         WHERE organization_id = #{organizationId}
         and id = #{id}
     </select>
 
-    <select id="fulltextSearch" resultType="io.choerodon.issue.infra.dto.StateMachine">
+    <select id="fulltextSearch" resultType="io.choerodon.issue.infra.dto.StateMachineDTO">
         SELECT * FROM state_machine
         WHERE 1=1
         <if test="stateMachine.organizationId != null">
@@ -35,7 +35,7 @@
         where smn.state_machine_id = #{stateMachineId} and smn.status_id != 0
     </select>
 
-    <select id="queryByIds" resultType="io.choerodon.issue.infra.dto.StateMachine">
+    <select id="queryByIds" resultType="io.choerodon.issue.infra.dto.StateMachineDTO">
         SELECT * FROM state_machine sm
         WHERE 1=1
         <if test="organizationId != null">

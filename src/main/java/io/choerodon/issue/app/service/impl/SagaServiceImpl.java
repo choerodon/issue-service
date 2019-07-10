@@ -9,8 +9,8 @@ import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.issue.api.vo.StatusVO;
 import io.choerodon.issue.api.vo.payload.*;
 import io.choerodon.issue.app.service.StatusService;
-import io.choerodon.issue.infra.dto.ProjectConfig;
-import io.choerodon.issue.infra.dto.Status;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
+import io.choerodon.issue.infra.dto.StatusDTO;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
 import org.modelmapper.ModelMapper;
@@ -60,7 +60,7 @@ public class SagaServiceImpl {
     @Saga(code = DEPLOY_STATE_MACHINE_SCHEME, description = "issue服务发布状态机方案", inputSchemaClass = StateMachineSchemeDeployUpdateIssue.class)
     public void deployStateMachineScheme(Long organizationId, Long schemeId, List<StateMachineSchemeChangeItem> changeItems, ChangeStatus changeStatus) {
         //获取当前方案配置的项目列表
-        List<ProjectConfig> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
+        List<ProjectConfigDTO> projectConfigs = projectConfigMapper.queryConfigsBySchemeId(SchemeType.STATE_MACHINE, schemeId);
         //获取所有状态
         List<StatusVO> statusVOS = statusService.queryAllStatus(organizationId);
         Map<Long, StatusVO> statusVOMap = statusVOS.stream().collect(Collectors.toMap(StatusVO::getId, x -> x));
@@ -93,16 +93,16 @@ public class SagaServiceImpl {
     }
 
     @Saga(code = DEPLOY_STATE_MACHINE, description = "发布状态机", inputSchemaClass = DeployStateMachinePayload.class)
-    public void deployStateMachine(Long organizationId, Long stateMachineId, Map<String, List<Status>> changeMap) {
+    public void deployStateMachine(Long organizationId, Long stateMachineId, Map<String, List<StatusDTO>> changeMap) {
         //新增的状态
-        List<Status> addList = changeMap.get("addList");
+        List<StatusDTO> addList = changeMap.get("addList");
         List<StatusVO> addListVO = modelMapper.map(addList, new TypeToken<List<StatusVO>>() {
         }.getType());
         Map<Long, StatusVO> statusMap = addListVO.stream().collect(Collectors.toMap(StatusVO::getId, x -> x));
         //移除的状态
-        List<Status> deleteList = changeMap.get("deleteList");
+        List<StatusDTO> deleteList = changeMap.get("deleteList");
         List<Long> addStatusIds = addListVO.stream().map(StatusVO::getId).collect(Collectors.toList());
-        List<Long> deleteStatusIds = deleteList.stream().map(Status::getId).collect(Collectors.toList());
+        List<Long> deleteStatusIds = deleteList.stream().map(StatusDTO::getId).collect(Collectors.toList());
         ChangeStatus changeStatus = new ChangeStatus(addStatusIds, deleteStatusIds);
         DeployStateMachinePayload deployStateMachinePayload = stateMachineService.handleStateMachineChangeStatusByStateMachineId(organizationId, stateMachineId, changeStatus);
         deployStateMachinePayload.setUserId(DetailsHelper.getUserDetails().getUserId());

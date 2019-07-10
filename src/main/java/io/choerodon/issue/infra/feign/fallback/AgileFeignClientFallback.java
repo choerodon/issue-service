@@ -2,7 +2,7 @@ package io.choerodon.issue.infra.feign.fallback;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
-import io.choerodon.issue.infra.dto.ProjectConfig;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.util.Map;
 @Component
 public class AgileFeignClientFallback implements AgileFeignClient {
     @Override
-    public ResponseEntity<Map<String, Object>> checkDeleteNode(Long organizationId, Long statusId, List<ProjectConfig> projectConfigs) {
+    public ResponseEntity<Map<String, Object>> checkDeleteNode(Long organizationId, Long statusId, List<ProjectConfigDTO> projectConfigs) {
         throw new CommonException("error.agileFeignClient.checkDeleteNode");
     }
 

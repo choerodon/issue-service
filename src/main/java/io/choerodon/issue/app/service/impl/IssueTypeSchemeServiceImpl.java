@@ -20,8 +20,8 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
-import io.choerodon.issue.infra.util.PageUtil;
-import io.choerodon.issue.infra.util.ProjectUtil;
+import io.choerodon.issue.infra.utils.PageUtil;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -69,11 +69,11 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
 
     @Override
     public IssueTypeSchemeVO queryById(Long organizationId, Long issueTypeSchemeId) {
-        IssueTypeScheme issueTypeScheme = issueTypeSchemeMapper.selectByPrimaryKey(issueTypeSchemeId);
+        IssueTypeSchemeDTO issueTypeScheme = issueTypeSchemeMapper.selectByPrimaryKey(issueTypeSchemeId);
         if (issueTypeScheme != null) {
             IssueTypeSchemeVO issueTypeSchemeVO = modelMapper.map(issueTypeScheme, IssueTypeSchemeVO.class);
             //根据方案配置表获取 问题类型
-            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
+            List<IssueTypeDTO> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
             issueTypeSchemeVO.setIssueTypes(modelMapper.map(issueTypes, new TypeToken<List<IssueTypeVO>>() {
             }.getType()));
             return issueTypeSchemeVO;
@@ -92,7 +92,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
         }
 
         issueTypeSchemeVO.setOrganizationId(organizationId);
-        IssueTypeScheme issueTypeScheme = modelMapper.map(issueTypeSchemeVO, IssueTypeScheme.class);
+        IssueTypeSchemeDTO issueTypeScheme = modelMapper.map(issueTypeSchemeVO, IssueTypeSchemeDTO.class);
         if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
             throw new CommonException("error.issueType.create");
         }
@@ -109,7 +109,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
             throw new CommonException("error.issueTypeScheme.name.exist");
         }
 
-        IssueTypeScheme issueTypeScheme = modelMapper.map(issueTypeSchemeVO, IssueTypeScheme.class);
+        IssueTypeSchemeDTO issueTypeScheme = modelMapper.map(issueTypeSchemeVO, IssueTypeSchemeDTO.class);
         int isUpdate = issueTypeSchemeMapper.updateByPrimaryKeySelective(issueTypeScheme);
         if (isUpdate != 1) {
             throw new CommonException("error.issueTypeScheme.update");
@@ -126,7 +126,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
     public Map<String, Object> checkDelete(Long organizationId, Long issueTypeSchemeId) {
         Map<String, Object> result = new HashMap<>();
         result.put("canDelete", true);
-        IssueTypeScheme issueTypeScheme = issueTypeSchemeMapper.selectByPrimaryKey(issueTypeSchemeId);
+        IssueTypeSchemeDTO issueTypeScheme = issueTypeSchemeMapper.selectByPrimaryKey(issueTypeSchemeId);
         if (issueTypeScheme == null) {
             throw new CommonException("error.issueTypeScheme.notFound");
         }
@@ -158,7 +158,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
 
     @Override
     public Boolean checkName(Long organizationId, String name, Long id) {
-        IssueTypeScheme select = new IssueTypeScheme();
+        IssueTypeSchemeDTO select = new IssueTypeSchemeDTO();
         select.setName(name);
         select.setOrganizationId(organizationId);
         select = issueTypeSchemeMapper.selectOne(select);
@@ -175,7 +175,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
             int sequence = 0;
             for (IssueTypeVO issueType : issueTypeVOS) {
                 if (issueTypeMapper.selectByPrimaryKey(issueType.getId()) != null) {
-                    IssueTypeSchemeConfig config = new IssueTypeSchemeConfig();
+                    IssueTypeSchemeConfigDTO config = new IssueTypeSchemeConfigDTO();
                     config.setIssueTypeId(issueType.getId());
                     config.setOrganizationId(organizationId);
                     config.setSchemeId(issueTypeSchemeId);
@@ -193,7 +193,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
 
     @Override
     public IssueTypeSchemeVO queryByProjectId(Long projectId) {
-        ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, SchemeApplyType.CLOOPM);
+        ProjectConfigDTO projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, SchemeApplyType.CLOOPM);
 
         if (projectConfig.getSchemeId() == null) {
             throw new CommonException("error.projectConfig.schemeId.null");
@@ -204,13 +204,13 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
     @Override
     public void initByConsumeCreateProject(Long projectId, String projectCode) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        IssueType query = new IssueType();
+        IssueTypeDTO query = new IssueTypeDTO();
         query.setOrganizationId(organizationId);
         query.setInitialize(true);
-        List<IssueType> issueTypes = issueTypeMapper.select(query);
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.select(query);
         //处理老的组织没有创建的数据
         issueTypes = initOrganizationIssueType(organizationId, issueTypes);
-        Map<String, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
+        Map<String, IssueTypeDTO> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueTypeDTO::getTypeCode, x -> x));
         //初始化敏捷问题类型方案
         initScheme(projectId, organizationId, projectCode + "默认类型方案【敏捷】", issueTypeMap.get(InitIssueType.STORY.getTypeCode()).getId(), SchemeApplyType.AGILE, issueTypeMap);
         //初始化测试问题类型方案
@@ -220,24 +220,24 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
     @Override
     public void initByConsumeCreateProgram(Long projectId, String projectCode) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        IssueType query = new IssueType();
+        IssueTypeDTO query = new IssueTypeDTO();
         query.setOrganizationId(organizationId);
         query.setInitialize(true);
-        List<IssueType> issueTypes = issueTypeMapper.select(query);
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.select(query);
         //处理老的组织没有创建的数据
         issueTypes = initOrganizationIssueType(organizationId, issueTypes);
-        Map<String, IssueType> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueType::getTypeCode, x -> x));
+        Map<String, IssueTypeDTO> issueTypeMap = issueTypes.stream().collect(Collectors.toMap(IssueTypeDTO::getTypeCode, x -> x));
         //初始化项目群问题类型方案
         initScheme(projectId, organizationId, projectCode + "默认类型方案【项目群】", issueTypeMap.get(InitIssueType.FEATURE.getTypeCode()).getId(), SchemeApplyType.PROGRAM, issueTypeMap);
     }
 
-    private List<IssueType> initOrganizationIssueType(Long organizationId, List<IssueType> issueTypes) {
+    private List<IssueTypeDTO> initOrganizationIssueType(Long organizationId, List<IssueTypeDTO> issueTypes) {
         if (issueTypes == null || issueTypes.isEmpty()) {
             //注册组织初始化问题类型
             issueTypeService.initIssueTypeByConsumeCreateOrganization(organizationId);
             //注册组织初始化优先级
             priorityService.initProrityByOrganization(Collections.singletonList(organizationId));
-            IssueType query = new IssueType();
+            IssueTypeDTO query = new IssueTypeDTO();
             query.setOrganizationId(organizationId);
             query.setInitialize(true);
             return issueTypeMapper.select(query);
@@ -252,11 +252,11 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
                 pageRequest.getSize(), PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(() -> issueTypeSchemeMapper.selectIssueTypeSchemeIds(organizationId, issueTypeSchemeSearchVO));
         List<IssueTypeSchemeWithInfoVO> issueTypeSchemeWithInfoVOList = new ArrayList<>(issueTypeSchemeIdsPage.getList().size());
         if (issueTypeSchemeIdsPage.getList() != null && !issueTypeSchemeIdsPage.getList().isEmpty()) {
-            List<IssueTypeSchemeWithInfo> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getList());
+            List<IssueTypeSchemeWithInfoDTO> issueTypeSchemeWithInfoList = issueTypeSchemeMapper.queryIssueTypeSchemeList(organizationId, issueTypeSchemeIdsPage.getList());
             issueTypeSchemeWithInfoVOList = modelMapper.map(issueTypeSchemeWithInfoList, new TypeToken<List<IssueTypeSchemeWithInfoVO>>() {
             }.getType());
             for (IssueTypeSchemeWithInfoVO type : issueTypeSchemeWithInfoVOList) {
-                for (ProjectWithInfo projectWithInfo : type.getProjectWithInfoList()) {
+                for (ProjectWithInfoDTO projectWithInfo : type.getProjectWithInfoList()) {
                     projectWithInfo.setProjectName(projectUtil.getName(projectWithInfo.getProjectId()));
                 }
             }
@@ -275,16 +275,16 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
      * @param schemeApplyType
      * @param issueTypeMap
      */
-    private void initScheme(Long projectId, Long organizationId, String name, Long defaultIssueTypeId, String schemeApplyType, Map<String, IssueType> issueTypeMap) {
+    private void initScheme(Long projectId, Long organizationId, String name, Long defaultIssueTypeId, String schemeApplyType, Map<String, IssueTypeDTO> issueTypeMap) {
         //初始化敏捷问题类型方案
-        IssueTypeScheme issueTypeScheme = new IssueTypeScheme();
+        IssueTypeSchemeDTO issueTypeScheme = new IssueTypeSchemeDTO();
         issueTypeScheme.setName(name);
         issueTypeScheme.setDefaultIssueTypeId(defaultIssueTypeId);
         issueTypeScheme.setApplyType(schemeApplyType);
         issueTypeScheme.setOrganizationId(organizationId);
         issueTypeScheme.setDescription(name);
         //保证幂等性
-        List<IssueTypeScheme> issueTypeSchemes = issueTypeSchemeMapper.select(issueTypeScheme);
+        List<IssueTypeSchemeDTO> issueTypeSchemes = issueTypeSchemeMapper.select(issueTypeScheme);
         if (issueTypeSchemes.isEmpty()) {
             if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
                 throw new CommonException("error.issueTypeScheme.create");
@@ -292,8 +292,8 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
             Integer sequence = 0;
             for (InitIssueType initIssueType : InitIssueType.listByApplyType(schemeApplyType)) {
                 sequence++;
-                IssueType issueType = issueTypeMap.get(initIssueType.getTypeCode());
-                IssueTypeSchemeConfig schemeConfig = new IssueTypeSchemeConfig(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence));
+                IssueTypeDTO issueType = issueTypeMap.get(initIssueType.getTypeCode());
+                IssueTypeSchemeConfigDTO schemeConfig = new IssueTypeSchemeConfigDTO(issueTypeScheme.getId(), issueType.getId(), organizationId, BigDecimal.valueOf(sequence));
                 if (issueTypeSchemeConfigMapper.insert(schemeConfig) != 1) {
                     throw new CommonException("error.issueTypeSchemeConfig.create");
                 }

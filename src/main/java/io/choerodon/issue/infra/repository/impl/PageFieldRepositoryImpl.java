@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.infra.dto.PageField;
+import io.choerodon.issue.infra.dto.PageFieldDTO;
 import io.choerodon.issue.infra.mapper.PageFieldMapper;
 import io.choerodon.issue.infra.repository.PageFieldRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class PageFieldRepositoryImpl implements PageFieldRepository {
     private static final String ERROR_PAGEFIELD_UPDATE = "error.pageField.update";
 
     @Override
-    public PageField create(PageField field) {
+    public PageFieldDTO create(PageFieldDTO field) {
         if (pageFieldMapper.insert(field) != 1) {
             throw new CommonException(ERROR_PAGEFIELD_CREATE);
         }
@@ -37,15 +37,15 @@ public class PageFieldRepositoryImpl implements PageFieldRepository {
     }
 
     @Override
-    public void update(PageField pageField) {
+    public void update(PageFieldDTO pageField) {
         if (pageFieldMapper.updateByPrimaryKeySelective(pageField) != 1) {
             throw new CommonException(ERROR_PAGEFIELD_UPDATE);
         }
     }
 
     @Override
-    public PageField queryById(Long organizationId, Long projectId, Long pageFieldId) {
-        PageField pageField = pageFieldMapper.selectByPrimaryKey(pageFieldId);
+    public PageFieldDTO queryById(Long organizationId, Long projectId, Long pageFieldId) {
+        PageFieldDTO pageField = pageFieldMapper.selectByPrimaryKey(pageFieldId);
         if (pageField == null) {
             throw new CommonException(ERROR_PAGEFIELD_NOTFOUND);
         }

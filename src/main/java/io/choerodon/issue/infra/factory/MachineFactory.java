@@ -8,8 +8,9 @@ import io.choerodon.issue.app.service.StateMachineNodeService;
 import io.choerodon.issue.app.service.StateMachineService;
 import io.choerodon.issue.app.service.StateMachineTransformService;
 import io.choerodon.issue.infra.cache.InstanceCache;
-import io.choerodon.issue.infra.dto.StateMachineNode;
-import io.choerodon.issue.infra.dto.StateMachineTransform;
+import io.choerodon.issue.infra.dto.StateMachineDTO;
+import io.choerodon.issue.infra.dto.StateMachineNodeDTO;
+import io.choerodon.issue.infra.dto.StateMachineTransformDTO;
 import io.choerodon.issue.infra.enums.TransformType;
 import io.choerodon.issue.infra.mapper.StateMachineNodeMapper;
 import org.slf4j.Logger;
@@ -49,9 +50,9 @@ public class MachineFactory {
     private InstanceCache instanceCache;
 
     private StateMachineBuilder.Builder<String, String> getBuilder(Long organizationId, String serviceCode, Long stateMachineId) {
-        io.choerodon.issue.infra.dto.StateMachine stateMachine = stateMachineService.queryDeployForInstance(organizationId, stateMachineId);
-        List<StateMachineNode> nodes = stateMachine.getNodes();
-        List<StateMachineTransform> transforms = stateMachine.getTransforms();
+        StateMachineDTO stateMachine = stateMachineService.queryDeployForInstance(organizationId, stateMachineId);
+        List<StateMachineNodeDTO> nodes = stateMachine.getNodes();
+        List<StateMachineTransformDTO> transforms = stateMachine.getTransforms();
         Long initNodeId = nodeService.getInitNode(organizationId, stateMachineId);
 
         StateMachineBuilder.Builder<String, String> builder = StateMachineBuilder.builder();
@@ -63,10 +64,10 @@ public class MachineFactory {
                     .withStates()
                     .initial(initNodeId.toString(), initialAction(organizationId, serviceCode))
                     .states(nodes.stream().map(x -> x.getId().toString()).collect(Collectors.toSet()));
-            for (StateMachineTransform transform : transforms) {
+            for (StateMachineTransformDTO transform : transforms) {
                 if (transform.getType().equals(TransformType.ALL)) {
                     //若配置了全部转换
-                    for (StateMachineNode node : nodes) {
+                    for (StateMachineNodeDTO node : nodes) {
                         String event = transform.getId().toString();
                         String source = node.getId().toString();
                         String target = transform.getEndNodeId().toString();
@@ -143,7 +144,7 @@ public class MachineFactory {
         try {
             Long instanceId = inputVO.getInstanceId();
             //校验transformId是否合法
-            List<StateMachineTransform> transforms = transformService.queryListByStatusIdByDeploy(organizationId, stateMachineId, currentStatusId);
+            List<StateMachineTransformDTO> transforms = transformService.queryListByStatusIdByDeploy(organizationId, stateMachineId, currentStatusId);
             if (transforms.stream().noneMatch(x -> x.getId().equals(transformId))) {
                 throw new CommonException("error.executeTransform.transformId.illegal");
             }

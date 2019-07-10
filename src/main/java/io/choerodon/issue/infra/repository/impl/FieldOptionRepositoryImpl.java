@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.infra.dto.FieldOption;
+import io.choerodon.issue.infra.dto.FieldOptionDTO;
 import io.choerodon.issue.infra.mapper.FieldOptionMapper;
 import io.choerodon.issue.infra.repository.FieldOptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class FieldOptionRepositoryImpl implements FieldOptionRepository {
     private static final String ERROR_OPTION_UPDATE = "error.option.update";
 
     @Override
-    public FieldOption create(FieldOption option) {
+    public FieldOptionDTO create(FieldOptionDTO option) {
         if (fieldOptionMapper.insert(option) != 1) {
             throw new CommonException(ERROR_OPTION_CREATE);
         }
@@ -38,15 +38,15 @@ public class FieldOptionRepositoryImpl implements FieldOptionRepository {
     }
 
     @Override
-    public void update(FieldOption option) {
+    public void update(FieldOptionDTO option) {
         if (fieldOptionMapper.updateByPrimaryKeySelective(option) != 1) {
             throw new CommonException(ERROR_OPTION_UPDATE);
         }
     }
 
     @Override
-    public FieldOption queryById(Long organizationId, Long optionId) {
-        FieldOption option = fieldOptionMapper.selectByPrimaryKey(optionId);
+    public FieldOptionDTO queryById(Long organizationId, Long optionId) {
+        FieldOptionDTO option = fieldOptionMapper.selectByPrimaryKey(optionId);
         if (option == null) {
             throw new CommonException(ERROR_OPTION_NOTFOUND);
         }

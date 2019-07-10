@@ -6,7 +6,7 @@ import io.choerodon.issue.api.vo.StateMachineSchemeConfigVO
 import io.choerodon.issue.api.vo.StateMachineSchemeVO
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeChangeItem
 import io.choerodon.issue.app.service.StateMachineSchemeService
-import io.choerodon.issue.infra.dto.StateMachineSchemeConfig
+import io.choerodon.issue.infra.dto.StateMachineSchemeConfigDTO
 import io.choerodon.issue.infra.mapper.StateMachineSchemeConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -184,7 +184,7 @@ class StateMachineSchemeControllerSpec extends Specification {
 
     def "checkDeploy"() {
         given: "准备数据"
-        StateMachineSchemeConfig schemeConfig = new StateMachineSchemeConfig()
+        StateMachineSchemeConfigDTO schemeConfig = new StateMachineSchemeConfigDTO()
         schemeConfig.issueTypeId = 1L
         schemeConfig.schemeId = 1L
         schemeConfig.organizationId = 1L

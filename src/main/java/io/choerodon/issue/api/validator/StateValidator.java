@@ -3,7 +3,7 @@ package io.choerodon.issue.api.validator;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.StatusVO;
 import io.choerodon.issue.infra.enums.StatusType;
-import io.choerodon.issue.infra.util.EnumUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

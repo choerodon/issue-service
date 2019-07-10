@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.vo;
 
-import io.choerodon.issue.infra.dto.IssueTypeSchemeRelation;
+import io.choerodon.issue.infra.dto.IssueTypeSchemeRelationDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class IssueTypeWithInfoVO {
     @ApiModelProperty(value = "乐观锁")
     private Long objectVersionNumber;
     @ApiModelProperty(value = "关联的问题类型方案列表")
-    private List<IssueTypeSchemeRelation> issueTypeSchemeRelationList;
+    private List<IssueTypeSchemeRelationDTO> issueTypeSchemeRelationList;
 
     public Long getId() {
         return id;
@@ -103,11 +103,11 @@ public class IssueTypeWithInfoVO {
         this.initialize = initialize;
     }
 
-    public void setIssueTypeSchemeRelationList(List<IssueTypeSchemeRelation> issueTypeSchemeRelationList) {
+    public void setIssueTypeSchemeRelationList(List<IssueTypeSchemeRelationDTO> issueTypeSchemeRelationList) {
         this.issueTypeSchemeRelationList = issueTypeSchemeRelationList;
     }
 
-    public List<IssueTypeSchemeRelation> getIssueTypeSchemeRelationList() {
+    public List<IssueTypeSchemeRelationDTO> getIssueTypeSchemeRelationList() {
         return issueTypeSchemeRelationList;
     }
 }

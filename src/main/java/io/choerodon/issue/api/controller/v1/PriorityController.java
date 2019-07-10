@@ -6,7 +6,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.PriorityVO;
 import io.choerodon.issue.app.service.PriorityService;
 import io.choerodon.issue.api.validator.PriorityValidator;
-import io.choerodon.issue.infra.util.ParamUtils;
+import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

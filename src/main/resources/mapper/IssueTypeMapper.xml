@@ -22,14 +22,14 @@
     <!--</if>-->
     <!--</select>-->
 
-    <select id="queryByOrgId" resultType="io.choerodon.issue.infra.dto.IssueType">
+    <select id="queryByOrgId" resultType="io.choerodon.issue.infra.dto.IssueTypeDTO">
         SELECT
         t.*
         FROM issue_type t
         WHERE t.organization_id = #{organizationId}
     </select>
 
-    <select id="queryBySchemeId" resultType="io.choerodon.issue.infra.dto.IssueType">
+    <select id="queryBySchemeId" resultType="io.choerodon.issue.infra.dto.IssueTypeDTO">
         SELECT
         t.*,
         c.sequence
@@ -63,7 +63,7 @@
         </if>
     </select>
 
-    <resultMap id="issueTypeListMap" type="io.choerodon.issue.infra.dto.IssueTypeWithInfo">
+    <resultMap id="issueTypeListMap" type="io.choerodon.issue.infra.dto.IssueTypeWithInfoDTO">
         <id property="id" column="it_id"/>
         <id property="name" column="it_name"/>
         <id property="description" column="it_description"/>
@@ -73,7 +73,7 @@
         <id property="initialize" column="it_is_initialize"/>
         <id property="objectVersionNumber" column="it_object_version_number"/>
         <collection property="issueTypeSchemeRelationList" autoMapping="true"
-                    ofType="io.choerodon.issue.infra.dto.IssueTypeSchemeRelation">
+                    ofType="io.choerodon.issue.infra.dto.IssueTypeSchemeRelationDTO">
             <id property="issueTypeSchemeId" column="itscits_scheme_id"/>
             <id property="issueTypeSchemeName" column="itscits_name"/>
         </collection>

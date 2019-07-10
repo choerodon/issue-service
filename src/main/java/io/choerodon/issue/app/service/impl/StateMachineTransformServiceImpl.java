@@ -14,7 +14,7 @@ import io.choerodon.issue.infra.enums.ConfigType;
 import io.choerodon.issue.infra.enums.TransformConditionStrategy;
 import io.choerodon.issue.infra.enums.TransformType;
 import io.choerodon.issue.infra.mapper.*;
-import io.choerodon.issue.infra.util.EnumUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.mybatis.entity.Criteria;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -64,14 +64,14 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     @Transactional(rollbackFor = Exception.class)
     public StateMachineTransformVO create(Long organizationId, Long stateMachineId, StateMachineTransformVO transformDTO) {
         transformDTO.setStateMachineId(stateMachineId);
-        StateMachineTransformDraft transform = new StateMachineTransformDraft();
+        StateMachineTransformDraftDTO transform = new StateMachineTransformDraftDTO();
         transform.setStartNodeId(transformDTO.getStartNodeId());
         transform.setEndNodeId(transformDTO.getEndNodeId());
         transform.setName(transformDTO.getName());
         if (!transformDraftMapper.select(transform).isEmpty()) {
             throw new CommonException("error.stateMachineTransform.exist");
         }
-        transform = modelMapper.map(transformDTO, StateMachineTransformDraft.class);
+        transform = modelMapper.map(transformDTO, StateMachineTransformDraftDTO.class);
         transform.setType(TransformType.CUSTOM);
         transform.setOrganizationId(organizationId);
         transform.setConditionStrategy(TransformConditionStrategy.ALL);
@@ -88,11 +88,11 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     @Transactional(rollbackFor = Exception.class)
     public StateMachineTransformVO update(Long organizationId, Long stateMachineId, Long transformId, StateMachineTransformVO transformDTO) {
         transformDTO.setStateMachineId(stateMachineId);
-        StateMachineTransformDraft origin = transformDraftMapper.queryById(organizationId, transformId);
+        StateMachineTransformDraftDTO origin = transformDraftMapper.queryById(organizationId, transformId);
         if (origin == null) {
             throw new CommonException("error.stateMachineTransform.queryById.notFound");
         }
-        StateMachineTransformDraft transform = modelMapper.map(transformDTO, StateMachineTransformDraft.class);
+        StateMachineTransformDraftDTO transform = modelMapper.map(transformDTO, StateMachineTransformDraftDTO.class);
         transform.setId(transformId);
         transform.setOrganizationId(organizationId);
         transform.setType(origin.getType());
@@ -108,7 +108,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     @ChangeStateMachineStatus
     @Transactional(rollbackFor = Exception.class)
     public Boolean delete(Long organizationId, Long stateMachineId, Long transformId) {
-        StateMachineTransformDraft transform = transformDraftMapper.queryById(organizationId, transformId);
+        StateMachineTransformDraftDTO transform = transformDraftMapper.queryById(organizationId, transformId);
         if (!stateMachineId.equals(transform.getStateMachineId())) {
             throw new CommonException("error.stateMachineTransform.deleteIllegal");
         }
@@ -121,7 +121,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
 
     @Override
     public StateMachineTransformVO queryById(Long organizationId, Long transformId) {
-        StateMachineTransformDraft transform = transformDraftMapper.queryById(organizationId, transformId);
+        StateMachineTransformDraftDTO transform = transformDraftMapper.queryById(organizationId, transformId);
         if (transform == null) {
             throw new CommonException("error.stateMachineTransform.queryById.notFound");
         }
@@ -132,13 +132,13 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
         transformVO.setPostpositions(configService.queryByTransformId(organizationId, transformId, ConfigType.ACTION, true));
         //获取开始节点，若为初始转换，则没有开始节点
         if (TransformType.CUSTOM.equals(transform.getType())) {
-            StateMachineNodeDraft startNode = nodeDraftMapper.getNodeById(transformVO.getStartNodeId());
+            StateMachineNodeDraftDTO startNode = nodeDraftMapper.getNodeById(transformVO.getStartNodeId());
             StateMachineNodeVO nodeVO = modelMapper.map(startNode, StateMachineNodeVO.class);
             nodeVO.setStatusVO(modelMapper.map(startNode.getStatus(), StatusVO.class));
             transformVO.setStartNodeVO(nodeVO);
         }
         //获取结束节点
-        StateMachineNodeDraft endNode = nodeDraftMapper.getNodeById(transformVO.getEndNodeId());
+        StateMachineNodeDraftDTO endNode = nodeDraftMapper.getNodeById(transformVO.getEndNodeId());
         StateMachineNodeVO nodeVO = modelMapper.map(endNode, StateMachineNodeVO.class);
         nodeVO.setStatusVO(modelMapper.map(endNode.getStatus(), StatusVO.class));
         transformVO.setEndNodeVO(nodeVO);
@@ -146,12 +146,12 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     }
 
     @Override
-    public StateMachineTransform getInitTransform(Long organizationId, Long stateMachineId) {
-        StateMachineTransform transform = new StateMachineTransform();
+    public StateMachineTransformDTO getInitTransform(Long organizationId, Long stateMachineId) {
+        StateMachineTransformDTO transform = new StateMachineTransformDTO();
         transform.setStateMachineId(stateMachineId);
         transform.setOrganizationId(organizationId);
         transform.setType(TransformType.INIT);
-        List<StateMachineTransform> transforms = transformDeployMapper.select(transform);
+        List<StateMachineTransformDTO> transforms = transformDeployMapper.select(transform);
         if (transforms.isEmpty()) {
             throw new CommonException("error.initTransform.null");
         }
@@ -159,8 +159,8 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     }
 
     @Override
-    public List<StateMachineTransform> queryListByStatusIdByDeploy(Long organizationId, Long stateMachineId, Long statusId) {
-        StateMachineNode startNode = nodeDeployMapper.getNodeDeployByStatusId(stateMachineId, statusId);
+    public List<StateMachineTransformDTO> queryListByStatusIdByDeploy(Long organizationId, Long stateMachineId, Long statusId) {
+        StateMachineNodeDTO startNode = nodeDeployMapper.getNodeDeployByStatusId(stateMachineId, statusId);
         if (startNode == null) {
             throw new CommonException("error.statusId.notFound");
         }
@@ -174,17 +174,17 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
         if (endNodeId == null) {
             throw new CommonException("error.endNodeId.null");
         }
-        StateMachineNodeDraft stateMachineNodeDraft = nodeDraftMapper.getNodeById(endNodeId);
+        StateMachineNodeDraftDTO stateMachineNodeDraft = nodeDraftMapper.getNodeById(endNodeId);
         if (stateMachineNodeDraft == null) {
             throw new CommonException("error.stateMachineNode.null");
         }
         //创建【全部转换到当前】的transform
-        Status state = stateMapper.queryById(organizationId, stateMachineNodeDraft.getStatusId());
+        StatusDTO state = stateMapper.queryById(organizationId, stateMachineNodeDraft.getStatusId());
         if (state == null) {
             throw new CommonException("error.createAllStatusTransform.state.null");
         }
         //判断当前节点是否已存在【全部】的转换id
-        StateMachineTransformDraft select = new StateMachineTransformDraft();
+        StateMachineTransformDraftDTO select = new StateMachineTransformDraftDTO();
         select.setStateMachineId(stateMachineId);
         select.setEndNodeId(endNodeId);
         select.setType(TransformType.ALL);
@@ -193,7 +193,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
         }
 
         //创建
-        StateMachineTransformDraft transform = new StateMachineTransformDraft();
+        StateMachineTransformDraftDTO transform = new StateMachineTransformDraftDTO();
         transform.setStateMachineId(stateMachineId);
         transform.setName(state.getName());
         transform.setDescription("全部转换");
@@ -222,7 +222,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteAllStatusTransform(Long organizationId, Long transformId) {
-        StateMachineTransformDraft transformDraft = transformDraftMapper.queryById(organizationId, transformId);
+        StateMachineTransformDraftDTO transformDraft = transformDraftMapper.queryById(organizationId, transformId);
         if (transformDraft == null) {
             throw new CommonException("error.stateMachineTransform.null");
         }
@@ -230,7 +230,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
             throw new CommonException("error.stateMachineTransform.type.illegal");
         }
         //目标节点
-        StateMachineNodeDraft node = nodeDraftMapper.getNodeById(transformDraft.getEndNodeId());
+        StateMachineNodeDraftDTO node = nodeDraftMapper.getNodeById(transformDraft.getEndNodeId());
         if (node == null) {
             throw new CommonException("error.stateMachineNode.null");
         }
@@ -250,7 +250,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
         if (!EnumUtil.contain(TransformConditionStrategy.class, conditionStrategy)) {
             throw new CommonException("error.updateConditionStrategy.conditionStrategy.illegal");
         }
-        StateMachineTransformDraft transform = transformDraftMapper.queryById(organizationId, transformId);
+        StateMachineTransformDraftDTO transform = transformDraftMapper.queryById(organizationId, transformId);
         if (transform == null) {
             throw new CommonException("error.updateConditionStrategy.queryById.notFound");
         }
@@ -266,7 +266,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
 
     @Override
     public Boolean checkName(Long organizationId, Long stateMachineId, Long startNodeId, Long endNodeId, String name) {
-        StateMachineTransformDraft transformDraft = new StateMachineTransformDraft();
+        StateMachineTransformDraftDTO transformDraft = new StateMachineTransformDraftDTO();
         transformDraft.setOrganizationId(organizationId);
         transformDraft.setName(name);
         transformDraft.setStartNodeId(startNodeId);
@@ -281,19 +281,19 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
             return null;
         }
         Map<Long, Map<Long, List<TransformVO>>> resultMap = new HashMap<>(stateMachineIds.size());
-        List<StateMachineTransform> allTransforms = transformDeployMapper.queryByStateMachineIds(organizationId, stateMachineIds);
-        List<TransformVO> allTransformVOS = modelMapper.map(allTransforms, new TypeToken<List<StateMachineTransform>>() {
+        List<StateMachineTransformDTO> allTransforms = transformDeployMapper.queryByStateMachineIds(organizationId, stateMachineIds);
+        List<TransformVO> allTransformVOS = modelMapper.map(allTransforms, new TypeToken<List<StateMachineTransformDTO>>() {
         }.getType());
         Map<Long, List<TransformVO>> transformStateMachineIdMap = allTransformVOS.stream().collect(Collectors.groupingBy(TransformVO::getStateMachineId));
-        List<StateMachineNode> allNodes = nodeDeployMapper.queryByStateMachineIds(organizationId, stateMachineIds);
-        Map<Long, List<StateMachineNode>> nodeStateMachineIdMap = allNodes.stream().collect(Collectors.groupingBy(StateMachineNode::getStateMachineId));
+        List<StateMachineNodeDTO> allNodes = nodeDeployMapper.queryByStateMachineIds(organizationId, stateMachineIds);
+        Map<Long, List<StateMachineNodeDTO>> nodeStateMachineIdMap = allNodes.stream().collect(Collectors.groupingBy(StateMachineNodeDTO::getStateMachineId));
         for (Long stateMachineId : stateMachineIds) {
             List<TransformVO> transforms = transformStateMachineIdMap.get(stateMachineId) != null ? transformStateMachineIdMap.get(stateMachineId) : new ArrayList<>();
             List<TransformVO> typeAll = transforms.stream().filter(x -> x.getType().equals(TransformType.ALL)).collect(Collectors.toList());
             Map<Long, List<TransformVO>> startListMap = transforms.stream().collect(Collectors.groupingBy(TransformVO::getStartNodeId));
-            List<StateMachineNode> nodes = nodeStateMachineIdMap.get(stateMachineId) != null ? nodeStateMachineIdMap.get(stateMachineId) : new ArrayList<>();
+            List<StateMachineNodeDTO> nodes = nodeStateMachineIdMap.get(stateMachineId) != null ? nodeStateMachineIdMap.get(stateMachineId) : new ArrayList<>();
             Map<Long, List<TransformVO>> statusMap = new HashMap<>(nodes.size());
-            for (StateMachineNode node : nodes) {
+            for (StateMachineNodeDTO node : nodes) {
                 List<TransformVO> nodeTransforms = startListMap.get(node.getId()) != null ? startListMap.get(node.getId()) : new ArrayList<>();
                 nodeTransforms.addAll(typeAll);
                 //增加一个自身状态的转换（用于拖动时的转换显示）
@@ -308,7 +308,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
     }
 
     @Override
-    public StateMachineTransform queryDeployTransformForAgile(Long organizationId, Long transformId) {
+    public StateMachineTransformDTO queryDeployTransformForAgile(Long organizationId, Long transformId) {
         return transformDeployMapper.queryById(organizationId, transformId);
     }
 }

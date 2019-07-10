@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.mapper;
 
 import io.choerodon.issue.api.vo.IssueTypeSchemeSearchVO;
-import io.choerodon.issue.infra.dto.IssueTypeScheme;
-import io.choerodon.issue.infra.dto.IssueTypeSchemeWithInfo;
+import io.choerodon.issue.infra.dto.IssueTypeSchemeDTO;
+import io.choerodon.issue.infra.dto.IssueTypeSchemeWithInfoDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
@@ -14,8 +14,8 @@ import java.util.List;
  * @date 2018/8/10
  */
 @Component
-public interface IssueTypeSchemeMapper extends Mapper<IssueTypeScheme> {
+public interface IssueTypeSchemeMapper extends Mapper<IssueTypeSchemeDTO> {
     List<Long> selectIssueTypeSchemeIds(@Param("organizationId") Long organizationId, @Param("issueTypeSchemeSearchVO") IssueTypeSchemeSearchVO issueTypeSchemeSearchVO);
 
-    List<IssueTypeSchemeWithInfo> queryIssueTypeSchemeList(@Param("organizationId") Long organizationId, @Param("issueTypeSchemeIds") List<Long> issueTypeSchemeIds);
+    List<IssueTypeSchemeWithInfoDTO> queryIssueTypeSchemeList(@Param("organizationId") Long organizationId, @Param("issueTypeSchemeIds") List<Long> issueTypeSchemeIds);
 }

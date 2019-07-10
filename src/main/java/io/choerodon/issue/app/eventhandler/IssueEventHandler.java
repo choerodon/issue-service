@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
-import static io.choerodon.issue.infra.util.SagaTopic.Organization.ORG_CREATE;
-import static io.choerodon.issue.infra.util.SagaTopic.Organization.TASK_ORG_CREATE;
-import static io.choerodon.issue.infra.util.SagaTopic.Project.PROJECT_CREATE;
-import static io.choerodon.issue.infra.util.SagaTopic.Project.TASK_PROJECT_UPDATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Organization.ORG_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Organization.TASK_ORG_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Project.PROJECT_CREATE;
+import static io.choerodon.issue.infra.utils.SagaTopic.Project.TASK_PROJECT_UPDATE;
 
 /**
  * @author shinan.chen

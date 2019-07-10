@@ -1,17 +1,17 @@
 package io.choerodon.issue.infra.repository;
 
-import io.choerodon.issue.infra.dto.PageField;
+import io.choerodon.issue.infra.dto.PageFieldDTO;
 
 /**
  * @author shinan.chen
  * @since 2019/4/1
  */
 public interface PageFieldRepository {
-    PageField create(PageField pageField);
+    PageFieldDTO create(PageFieldDTO pageField);
 
     void delete(Long pageFieldId);
 
-    void update(PageField pageField);
+    void update(PageFieldDTO pageField);
 
-    PageField queryById(Long organizationId, Long projectId, Long pageFieldId);
+    PageFieldDTO queryById(Long organizationId, Long projectId, Long pageFieldId);
 }

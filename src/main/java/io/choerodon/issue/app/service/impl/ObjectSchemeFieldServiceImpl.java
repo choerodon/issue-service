@@ -3,10 +3,10 @@ package io.choerodon.issue.app.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.app.service.*;
-import io.choerodon.issue.infra.dto.LookupTypeWithValues;
-import io.choerodon.issue.infra.dto.LookupValue;
-import io.choerodon.issue.infra.dto.ObjectScheme;
-import io.choerodon.issue.infra.dto.ObjectSchemeField;
+import io.choerodon.issue.infra.dto.LookupTypeWithValuesDTO;
+import io.choerodon.issue.infra.dto.LookupValueDTO;
+import io.choerodon.issue.infra.dto.ObjectSchemeDTO;
+import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
 import io.choerodon.issue.infra.enums.FieldType;
 import io.choerodon.issue.infra.enums.LookupType;
 import io.choerodon.issue.infra.enums.ObjectSchemeCode;
@@ -15,8 +15,8 @@ import io.choerodon.issue.infra.mapper.LookupValueMapper;
 import io.choerodon.issue.infra.mapper.ObjectSchemeFieldMapper;
 import io.choerodon.issue.infra.mapper.ObjectSchemeMapper;
 import io.choerodon.issue.infra.repository.ObjectSchemeFieldRepository;
-import io.choerodon.issue.infra.util.EnumUtil;
-import io.choerodon.issue.infra.util.FieldValueUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
+import io.choerodon.issue.infra.utils.FieldValueUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -78,7 +78,7 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
         List<ObjectSchemeFieldVO> fieldDTOS = modelMapper.map(objectSchemeFieldRepository.listQuery(organizationId, projectId, searchDTO), new TypeToken<List<ObjectSchemeFieldVO>>() {
         }.getType());
         fillContextName(fieldDTOS);
-        ObjectScheme select = new ObjectScheme();
+        ObjectSchemeDTO select = new ObjectSchemeDTO();
         select.setSchemeCode(schemeCode);
         result.put("name", objectSchemeMapper.selectOne(select).getName());
         result.put("content", fieldDTOS);
@@ -91,8 +91,8 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
      * @param fieldDTOS
      */
     private void fillContextName(List<ObjectSchemeFieldVO> fieldDTOS) {
-        LookupTypeWithValues typeWithValues = lookupValueMapper.queryLookupValueByCode(LookupType.CONTEXT);
-        Map<String, String> codeMap = typeWithValues.getLookupValues().stream().collect(Collectors.toMap(LookupValue::getValueCode, LookupValue::getName));
+        LookupTypeWithValuesDTO typeWithValues = lookupValueMapper.queryLookupValueByCode(LookupType.CONTEXT);
+        Map<String, String> codeMap = typeWithValues.getLookupValues().stream().collect(Collectors.toMap(LookupValueDTO::getValueCode, LookupValueDTO::getName));
         for (ObjectSchemeFieldVO fieldDTO : fieldDTOS) {
             String[] contextCodes = fieldDTO.getContext().split(",");
             List<String> contextNames = new ArrayList<>(contextCodes.length);
@@ -119,7 +119,7 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
                 throw new CommonException(ERROR_CONTEXT_ILLEGAL);
             }
         }
-        ObjectSchemeField field = modelMapper.map(fieldCreateDTO, ObjectSchemeField.class);
+        ObjectSchemeFieldDTO field = modelMapper.map(fieldCreateDTO, ObjectSchemeFieldDTO.class);
         field.setContext(Arrays.asList(fieldCreateDTO.getContext()).stream().collect(Collectors.joining(",")));
         field.setOrganizationId(organizationId);
         field.setProjectId(projectId);
@@ -136,7 +136,7 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
 
     @Override
     public ObjectSchemeFieldDetailVO queryById(Long organizationId, Long projectId, Long fieldId) {
-        ObjectSchemeField field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
+        ObjectSchemeFieldDTO field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
         ObjectSchemeFieldDetailVO fieldDetailDTO = modelMapper.map(field, ObjectSchemeFieldDetailVO.class);
         fieldDetailDTO.setContext(field.getContext().split(","));
         //获取字段选项，并设置默认值
@@ -158,7 +158,7 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
 
     @Override
     public void delete(Long organizationId, Long projectId, Long fieldId) {
-        ObjectSchemeField field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
+        ObjectSchemeFieldDTO field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
         //组织层无法删除项目层
         if (projectId == null && field.getProjectId() != null) {
             throw new CommonException(ERROR_FIELD_ILLEGAL);
@@ -189,11 +189,11 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
                 updateDTO.setDefaultValue(defaultIds);
             }
         }
-        ObjectSchemeField field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
+        ObjectSchemeFieldDTO field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
         if (field.getRequired() && "".equals(updateDTO.getDefaultValue())) {
             throw new CommonException(ERROR_FIELD_REQUIRED_NEED_DEFAULT_VALUE);
         }
-        ObjectSchemeField update = modelMapper.map(updateDTO, ObjectSchemeField.class);
+        ObjectSchemeFieldDTO update = modelMapper.map(updateDTO, ObjectSchemeFieldDTO.class);
         //处理context
         String[] contexts = updateDTO.getContext();
         if (contexts != null && contexts.length != 0) {
@@ -238,7 +238,7 @@ public class ObjectSchemeFieldServiceImpl implements ObjectSchemeFieldService {
         }
         ObjectSchemeFieldSearchVO searchDTO = new ObjectSchemeFieldSearchVO();
         searchDTO.setSchemeCode(schemeCode);
-        List<ObjectSchemeField> objectSchemeFields = objectSchemeFieldRepository.listQuery(organizationId, projectId, searchDTO)
+        List<ObjectSchemeFieldDTO> objectSchemeFields = objectSchemeFieldRepository.listQuery(organizationId, projectId, searchDTO)
                 .stream().filter(objectSchemeField -> !objectSchemeField.getSystem()).collect(Collectors.toList());
         List<AgileIssueHeadVO> agileIssueHeadDTOS = new ArrayList<>();
         objectSchemeFields.forEach(objectSchemeField -> {

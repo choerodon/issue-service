@@ -1,7 +1,7 @@
 package io.choerodon.issue.app.service;
 
 import io.choerodon.issue.api.vo.StateMachineTransformVO;
-import io.choerodon.issue.infra.dto.StateMachineTransform;
+import io.choerodon.issue.infra.dto.StateMachineTransformDTO;
 import io.choerodon.issue.api.vo.payload.TransformVO;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public interface StateMachineTransformService {
      * @param stateMachineId
      * @return
      */
-    StateMachineTransform getInitTransform(Long organizationId, Long stateMachineId);
+    StateMachineTransformDTO getInitTransform(Long organizationId, Long stateMachineId);
 
     /**
      * 根据id获取转换
@@ -65,7 +65,7 @@ public interface StateMachineTransformService {
      * @param statusId
      * @return
      */
-    List<StateMachineTransform> queryListByStatusIdByDeploy(Long organizationId, Long stateMachineId, Long statusId);
+    List<StateMachineTransformDTO> queryListByStatusIdByDeploy(Long organizationId, Long stateMachineId, Long statusId);
 
     /**
      * 创建【全部转换到此状态】转换，所有节点均可转换到当前节点
@@ -121,5 +121,5 @@ public interface StateMachineTransformService {
      * @param transformId
      * @return
      */
-    StateMachineTransform queryDeployTransformForAgile(Long organizationId, Long transformId);
+    StateMachineTransformDTO queryDeployTransformForAgile(Long organizationId, Long transformId);
 }

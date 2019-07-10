@@ -11,9 +11,9 @@ import io.choerodon.issue.infra.enums.*;
 import io.choerodon.issue.infra.enums.LookupType;
 import io.choerodon.issue.infra.mapper.*;
 import io.choerodon.issue.infra.repository.PageFieldRepository;
-import io.choerodon.issue.infra.util.EnumUtil;
-import io.choerodon.issue.infra.util.FieldValueUtil;
-import io.choerodon.issue.infra.util.RankUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
+import io.choerodon.issue.infra.utils.FieldValueUtil;
+import io.choerodon.issue.infra.utils.RankUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -69,11 +69,11 @@ public class PageFieldServiceImpl implements PageFieldService {
         if (context != null && !EnumUtil.contain(ObjectSchemeFieldContext.class, context)) {
             throw new CommonException(ERROR_CONTEXT_ILLEGAL);
         }
-        List<PageField> pageFields = queryPageField(organizationId, projectId, pageCode, context);
+        List<PageFieldDTO> pageFields = queryPageField(organizationId, projectId, pageCode, context);
         List<PageFieldVO> pageFieldVOS = modelMapper.map(pageFields, new TypeToken<List<PageFieldVO>>() {
         }.getType());
         fillContextName(pageFieldVOS);
-        Page select = new Page();
+        PageDTO select = new PageDTO();
         select.setPageCode(pageCode);
         result.put("name", pageMapper.selectOne(select).getName());
         result.put("content", pageFieldVOS);
@@ -86,8 +86,8 @@ public class PageFieldServiceImpl implements PageFieldService {
      * @param pageFieldVOS
      */
     private void fillContextName(List<PageFieldVO> pageFieldVOS) {
-        LookupTypeWithValues typeWithValues = lookupValueMapper.queryLookupValueByCode(LookupType.CONTEXT);
-        Map<String, String> codeMap = typeWithValues.getLookupValues().stream().collect(Collectors.toMap(LookupValue::getValueCode, LookupValue::getName));
+        LookupTypeWithValuesDTO typeWithValues = lookupValueMapper.queryLookupValueByCode(LookupType.CONTEXT);
+        Map<String, String> codeMap = typeWithValues.getLookupValues().stream().collect(Collectors.toMap(LookupValueDTO::getValueCode, LookupValueDTO::getName));
         for (PageFieldVO pageFieldVO : pageFieldVOS) {
             String[] contextCodes = pageFieldVO.getContext().split(",");
             List<String> contextNames = new ArrayList<>(contextCodes.length);
@@ -107,8 +107,8 @@ public class PageFieldServiceImpl implements PageFieldService {
      * @return
      */
     @Override
-    public List<PageField> queryPageField(Long organizationId, Long projectId, String pageCode, String context) {
-        List<PageField> pageFields;
+    public List<PageFieldDTO> queryPageField(Long organizationId, Long projectId, String pageCode, String context) {
+        List<PageFieldDTO> pageFields;
         if (projectId != null && projectPageFieldMapper.queryOne(organizationId, projectId) != null) {
             pageFields = pageFieldMapper.listQuery(organizationId, projectId, pageCode, context);
         } else {
@@ -132,9 +132,9 @@ public class PageFieldServiceImpl implements PageFieldService {
         if (!EnumUtil.contain(PageCode.class, pageCode)) {
             throw new CommonException(ERROR_PAGECODE_ILLEGAL);
         }
-        PageField current = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, adjustOrder.getCurrentFieldId());
-        PageField outset = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, adjustOrder.getOutsetFieldId());
-        PageField update = new PageField();
+        PageFieldDTO current = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, adjustOrder.getCurrentFieldId());
+        PageFieldDTO outset = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, adjustOrder.getOutsetFieldId());
+        PageFieldDTO update = new PageFieldDTO();
         update.setId(current.getId());
         update.setObjectVersionNumber(current.getObjectVersionNumber());
         if (adjustOrder.getBefore()) {
@@ -157,8 +157,8 @@ public class PageFieldServiceImpl implements PageFieldService {
         if (!EnumUtil.contain(PageCode.class, pageCode)) {
             throw new CommonException(ERROR_PAGECODE_ILLEGAL);
         }
-        PageField field = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, fieldId);
-        PageField update = modelMapper.map(updateDTO, PageField.class);
+        PageFieldDTO field = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, fieldId);
+        PageFieldDTO update = modelMapper.map(updateDTO, PageFieldDTO.class);
         update.setId(field.getId());
         pageFieldRepository.update(update);
         return modelMapper.map(pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, fieldId), PageFieldVO.class);
@@ -168,11 +168,11 @@ public class PageFieldServiceImpl implements PageFieldService {
     public synchronized void initPageFieldByOrg(Long organizationId) {
         if (pageFieldMapper.listQuery(organizationId, null, null, null).isEmpty()) {
             //查询page
-            List<Page> pages = pageMapper.fulltextSearch(organizationId, new PageSearchVO());
-            Map<String, Long> pageMap = pages.stream().collect(Collectors.toMap(Page::getPageCode, Page::getId));
+            List<PageDTO> pages = pageMapper.fulltextSearch(organizationId, new PageSearchVO());
+            Map<String, Long> pageMap = pages.stream().collect(Collectors.toMap(PageDTO::getPageCode, PageDTO::getId));
             //查询field
-            List<ObjectSchemeField> fields = objectSchemeFieldMapper.listQuery(organizationId, null, new ObjectSchemeFieldSearchVO());
-            Map<String, Map<String, Long>> schemeCodeFieldMap = fields.stream().collect(Collectors.groupingBy(ObjectSchemeField::getSchemeCode, Collectors.toMap(ObjectSchemeField::getCode, ObjectSchemeField::getId)));
+            List<ObjectSchemeFieldDTO> fields = objectSchemeFieldMapper.listQuery(organizationId, null, new ObjectSchemeFieldSearchVO());
+            Map<String, Map<String, Long>> schemeCodeFieldMap = fields.stream().collect(Collectors.groupingBy(ObjectSchemeFieldDTO::getSchemeCode, Collectors.toMap(ObjectSchemeFieldDTO::getCode, ObjectSchemeFieldDTO::getId)));
             handleInitPageFieldE(organizationId, schemeCodeFieldMap, pageMap);
         }
     }
@@ -202,7 +202,7 @@ public class PageFieldServiceImpl implements PageFieldService {
                 pageField.setRank(rank);
                 rank = RankUtil.genPre(rank);
             }
-            List<PageField> pageFields = modelMapper.map(initPageFields, new TypeToken<List<PageField>>() {
+            List<PageFieldDTO> pageFields = modelMapper.map(initPageFields, new TypeToken<List<PageFieldDTO>>() {
             }.getType());
             pageFieldMapper.batchInsert(organizationId, null, pageFields);
         });
@@ -210,14 +210,14 @@ public class PageFieldServiceImpl implements PageFieldService {
 
     @Override
     @CopyPageField
-    public void createByFieldWithPro(Long organizationId, Long projectId, ObjectSchemeField field) {
+    public void createByFieldWithPro(Long organizationId, Long projectId, ObjectSchemeFieldDTO field) {
         //查询page
         PageSearchVO searchDTO = new PageSearchVO();
         searchDTO.setSchemeCode(field.getSchemeCode());
-        List<Page> pages = pageMapper.fulltextSearch(organizationId, searchDTO);
+        List<PageDTO> pages = pageMapper.fulltextSearch(organizationId, searchDTO);
         pages.forEach(page -> {
             //创建pageField
-            PageField pageField = new PageField();
+            PageFieldDTO pageField = new PageFieldDTO();
             pageField.setProjectId(projectId);
             pageField.setOrganizationId(organizationId);
             pageField.setDisplay(false);
@@ -235,16 +235,16 @@ public class PageFieldServiceImpl implements PageFieldService {
     }
 
     @Override
-    public void createByFieldWithOrg(Long organizationId, ObjectSchemeField field) {
+    public void createByFieldWithOrg(Long organizationId, ObjectSchemeFieldDTO field) {
         //项目层自定义同样需要创建字段
-        List<ProjectPageField> projectPageFields = projectPageFieldMapper.queryByOrgId(organizationId);
+        List<ProjectPageFieldDTO> projectPageFields = projectPageFieldMapper.queryByOrgId(organizationId);
         //查询page
         PageSearchVO searchDTO = new PageSearchVO();
         searchDTO.setSchemeCode(field.getSchemeCode());
-        List<Page> pages = pageMapper.fulltextSearch(organizationId, searchDTO);
+        List<PageDTO> pages = pageMapper.fulltextSearch(organizationId, searchDTO);
         pages.forEach(page -> {
             //组织层创建pageField
-            PageField pageField = new PageField();
+            PageFieldDTO pageField = new PageFieldDTO();
             pageField.setOrganizationId(organizationId);
             pageField.setDisplay(false);
             pageField.setFieldId(field.getId());
@@ -282,10 +282,10 @@ public class PageFieldServiceImpl implements PageFieldService {
         if (!EnumUtil.contain(ObjectSchemeFieldContext.class, paramDTO.getContext())) {
             throw new CommonException(ERROR_CONTEXT_ILLEGAL);
         }
-        List<PageField> pageFields = queryPageField(organizationId, projectId, paramDTO.getPageCode(), paramDTO.getContext());
+        List<PageFieldDTO> pageFields = queryPageField(organizationId, projectId, paramDTO.getPageCode(), paramDTO.getContext());
         //modelMapper设置严格匹配策略
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        pageFields = pageFields.stream().filter(PageField::getDisplay).collect(Collectors.toList());
+        pageFields = pageFields.stream().filter(PageFieldDTO::getDisplay).collect(Collectors.toList());
         List<PageFieldViewVO> pageFieldViews = modelMapper.map(pageFields, new TypeToken<List<PageFieldViewVO>>() {
         }.getType());
         //填充option

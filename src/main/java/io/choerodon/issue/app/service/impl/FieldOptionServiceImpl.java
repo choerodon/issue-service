@@ -6,7 +6,7 @@ import io.choerodon.issue.app.service.FieldValueService;
 import io.choerodon.issue.api.vo.FieldOptionUpdateVO;
 import io.choerodon.issue.api.vo.FieldOptionVO;
 import io.choerodon.issue.api.vo.PageFieldViewVO;
-import io.choerodon.issue.infra.dto.FieldOption;
+import io.choerodon.issue.infra.dto.FieldOptionDTO;
 import io.choerodon.issue.infra.mapper.FieldOptionMapper;
 import io.choerodon.issue.infra.repository.FieldOptionRepository;
 import org.modelmapper.ModelMapper;
@@ -93,7 +93,7 @@ public class FieldOptionServiceImpl implements FieldOptionService {
 
     @Override
     public void create(Long organizationId, Long fieldId, FieldOptionUpdateVO optionDTO) {
-        FieldOption fieldOption = modelMapper.map(optionDTO, FieldOption.class);
+        FieldOptionDTO fieldOption = modelMapper.map(optionDTO, FieldOptionDTO.class);
         fieldOption.setOrganizationId(organizationId);
         fieldOption.setFieldId(fieldId);
         fieldOptionRepository.create(fieldOption);
@@ -102,7 +102,7 @@ public class FieldOptionServiceImpl implements FieldOptionService {
 
     @Override
     public void deleteByFieldId(Long organizationId, Long fieldId) {
-        FieldOption delete = new FieldOption();
+        FieldOptionDTO delete = new FieldOptionDTO();
         delete.setFieldId(fieldId);
         delete.setOrganizationId(organizationId);
         fieldOptionMapper.delete(delete);

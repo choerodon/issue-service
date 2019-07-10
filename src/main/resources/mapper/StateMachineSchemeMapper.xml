@@ -3,7 +3,7 @@
 
 <mapper namespace="io.choerodon.issue.infra.mapper.StateMachineSchemeMapper">
 
-    <resultMap id="stateMachineSchemeWithConfig" type="io.choerodon.issue.infra.dto.StateMachineScheme">
+    <resultMap id="stateMachineSchemeWithConfig" type="io.choerodon.issue.infra.dto.StateMachineSchemeDTO">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
@@ -15,16 +15,16 @@
         <result property="lastUpdatedBy" column="last_updated_by"/>
         <result property="objectVersionNumber" column="object_version_number"/>
 
-        <collection property="schemeConfigs" ofType="io.choerodon.issue.infra.dto.StateMachineSchemeConfig"
+        <collection property="schemeConfigs" ofType="io.choerodon.issue.infra.dto.StateMachineSchemeConfigDTO"
                     columnPrefix="c_" autoMapping="true">
         </collection>
 
-        <collection property="projectConfigs" ofType="io.choerodon.issue.infra.dto.ProjectConfig" columnPrefix="pc_"
+        <collection property="projectConfigs" ofType="io.choerodon.issue.infra.dto.ProjectConfigDTO" columnPrefix="pc_"
                     autoMapping="true">
         </collection>
     </resultMap>
 
-    <select id="fulltextSearch" resultType="io.choerodon.issue.infra.dto.StateMachineScheme">
+    <select id="fulltextSearch" resultType="io.choerodon.issue.infra.dto.StateMachineSchemeDTO">
         SELECT SMS.*
         FROM state_machine_scheme SMS
         WHERE 1=1
@@ -71,7 +71,7 @@
         order by SMS.id DESC
     </select>
 
-    <select id="queryByIds" resultType="io.choerodon.issue.infra.dto.StateMachineScheme">
+    <select id="queryByIds" resultType="io.choerodon.issue.infra.dto.StateMachineSchemeDTO">
         SELECT SMS.*
         FROM state_machine_scheme SMS
         WHERE 1=1
@@ -86,7 +86,7 @@
         </if>
     </select>
 
-    <select id="queryByOrgId" resultType="io.choerodon.issue.infra.dto.StateMachineScheme">
+    <select id="queryByOrgId" resultType="io.choerodon.issue.infra.dto.StateMachineSchemeDTO">
         SELECT SMS.*
         FROM state_machine_scheme SMS
         WHERE SMS.organization_id = #{organizationId}

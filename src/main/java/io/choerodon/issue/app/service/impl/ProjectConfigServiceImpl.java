@@ -12,8 +12,8 @@ import io.choerodon.issue.api.vo.payload.StatusPayload;
 import io.choerodon.issue.api.vo.payload.TransformVO;
 import io.choerodon.issue.api.vo.payload.TransformInfo;
 import io.choerodon.issue.app.service.*;
-import io.choerodon.issue.infra.dto.IssueType;
-import io.choerodon.issue.infra.dto.ProjectConfig;
+import io.choerodon.issue.infra.dto.IssueTypeDTO;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.exception.RemoveStatusException;
@@ -21,8 +21,8 @@ import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeConfigMapper;
 import io.choerodon.issue.infra.mapper.IssueTypeSchemeMapper;
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper;
-import io.choerodon.issue.infra.util.EnumUtil;
-import io.choerodon.issue.infra.util.ProjectUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -93,16 +93,16 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     }
 
     @Override
-    public ProjectConfig create(Long projectId, Long schemeId, String schemeType, String applyType) {
+    public ProjectConfigDTO create(Long projectId, Long schemeId, String schemeType, String applyType) {
         if (!EnumUtil.contain(SchemeType.class, schemeType)) {
             throw new CommonException("error.schemeType.illegal");
         }
         if (!EnumUtil.contain(SchemeApplyType.class, applyType)) {
             throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
-        ProjectConfig projectConfig = new ProjectConfig(projectId, schemeId, schemeType, applyType);
+        ProjectConfigDTO projectConfig = new ProjectConfigDTO(projectId, schemeId, schemeType, applyType);
         //保证幂等性
-        List<ProjectConfig> configs = projectConfigMapper.select(projectConfig);
+        List<ProjectConfigDTO> configs = projectConfigMapper.select(projectConfig);
         if (!configs.isEmpty()) {
             return configs.get(0);
         }
@@ -121,25 +121,25 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
     @Override
     public ProjectConfigDetailVO queryById(Long projectId) {
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        List<ProjectConfig> projectConfigs = projectConfigMapper.queryByProjectId(projectId);
-        Map<String, List<ProjectConfig>> configMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getSchemeType));
+        List<ProjectConfigDTO> projectConfigs = projectConfigMapper.queryByProjectId(projectId);
+        Map<String, List<ProjectConfigDTO>> configMap = projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfigDTO::getSchemeType));
         ProjectConfigDetailVO projectConfigDetailVO = new ProjectConfigDetailVO();
         projectConfigDetailVO.setProjectId(projectId);
         //获取问题类型方案
-        List<ProjectConfig> issueTypeSchemeConfigs = configMap.get(SchemeType.ISSUE_TYPE);
+        List<ProjectConfigDTO> issueTypeSchemeConfigs = configMap.get(SchemeType.ISSUE_TYPE);
         if (issueTypeSchemeConfigs != null && !issueTypeSchemeConfigs.isEmpty()) {
             Map<String, IssueTypeSchemeVO> issueTypeSchemeMap = new HashMap<>(issueTypeSchemeConfigs.size());
-            for (ProjectConfig projectConfig : issueTypeSchemeConfigs) {
+            for (ProjectConfigDTO projectConfig : issueTypeSchemeConfigs) {
                 IssueTypeSchemeVO issueTypeSchemeVO = issueTypeSchemeService.queryById(organizationId, projectConfig.getSchemeId());
                 issueTypeSchemeMap.put(projectConfig.getApplyType(), issueTypeSchemeVO);
             }
             projectConfigDetailVO.setIssueTypeSchemeMap(issueTypeSchemeMap);
         }
         //获取状态机方案
-        List<ProjectConfig> stateMachineSchemeConfigs = configMap.get(SchemeType.STATE_MACHINE);
+        List<ProjectConfigDTO> stateMachineSchemeConfigs = configMap.get(SchemeType.STATE_MACHINE);
         if (stateMachineSchemeConfigs != null && !stateMachineSchemeConfigs.isEmpty()) {
             Map<String, StateMachineSchemeVO> stateMachineSchemeMap = new HashMap<>(stateMachineSchemeConfigs.size());
-            for (ProjectConfig projectConfig : stateMachineSchemeConfigs) {
+            for (ProjectConfigDTO projectConfig : stateMachineSchemeConfigs) {
                 StateMachineSchemeVO stateMachineSchemeVO = stateMachineSchemeService.querySchemeWithConfigById(false, organizationId, projectConfig.getSchemeId());
                 stateMachineSchemeMap.put(projectConfig.getApplyType(), stateMachineSchemeVO);
             }
@@ -154,11 +154,11 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType);
+        ProjectConfigDTO projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType);
         //获取问题类型方案
         if (projectConfig.getSchemeId() != null) {
             //根据方案配置表获取 问题类型
-            List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, projectConfig.getSchemeId());
+            List<IssueTypeDTO> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, projectConfig.getSchemeId());
             return modelMapper.map(issueTypes, new TypeToken<List<IssueTypeVO>>() {
             }.getType());
         } else {
@@ -181,7 +181,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException(ERROR_STATEMACHINESCHEMEID_NULL);
         }
         //根据方案配置表获取 问题类型
-        List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, issueTypeSchemeId);
         //根据方案配置表获取 状态机与问题类型的对应关系
         List<StateMachineSchemeConfigVO> configs = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, stateMachineSchemeId);
         Map<Long, Long> map = configs.stream().collect(Collectors.toMap(StateMachineSchemeConfigVO::getIssueTypeId, StateMachineSchemeConfigVO::getStateMachineId));
@@ -230,7 +230,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
             throw new CommonException(ERROR_APPLYTYPE_ILLEGAL);
         }
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        ProjectConfig projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType);
+        ProjectConfigDTO projectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType);
         //获取状态机方案
         if (projectConfig.getSchemeId() != null) {
             //获取状态机
@@ -266,17 +266,17 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         }
         //获取状态机方案
         Long organizationId = projectUtil.getOrganizationId(projectId);
-        ProjectConfig smProjectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType);
+        ProjectConfigDTO smProjectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType);
         if (smProjectConfig.getSchemeId() == null) {
             throw new CommonException("error.queryTransformsMapByProjectId.stateMachineSchemeId.null");
         }
         List<StateMachineSchemeConfigVO> smsConfigVO = stateMachineSchemeConfigService.queryBySchemeId(false, organizationId, smProjectConfig.getSchemeId());
         //获取问题类型方案
-        ProjectConfig itProjectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType);
+        ProjectConfigDTO itProjectConfig = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.ISSUE_TYPE, applyType);
         if (itProjectConfig.getSchemeId() == null) {
             throw new CommonException("error.queryTransformsMapByProjectId.issueTypeSchemeId.null");
         }
-        List<IssueType> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, itProjectConfig.getSchemeId());
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.queryBySchemeId(organizationId, itProjectConfig.getSchemeId());
         List<Long> stateMachineIds = smsConfigVO.stream().map(StateMachineSchemeConfigVO::getStateMachineId).collect(Collectors.toList());
         //状态机id->状态id->转换列表
         Map<Long, Map<Long, List<TransformVO>>> statusMap = transformService.queryStatusTransformsMap(organizationId, stateMachineIds);
@@ -296,7 +296,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long defaultStateMachineId = idMap.get(0L);
         resultMap.put(0L, statusMap.get(defaultStateMachineId));
         //匹配状态机的问题类型映射
-        for (IssueType issueType : issueTypes) {
+        for (IssueTypeDTO issueType : issueTypes) {
             Long stateMachineId = idMap.get(issueType.getId());
             if (stateMachineId != null) {
                 resultMap.put(issueType.getId(), statusMap.get(stateMachineId));
@@ -343,7 +343,7 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         Long organizationId = projectUtil.getOrganizationId(projectId);
         Long stateMachineSchemeId = projectConfigMapper.queryBySchemeTypeAndApplyType(projectId, SchemeType.STATE_MACHINE, applyType).getSchemeId();
         //校验状态机方案是否只关联一个项目
-        ProjectConfig select = new ProjectConfig();
+        ProjectConfigDTO select = new ProjectConfigDTO();
         select.setSchemeId(stateMachineSchemeId);
         select.setSchemeType(SchemeType.STATE_MACHINE);
         select.setApplyType(SchemeApplyType.AGILE);
@@ -421,8 +421,8 @@ public class ProjectConfigServiceImpl implements ProjectConfigService {
         List<Long> schemeIds = stateMachineSchemeConfigService.querySchemeIdsByStateMachineId(false, organizationId, stateMachineId);
 
         if (!schemeIds.isEmpty()) {
-            List<ProjectConfig> projectConfigs = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE);
-            return projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfig::getApplyType, Collectors.mapping(ProjectConfig::getProjectId, Collectors.toList())));
+            List<ProjectConfigDTO> projectConfigs = projectConfigMapper.queryBySchemeIds(schemeIds, SchemeType.STATE_MACHINE);
+            return projectConfigs.stream().collect(Collectors.groupingBy(ProjectConfigDTO::getApplyType, Collectors.mapping(ProjectConfigDTO::getProjectId, Collectors.toList())));
         }
         return Collections.emptyMap();
     }

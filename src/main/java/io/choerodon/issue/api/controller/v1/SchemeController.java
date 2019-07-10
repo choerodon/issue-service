@@ -12,7 +12,7 @@ import io.choerodon.issue.api.vo.StatusVO;
 import io.choerodon.issue.app.service.PriorityService;
 import io.choerodon.issue.app.service.ProjectConfigService;
 import io.choerodon.issue.api.vo.payload.TransformVO;
-import io.choerodon.issue.infra.util.ProjectUtil;
+import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;

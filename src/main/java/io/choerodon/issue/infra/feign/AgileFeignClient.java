@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.feign;
 
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
-import io.choerodon.issue.infra.dto.ProjectConfig;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -36,7 +36,7 @@ public interface AgileFeignClient {
                                                         @PathVariable(name = "organization_id") Long organizationId,
                                                         @ApiParam(value = "状态id", required = true)
                                                         @RequestParam(value = "status_id") Long statusId,
-                                                        @RequestBody List<ProjectConfig> projectConfigs);
+                                                        @RequestBody List<ProjectConfigDTO> projectConfigs);
 
     /**
      * 查询状态机方案变更后对issue的影响

@@ -8,7 +8,7 @@ import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.issue.api.vo.StateMachineTransformVO;
 import io.choerodon.issue.app.service.StateMachineTransformService;
 import io.choerodon.issue.api.validator.StateMachineTransformValidator;
-import io.choerodon.issue.infra.dto.StateMachineTransform;
+import io.choerodon.issue.infra.dto.StateMachineTransformDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -111,8 +111,8 @@ public class StateMachineTransformController extends BaseController {
     @Permission(type = ResourceType.ORGANIZATION, roles = {InitRoleCode.ORGANIZATION_ADMINISTRATOR, InitRoleCode.ORGANIZATION_MEMBER})
     @ApiOperation(value = "敏捷获取转换")
     @GetMapping(value = "/query_deploy_transform")
-    public ResponseEntity<StateMachineTransform> queryDeployTransformForAgile(@PathVariable("organization_id") Long organizationId,
-                                                                              @RequestParam("transformId") Long transformId) {
+    public ResponseEntity<StateMachineTransformDTO> queryDeployTransformForAgile(@PathVariable("organization_id") Long organizationId,
+                                                                                 @RequestParam("transformId") Long transformId) {
         return Optional.ofNullable(transformService.queryDeployTransformForAgile(organizationId, transformId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.stateMachineTransform.queryDeployTransformForAgile"));

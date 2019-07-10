@@ -3,7 +3,7 @@ package io.choerodon.issue.app.service;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.issue.api.vo.*;
-import io.choerodon.issue.infra.dto.Status;
+import io.choerodon.issue.infra.dto.StatusDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -69,7 +69,7 @@ public interface StatusService {
      */
     StatusCheckVO checkName(Long organizationId, String name);
 
-    Map<Long, Status> batchStatusGet(List<Long> ids);
+    Map<Long, StatusDTO> batchStatusGet(List<Long> ids);
 
     /**
      * 敏捷添加状态

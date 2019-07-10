@@ -5,7 +5,7 @@ import io.choerodon.core.oauth.CustomUserDetails;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.issue.app.service.PriorityService;
 import io.choerodon.issue.api.vo.PriorityVO;
-import io.choerodon.issue.infra.dto.Priority;
+import io.choerodon.issue.infra.dto.PriorityDTO;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
@@ -51,8 +51,8 @@ public class PriorityServiceImpl implements PriorityService {
 
     @Override
     public List<PriorityVO> selectAll(PriorityVO priorityVO, String param) {
-        Priority priority = modelMapper.map(priorityVO, Priority.class);
-        List<Priority> priorities = priorityMapper.fulltextSearch(priority, param);
+        PriorityDTO priority = modelMapper.map(priorityVO, PriorityDTO.class);
+        List<PriorityDTO> priorities = priorityMapper.fulltextSearch(priority, param);
         return modelMapper.map(priorities, new TypeToken<List<PriorityVO>>() {
         }.getType());
     }
@@ -70,7 +70,7 @@ public class PriorityServiceImpl implements PriorityService {
         } else {
             priorityVO.setDefault(false);
         }
-        Priority priority = modelMapper.map(priorityVO, Priority.class);
+        PriorityDTO priority = modelMapper.map(priorityVO, PriorityDTO.class);
         priority.setEnable(true);
         int isInsert = priorityMapper.insert(priority);
         if (isInsert != 1) {
@@ -81,10 +81,10 @@ public class PriorityServiceImpl implements PriorityService {
     }
 
     private Boolean checkNameUpdate(Long organizationId, Long priorityId, String name) {
-        Priority priority = new Priority();
+        PriorityDTO priority = new PriorityDTO();
         priority.setOrganizationId(organizationId);
         priority.setName(name);
-        Priority res = priorityMapper.selectOne(priority);
+        PriorityDTO res = priorityMapper.selectOne(priority);
         return res != null && !priorityId.equals(res.getId());
     }
 
@@ -93,16 +93,16 @@ public class PriorityServiceImpl implements PriorityService {
         if (checkNameUpdate(priorityVO.getOrganizationId(), priorityVO.getId(), priorityVO.getName())) {
             throw new CommonException("error.priority.update.name.same");
         }
-        Priority priority = modelMapper.map(priorityVO, Priority.class);
+        PriorityDTO priority = modelMapper.map(priorityVO, PriorityDTO.class);
         //若设置为默认值，则清空其他默认值
         if (priorityVO.getDefault() != null && priorityVO.getDefault()) {
             priorityMapper.cancelDefaultPriority(priorityVO.getOrganizationId());
         } else {
             //如果只有一个默认优先级时，无法取消当前默认优先级
-            Priority select = new Priority();
+            PriorityDTO select = new PriorityDTO();
             select.setDefault(true);
             select.setOrganizationId(priorityVO.getOrganizationId());
-            Priority result = priorityMapper.selectOne(select);
+            PriorityDTO result = priorityMapper.selectOne(select);
             if (result.getId().equals(priority.getId())) {
                 throw new CommonException("error.priority.illegal");
             }
@@ -117,10 +117,10 @@ public class PriorityServiceImpl implements PriorityService {
 
     @Override
     public Boolean checkName(Long organizationId, String name) {
-        Priority priority = new Priority();
+        PriorityDTO priority = new PriorityDTO();
         priority.setOrganizationId(organizationId);
         priority.setName(name);
-        Priority res = priorityMapper.selectOne(priority);
+        PriorityDTO res = priorityMapper.selectOne(priority);
         return res != null;
     }
 
@@ -128,7 +128,7 @@ public class PriorityServiceImpl implements PriorityService {
     public List<PriorityVO> updateByList(List<PriorityVO> list, Long organizationId) {
         int seq = 1;
         for (PriorityVO priorityVO : list) {
-            Priority p = modelMapper.map(priorityVO, Priority.class);
+            PriorityDTO p = modelMapper.map(priorityVO, PriorityDTO.class);
             p.setSequence(new BigDecimal(seq));
             seq++;
             int isUpdate = priorityMapper.updateSequenceById(p);
@@ -136,18 +136,18 @@ public class PriorityServiceImpl implements PriorityService {
                 throw new CommonException("error.priority.update");
             }
         }
-        List<Priority> priorities = priorityMapper.fulltextSearch(new Priority(), null);
+        List<PriorityDTO> priorities = priorityMapper.fulltextSearch(new PriorityDTO(), null);
         return modelMapper.map(priorities, new TypeToken<List<PriorityVO>>() {
         }.getType());
     }
 
     @Override
     public Map<Long, PriorityVO> queryByOrganizationId(Long organizationId) {
-        Priority priority = new Priority();
+        PriorityDTO priority = new PriorityDTO();
         priority.setOrganizationId(organizationId);
-        List<Priority> priorities = priorityMapper.select(priority);
+        List<PriorityDTO> priorities = priorityMapper.select(priority);
         Map<Long, PriorityVO> result = new HashMap<>();
-        for (Priority pri : priorities) {
+        for (PriorityDTO pri : priorities) {
             PriorityVO priorityVO = modelMapper.map(pri, new TypeToken<PriorityVO>() {
             }.getType());
             result.put(priorityVO.getId(), priorityVO);
@@ -157,10 +157,10 @@ public class PriorityServiceImpl implements PriorityService {
 
     @Override
     public PriorityVO queryDefaultByOrganizationId(Long organizationId) {
-        Priority priority = new Priority();
+        PriorityDTO priority = new PriorityDTO();
         priority.setOrganizationId(organizationId);
         priority.setDefault(true);
-        Priority result = priorityMapper.selectOne(priority);
+        PriorityDTO result = priorityMapper.selectOne(priority);
         if (result == null) {
             throw new CommonException(NOT_FOUND);
         }
@@ -170,10 +170,10 @@ public class PriorityServiceImpl implements PriorityService {
 
     @Override
     public List<PriorityVO> queryByOrganizationIdList(Long organizationId) {
-        Priority priority = new Priority();
+        PriorityDTO priority = new PriorityDTO();
         priority.setOrganizationId(organizationId);
-        List<Priority> priorities = priorityMapper.select(priority);
-        Collections.sort(priorities, Comparator.comparing(Priority::getSequence));
+        List<PriorityDTO> priorities = priorityMapper.select(priority);
+        Collections.sort(priorities, Comparator.comparing(PriorityDTO::getSequence));
         return modelMapper.map(priorities, new TypeToken<List<PriorityVO>>() {
         }.getType());
     }
@@ -181,7 +181,7 @@ public class PriorityServiceImpl implements PriorityService {
 
     @Override
     public PriorityVO queryById(Long organizationId, Long id) {
-        Priority result = priorityMapper.selectByPrimaryKey(id);
+        PriorityDTO result = priorityMapper.selectByPrimaryKey(id);
         if (result == null) {
             throw new CommonException("error.priority.get");
         }
@@ -189,8 +189,8 @@ public class PriorityServiceImpl implements PriorityService {
         }.getType());
     }
 
-    private Priority savePrority(Long organizationId, String name, BigDecimal sequence, String colour, Boolean isDefault) {
-        Priority priority = new Priority();
+    private PriorityDTO savePrority(Long organizationId, String name, BigDecimal sequence, String colour, Boolean isDefault) {
+        PriorityDTO priority = new PriorityDTO();
         priority.setOrganizationId(organizationId);
         priority.setName(name);
         priority.setSequence(sequence);
@@ -199,7 +199,7 @@ public class PriorityServiceImpl implements PriorityService {
         priority.setDefault(isDefault);
         priority.setEnable(true);
         //保证幂等性
-        List<Priority> list = priorityMapper.select(priority);
+        List<PriorityDTO> list = priorityMapper.select(priority);
         if (list.isEmpty()) {
             if (priorityMapper.insert(priority) != 1) {
                 throw new CommonException("error.prority.insert");
@@ -213,9 +213,9 @@ public class PriorityServiceImpl implements PriorityService {
 
     private Map<String, Long> initPrority(Long organizationId) {
         Map<String, Long> map = new HashMap<>();
-        Priority high = savePrority(organizationId, "高", new BigDecimal(0), "#FFB100", false);
-        Priority medium = savePrority(organizationId, "中", new BigDecimal(1), "#3575DF", true);
-        Priority low = savePrority(organizationId, "低", new BigDecimal(2), "#979797", false);
+        PriorityDTO high = savePrority(organizationId, "高", new BigDecimal(0), "#FFB100", false);
+        PriorityDTO medium = savePrority(organizationId, "中", new BigDecimal(1), "#3575DF", true);
+        PriorityDTO low = savePrority(organizationId, "低", new BigDecimal(2), "#979797", false);
         map.put("high", high.getId());
         map.put("medium", medium.getId());
         map.put("low", low.getId());
@@ -236,7 +236,7 @@ public class PriorityServiceImpl implements PriorityService {
         if (!enable) {
             checkLastPriority(organizationId, id);
         }
-        Priority priority = priorityMapper.selectByPrimaryKey(id);
+        PriorityDTO priority = priorityMapper.selectByPrimaryKey(id);
         if (priority == null) {
             throw new CommonException(NOT_FOUND);
         }
@@ -271,7 +271,7 @@ public class PriorityServiceImpl implements PriorityService {
             throw new CommonException(DELETE_ILLEGAL);
         }
         checkLastPriority(organizationId, priorityId);
-        Priority priority = priorityMapper.selectByPrimaryKey(priorityId);
+        PriorityDTO priority = priorityMapper.selectByPrimaryKey(priorityId);
         List<ProjectVO> projectVOS = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         List<Long> projectIds = projectVOS.stream().map(ProjectVO::getId).collect(Collectors.toList());
         Long count;
@@ -304,10 +304,10 @@ public class PriorityServiceImpl implements PriorityService {
      * @param organizationId
      */
     private void checkLastPriority(Long organizationId, Long priorityId) {
-        Priority priority = new Priority();
+        PriorityDTO priority = new PriorityDTO();
         priority.setEnable(true);
         priority.setOrganizationId(organizationId);
-        List<Priority> priorities = priorityMapper.select(priority);
+        List<PriorityDTO> priorities = priorityMapper.select(priority);
         if (priorities.size() == 1 && priorityId.equals(priorities.get(0).getId())) {
             throw new CommonException(LAST_ILLEGAL);
         }

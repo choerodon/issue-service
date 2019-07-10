@@ -4,11 +4,11 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.app.service.FieldDataLogService;
 import io.choerodon.issue.api.vo.FieldDataLogCreateVO;
 import io.choerodon.issue.api.vo.FieldDataLogVO;
-import io.choerodon.issue.infra.dto.FieldDataLog;
+import io.choerodon.issue.infra.dto.FieldDataLogDTO;
 import io.choerodon.issue.infra.enums.ObjectSchemeCode;
 import io.choerodon.issue.infra.mapper.FieldDataLogMapper;
 import io.choerodon.issue.infra.repository.FieldDataLogRepository;
-import io.choerodon.issue.infra.util.EnumUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -47,7 +47,7 @@ public class FieldDataLogServiceImpl implements FieldDataLogService {
 
     @Override
     public FieldDataLogVO createDataLog(Long projectId, String schemeCode, FieldDataLogCreateVO create) {
-        FieldDataLog dataLog = modelMapper.map(create, FieldDataLog.class);
+        FieldDataLogDTO dataLog = modelMapper.map(create, FieldDataLogDTO.class);
         dataLog.setProjectId(projectId);
         dataLog.setSchemeCode(schemeCode);
         return modelMapper.map(fieldDataLogRepository.create(dataLog), FieldDataLogVO.class);
@@ -55,7 +55,7 @@ public class FieldDataLogServiceImpl implements FieldDataLogService {
 
     @Override
     public void deleteByFieldId(Long projectId, Long fieldId) {
-        FieldDataLog delete = new FieldDataLog();
+        FieldDataLogDTO delete = new FieldDataLogDTO();
         delete.setFieldId(fieldId);
         delete.setProjectId(projectId);
         fieldDataLogMapper.delete(delete);

@@ -8,10 +8,10 @@ import io.choerodon.issue.app.service.IssueTypeService;
 import io.choerodon.issue.app.service.StateMachineSchemeConfigService;
 import io.choerodon.issue.app.service.StateMachineService;
 import io.choerodon.issue.api.vo.*;
-import io.choerodon.issue.infra.dto.IssueType;
+import io.choerodon.issue.infra.dto.IssueTypeDTO;
 import io.choerodon.issue.infra.enums.InitIssueType;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
-import io.choerodon.issue.infra.util.PageUtil;
+import io.choerodon.issue.infra.utils.PageUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -50,7 +50,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
 
     @Override
     public IssueTypeVO queryById(Long organizationId, Long issueTypeId) {
-        IssueType issueType = issueTypeMapper.selectByPrimaryKey(issueTypeId);
+        IssueTypeDTO issueType = issueTypeMapper.selectByPrimaryKey(issueTypeId);
         if (issueType != null) {
             return modelMapper.map(issueType, IssueTypeVO.class);
         }
@@ -63,7 +63,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
             throw new CommonException("error.issueType.checkName");
         }
         issueTypeVO.setOrganizationId(organizationId);
-        IssueType issueType = modelMapper.map(issueTypeVO, IssueType.class);
+        IssueTypeDTO issueType = modelMapper.map(issueTypeVO, IssueTypeDTO.class);
         return modelMapper.map(createIssueType(issueType), IssueTypeVO.class);
     }
 
@@ -72,7 +72,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
         if (issueTypeVO.getName() != null && !checkName(issueTypeVO.getOrganizationId(), issueTypeVO.getName(), issueTypeVO.getId())) {
             throw new CommonException("error.issueType.checkName");
         }
-        IssueType issueType = modelMapper.map(issueTypeVO, IssueType.class);
+        IssueTypeDTO issueType = modelMapper.map(issueTypeVO, IssueTypeDTO.class);
         int isUpdate = issueTypeMapper.updateByPrimaryKeySelective(issueType);
         if (isUpdate != 1) {
             throw new CommonException("error.issueType.update");
@@ -85,7 +85,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
     public Map<String, Object> checkDelete(Long organizationId, Long issueTypeId) {
         Map<String, Object> result = new HashMap<>();
         result.put("canDelete", true);
-        IssueType issueType = issueTypeMapper.selectByPrimaryKey(issueTypeId);
+        IssueTypeDTO issueType = issueTypeMapper.selectByPrimaryKey(issueTypeId);
         if (issueType == null) {
             throw new CommonException("error.base.notFound");
         } else if (!issueType.getOrganizationId().equals(organizationId)) {
@@ -127,7 +127,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
 
     @Override
     public Boolean checkName(Long organizationId, String name, Long id) {
-        IssueType select = new IssueType();
+        IssueTypeDTO select = new IssueTypeDTO();
         select.setName(name);
         select.setOrganizationId(organizationId);
         select = issueTypeMapper.selectOne(select);
@@ -140,7 +140,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
 
     @Override
     public List<IssueTypeVO> queryByOrgId(Long organizationId) {
-        List<IssueType> issueTypes = issueTypeMapper.queryByOrgId(organizationId);
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.queryByOrgId(organizationId);
         return modelMapper.map(issueTypes, new TypeToken<List<IssueTypeVO>>() {
         }.getType());
     }
@@ -165,14 +165,14 @@ public class IssueTypeServiceImpl implements IssueTypeService {
     public void initIssueTypeByConsumeCreateOrganization(Long organizationId) {
         for (InitIssueType initIssueType : InitIssueType.values()) {
             //创建默认问题类型
-            createIssueType(new IssueType(initIssueType.getIcon(), initIssueType.getName(), initIssueType.getDescription(), organizationId, initIssueType.getColour(), initIssueType.getTypeCode(), true));
+            createIssueType(new IssueTypeDTO(initIssueType.getIcon(), initIssueType.getName(), initIssueType.getDescription(), organizationId, initIssueType.getColour(), initIssueType.getTypeCode(), true));
         }
     }
 
 
-    private IssueType createIssueType(IssueType issueType) {
+    private IssueTypeDTO createIssueType(IssueTypeDTO issueType) {
         //保证幂等性
-        List<IssueType> issueTypes = issueTypeMapper.select(issueType);
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.select(issueType);
         if (!issueTypes.isEmpty()) {
             return issueTypes.get(0);
         }
@@ -185,11 +185,11 @@ public class IssueTypeServiceImpl implements IssueTypeService {
 
     @Override
     public Map<Long, IssueTypeVO> listIssueTypeMap(Long organizationId) {
-        IssueType issueType = new IssueType();
+        IssueTypeDTO issueType = new IssueTypeDTO();
         issueType.setOrganizationId(organizationId);
-        List<IssueType> issueTypes = issueTypeMapper.select(issueType);
+        List<IssueTypeDTO> issueTypes = issueTypeMapper.select(issueType);
         Map<Long, IssueTypeVO> issueTypeVOMap = new HashMap<>();
-        for (IssueType iType : issueTypes) {
+        for (IssueTypeDTO iType : issueTypes) {
             issueTypeVOMap.put(iType.getId(), modelMapper.map(iType, new TypeToken<IssueTypeVO>() {
             }.getType()));
         }
@@ -202,7 +202,7 @@ public class IssueTypeServiceImpl implements IssueTypeService {
         for (Long orgId : orgIds) {
             Map<String, Long> temp = new HashMap<>();
             for (InitIssueType initIssueType : InitIssueType.values()) {
-                IssueType issueType = createIssueType(new IssueType(initIssueType.getIcon(), initIssueType.getName(), initIssueType.getDescription(), orgId, initIssueType.getColour(), initIssueType.getTypeCode(), true));
+                IssueTypeDTO issueType = createIssueType(new IssueTypeDTO(initIssueType.getIcon(), initIssueType.getName(), initIssueType.getDescription(), orgId, initIssueType.getColour(), initIssueType.getTypeCode(), true));
                 temp.put(initIssueType.getTypeCode(), issueType.getId());
             }
             result.put(orgId, temp);

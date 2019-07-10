@@ -5,12 +5,12 @@ import io.choerodon.issue.app.service.ConfigCodeService;
 import io.choerodon.issue.app.service.StateMachineConfigService;
 import io.choerodon.issue.api.vo.ConfigCodeVO;
 import io.choerodon.issue.api.vo.StateMachineConfigVO;
-import io.choerodon.issue.infra.dto.StateMachineConfig;
-import io.choerodon.issue.infra.dto.StateMachineConfigDraft;
+import io.choerodon.issue.infra.dto.StateMachineConfigDTO;
+import io.choerodon.issue.infra.dto.StateMachineConfigDraftDTO;
 import io.choerodon.issue.infra.enums.ConfigType;
 import io.choerodon.issue.infra.mapper.StateMachineConfigDraftMapper;
 import io.choerodon.issue.infra.mapper.StateMachineConfigMapper;
-import io.choerodon.issue.infra.util.EnumUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -55,7 +55,7 @@ public class StateMachineConfigServiceImpl implements StateMachineConfigService 
 
         configDTO.setTransformId(transformId);
         configDTO.setOrganizationId(organizationId);
-        StateMachineConfigDraft config = modelMapper.map(configDTO, StateMachineConfigDraft.class);
+        StateMachineConfigDraftDTO config = modelMapper.map(configDTO, StateMachineConfigDraftDTO.class);
         config.setStateMachineId(stateMachineId);
         int isInsert = configDraftMapper.insert(config);
         if (isInsert != 1) {
@@ -67,7 +67,7 @@ public class StateMachineConfigServiceImpl implements StateMachineConfigService 
 
     @Override
     public Boolean delete(Long organizationId, Long configId) {
-        StateMachineConfigDraft config = new StateMachineConfigDraft();
+        StateMachineConfigDraftDTO config = new StateMachineConfigDraftDTO();
         config.setId(configId);
         config.setOrganizationId(organizationId);
         int isDelete = configDraftMapper.delete(config);
@@ -84,11 +84,11 @@ public class StateMachineConfigServiceImpl implements StateMachineConfigService 
         }
         List<StateMachineConfigVO> configVOS;
         if (isDraft) {
-            List<StateMachineConfigDraft> configs = configDraftMapper.queryWithCodeInfo(organizationId, transformId, type);
+            List<StateMachineConfigDraftDTO> configs = configDraftMapper.queryWithCodeInfo(organizationId, transformId, type);
             configVOS = modelMapper.map(configs, new TypeToken<List<StateMachineConfigVO>>() {
             }.getType());
         } else {
-            List<StateMachineConfig> configs = configDeployMapper.queryWithCodeInfo(organizationId, transformId, type);
+            List<StateMachineConfigDTO> configs = configDeployMapper.queryWithCodeInfo(organizationId, transformId, type);
             configVOS = modelMapper.map(configs, new TypeToken<List<StateMachineConfigVO>>() {
             }.getType());
         }
@@ -101,7 +101,7 @@ public class StateMachineConfigServiceImpl implements StateMachineConfigService 
             throw new CommonException(ERROR_STATUS_TYPE_ILLEGAL);
         }
         if (transformIds != null && !transformIds.isEmpty()) {
-            List<StateMachineConfig> configs = configDeployMapper.queryWithCodeInfoByTransformIds(organizationId, type, transformIds);
+            List<StateMachineConfigDTO> configs = configDeployMapper.queryWithCodeInfoByTransformIds(organizationId, type, transformIds);
             return modelMapper.map(configs, new TypeToken<List<StateMachineConfigVO>>() {
             }.getType());
         } else {
@@ -114,7 +114,7 @@ public class StateMachineConfigServiceImpl implements StateMachineConfigService 
         if (configCodeVOS.stream().noneMatch(configCodeDTO -> configCodeDTO.getCode().equals(code))) {
             throw new CommonException("error.configCode.illegal");
         }
-        StateMachineConfigDraft configDraft = new StateMachineConfigDraft();
+        StateMachineConfigDraftDTO configDraft = new StateMachineConfigDraftDTO();
         configDraft.setTransformId(transformId);
         configDraft.setCode(code);
         if (!configDraftMapper.select(configDraft).isEmpty()) {

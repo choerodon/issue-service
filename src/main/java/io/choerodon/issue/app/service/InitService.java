@@ -1,7 +1,7 @@
 package io.choerodon.issue.app.service;
 
 import io.choerodon.issue.api.vo.payload.ProjectEvent;
-import io.choerodon.issue.infra.dto.Status;
+import io.choerodon.issue.infra.dto.StatusDTO;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public interface InitService {
      *
      * @param organizationId
      */
-    List<Status> initStatus(Long organizationId);
+    List<StatusDTO> initStatus(Long organizationId);
 
     /**
      * 创建项目时初始化状态机

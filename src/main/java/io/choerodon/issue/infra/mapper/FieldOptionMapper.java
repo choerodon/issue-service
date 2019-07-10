@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.infra.dto.FieldOption;
+import io.choerodon.issue.infra.dto.FieldOptionDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * @author shinan.chen
  * @since 2019/4/1
  */
-public interface FieldOptionMapper extends Mapper<FieldOption> {
+public interface FieldOptionMapper extends Mapper<FieldOptionDTO> {
 
     /**
      * 根据字段id获取字段选项
@@ -19,7 +19,7 @@ public interface FieldOptionMapper extends Mapper<FieldOption> {
      * @param fieldId
      * @return
      */
-    List<FieldOption> selectByFieldId(@Param("organizationId") Long organizationId, @Param("fieldId") Long fieldId);
+    List<FieldOptionDTO> selectByFieldId(@Param("organizationId") Long organizationId, @Param("fieldId") Long fieldId);
 
     /**
      * 根据字段id列表获取字段选项
@@ -28,7 +28,7 @@ public interface FieldOptionMapper extends Mapper<FieldOption> {
      * @param fieldIds
      * @return
      */
-    List<FieldOption> selectByFieldIds(@Param("organizationId") Long organizationId, @Param("fieldIds") List<Long> fieldIds);
+    List<FieldOptionDTO> selectByFieldIds(@Param("organizationId") Long organizationId, @Param("fieldIds") List<Long> fieldIds);
 
     /**
      * 根据optionIds查询对象
@@ -37,5 +37,5 @@ public interface FieldOptionMapper extends Mapper<FieldOption> {
      * @param optionIds
      * @return
      */
-    List<FieldOption> selectByOptionIds(@Param("organizationId") Long organizationId, @Param("optionIds") List<Long> optionIds);
+    List<FieldOptionDTO> selectByOptionIds(@Param("organizationId") Long organizationId, @Param("optionIds") List<Long> optionIds);
 }

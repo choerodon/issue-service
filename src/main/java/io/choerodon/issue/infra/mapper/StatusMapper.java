@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.mapper;
 
 import io.choerodon.issue.api.vo.StatusSearchVO;
-import io.choerodon.issue.infra.dto.Status;
-import io.choerodon.issue.infra.dto.StatusWithInfo;
+import io.choerodon.issue.infra.dto.StatusDTO;
+import io.choerodon.issue.infra.dto.StatusWithInfoDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,15 +11,15 @@ import java.util.List;
 /**
  * @author peng.jiang, dinghuang123@gmail.com
  */
-public interface StatusMapper extends Mapper<Status> {
+public interface StatusMapper extends Mapper<StatusDTO> {
 
     List<Long> selectStatusIds(@Param("organizationId") Long organizationId, @Param("statusSearchVO") StatusSearchVO statusSearchVO);
 
-    List<StatusWithInfo> queryStatusList(@Param("organizationId") Long organizationId, @Param("statusIds") List<Long> statusIds);
+    List<StatusWithInfoDTO> queryStatusList(@Param("organizationId") Long organizationId, @Param("statusIds") List<Long> statusIds);
 
-    Status queryById(@Param("organizationId") Long organizationId, @Param("id") Long id);
+    StatusDTO queryById(@Param("organizationId") Long organizationId, @Param("id") Long id);
 
-    List<Status> batchStatusGet(@Param("ids") List<Long> ids);
+    List<StatusDTO> batchStatusGet(@Param("ids") List<Long> ids);
 
     /**
      * 查询状态机下的所有状态
@@ -28,5 +28,5 @@ public interface StatusMapper extends Mapper<Status> {
      * @param stateMachineIds
      * @return
      */
-    List<Status> queryByStateMachineIds(@Param("organizationId") Long organizationId, @Param("stateMachineIds") List<Long> stateMachineIds);
+    List<StatusDTO> queryByStateMachineIds(@Param("organizationId") Long organizationId, @Param("stateMachineIds") List<Long> stateMachineIds);
 }

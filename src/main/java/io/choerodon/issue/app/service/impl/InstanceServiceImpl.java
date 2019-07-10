@@ -9,9 +9,9 @@ import io.choerodon.issue.api.vo.InputVO;
 import io.choerodon.issue.api.vo.StateMachineConfigVO;
 import io.choerodon.issue.api.vo.StateMachineTransformVO;
 import io.choerodon.issue.api.vo.payload.TransformInfo;
-import io.choerodon.issue.infra.dto.StateMachine;
-import io.choerodon.issue.infra.dto.StateMachineNode;
-import io.choerodon.issue.infra.dto.StateMachineTransform;
+import io.choerodon.issue.infra.dto.StateMachineDTO;
+import io.choerodon.issue.infra.dto.StateMachineNodeDTO;
+import io.choerodon.issue.infra.dto.StateMachineTransformDTO;
 import io.choerodon.issue.infra.enums.ConfigType;
 import io.choerodon.issue.infra.enums.NodeType;
 import io.choerodon.issue.infra.factory.MachineFactory;
@@ -73,7 +73,7 @@ public class InstanceServiceImpl implements InstanceService {
 
     @Override
     public ExecuteResult startInstance(Long organizationId, String serviceCode, Long stateMachineId, InputVO inputVO) {
-        StateMachine stateMachine = stateMachineMapper.queryById(organizationId, stateMachineId);
+        StateMachineDTO stateMachine = stateMachineMapper.queryById(organizationId, stateMachineId);
         if (stateMachine == null) {
             throw new CommonException("error.stateMachine.notFound");
         }
@@ -89,11 +89,11 @@ public class InstanceServiceImpl implements InstanceService {
 
     @Override
     public Long queryInitStatusId(Long organizationId, Long stateMachineId) {
-        StateMachineNode select = new StateMachineNode();
+        StateMachineNodeDTO select = new StateMachineNodeDTO();
         select.setOrganizationId(organizationId);
         select.setStateMachineId(stateMachineId);
         select.setType(NodeType.INIT);
-        List<StateMachineNode> nodes = nodeDeployMapper.select(select);
+        List<StateMachineNodeDTO> nodes = nodeDeployMapper.select(select);
         if (nodes.isEmpty()) {
             throw new CommonException("error.queryInitStatusId.notFound");
         }
@@ -108,14 +108,14 @@ public class InstanceServiceImpl implements InstanceService {
     @Override
     public List<TransformInfo> queryListTransform(Long organizationId, String serviceCode, Long stateMachineId, Long instanceId, Long statusId) {
         Boolean isNeedFilter = false;
-        List<StateMachineTransform> stateMachineTransforms = transformService.queryListByStatusIdByDeploy(organizationId, stateMachineId, statusId);
+        List<StateMachineTransformDTO> stateMachineTransforms = transformService.queryListByStatusIdByDeploy(organizationId, stateMachineId, statusId);
         //获取节点信息
-        List<StateMachineNode> nodes = nodeDeployMapper.selectByStateMachineId(stateMachineId);
-        List<StateMachineConfigVO> configs = configService.queryDeployByTransformIds(organizationId, ConfigType.CONDITION, stateMachineTransforms.stream().map(StateMachineTransform::getId).collect(Collectors.toList()));
-        Map<Long, Long> nodeMap = nodes.stream().collect(Collectors.toMap(StateMachineNode::getId, StateMachineNode::getStatusId));
+        List<StateMachineNodeDTO> nodes = nodeDeployMapper.selectByStateMachineId(stateMachineId);
+        List<StateMachineConfigVO> configs = configService.queryDeployByTransformIds(organizationId, ConfigType.CONDITION, stateMachineTransforms.stream().map(StateMachineTransformDTO::getId).collect(Collectors.toList()));
+        Map<Long, Long> nodeMap = nodes.stream().collect(Collectors.toMap(StateMachineNodeDTO::getId, StateMachineNodeDTO::getStatusId));
         Map<Long, List<StateMachineConfigVO>> configMaps = configs.stream().collect(Collectors.groupingBy(StateMachineConfigVO::getTransformId));
         List<TransformInfo> transformInfos = new ArrayList<>(stateMachineTransforms.size());
-        for (StateMachineTransform transform : stateMachineTransforms) {
+        for (StateMachineTransformDTO transform : stateMachineTransforms) {
             TransformInfo transformInfo = modelMapper.map(transform, TransformInfo.class);
             transformInfo.setStartStatusId(nodeMap.get(transform.getStartNodeId()));
             transformInfo.setEndStatusId(nodeMap.get(transform.getEndNodeId()));
@@ -144,7 +144,7 @@ public class InstanceServiceImpl implements InstanceService {
 
     @Override
     public Boolean validatorGuard(Long organizationId, String serviceCode, Long transformId, InputVO inputVO, StateContext<String, String> context) {
-        StateMachineTransform transform = transformMapper.queryById(organizationId, transformId);
+        StateMachineTransformDTO transform = transformMapper.queryById(organizationId, transformId);
         List<StateMachineConfigVO> conditionConfigs = condition(organizationId, transformId);
         List<StateMachineConfigVO> validatorConfigs = validator(organizationId, transformId);
         ExecuteResult executeResult = new ExecuteResult(true, null, null);
@@ -172,7 +172,7 @@ public class InstanceServiceImpl implements InstanceService {
     public Boolean postAction(Long organizationId, String serviceCode, Long transformId, InputVO inputVO, StateContext<String, String> context) {
         List<StateMachineConfigVO> configs = action(organizationId, transformId);
         inputVO.setConfigs(configs);
-        StateMachineTransform transform = transformMapper.queryById(organizationId, transformId);
+        StateMachineTransformDTO transform = transformMapper.queryById(organizationId, transformId);
         //节点转状态
         Long targetStatusId = nodeDeployMapper.getNodeDeployById(Long.parseLong(context.getTarget().getId())).getStatusId();
         if (targetStatusId == null) {
@@ -225,7 +225,7 @@ public class InstanceServiceImpl implements InstanceService {
     public Map<Long, Long> queryInitStatusIds(Long organizationId, List<Long> stateMachineIds) {
         if (!stateMachineIds.isEmpty()) {
             return nodeDeployMapper.queryInitByStateMachineIds(stateMachineIds, organizationId).stream()
-                    .collect(Collectors.toMap(StateMachineNode::getStateMachineId, StateMachineNode::getStatusId));
+                    .collect(Collectors.toMap(StateMachineNodeDTO::getStateMachineId, StateMachineNodeDTO::getStatusId));
         } else {
             return new HashMap<>();
         }
@@ -340,7 +340,7 @@ public class InstanceServiceImpl implements InstanceService {
     @Override
     public StateMachineTransformVO queryInitTransform(Long organizationId, Long stateMachineId) {
         //获取初始转换
-        StateMachineTransform initTransform = transformService.getInitTransform(organizationId, stateMachineId);
+        StateMachineTransformDTO initTransform = transformService.getInitTransform(organizationId, stateMachineId);
         StateMachineTransformVO stateMachineTransformVO = modelMapper.map(initTransform, StateMachineTransformVO.class);
         //获取转换配置
         List<StateMachineConfigVO> configDTOS = configService.queryByTransformId(organizationId, initTransform.getId(), null, false);

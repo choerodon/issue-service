@@ -4,12 +4,12 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.ConfigCodeVO;
 import io.choerodon.issue.api.vo.PropertyData;
 import io.choerodon.issue.app.service.ConfigCodeService;
-import io.choerodon.issue.infra.dto.ConfigCode;
-import io.choerodon.issue.infra.dto.StateMachineConfigDraft;
+import io.choerodon.issue.infra.dto.ConfigCodeDTO;
+import io.choerodon.issue.infra.dto.StateMachineConfigDraftDTO;
 import io.choerodon.issue.infra.enums.ConfigType;
 import io.choerodon.issue.infra.mapper.ConfigCodeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineConfigDraftMapper;
-import io.choerodon.issue.infra.util.EnumUtil;
+import io.choerodon.issue.infra.utils.EnumUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
@@ -47,9 +47,9 @@ public class ConfigCodeServiceImpl implements ConfigCodeService {
         if (!EnumUtil.contain(ConfigType.class, type)) {
             throw new CommonException("error.status.type.illegal");
         }
-        ConfigCode configCode = new ConfigCode();
+        ConfigCodeDTO configCode = new ConfigCodeDTO();
         configCode.setType(type);
-        List<ConfigCode> configCodes = configCodeMapper.select(configCode);
+        List<ConfigCodeDTO> configCodes = configCodeMapper.select(configCode);
         return modelMapper.map(configCodes, new TypeToken<List<ConfigCodeVO>>() {
         }.getType());
     }
@@ -62,12 +62,12 @@ public class ConfigCodeServiceImpl implements ConfigCodeService {
         if (!EnumUtil.contain(ConfigType.class, type)) {
             throw new CommonException("error.status.type.illegal");
         }
-        StateMachineConfigDraft config = new StateMachineConfigDraft();
+        StateMachineConfigDraftDTO config = new StateMachineConfigDraftDTO();
         config.setOrganizationId(organizationId);
         config.setTransformId(transformId);
         config.setType(type);
-        List<StateMachineConfigDraft> configs = configDraftMapper.select(config);
-        List<String> configCodes = configs.stream().map(StateMachineConfigDraft::getCode).collect(Collectors.toList());
+        List<StateMachineConfigDraftDTO> configs = configDraftMapper.select(config);
+        List<String> configCodes = configs.stream().map(StateMachineConfigDraftDTO::getCode).collect(Collectors.toList());
         //过滤掉已经配置的，返回未配置的code
         return queryByType(type).stream().filter(configCodeDTO -> !configCodes.contains(configCodeDTO.getCode())).collect(Collectors.toList());
     }
@@ -79,14 +79,14 @@ public class ConfigCodeServiceImpl implements ConfigCodeService {
             throw new CommonException("error.handlePropertyData.service.notNull");
         }
         //先删除该服务的ConfigCode
-        ConfigCode delete = new ConfigCode();
+        ConfigCodeDTO delete = new ConfigCodeDTO();
         delete.setService(propertyData.getServiceName());
         configCodeMapper.delete(delete);
         //再插入扫描到的ConfigCode
         List<ConfigCodeVO> configCodeVOS = propertyData.getList();
         configCodeVOS.forEach(configCode -> {
             configCode.setService(service);
-            configCodeMapper.insert(modelMapper.map(configCode, ConfigCode.class));
+            configCodeMapper.insert(modelMapper.map(configCode, ConfigCodeDTO.class));
             logger.info("handlePropertyData service:{} insert code:{} successful", service, configCode.getCode());
         });
         logger.info("handlePropertyData load service:{} successful", service);
