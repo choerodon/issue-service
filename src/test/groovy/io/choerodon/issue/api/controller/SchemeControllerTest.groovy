@@ -3,6 +3,7 @@ package io.choerodon.issue.api.controller
 import io.choerodon.issue.IntegrationTestConfiguration
 import io.choerodon.issue.api.vo.PriorityVO
 import io.choerodon.issue.api.vo.StatusVO
+import io.choerodon.issue.infra.enums.StatusType
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -60,13 +61,13 @@ class SchemeControllerTest extends Specification {
     def "queryTransformsByProjectId"() {
         when: '查询项目下某个问题类型拥有的转换（包含可以转换到的状态）'
         def entity = restTemplate.getForEntity("/v1/projects/{project_id}/schemes/query_transforms?current_status_id={current_status_id}&issue_id={issue_id}&issue_type_id={issue_type_id}&apply_type={apply_type}",
-                List, projectId, 1L, 1L, 1L, "agile")
+                List, projectId, 2L, 1L, 1L, "agile")
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body.size() == 1
+        entity.body.size() != 0
     }
 
     def "queryTransformsMapByProjectId"() {
@@ -90,7 +91,7 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body.size() == 1
+        entity.body.size() != 0
     }
 
     def "queryStatusByProjectId"() {
@@ -102,7 +103,7 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body.size() == 1
+        entity.body.size() != 0
     }
 
     def "queryStateMachineId"() {
@@ -114,14 +115,14 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: '期望验证'
-        entity.body == 1
+        entity.body == 2
     }
 
     def "createStatusForAgile"() {
         given: "准备数据"
         StatusVO statusDTO = new StatusVO()
         statusDTO.organizationId = organizationId
-        statusDTO.type = "XX2"
+        statusDTO.type = StatusType.TODO
         statusDTO.name = "XX2"
         statusDTO.description = "XX"
         statusDTO.code = "XX"
@@ -134,7 +135,7 @@ class SchemeControllerTest extends Specification {
         entity.getStatusCode().is2xxSuccessful()
 
         expect: "期望比较"
-        entity.body.code == "error.stateMachineScheme.stateMachineInMoreThanOneScheme"
+        entity.body.code == "XX"
 
     }
 
@@ -146,7 +147,7 @@ class SchemeControllerTest extends Specification {
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful()
         expect: '期望验证'
-        !entity.body
+        entity.body
     }
 
     def "removeStatusForAgile"() {
@@ -156,8 +157,6 @@ class SchemeControllerTest extends Specification {
 
         expect: '返回结果'
         entity == null
-
-
     }
 
     def "queryDefaultByOrganizationId"() {

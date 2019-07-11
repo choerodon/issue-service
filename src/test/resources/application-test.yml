@@ -21,6 +21,8 @@ hystrix:
   stream:
     queue:
       enabled: false # 关闭hystrix stream，否则kafka报错
+  metrics:
+    enabled: false
 data:
   dir: src/main/resources
 eureka:

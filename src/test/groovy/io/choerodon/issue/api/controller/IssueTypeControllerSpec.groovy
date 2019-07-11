@@ -54,15 +54,15 @@ class IssueTypeControllerSpec extends Specification {
 
     def "create"() {
         given: '准备工作'
-        IssueTypeVO issueTypeDTO = new IssueTypeVO()
-        issueTypeDTO.setName(name)
-        issueTypeDTO.setTypeCode(name)
-        issueTypeDTO.setIcon(icon)
-        issueTypeDTO.setDescription(description)
-        issueTypeDTO.setOrganizationId(organizationId)
+        IssueTypeVO issueType = new IssueTypeVO()
+        issueType.setName(name)
+        issueType.setTypeCode(name)
+        issueType.setIcon(icon)
+        issueType.setDescription(description)
+        issueType.setOrganizationId(organizationId)
 
         when: '创建问题类型'
-        HttpEntity<IssueTypeVO> httpEntity = new HttpEntity<>(issueTypeDTO)
+        HttpEntity<IssueTypeVO> httpEntity = new HttpEntity<>(issueType)
         def entity = restTemplate.exchange("/v1/organizations/{organization_id}/issue_type", HttpMethod.POST, httpEntity, IssueTypeVO, organizationId)
 
         then: '状态码为200，调用成功'

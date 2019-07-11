@@ -148,7 +148,7 @@ class StateMachineSchemeControllerSpec extends Specification {
         entity.getStatusCode().is2xxSuccessful() == isSuccess
         (entity.getBody() != null && entity.getBody().getId() != null) == reponseResult
         if (reponseResult) {
-            entity.getBody().getConfigDTOs().each { a ->
+            entity.getBody().getConfigVOS().each { a ->
                 configIds.add(a.id)
             }
         }

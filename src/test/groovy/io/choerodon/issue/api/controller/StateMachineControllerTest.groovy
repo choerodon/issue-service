@@ -43,17 +43,17 @@ class StateMachineControllerTest extends Specification {
 
     def "queryProjectIdsMap"() {
         when: '【内部调用】查询状态机关联的项目id列表的Map'
-        def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine/query_project_ids_map?stateMachineId={stateMachineId}", Map, organizationId, 1)
+        def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine/query_project_ids_map?stateMachineId={stateMachineId}", Map, organizationId, 2)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful()
         Map<String, List<Long>> map = entity.body
         expect: '期望验证'
-        map.get("test") != null
+        map.get("agile") != null
     }
 
     def "checkDeleteNode"() {
-        when: '内部调用】状态机删除节点的校验，是否可以直接删除'
+        when: '【内部调用】状态机删除节点的校验，是否可以直接删除'
         def entity = restTemplate.getForEntity("/v1/organizations/{organization_id}/state_machine/check_delete_node?stateMachineId={stateMachineId}&statusId={statusId}", Map, organizationId, 1L, 1L)
 
         then: '返回结果'
@@ -73,7 +73,7 @@ class StateMachineControllerTest extends Specification {
         changeStatus.setAddStatusIds(addIds)
         changeStatus.setDeleteStatusIds(deleteIds)
         when: '【内部调用】发布状态机时对增加与减少的状态进行处理，影响到的项目是否需要增加与减少相应的状态'
-        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/state_machine/{state_machine_id}", HttpMethod.DELETE, null, Object, organizationId, 1L)
+        def entity = restTemplate.exchange("/v1/organizations/{organization_id}/state_machine/{state_machine_id}", HttpMethod.DELETE, null, Object, organizationId, 2L)
 
         then: '返回结果'
         entity.getStatusCode().is2xxSuccessful()

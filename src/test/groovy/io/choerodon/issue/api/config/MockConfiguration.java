@@ -7,11 +7,18 @@ import io.choerodon.asgard.saga.dto.StartInstanceDTO;
 import io.choerodon.asgard.saga.feign.SagaClient;
 import io.choerodon.core.convertor.ApplicationContextHelper;
 import io.choerodon.issue.api.vo.ExecuteResult;
+import io.choerodon.issue.api.vo.InputVO;
 import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
+import io.choerodon.issue.api.vo.payload.TransformInfo;
+import io.choerodon.issue.app.service.impl.InitServiceImpl;
 import io.choerodon.issue.app.service.impl.SagaServiceImpl;
+import io.choerodon.issue.infra.enums.TransformConditionStrategy;
+import io.choerodon.issue.infra.enums.TransformType;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
+import io.choerodon.issue.infra.feign.CustomFeignClientAdaptor;
 import io.choerodon.issue.infra.feign.UserFeignClient;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
+import io.choerodon.issue.infra.feign.fallback.CustomFeignClientAdaptorFallBack;
 import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import io.choerodon.issue.infra.utils.ProjectUtil;
@@ -25,6 +32,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +43,41 @@ import java.util.Map;
  * @since 2018/11/12
  */
 @Configuration
-public class FeignConfigure {
+public class MockConfiguration {
+    @Bean
+    public SagaClient sagaClient() {
+        SagaClient sagaClient = Mockito.mock(SagaClient.class);
+        Mockito.when(sagaClient.startSaga(Matchers.anyString(), Matchers.any(StartInstanceDTO.class))).thenReturn(new SagaInstanceDTO());
+        SagaServiceImpl sagaService = ApplicationContextHelper.getSpringFactory().getBean(SagaServiceImpl.class);
+        sagaService.setSagaClient(sagaClient);
+        InitServiceImpl initService = ApplicationContextHelper.getSpringFactory().getBean(InitServiceImpl.class);
+        initService.setSagaClient(sagaClient);
+        return sagaClient;
+    }
+
+    @Bean
+    @Primary
+    CustomFeignClientAdaptor customFeignClientAdaptor() {
+        CustomFeignClientAdaptor customFeignClientAdaptor = Mockito.mock(CustomFeignClientAdaptorFallBack.class);
+        ExecuteResult executeResult = new ExecuteResult();
+        executeResult.setSuccess(true);
+        executeResult.setResultStatusId(1L);
+        Mockito.when(customFeignClientAdaptor.executeConfig(Matchers.any(URI.class), Matchers.any(InputVO.class))).thenReturn(new ResponseEntity(executeResult, HttpStatus.OK));
+        List<TransformInfo> transformInfos = new ArrayList<>();
+        TransformInfo transformInfo = new TransformInfo();
+        transformInfo.setId(10L);
+        transformInfo.setOrganizationId(1L);
+        transformInfo.setName("新转换");
+        transformInfo.setType(TransformType.ALL);
+        transformInfo.setConditionStrategy(TransformConditionStrategy.ALL);
+        transformInfo.setStateMachineId(10L);
+        transformInfo.setEndStatusId(10L);
+        transformInfo.setStartStatusId(0L);
+        transformInfos.add(transformInfo);
+        Mockito.when(customFeignClientAdaptor.filterTransformsByConfig(Matchers.any(URI.class), Matchers.any(ArrayList.class))).thenReturn(new ResponseEntity(transformInfos, HttpStatus.OK));
+        return customFeignClientAdaptor;
+    }
+
     @Bean
     @Primary
     UserFeignClient userFeignClient() {
@@ -91,14 +133,5 @@ public class FeignConfigure {
         Mockito.when(agileFeignClient.checkDeleteNode(Matchers.anyLong(), Matchers.anyLong(), Matchers.any(List.class))).thenReturn(new ResponseEntity<>(map, HttpStatus.OK));
         Mockito.when(agileFeignClient.checkStateMachineSchemeChange(Matchers.anyLong(), Matchers.any(StateMachineSchemeDeployCheckIssue.class))).thenReturn(new ResponseEntity<>(map2, HttpStatus.OK));
         return agileFeignClient;
-    }
-
-    @Bean
-    SagaClient sagaClient() {
-        SagaClient sagaClient = Mockito.mock(SagaClient.class);
-        Mockito.when(sagaClient.startSaga(Matchers.anyString(), Matchers.any(StartInstanceDTO.class))).thenReturn(new SagaInstanceDTO());
-        SagaServiceImpl sagaService = ApplicationContextHelper.getSpringFactory().getBean(SagaServiceImpl.class);
-        sagaService.setSagaClient(sagaClient);
-        return sagaClient;
     }
 }

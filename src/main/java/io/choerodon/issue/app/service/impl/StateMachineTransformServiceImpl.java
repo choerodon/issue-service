@@ -275,7 +275,7 @@ public class StateMachineTransformServiceImpl implements StateMachineTransformSe
         }
         Map<Long, Map<Long, List<TransformVO>>> resultMap = new HashMap<>(stateMachineIds.size());
         List<StateMachineTransformDTO> allTransforms = transformDeployMapper.queryByStateMachineIds(organizationId, stateMachineIds);
-        List<TransformVO> allTransformVOS = modelMapper.map(allTransforms, new TypeToken<List<StateMachineTransformDTO>>() {
+        List<TransformVO> allTransformVOS = modelMapper.map(allTransforms, new TypeToken<List<TransformVO>>() {
         }.getType());
         Map<Long, List<TransformVO>> transformStateMachineIdMap = allTransformVOS.stream().collect(Collectors.groupingBy(TransformVO::getStateMachineId));
         List<StateMachineNodeDTO> allNodes = nodeDeployMapper.queryByStateMachineIds(organizationId, stateMachineIds);
