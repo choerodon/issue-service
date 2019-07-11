@@ -2,6 +2,7 @@ package io.choerodon.issue.app.service;
 
 import io.choerodon.issue.api.vo.FieldDataLogCreateVO;
 import io.choerodon.issue.api.vo.FieldDataLogVO;
+import io.choerodon.issue.infra.dto.FieldDataLogDTO;
 
 import java.util.List;
 
@@ -10,6 +11,8 @@ import java.util.List;
  * @since 2019/6/19
  */
 public interface FieldDataLogService {
+
+    FieldDataLogDTO baseCreate(FieldDataLogDTO create);
 
     FieldDataLogVO createDataLog(Long projectId, String schemeCode, FieldDataLogCreateVO create);
 

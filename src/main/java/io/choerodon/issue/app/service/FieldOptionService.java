@@ -1,8 +1,9 @@
 package io.choerodon.issue.app.service;
 
-import io.choerodon.issue.api.vo.FieldOptionVO;
 import io.choerodon.issue.api.vo.FieldOptionUpdateVO;
+import io.choerodon.issue.api.vo.FieldOptionVO;
 import io.choerodon.issue.api.vo.PageFieldViewVO;
+import io.choerodon.issue.infra.dto.FieldOptionDTO;
 
 import java.util.List;
 
@@ -11,6 +12,15 @@ import java.util.List;
  * @since 2019/4/1
  */
 public interface FieldOptionService {
+
+    FieldOptionDTO baseCreate(FieldOptionDTO option);
+
+    void baseDelete(Long optionId);
+
+    void baseUpdate(FieldOptionDTO option);
+
+    FieldOptionDTO baseQueryById(Long organizationId, Long optionId);
+
     /**
      * 处理字段选项
      *

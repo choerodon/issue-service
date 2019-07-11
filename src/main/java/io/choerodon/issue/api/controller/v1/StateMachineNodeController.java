@@ -24,7 +24,6 @@ public class StateMachineNodeController extends BaseController {
 
     @Autowired
     private StateMachineNodeService nodeService;
-
     @Autowired
     private StateMachineNodeValidator nodeValidator;
 

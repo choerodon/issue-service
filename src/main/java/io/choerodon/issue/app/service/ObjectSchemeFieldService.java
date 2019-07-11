@@ -1,9 +1,7 @@
 package io.choerodon.issue.app.service;
 
-import io.choerodon.issue.api.vo.AgileIssueHeadVO;
-import io.choerodon.issue.api.vo.ObjectSchemeFieldCreateVO;
-import io.choerodon.issue.api.vo.ObjectSchemeFieldDetailVO;
-import io.choerodon.issue.api.vo.ObjectSchemeFieldUpdateVO;
+import io.choerodon.issue.api.vo.*;
+import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +11,18 @@ import java.util.Map;
  * @since 2019/3/29
  */
 public interface ObjectSchemeFieldService {
+
+    ObjectSchemeFieldDTO baseCreate(ObjectSchemeFieldDTO field);
+
+    void baseDelete(Long fieldId);
+
+    void baseUpdate(ObjectSchemeFieldDTO field);
+
+    ObjectSchemeFieldDTO baseQueryById(Long organizationId, Long projectId, Long fieldId);
+
+    List<ObjectSchemeFieldDTO> listQuery(Long organizationId, Long projectId, ObjectSchemeFieldSearchVO searchDTO);
+
+    ObjectSchemeFieldDTO queryByFieldCode(Long organizationId, Long projectId, String fieldCode);
     /**
      * 组织层/项目层 获取字段列表
      *

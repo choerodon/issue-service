@@ -5,6 +5,7 @@ import io.choerodon.base.domain.Sort;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.*;
 import io.choerodon.issue.app.service.FieldValueService;
+import io.choerodon.issue.app.service.ObjectSchemeFieldService;
 import io.choerodon.issue.app.service.PageFieldService;
 import io.choerodon.issue.infra.dto.FieldValueDTO;
 import io.choerodon.issue.infra.dto.ObjectSchemeFieldDTO;
@@ -15,7 +16,6 @@ import io.choerodon.issue.infra.enums.ObjectSchemeFieldContext;
 import io.choerodon.issue.infra.enums.PageCode;
 import io.choerodon.issue.infra.feign.vo.UserVO;
 import io.choerodon.issue.infra.mapper.FieldValueMapper;
-import io.choerodon.issue.infra.repository.ObjectSchemeFieldRepository;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.FieldValueUtil;
 import io.choerodon.issue.infra.utils.PageUtil;
@@ -47,7 +47,7 @@ public class FieldValueServiceImpl implements FieldValueService {
     @Autowired
     private PageFieldService pageFieldService;
     @Autowired
-    private ObjectSchemeFieldRepository objectSchemeFieldRepository;
+    private ObjectSchemeFieldService objectSchemeFieldService;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -73,7 +73,7 @@ public class FieldValueServiceImpl implements FieldValueService {
             List<FieldValueDTO> values = new ArrayList<>();
             FieldValueUtil.handleValue2DTO(values, createDTO.getFieldType(), createDTO.getValue());
             //校验
-            ObjectSchemeFieldDTO field = objectSchemeFieldRepository.queryById(organizationId, projectId, createDTO.getFieldId());
+            ObjectSchemeFieldDTO field = objectSchemeFieldService.baseQueryById(organizationId, projectId, createDTO.getFieldId());
             if (field.getSystem()) {
                 throw new CommonException(ERROR_SYSTEM_ILLEGAL);
             }
@@ -94,7 +94,7 @@ public class FieldValueServiceImpl implements FieldValueService {
             throw new CommonException(ERROR_FIELDTYPE_ILLEGAL);
         }
         //校验
-        ObjectSchemeFieldDTO field = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
+        ObjectSchemeFieldDTO field = objectSchemeFieldService.baseQueryById(organizationId, projectId, fieldId);
         //获取原fieldValue
         List<FieldValueDTO> oldFieldValues = fieldValueMapper.queryList(projectId, instanceId, schemeCode, fieldId);
         //删除原fieldValue
@@ -171,7 +171,7 @@ public class FieldValueServiceImpl implements FieldValueService {
         Map<Long, List<FieldValueVO>> valueGroup = values.stream().collect(Collectors.groupingBy(FieldValueVO::getFieldId));
 
         valueGroup.forEach((fieldId, fieldValueDTOList) -> {
-            ObjectSchemeFieldDTO objectSchemeField = objectSchemeFieldRepository.queryById(organizationId, projectId, fieldId);
+            ObjectSchemeFieldDTO objectSchemeField = objectSchemeFieldService.baseQueryById(organizationId, projectId, fieldId);
             PageFieldViewVO view = new PageFieldViewVO();
             FieldValueUtil.handleDTO2Value(view, objectSchemeField.getFieldType(), fieldValueDTOList, userMap, true);
             result.put(objectSchemeField.getCode(), view.getValueStr().toString());
@@ -189,7 +189,7 @@ public class FieldValueServiceImpl implements FieldValueService {
                 Sort.Order order = iterator.next();
                 fieldCode = order.getProperty();
             }
-            ObjectSchemeFieldDTO objectSchemeField = objectSchemeFieldRepository.queryByFieldCode(organizationId, projectId, fieldCode);
+            ObjectSchemeFieldDTO objectSchemeField = objectSchemeFieldService.queryByFieldCode(organizationId, projectId, fieldCode);
             String fieldType = objectSchemeField.getFieldType();
             FieldValueUtil.handleAgileSortPageRequest(fieldCode, fieldType, pageRequest);
             return fieldValueMapper.sortIssueIdsByFieldValue(organizationId, projectId, objectSchemeField.getId(), PageUtil.sortToSql(pageRequest.getSort()));

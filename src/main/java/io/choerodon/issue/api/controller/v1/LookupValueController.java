@@ -2,7 +2,6 @@ package io.choerodon.issue.api.controller.v1;
 
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.enums.ResourceType;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.issue.api.vo.LookupTypeWithValuesVO;
 import io.choerodon.issue.app.service.LookupValueService;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 /**
  * Created by HuangFuqiang@choerodon.io on 2018/09/27.
@@ -33,12 +30,10 @@ public class LookupValueController {
     @ApiOperation("根据type code查询其下的value值")
     @GetMapping(value = "/{typeCode}")
     public ResponseEntity<LookupTypeWithValuesVO> queryLookupValueByCode(@ApiParam(value = "项目id", required = true)
-                                                                          @PathVariable(name = "organization_id") Long organizationId,
+                                                                         @PathVariable(name = "organization_id") Long organizationId,
                                                                          @ApiParam(value = "type code", required = true)
-                                                                          @PathVariable String typeCode) {
-        return Optional.ofNullable(lookupValueService.queryLookupValueByCode(organizationId, typeCode))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.lookupValueList.get"));
+                                                                         @PathVariable String typeCode) {
+        return new ResponseEntity<>(lookupValueService.queryLookupValueByCode(organizationId, typeCode), HttpStatus.OK);
     }
 
 }

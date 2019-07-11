@@ -31,10 +31,8 @@ public class StateMachineSchemeController {
 
     @Autowired
     private StateMachineSchemeService schemeService;
-
     @Autowired
     private StateMachineSchemeValidator schemeValidator;
-
     @Autowired
     private StateMachineSchemeConfigService configService;
 

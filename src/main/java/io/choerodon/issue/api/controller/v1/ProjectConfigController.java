@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/projects/{project_id}/project_configs")
 public class ProjectConfigController {
+
     @Autowired
     ProjectConfigService projectConfigService;
 

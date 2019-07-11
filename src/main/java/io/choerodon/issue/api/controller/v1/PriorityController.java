@@ -3,9 +3,9 @@ package io.choerodon.issue.api.controller.v1;
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.issue.api.validator.PriorityValidator;
 import io.choerodon.issue.api.vo.PriorityVO;
 import io.choerodon.issue.app.service.PriorityService;
-import io.choerodon.issue.api.validator.PriorityValidator;
 import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;
@@ -94,7 +94,7 @@ public class PriorityController {
     @ApiOperation(value = "根据组织id查询优先级,map")
     @GetMapping("/organizations/{organization_id}/priority/list")
     public ResponseEntity<Map<Long, PriorityVO>> queryByOrganizationId(@ApiParam(value = "组织id", required = true)
-                                                                        @PathVariable("organization_id") Long organizationId) {
+                                                                       @PathVariable("organization_id") Long organizationId) {
         return Optional.ofNullable(priorityService.queryByOrganizationId(organizationId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
@@ -105,7 +105,7 @@ public class PriorityController {
     @ApiOperation(value = "根据组织id查询默认优先级")
     @GetMapping("/organizations/{organization_id}/priority/default")
     public ResponseEntity<PriorityVO> queryDefaultByOrganizationId(@ApiParam(value = "组织id", required = true)
-                                                                    @PathVariable("organization_id") Long organizationId) {
+                                                                   @PathVariable("organization_id") Long organizationId) {
         return Optional.ofNullable(priorityService.queryDefaultByOrganizationId(organizationId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.priority.get"));
@@ -116,7 +116,7 @@ public class PriorityController {
     @ApiOperation(value = "根据组织id查询优先级,list")
     @GetMapping("/organizations/{organization_id}/priority/list_by_org")
     public ResponseEntity<List<PriorityVO>> queryByOrganizationIdList(@ApiParam(value = "组织id", required = true)
-                                                                       @PathVariable("organization_id") Long organizationId) {
+                                                                      @PathVariable("organization_id") Long organizationId) {
         return Optional.ofNullable(priorityService.queryByOrganizationIdList(organizationId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.priorityList.get"));
@@ -126,9 +126,9 @@ public class PriorityController {
     @ApiOperation(value = "根据id查询优先级")
     @GetMapping("/organizations/{organization_id}/priority/{id}")
     public ResponseEntity<PriorityVO> queryById(@ApiParam(value = "组织id", required = true)
-                                                 @PathVariable("organization_id") Long organizationId,
+                                                @PathVariable("organization_id") Long organizationId,
                                                 @ApiParam(value = "id", required = true)
-                                                 @PathVariable Long id) {
+                                                @PathVariable Long id) {
         return Optional.ofNullable(priorityService.queryById(organizationId, id))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.CREATED))
                 .orElseThrow(() -> new CommonException("error.priority.get"));
@@ -139,7 +139,7 @@ public class PriorityController {
     @GetMapping("/organizations/{organization_id}/priority/enable/{id}")
     public ResponseEntity<PriorityVO> enablePriority(@PathVariable("organization_id") Long organizationId,
                                                      @ApiParam(value = "id", required = true)
-                                                      @PathVariable Long id,
+                                                     @PathVariable Long id,
                                                      @RequestParam(required = false) Boolean enable) {
         return new ResponseEntity<>(priorityService.enablePriority(organizationId, id, enable), HttpStatus.OK);
     }

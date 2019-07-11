@@ -8,7 +8,6 @@ import io.choerodon.issue.app.service.FieldOptionService;
 import io.choerodon.issue.app.service.FieldValueService;
 import io.choerodon.issue.infra.dto.FieldOptionDTO;
 import io.choerodon.issue.infra.mapper.FieldOptionMapper;
-import io.choerodon.issue.infra.repository.FieldOptionRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +25,51 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FieldOptionServiceImpl implements FieldOptionService {
-    private static final String ERROR_OPTION_ILLEGAL = "error.fieldOption.illegal";
+    private static final String ERROR_OPTION_ILLEGAL = "error.option.illegal";
+    private static final String ERROR_OPTION_CREATE = "error.option.create";
+    private static final String ERROR_OPTION_DELETE = "error.option.delete";
+    private static final String ERROR_OPTION_NOTFOUND = "error.option.notFound";
+    private static final String ERROR_OPTION_UPDATE = "error.option.update";
     @Autowired
     private FieldOptionMapper fieldOptionMapper;
-    @Autowired
-    private FieldOptionRepository fieldOptionRepository;
     @Autowired
     private FieldValueService fieldValueService;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Override
+    public FieldOptionDTO baseCreate(FieldOptionDTO option) {
+        if (fieldOptionMapper.insert(option) != 1) {
+            throw new CommonException(ERROR_OPTION_CREATE);
+        }
+        return fieldOptionMapper.selectByPrimaryKey(option.getId());
+    }
+
+    @Override
+    public void baseDelete(Long optionId) {
+        if (fieldOptionMapper.deleteByPrimaryKey(optionId) != 1) {
+            throw new CommonException(ERROR_OPTION_DELETE);
+        }
+    }
+
+    @Override
+    public void baseUpdate(FieldOptionDTO option) {
+        if (fieldOptionMapper.updateByPrimaryKeySelective(option) != 1) {
+            throw new CommonException(ERROR_OPTION_UPDATE);
+        }
+    }
+
+    @Override
+    public FieldOptionDTO baseQueryById(Long organizationId, Long optionId) {
+        FieldOptionDTO option = fieldOptionMapper.selectByPrimaryKey(optionId);
+        if (option == null) {
+            throw new CommonException(ERROR_OPTION_NOTFOUND);
+        }
+        if (!option.getOrganizationId().equals(organizationId)) {
+            throw new CommonException(ERROR_OPTION_ILLEGAL);
+        }
+        return option;
+    }
 
     @Override
     public synchronized String handleFieldOption(Long organizationId, Long fieldId, List<FieldOptionUpdateVO> newOptions) {
@@ -88,7 +123,7 @@ public class FieldOptionServiceImpl implements FieldOptionService {
         FieldOptionDTO fieldOption = modelMapper.map(optionDTO, FieldOptionDTO.class);
         fieldOption.setOrganizationId(organizationId);
         fieldOption.setFieldId(fieldId);
-        fieldOptionRepository.create(fieldOption);
+        baseCreate(fieldOption);
         optionDTO.setId(fieldOption.getId());
     }
 

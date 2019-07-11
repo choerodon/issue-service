@@ -27,6 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping(value = "/v1/organizations/{organization_id}/object_scheme")
 public class ObjectSchemeController extends BaseController {
+
     @Autowired
     private ObjectSchemeService objectSchemeService;
 

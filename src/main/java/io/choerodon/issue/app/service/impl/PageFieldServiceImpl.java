@@ -9,7 +9,6 @@ import io.choerodon.issue.infra.annotation.CopyPageField;
 import io.choerodon.issue.infra.dto.*;
 import io.choerodon.issue.infra.enums.*;
 import io.choerodon.issue.infra.mapper.*;
-import io.choerodon.issue.infra.repository.PageFieldRepository;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import io.choerodon.issue.infra.utils.FieldValueUtil;
 import io.choerodon.issue.infra.utils.RankUtil;
@@ -35,11 +34,13 @@ public class PageFieldServiceImpl implements PageFieldService {
     private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
     private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
     private static final String ERROR_FIELDCODE_ILLEGAL = "error.fieldCode.illegal";
+    private static final String ERROR_PAGEFIELD_CREATE = "error.pageField.create";
+    private static final String ERROR_PAGEFIELD_DELETE = "error.pageField.delete";
+    private static final String ERROR_PAGEFIELD_NOTFOUND = "error.pageField.notFound";
+    private static final String ERROR_PAGEFIELD_UPDATE = "error.pageField.update";
 
     @Autowired
     private PageFieldMapper pageFieldMapper;
-    @Autowired
-    private PageFieldRepository pageFieldRepository;
     @Autowired
     private PageMapper pageMapper;
     @Autowired
@@ -54,6 +55,37 @@ public class PageFieldServiceImpl implements PageFieldService {
     private LookupValueMapper lookupValueMapper;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Override
+    public PageFieldDTO baseCreate(PageFieldDTO field) {
+        if (pageFieldMapper.insert(field) != 1) {
+            throw new CommonException(ERROR_PAGEFIELD_CREATE);
+        }
+        return pageFieldMapper.selectByPrimaryKey(field.getId());
+    }
+
+    @Override
+    public void baseDelete(Long fieldId) {
+        if (pageFieldMapper.deleteByPrimaryKey(fieldId) != 1) {
+            throw new CommonException(ERROR_PAGEFIELD_DELETE);
+        }
+    }
+
+    @Override
+    public void baseUpdate(PageFieldDTO pageField) {
+        if (pageFieldMapper.updateByPrimaryKeySelective(pageField) != 1) {
+            throw new CommonException(ERROR_PAGEFIELD_UPDATE);
+        }
+    }
+
+    @Override
+    public PageFieldDTO baseQueryById(Long organizationId, Long projectId, Long pageFieldId) {
+        PageFieldDTO pageField = pageFieldMapper.selectByPrimaryKey(pageFieldId);
+        if (pageField == null) {
+            throw new CommonException(ERROR_PAGEFIELD_NOTFOUND);
+        }
+        return pageField;
+    }
 
     @Override
     public Map<String, Object> listQuery(Long organizationId, Long projectId, String pageCode, String context) {
@@ -142,7 +174,7 @@ public class PageFieldServiceImpl implements PageFieldService {
                 update.setRank(RankUtil.between(outset.getRank(), rightRank));
             }
         }
-        pageFieldRepository.update(update);
+        baseUpdate(update);
         return modelMapper.map(pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, current.getFieldId()), PageFieldVO.class);
     }
 
@@ -155,7 +187,7 @@ public class PageFieldServiceImpl implements PageFieldService {
         PageFieldDTO field = pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, fieldId);
         PageFieldDTO update = modelMapper.map(updateDTO, PageFieldDTO.class);
         update.setId(field.getId());
-        pageFieldRepository.update(update);
+        baseUpdate(update);
         return modelMapper.map(pageFieldMapper.queryByFieldId(organizationId, projectId, pageCode, fieldId), PageFieldVO.class);
     }
 
@@ -225,7 +257,7 @@ public class PageFieldServiceImpl implements PageFieldService {
                 minRank = pageFieldMapper.queryMinRank(organizationId, projectId, page.getPageCode());
             }
             pageField.setRank(RankUtil.genPre(minRank));
-            pageFieldRepository.create(pageField);
+            baseCreate(pageField);
         });
     }
 
@@ -251,12 +283,12 @@ public class PageFieldServiceImpl implements PageFieldService {
                 minRank = pageFieldMapper.queryMinRank(organizationId, null, page.getPageCode());
             }
             pageField.setRank(RankUtil.genPre(minRank));
-            pageFieldRepository.create(pageField);
+            baseCreate(pageField);
             //项目层创建pageField
             projectPageFields.forEach(projectPageField -> {
                 pageField.setId(null);
                 pageField.setProjectId(projectPageField.getProjectId());
-                pageFieldRepository.create(pageField);
+                baseCreate(pageField);
             });
         });
     }
@@ -300,10 +332,8 @@ public class PageFieldServiceImpl implements PageFieldService {
     @Override
     public Map<Long, Map<String, String>> queryFieldValueWithIssueIdsForAgileExport(Long organizationId, Long projectId, List<Long> instanceIds) {
         Map<Long, Map<String, String>> result = new HashMap<>();
-
         instanceIds.forEach(instanceId -> result.put(instanceId, fieldValueService
                 .queryFieldValueMapWithInstanceId(organizationId, projectId, instanceId)));
-
         return result;
     }
 }

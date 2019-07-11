@@ -7,7 +7,6 @@ import io.choerodon.issue.app.service.FieldDataLogService;
 import io.choerodon.issue.infra.dto.FieldDataLogDTO;
 import io.choerodon.issue.infra.enums.ObjectSchemeCode;
 import io.choerodon.issue.infra.mapper.FieldDataLogMapper;
-import io.choerodon.issue.infra.repository.FieldDataLogRepository;
 import io.choerodon.issue.infra.utils.EnumUtil;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -25,25 +24,27 @@ import java.util.List;
 @Transactional(rollbackFor = Exception.class)
 public class FieldDataLogServiceImpl implements FieldDataLogService {
 
-    private static final String ERROR_PAGECODE_ILLEGAL = "error.pageCode.illegal";
-    private static final String ERROR_CONTEXT_ILLEGAL = "error.context.illegal";
+    private static final String ERROR_DATALOG_CREATE = "error.dataLog.create";
     private static final String ERROR_SCHEMECODE_ILLEGAL = "error.schemeCode.illegal";
-    private static final String ERROR_OPTION_ILLEGAL = "error.option.illegal";
-    private static final String ERROR_FIELDTYPE_ILLEGAL = "error.fieldType.illegal";
-    private static final String ERROR_SYSTEM_ILLEGAL = "error.system.illegal";
     @Autowired
     private FieldDataLogMapper fieldDataLogMapper;
     @Autowired
-    private FieldDataLogRepository fieldDataLogRepository;
-    @Autowired
     private ModelMapper modelMapper;
+
+    @Override
+    public FieldDataLogDTO baseCreate(FieldDataLogDTO create) {
+        if (fieldDataLogMapper.insert(create) != 1) {
+            throw new CommonException(ERROR_DATALOG_CREATE);
+        }
+        return fieldDataLogMapper.selectByPrimaryKey(create.getId());
+    }
 
     @Override
     public FieldDataLogVO createDataLog(Long projectId, String schemeCode, FieldDataLogCreateVO create) {
         FieldDataLogDTO dataLog = modelMapper.map(create, FieldDataLogDTO.class);
         dataLog.setProjectId(projectId);
         dataLog.setSchemeCode(schemeCode);
-        return modelMapper.map(fieldDataLogRepository.create(dataLog), FieldDataLogVO.class);
+        return modelMapper.map(baseCreate(dataLog), FieldDataLogVO.class);
     }
 
     @Override

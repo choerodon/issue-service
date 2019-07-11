@@ -13,6 +13,14 @@ import java.util.Map;
  */
 public interface PageFieldService {
 
+    PageFieldDTO baseCreate(PageFieldDTO pageField);
+
+    void baseDelete(Long pageFieldId);
+
+    void baseUpdate(PageFieldDTO pageField);
+
+    PageFieldDTO baseQueryById(Long organizationId, Long projectId, Long pageFieldId);
+
     /**
      * 根据pageCode和context获取pageField，不存在则创建
      *

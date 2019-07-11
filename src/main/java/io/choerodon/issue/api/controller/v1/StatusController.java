@@ -37,7 +37,6 @@ public class StatusController extends BaseController {
 
     @Autowired
     private StatusService statusService;
-
     @Autowired
     private StateValidator stateValidator;
 

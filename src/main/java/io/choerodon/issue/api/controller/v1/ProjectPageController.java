@@ -27,6 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping(value = "/v1/projects/{project_id}/page")
 public class ProjectPageController extends BaseController {
+
     @Autowired
     private PageService pageService;
 

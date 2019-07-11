@@ -27,7 +27,6 @@ public class StateMachineTransformController extends BaseController {
 
     @Autowired
     private StateMachineTransformService transformService;
-
     @Autowired
     private StateMachineTransformValidator transformValidator;
 

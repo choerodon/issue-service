@@ -2,7 +2,6 @@ package io.choerodon.issue.api.controller.v1;
 
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.enums.ResourceType;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.api.vo.LookupTypeVO;
 import io.choerodon.issue.app.service.LookupTypeService;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by HuangFuqiang@choerodon.io on 2018/09/27.
@@ -26,7 +24,6 @@ import java.util.Optional;
 @RequestMapping(value = "/v1/organizations/{organization_id}/lookup_types")
 public class LookupTypeController {
 
-
     @Autowired
     private LookupTypeService lookupTypeService;
 
@@ -34,10 +31,7 @@ public class LookupTypeController {
     @ApiOperation("查询所有lookup type类型")
     @GetMapping
     public ResponseEntity<List<LookupTypeVO>> listLookupType(@ApiParam(value = "项目id", required = true)
-                                                              @PathVariable(name = "organization_id") Long organizationId) {
-        return Optional.ofNullable(lookupTypeService.listLookupType(organizationId))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.lookupTypeList.get"));
+                                                             @PathVariable(name = "organization_id") Long organizationId) {
+        return new ResponseEntity<>(lookupTypeService.listLookupType(organizationId), HttpStatus.OK);
     }
-
 }
