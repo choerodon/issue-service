@@ -15,6 +15,8 @@ const PriorityIndex = asyncRouter(() => import('./organization/priority'));
 const IssueTypeScreenSchemes = asyncRouter(() => import('./organization/issueTypeScreenSchemes'));
 const StateIndex = asyncRouter(() => import('./organization/state'));
 const StateMachineIndex = asyncRouter(() => import('./organization/stateMachine'));
+const OBJECTSCHEMEINDEX = asyncRouter(() => import('./organization/ObjectScheme'));
+const PAGEINDEX = asyncRouter(() => import('./organization/Page'));
 
 @inject('AppState')
 class ISSUEIndex extends React.Component {
@@ -52,6 +54,14 @@ class ISSUEIndex extends React.Component {
           <Route
             path={`${match.url}/state-machines`}
             component={StateMachineIndex}
+          />
+          <Route
+            path={`${match.url}/objectScheme`}
+            component={OBJECTSCHEMEINDEX}
+          />
+          <Route
+            path={`${match.url}/page`}
+            component={PAGEINDEX}
           />
           <Route path="*" component={nomatch} />
         </Switch>
