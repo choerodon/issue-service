@@ -19,7 +19,7 @@ import spock.lang.Stepwise
 @Import(IntegrationTestConfiguration)
 @ActiveProfiles("test")
 @Stepwise
-class ProjectConfigControllerTest extends Specification {
+class ProjectConfigControllerSpec extends Specification {
 
     @Autowired
     TestRestTemplate restTemplate

@@ -6,12 +6,12 @@ import io.choerodon.base.domain.PageRequest;
 import io.choerodon.base.domain.Sort;
 import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.vo.StateMachineVO;
+import io.choerodon.issue.api.validator.StateMachineValidator;
 import io.choerodon.issue.api.vo.StateMachineListVO;
-import io.choerodon.issue.app.service.InitService;
+import io.choerodon.issue.api.vo.StateMachineVO;
 import io.choerodon.issue.app.service.ProjectConfigService;
 import io.choerodon.issue.app.service.StateMachineService;
-import io.choerodon.issue.api.validator.StateMachineValidator;
+import io.choerodon.issue.infra.utils.ParamUtils;
 import io.choerodon.mybatis.annotation.SortDefault;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -34,8 +33,6 @@ public class StateMachineController {
     @Autowired
     private StateMachineValidator stateMachineValidator;
     @Autowired
-    private InitService initService;
-    @Autowired
     private ProjectConfigService projectConfigService;
 
 
@@ -45,11 +42,11 @@ public class StateMachineController {
     @GetMapping
     public ResponseEntity<PageInfo<StateMachineListVO>> pagingQuery(@PathVariable("organization_id") Long organizationId,
                                                                     @ApiIgnore
-                                                                     @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                    @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                     @RequestParam(required = false) String name,
                                                                     @RequestParam(required = false) String description,
                                                                     @RequestParam(required = false) String[] param) {
-        return new ResponseEntity<>(stateMachineService.pageQuery(organizationId, pageRequest, name, description, param), HttpStatus.OK);
+        return new ResponseEntity<>(stateMachineService.pageQuery(organizationId, pageRequest, name, description, ParamUtils.arrToStr(param)), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.ORGANIZATION)
@@ -135,26 +132,5 @@ public class StateMachineController {
     @GetMapping(value = "/query_all")
     public ResponseEntity<List<StateMachineVO>> queryAll(@PathVariable("organization_id") Long organizationId) {
         return new ResponseEntity<>(stateMachineService.queryAll(organizationId), HttpStatus.OK);
-    }
-
-    @Permission(type = ResourceType.ORGANIZATION)
-    @ApiOperation(value = "【内部调用】查询状态机关联的项目id列表的Map")
-    @GetMapping(value = "/query_project_ids_map")
-    public ResponseEntity<Map<String, List<Long>>> queryProjectIdsMap(@PathVariable("organization_id") Long organizationId,
-                                                                      @RequestParam("stateMachineId") Long stateMachineId) {
-        return Optional.ofNullable(projectConfigService.queryProjectIdsMap(organizationId, stateMachineId))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.queryProjectIdsMap.get"));
-    }
-
-    @Permission(type = ResourceType.ORGANIZATION)
-    @ApiOperation(value = "【内部调用】状态机删除节点的校验，是否可以直接删除")
-    @GetMapping(value = "/check_delete_node")
-    public ResponseEntity<Map<String, Object>> checkDeleteNode(@PathVariable("organization_id") Long organizationId,
-                                                               @RequestParam("stateMachineId") Long stateMachineId,
-                                                               @RequestParam("statusId") Long statusId) {
-        return Optional.ofNullable(stateMachineService.checkDeleteNode(organizationId, stateMachineId, statusId))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.checkDeleteNode.get"));
     }
 }

@@ -80,14 +80,14 @@ public class StateMachineServiceImpl implements StateMachineService {
     private ModelMapper modelMapper;
 
     @Override
-    public PageInfo<StateMachineListVO> pageQuery(Long organizationId, PageRequest pageRequest, String name, String description, String[] param) {
+    public PageInfo<StateMachineListVO> pageQuery(Long organizationId, PageRequest pageRequest, String name, String description, String param) {
         StateMachineDTO stateMachine = new StateMachineDTO();
         stateMachine.setName(name);
         stateMachine.setDescription(description);
         stateMachine.setOrganizationId(organizationId);
 
         PageInfo<StateMachineDTO> page = PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), PageUtil.sortToSql(pageRequest.getSort())).doSelectPageInfo(
-                () -> stateMachineMapper.fulltextSearch(stateMachine, Arrays.asList(param).stream().collect(Collectors.joining(","))));
+                () -> stateMachineMapper.fulltextSearch(stateMachine, param));
         List<StateMachineListVO> stateMachineVOS = modelMapper.map(page.getList(), new TypeToken<List<StateMachineListVO>>() {
         }.getType());
         for (StateMachineListVO stateMachineVO : stateMachineVOS) {

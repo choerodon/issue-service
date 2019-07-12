@@ -33,7 +33,6 @@ import spock.mock.DetachedMockFactory
 import javax.annotation.PostConstruct
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
-
 /**
  * Created by hailuoliu@choerodon.io on 2018/7/13.
  */

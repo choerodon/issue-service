@@ -1,12 +1,12 @@
 package io.choerodon.issue.api.controller
 
+import com.github.pagehelper.PageInfo
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.vo.IssueTypeVO
-import io.choerodon.issue.api.vo.IssueTypeSchemeVO
 import io.choerodon.issue.api.vo.IssueTypeSchemeSearchVO
+import io.choerodon.issue.api.vo.IssueTypeSchemeVO
+import io.choerodon.issue.api.vo.IssueTypeVO
 import io.choerodon.issue.app.service.IssueTypeSchemeService
 import io.choerodon.issue.app.service.IssueTypeService
-import com.github.pagehelper.PageInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -17,8 +17,6 @@ import org.springframework.test.context.ActiveProfiles
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
-
-
 /**
  * @author shinan.chen
  * @date 2018/8/16

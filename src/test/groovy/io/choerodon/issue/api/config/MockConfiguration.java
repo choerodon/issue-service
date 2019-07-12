@@ -126,11 +126,12 @@ public class MockConfiguration {
     @SuppressWarnings("unchecked")
     AgileFeignClient agileFeignClient() {
         AgileFeignClient agileFeignClient = Mockito.mock(AgileFeignClientFallback.class);
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(2);
         Map<Long, Long> map2 = new HashMap<>();
-        map.put("XX", "XX");
+        result.put("canDelete", true);
+        result.put("count", 0);
         map2.put(1L, 1L);
-        Mockito.when(agileFeignClient.checkDeleteNode(Matchers.anyLong(), Matchers.anyLong(), Matchers.any(List.class))).thenReturn(new ResponseEntity<>(map, HttpStatus.OK));
+        Mockito.when(agileFeignClient.checkDeleteNode(Matchers.anyLong(), Matchers.anyLong(), Matchers.any(List.class))).thenReturn(new ResponseEntity<>(result, HttpStatus.OK));
         Mockito.when(agileFeignClient.checkStateMachineSchemeChange(Matchers.anyLong(), Matchers.any(StateMachineSchemeDeployCheckIssue.class))).thenReturn(new ResponseEntity<>(map2, HttpStatus.OK));
         return agileFeignClient;
     }

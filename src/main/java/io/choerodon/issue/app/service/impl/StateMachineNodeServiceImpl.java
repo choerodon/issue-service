@@ -190,7 +190,7 @@ public class StateMachineNodeServiceImpl implements StateMachineNodeService {
         if (isDraft) {
             //获取节点
             List<StateMachineNodeDraftDTO> nodes = nodeDraftMapper.selectByStateMachineId(stateMachineId);
-            Map<Long, StatusDTO> map = nodes.stream().collect(Collectors.toMap(StateMachineNodeDraftDTO::getId, StateMachineNodeDraftDTO::getStatus));
+            Map<Long, StatusDTO> map = nodes.stream().filter(x->x.getStatus()!=null).collect(Collectors.toMap(StateMachineNodeDraftDTO::getId, StateMachineNodeDraftDTO::getStatus));
             nodeVOS = modelMapper.map(nodes, new TypeToken<List<StateMachineNodeVO>>() {
             }.getType());
             for (StateMachineNodeVO nodeVO : nodeVOS) {
@@ -201,7 +201,7 @@ public class StateMachineNodeServiceImpl implements StateMachineNodeService {
             }
         } else {
             List<StateMachineNodeDTO> nodes = nodeDeployMapper.selectByStateMachineId(stateMachineId);
-            Map<Long, StatusDTO> map = nodes.stream().collect(Collectors.toMap(StateMachineNodeDTO::getId, StateMachineNodeDTO::getStatus));
+            Map<Long, StatusDTO> map = nodes.stream().filter(x->x.getStatus()!=null).collect(Collectors.toMap(StateMachineNodeDTO::getId, StateMachineNodeDTO::getStatus));
             nodeVOS = modelMapper.map(nodes, new TypeToken<List<StateMachineNodeVO>>() {
             }.getType());
             for (StateMachineNodeVO nodeVO : nodeVOS) {

@@ -27,7 +27,7 @@ public interface StateMachineService {
      * @param param          模糊查询参数
      * @return 状态机列表
      */
-    PageInfo<StateMachineListVO> pageQuery(Long organizationId, PageRequest pageRequest, String name, String description, String[] param);
+    PageInfo<StateMachineListVO> pageQuery(Long organizationId, PageRequest pageRequest, String name, String description, String param);
 
     /**
      * 创建状态机及配置

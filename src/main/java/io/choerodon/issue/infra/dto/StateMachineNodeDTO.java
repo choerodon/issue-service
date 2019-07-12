@@ -28,7 +28,6 @@ public class StateMachineNodeDTO extends BaseDTO {
     @Transient
     private StatusDTO status;
 
-
     public Long getId() {
         return id;
     }
