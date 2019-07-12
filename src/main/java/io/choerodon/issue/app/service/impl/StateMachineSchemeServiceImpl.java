@@ -13,7 +13,7 @@ import io.choerodon.issue.infra.enums.SchemeApplyType;
 import io.choerodon.issue.infra.enums.SchemeType;
 import io.choerodon.issue.infra.enums.StateMachineSchemeDeployStatus;
 import io.choerodon.issue.infra.enums.StateMachineSchemeStatus;
-import io.choerodon.issue.infra.feign.UserFeignClient;
+import io.choerodon.issue.infra.feign.IamFeignClient;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import io.choerodon.issue.infra.mapper.IssueTypeMapper;
 import io.choerodon.issue.infra.mapper.StateMachineSchemeMapper;
@@ -53,7 +53,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
     @Autowired
     private ProjectConfigService projectConfigService;
     @Autowired
-    private UserFeignClient userFeignClient;
+    private IamFeignClient iamFeignClient;
     @Autowired
     private InitService initService;
     @Autowired
@@ -62,7 +62,7 @@ public class StateMachineSchemeServiceImpl implements StateMachineSchemeService 
     @Override
     public PageInfo<StateMachineSchemeVO> pageQuery(Long organizationId, PageRequest pageRequest, StateMachineSchemeVO schemeVO, String params) {
         //查询出组织下的所有项目
-        List<ProjectVO> projectVOS = userFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
+        List<ProjectVO> projectVOS = iamFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
         Map<Long, ProjectVO> projectMap = projectVOS.stream().collect(Collectors.toMap(ProjectVO::getId, x -> x));
         //查询组织下的所有问题类型
         List<IssueTypeDTO> issueTypes = issueTypeMapper.queryByOrgId(organizationId);

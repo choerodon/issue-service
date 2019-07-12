@@ -1,7 +1,7 @@
 package io.choerodon.issue.infra.utils;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.infra.feign.UserFeignClient;
+import io.choerodon.issue.infra.feign.IamFeignClient;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.util.Map;
 @Component
 public class ProjectUtil {
     @Autowired
-    private UserFeignClient iamServiceFeign;
+    private IamFeignClient iamFeignClient;
 
     protected static final Map<Long, ProjectVO> map = new HashMap<>();
 
@@ -38,7 +38,7 @@ public class ProjectUtil {
         if (projectVO != null) {
             return projectVO;
         } else {
-            projectVO = iamServiceFeign.queryProject(projectId).getBody();
+            projectVO = iamFeignClient.queryProject(projectId).getBody();
             if (projectVO != null) {
                 map.put(projectId, projectVO);
                 return projectVO;

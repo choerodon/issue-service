@@ -1,5 +1,7 @@
 package io.choerodon.issue.infra.feign.fallback;
 
+import com.github.pagehelper.PageInfo;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.issue.infra.feign.IamFeignClient;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
@@ -17,6 +19,16 @@ import java.util.List;
 public class IamFeignClientFallback implements IamFeignClient {
     private static final String BATCH_QUERY_ERROR = "error.UserFeign.queryList";
     private static final String PROJECT_INFO_ERROR = "error.UserFeign.queryProjectInfo";
+
+    @Override
+    public ResponseEntity<ProjectVO> queryProject(Long projectId) {
+        throw new CommonException("error.userFeign.queryProject");
+    }
+
+    @Override
+    public ResponseEntity<PageInfo<ProjectVO>> queryProjectsByOrgId(Long organizationId, Integer page, Integer size) {
+        throw new CommonException("error.iamServiceFeignFallback.queryProjectsByOrgId");
+    }
 
     @Override
     public ResponseEntity<List<UserVO>> listUsersByIds(Long[] ids, Boolean onlyEnabled) {

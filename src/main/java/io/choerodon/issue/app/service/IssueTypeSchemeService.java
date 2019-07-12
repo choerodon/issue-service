@@ -1,11 +1,12 @@
 package io.choerodon.issue.app.service;
 
-import io.choerodon.base.domain.PageRequest;
 import com.github.pagehelper.PageInfo;
-import io.choerodon.issue.api.vo.IssueTypeVO;
-import io.choerodon.issue.api.vo.IssueTypeSchemeVO;
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.issue.api.vo.IssueTypeSchemeSearchVO;
+import io.choerodon.issue.api.vo.IssueTypeSchemeVO;
 import io.choerodon.issue.api.vo.IssueTypeSchemeWithInfoVO;
+import io.choerodon.issue.api.vo.IssueTypeVO;
+import io.choerodon.issue.infra.dto.IssueTypeSchemeDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import java.util.Map;
  * @Date 2018/8/10
  */
 public interface IssueTypeSchemeService {
+
+    IssueTypeSchemeDTO baseCreate(IssueTypeSchemeDTO scheme);
 
     /**
      * 查询方案

@@ -20,7 +20,7 @@
         SELECT os.*,
         flv.name as scheme_code_name
         FROM object_scheme os
-        LEFT JOIN foundation_lookup_value flv ON flv.value_code = os.scheme_code and flv.type_code =
+        LEFT JOIN lookup_value flv ON flv.value_code = os.scheme_code and flv.type_code =
         'object_scheme_code'
         WHERE (os.is_system = 1 OR os.organization_id = #{organizationId})
         <if test="searchVO.name != null">

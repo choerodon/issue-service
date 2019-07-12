@@ -14,7 +14,7 @@ public interface StateMachineNodeService {
      * 创建状态节点
      *
      * @param organizationId
-     * @param nodeDTO
+     * @param nodeVO
      * @return
      */
     List<StateMachineNodeVO> create(Long organizationId, Long stateMachineId, StateMachineNodeVO nodeVO);

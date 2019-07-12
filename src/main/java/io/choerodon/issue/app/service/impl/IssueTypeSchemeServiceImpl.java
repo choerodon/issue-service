@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 @RefreshScope
 public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
 
+    private static final String ERROR_SCHEME_CREATE = "error.issueTypeScheme.create";
     @Autowired
     private IssueTypeSchemeMapper issueTypeSchemeMapper;
     @Autowired
@@ -59,6 +60,14 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
     private PriorityService priorityService;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Override
+    public IssueTypeSchemeDTO baseCreate(IssueTypeSchemeDTO scheme) {
+        if (issueTypeSchemeMapper.insert(scheme) != 1) {
+            throw new CommonException(ERROR_SCHEME_CREATE);
+        }
+        return issueTypeSchemeMapper.selectByPrimaryKey(scheme.getId());
+    }
 
     @Override
     public IssueTypeSchemeVO queryById(Long organizationId, Long issueTypeSchemeId) {
@@ -86,9 +95,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
 
         issueTypeSchemeVO.setOrganizationId(organizationId);
         IssueTypeSchemeDTO issueTypeScheme = modelMapper.map(issueTypeSchemeVO, IssueTypeSchemeDTO.class);
-        if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
-            throw new CommonException("error.issueType.create");
-        }
+        baseCreate(issueTypeScheme);
         //创建方案配置
         createConfig(organizationId, issueTypeScheme.getId(), issueTypeSchemeVO.getIssueTypes());
 
@@ -279,9 +286,7 @@ public class IssueTypeSchemeServiceImpl implements IssueTypeSchemeService {
         //保证幂等性
         List<IssueTypeSchemeDTO> issueTypeSchemes = issueTypeSchemeMapper.select(issueTypeScheme);
         if (issueTypeSchemes.isEmpty()) {
-            if (issueTypeSchemeMapper.insert(issueTypeScheme) != 1) {
-                throw new CommonException("error.issueTypeScheme.create");
-            }
+            baseCreate(issueTypeScheme);
             Integer sequence = 0;
             for (InitIssueType initIssueType : InitIssueType.listByApplyType(schemeApplyType)) {
                 sequence++;

@@ -28,7 +28,7 @@
         SELECT osf.*,
         flv.name as field_type_name
         FROM object_scheme_field osf
-        LEFT JOIN foundation_lookup_value flv ON flv.value_code = osf.field_type and flv.type_code = 'field_type'
+        LEFT JOIN lookup_value flv ON flv.value_code = osf.field_type and flv.type_code = 'field_type'
         WHERE (osf.is_system = 1 OR (
         osf.organization_id = #{organizationId}
         AND osf.project_id is null
@@ -54,7 +54,7 @@
         SELECT osf.*,
         flv.name as field_type_name
         FROM object_scheme_field osf
-        LEFT JOIN foundation_lookup_value flv ON flv.value_code = osf.field_type AND flv.type_code = 'field_type'
+        LEFT JOIN lookup_value flv ON flv.value_code = osf.field_type AND flv.type_code = 'field_type'
         WHERE osf.id = #{fieldId}
     </select>
 
@@ -64,7 +64,7 @@
         flv.NAME AS field_type_name
         FROM
         object_scheme_field osf
-        LEFT JOIN foundation_lookup_value flv ON flv.value_code = osf.field_type
+        LEFT JOIN lookup_value flv ON flv.value_code = osf.field_type
         AND flv.type_code = 'field_type'
         WHERE
         (

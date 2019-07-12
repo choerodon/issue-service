@@ -40,7 +40,7 @@
         FROM page_field pf
         LEFT JOIN page p ON p.id = pf.page_id
         LEFT JOIN object_scheme_field osf ON osf.id = pf.field_id
-        LEFT JOIN foundation_lookup_value flv ON flv.value_code = osf.field_type and flv.type_code = 'field_type'
+        LEFT JOIN lookup_value flv ON flv.value_code = osf.field_type and flv.type_code = 'field_type'
         WHERE pf.organization_id = #{organizationId}
         <choose>
             <when test="projectId != null">

@@ -16,7 +16,7 @@ public interface StateMachineTransformService {
      * 创建转换
      *
      * @param organizationId
-     * @param transformDTO
+     * @param transformVO
      * @return
      */
     StateMachineTransformVO create(Long organizationId, Long stateMachineId, StateMachineTransformVO transformVO);

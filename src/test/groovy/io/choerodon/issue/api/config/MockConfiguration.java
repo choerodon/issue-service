@@ -12,18 +12,22 @@ import io.choerodon.issue.api.vo.payload.StateMachineSchemeDeployCheckIssue;
 import io.choerodon.issue.api.vo.payload.TransformInfo;
 import io.choerodon.issue.app.service.impl.InitServiceImpl;
 import io.choerodon.issue.app.service.impl.SagaServiceImpl;
+import io.choerodon.issue.infra.enums.ProjectCategoryCode;
 import io.choerodon.issue.infra.enums.TransformConditionStrategy;
 import io.choerodon.issue.infra.enums.TransformType;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.CustomFeignClientAdaptor;
-import io.choerodon.issue.infra.feign.UserFeignClient;
+import io.choerodon.issue.infra.feign.IamFeignClient;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.CustomFeignClientAdaptorFallBack;
-import io.choerodon.issue.infra.feign.fallback.UserFeignClientFallback;
+import io.choerodon.issue.infra.feign.fallback.IamFeignClientFallback;
+import io.choerodon.issue.infra.feign.vo.ProjectCategoryVO;
 import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.UserVO;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClientFallback;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -33,10 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author dinghuang123@gmail.com
@@ -80,21 +81,31 @@ public class MockConfiguration {
 
     @Bean
     @Primary
-    UserFeignClient userFeignClient() {
-        UserFeignClient userFeignClient = Mockito.mock(UserFeignClientFallback.class);
+    IamFeignClient iamFeignClient() {
+        IamFeignClient iamFeignClient = Mockito.mock(IamFeignClientFallback.class);
         ProjectVO projectVO = new ProjectVO();
         projectVO.setId(1L);
         projectVO.setName("test");
         projectVO.setOrganizationId(1L);
-        Mockito.when(userFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectVO, HttpStatus.OK));
+        Mockito.when(iamFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectVO, HttpStatus.OK));
         PageInfo<ProjectVO> projectVOS = new PageInfo<>();
         List<ProjectVO> projectVOList = new ArrayList<>(1);
         projectVOList.add(projectVO);
         projectVOS.setList(projectVOList);
         projectVOS.setPageSize(1);
         projectVOS.setSize(1);
-        Mockito.when(userFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(new ResponseEntity<>(projectVOS, HttpStatus.OK));
-        return userFeignClient;
+        Mockito.when(iamFeignClient.queryProjectsByOrgId(Matchers.anyLong(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(new ResponseEntity<>(projectVOS, HttpStatus.OK));
+        UserVO user = new UserVO();
+        user.setId(1L);
+        user.setRealName("test");
+        Mockito.when(iamFeignClient.listUsersByIds(ArgumentMatchers.anyObject(), ArgumentMatchers.anyBoolean())).thenReturn(new ResponseEntity<>(Arrays.asList(user), HttpStatus.OK));
+        ProjectVO project = new ProjectVO();
+        project.setId(1L);
+        ProjectCategoryVO category = new ProjectCategoryVO();
+        category.setCode(ProjectCategoryCode.PROGRAM);
+        project.setCategories(Arrays.asList(category));
+        Mockito.when(iamFeignClient.queryProjectInfo(ArgumentMatchers.anyLong())).thenReturn(new ResponseEntity<>(project, HttpStatus.OK));
+        return iamFeignClient;
     }
 
     @Bean
