@@ -26,7 +26,7 @@ class ProjectConfigControllerSpec extends Specification {
 
     def "queryById"() {
         when: '获取项目配置方案信息'
-        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/project_configs", ProjectConfigDetailVO, 1L)
+        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/project_config", ProjectConfigDetailVO, 1L)
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().is2xxSuccessful()

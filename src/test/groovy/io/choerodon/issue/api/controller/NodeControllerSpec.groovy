@@ -52,7 +52,7 @@ class NodeControllerSpec extends Specification {
     @Shared
     Long testOrganizationId = 2L
     @Shared
-    String baseUrl = '/v1/organizations/{organization_id}/state_machine_nodes'
+    String baseUrl = '/v1/organizations/{organization_id}/state_machine_node'
     @Shared
     List<StateMachineNodeDraftDTO> nodeDrafts = new ArrayList<>()
     /**

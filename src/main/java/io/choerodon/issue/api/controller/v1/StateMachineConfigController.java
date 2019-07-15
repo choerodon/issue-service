@@ -17,7 +17,7 @@ import java.util.List;
  * @author peng.jiang, dinghuang123@gmail.com
  */
 @RestController
-@RequestMapping(value = "/v1/organizations/{organization_id}/state_machine_configs")
+@RequestMapping(value = "/v1/organizations/{organization_id}/state_machine_config")
 public class StateMachineConfigController extends BaseController {
 
     @Autowired

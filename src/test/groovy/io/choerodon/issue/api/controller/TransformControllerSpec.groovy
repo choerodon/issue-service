@@ -53,7 +53,7 @@ class TransformControllerSpec extends Specification {
     @Shared
     Long testOrganizationId = 2L
     @Shared
-    String baseUrl = '/v1/organizations/{organization_id}/state_machine_transforms'
+    String baseUrl = '/v1/organizations/{organization_id}/state_machine_transform'
     @Shared
     List<StateMachineTransformDraftDTO> transformDrafts = new ArrayList<>()
     /**

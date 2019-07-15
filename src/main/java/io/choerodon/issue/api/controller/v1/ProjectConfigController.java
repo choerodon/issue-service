@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/v1/projects/{project_id}/project_configs")
+@RequestMapping("/v1/projects/{project_id}/project_config")
 public class ProjectConfigController {
 
     @Autowired

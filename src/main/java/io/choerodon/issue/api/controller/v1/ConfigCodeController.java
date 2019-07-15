@@ -20,7 +20,7 @@ import java.util.Optional;
  * @date 2018/10/10
  */
 @RestController
-@RequestMapping(value = "/v1/organizations/{organization_id}/config_codes")
+@RequestMapping(value = "/v1/organizations/{organization_id}/config_code")
 public class ConfigCodeController extends BaseController {
 
     @Autowired

@@ -228,18 +228,6 @@ class SchemeControllerSpec extends Specification {
         priorityDTO != null
     }
 
-//    def "queryByOrganizationIdList"() {
-//        when: '根据项目id查询组织优先级列表'
-//        def entity = restTemplate.getForEntity("/v1/projects/{project_id}/priority/list_by_org",
-//                List, projectId)
-//
-//        then: '返回结果'
-//        entity.getStatusCode().is2xxSuccessful()
-//        List<PriorityDTO> priorityDTOList = entity.body
-//
-//        expect: '期望验证'
-//        priorityDTOList.size() == 6
-//    }
 
     def "queryWorkFlowFirstStatus"() {
         when: '查询工作流第一个状态'
