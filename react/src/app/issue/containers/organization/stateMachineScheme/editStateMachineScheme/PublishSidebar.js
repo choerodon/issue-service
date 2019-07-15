@@ -122,7 +122,7 @@ class PublishSidebar extends Component {
     render: (text, record) => (
         <Fragment>
           <TypeTag
-            data={record.issueTypeDTO}
+            data={record.issueTypeVO}
             showName
           />
           <span
@@ -195,13 +195,13 @@ class PublishSidebar extends Component {
     render: (text, record) => {
       const options = [];
       const list = [];
-      options.push(record.newStateMachine.statusDTOS.map(data => (
+      options.push(record.newStateMachine.statusVOS.map(data => (
         <Option value={data.id}>{data.name}</Option>
       )));
       list.push(record.statusChangeItems.map(data => (
         <div style={{ height: 25 }}>
           <Select
-            defaultValue={record.newStateMachine.statusDTOS[0].id}
+            defaultValue={record.newStateMachine.statusVOS[0].id}
             style={{ width: 200 }}
             onChange={e => this.handleChange(data.oldStatus.id, e)}
           >

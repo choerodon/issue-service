@@ -57,8 +57,8 @@ class StateMachineList extends Component {
     filters: [],
   }, {
     title: <FormattedMessage id="stateMachine.related" />,
-    dataIndex: 'stateMachineSchemeDTOs',
-    key: 'stateMachineSchemeDTOs',
+    dataIndex: 'stateMachineSchemeVOS',
+    key: 'stateMachineSchemeVOS',
     className: 'issue-table-ellipsis',
     render: (text, record) => {
       const map = [];
@@ -84,7 +84,7 @@ class StateMachineList extends Component {
             <i className="icon icon-mode_edit" />
           </Button>
         </Tooltip>
-        {!(record && record.stateMachineSchemeDTOs && record.stateMachineSchemeDTOs.length)
+        {!(record && record.stateMachineSchemeVOS && record.stateMachineSchemeVOS.length)
         && !record.default
           ? (
             <Tooltip placement="top" title={<FormattedMessage id="delete" />}>

@@ -84,13 +84,13 @@ class EditStateMachineScheme extends Component {
       isDraft,
     ).then(() => {
       const {
-        viewDTOs, name, description, objectVersionNumber,
+        viewVOS, name, description, objectVersionNumber,
       } = StateMachineSchemeStore.getStateMachine;
       // 过滤已经关联的状态机
       const stateMachineIds = [];
-      viewDTOs.forEach((data) => {
-        if (data.stateMachineDTO) {
-          stateMachineIds.push(data.stateMachineDTO.id);
+      viewVOS.forEach((data) => {
+        if (data.stateMachineVO) {
+          stateMachineIds.push(data.stateMachineVO.id);
         }
       });
       this.setState({
@@ -156,7 +156,7 @@ class EditStateMachineScheme extends Component {
 
   handleCloseConnectStateMachine = () => {
     const { StateMachineSchemeStore } = this.props;
-    StateMachineSchemeStore.setSchemeDTOs([]);
+    StateMachineSchemeStore.setSchemeVOS([]);
     StateMachineSchemeStore.setIsAddVisible(false);
     StateMachineSchemeStore.setIsConnectVisible(false);
     this.setState({
@@ -164,18 +164,18 @@ class EditStateMachineScheme extends Component {
     });
   };
 
-  handleFinishConnectStateMachine = (schemeDTOs) => {
+  handleFinishConnectStateMachine = (schemeVOS) => {
     const { StateMachineSchemeStore } = this.props;
-    StateMachineSchemeStore.setSchemeDTOs([]);
+    StateMachineSchemeStore.setSchemeVOS([]);
     StateMachineSchemeStore.setIsAddVisible(false);
     StateMachineSchemeStore.setIsConnectVisible(false);
-    StateMachineSchemeStore.setSelectedIssueTypeId(schemeDTOs);
+    StateMachineSchemeStore.setSelectedIssueTypeId(schemeVOS);
   };
 
   setGraphData = (res) => {
     const { StateMachineSchemeStore } = this.props;
-    StateMachineSchemeStore.setNodeData(res.nodeDTOs);
-    StateMachineSchemeStore.setTransferData(res.transformDTOs);
+    StateMachineSchemeStore.setNodeData(res.nodeVOS);
+    StateMachineSchemeStore.setTransferData(res.transformVOS);
   };
 
   loadGraphData = (item) => {
@@ -213,17 +213,17 @@ class EditStateMachineScheme extends Component {
   };
 
   handleRowSelectChange = (selectedRowKeys, selectedRows) => {
-    const schemeDTOs = [];
+    const schemeVOS = [];
     const { StateMachineSchemeStore } = this.props;
     if (selectedRows && selectedRows.length) {
       selectedRows.map((selectedRow) => {
         const row = {};
         row.issueTypeId = selectedRow.id;
-        schemeDTOs.push(row);
+        schemeVOS.push(row);
         return true;
       });
     }
-    StateMachineSchemeStore.setSchemeDTOs(schemeDTOs);
+    StateMachineSchemeStore.setSchemeVOS(schemeVOS);
   };
 
   handleFinish = () => {
@@ -233,19 +233,19 @@ class EditStateMachineScheme extends Component {
     this.setState({
       loading: true,
     });
-    const schemeDTOs = StateMachineSchemeStore.getSchemeDTOs;
+    const schemeVOS = StateMachineSchemeStore.getSchemeVOS;
 
     StateMachineSchemeStore.saveStateMachine(
       organizationId,
       schemeId,
       stateMachineId,
-      schemeDTOs,
+      schemeVOS,
     ).then(() => {
       this.setState({
         loading: false,
         machineId: false,
       });
-      this.handleFinishConnectStateMachine(schemeDTOs);
+      this.handleFinishConnectStateMachine(schemeVOS);
       this.refresh();
     });
   };
@@ -368,7 +368,7 @@ class EditStateMachineScheme extends Component {
         title: '',
         align: 'right',
         key: 'warning',
-        render: (text, record) => record.stateMachineSchemeConfigDTO && (
+        render: (text, record) => record.stateMachineSchemeConfigVO && (
           <Popover
             content={
               <FormattedMessage id="stateMachineScheme.conflictInfo" />
@@ -454,8 +454,8 @@ class EditStateMachineScheme extends Component {
       key: 'stateMachine',
       className: 'issue-table-ellipsis',
       render: record => (
-        record.stateMachineDTO && record.stateMachineDTO.length !== 0 && (
-          <Fragment>{record.stateMachineDTO.name}</Fragment>
+        record.stateMachineVO && record.stateMachineVO.length !== 0 && (
+          <Fragment>{record.stateMachineVO.name}</Fragment>
         )
       ),
     },
@@ -465,7 +465,7 @@ class EditStateMachineScheme extends Component {
       align: 'left',
       render: record => (
         <div>
-          {record.issueTypeDTOs.length !== 0 && record.issueTypeDTOs
+          {record.issueTypeVOS.length !== 0 && record.issueTypeVOS
             .map(type => (
               <div key={type.id}>
                 <TypeTag data={type} showName />
@@ -479,15 +479,15 @@ class EditStateMachineScheme extends Component {
       title: '',
       key: 'operation',
       render: record => (
-        record.issueTypeDTOs && record.issueTypeDTOs.length
-        && record.issueTypeDTOs[0].id && this.state.showStatus === 'draft'
+        record.issueTypeVOS && record.issueTypeVOS.length
+        && record.issueTypeVOS[0].id && this.state.showStatus === 'draft'
           ? <Fragment>
             <Button
               shape="circle"
               size="small"
               onClick={this.handleEditStateMachine.bind(
                 this,
-                record.stateMachineDTO && record.stateMachineDTO.id,
+                record.stateMachineVO && record.stateMachineVO.id,
               )}
             >
               <Icon type="mode_edit" />
@@ -497,7 +497,7 @@ class EditStateMachineScheme extends Component {
               size="small"
               onClick={this.handleDelete.bind(
                 this,
-                record.stateMachineDTO && record.stateMachineDTO.id,
+                record.stateMachineVO && record.stateMachineVO.id,
               )}
             >
               <Icon type="delete" />
@@ -528,8 +528,8 @@ class EditStateMachineScheme extends Component {
           type="primary"
           funcType="raised"
           onClick={this.handleFinish}
-          disabled={!(StateMachineSchemeStore.getSchemeDTOs
-          && StateMachineSchemeStore.getSchemeDTOs.length)}
+          disabled={!(StateMachineSchemeStore.getSchemeVOS
+          && StateMachineSchemeStore.getSchemeVOS.length)}
           loading={loading}
         >
           {<FormattedMessage id="stateMachineScheme.finish" />}
@@ -766,7 +766,7 @@ class EditStateMachineScheme extends Component {
           <Table
             loading={getStateMachineLoading}
             columns={this.getColumns()}
-            dataSource={getStateMachine.viewDTOs || []}
+            dataSource={getStateMachine.viewVOS || []}
             rowKey={record => record.id}
             className="issue-table"
             rowClassName={`${prefixCls}-table-col`}

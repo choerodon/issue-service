@@ -88,7 +88,7 @@ class ObjectSchemeStore {
   @action
   initCurrentMenuType(data) {
     const { type, id, organizationId } = data;
-    this.apiGetway = `/foundation/v1/${type}s/${id}`;
+    this.apiGetway = `/issue/v1/${type}s/${id}`;
     this.iamGetway = `/iam/v1/${type}s/${id}`;
     this.orgId = organizationId;
   }
@@ -122,7 +122,7 @@ class ObjectSchemeStore {
     return data;
   });
 
-  loadLookupValue = code => axios.get(`/foundation/v1/organizations/${this.orgId}/lookup_values/${code}`);
+  loadLookupValue = code => axios.get(`/issue/v1/organizations/${this.orgId}/lookup_values/${code}`);
 
   createField = field => axios.post(`${this.apiGetway}/object_scheme_field?organizationId=${this.orgId}`, field);
 
