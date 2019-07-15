@@ -35,7 +35,7 @@ class StateMachineSchemeStore {
 
   @observable newStateMachineId = '';
 
-  @observable schemeDTOs = [];
+  @observable schemeVOS = [];
 
   @observable selectedIssueTypeId = [];
 
@@ -168,13 +168,13 @@ class StateMachineSchemeStore {
   }
 
   @computed
-  get getSchemeDTOs() {
-    return this.schemeDTOs;
+  get getSchemeVOS() {
+    return this.schemeVOS;
   }
 
   @action
-  setSchemeDTOs(data) {
-    this.schemeDTOs = data;
+  setSchemeVOS(data) {
+    this.schemeVOS = data;
   }
 
   @computed
@@ -298,11 +298,11 @@ class StateMachineSchemeStore {
   loadGraphData = (orgId, stateMachineId) => {
     this.setGraphLoading(true);
     axios
-      .get(`/state/v1/organizations/${orgId}/state_machines/${stateMachineId}`)
+      .get(`/issue/v1/organizations/${orgId}/state_machines/${stateMachineId}`)
       .then((res) => {
         this.setGraphLoading(false);
-        this.setNodeData(res.nodeDTOs);
-        this.setTransferData(res.transfDTOs);
+        this.setNodeData(res.nodeVOS);
+        this.setTransferData(res.transfVOS);
       })
       .catch((e) => {
         this.setGraphLoading(false);
@@ -310,7 +310,7 @@ class StateMachineSchemeStore {
   };
 
   loadAllStateMachine = orgId => axios
-    .get(`/state/v1/organizations/${orgId}/state_machines/query_all`)
+    .get(`/issue/v1/organizations/${orgId}/state_machines/query_all`)
     .then(
       action((res) => {
         this.setAllStateMachine(res);
@@ -327,8 +327,8 @@ class StateMachineSchemeStore {
       );
   }
 
-  saveStateMachine = (orgId, schemeId, stateMachineId, schemeDTOs) => axios
-    .post(`/issue/v1/organizations/${orgId}/state_machine_scheme/create_config/${schemeId}/${stateMachineId}`, schemeDTOs);
+  saveStateMachine = (orgId, schemeId, stateMachineId, schemeVOS) => axios
+    .post(`/issue/v1/organizations/${orgId}/state_machine_scheme/create_config/${schemeId}/${stateMachineId}`, schemeVOS);
 
   deleteStateMachine = (orgId, schemeId, stateMachineId) => axios
     .delete(`/issue/v1/organizations/${orgId}/state_machine_scheme/delete_config/${schemeId}/${stateMachineId}`);

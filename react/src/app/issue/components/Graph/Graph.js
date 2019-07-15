@@ -208,9 +208,9 @@ class Graph extends Component {
     graph.getModel().beginUpdate();
     let cell;
     try {
-      const textWidth = (values.statusDTO
-        && values.statusDTO.name
-        && getByteLen(values.statusDTO.name)) || 0;
+      const textWidth = (values.statusVO
+        && values.statusVO.name
+        && getByteLen(values.statusVO.name)) || 0;
       const statusWidth = textWidth > 62 ? textWidth : 62;
       let height = 0;
       while (this.checkIsOverlap(height)) {
@@ -219,16 +219,16 @@ class Graph extends Component {
       cell = graph.insertVertex(
         parent,
         `n${values.id}`,
-        values.statusDTO && values.statusDTO.name,
+        values.statusVO && values.statusVO.name,
         150, height, statusWidth, 26,
-        `strokeColor=red;fillColor=${statusColor[values.statusDTO.type].colour
-          ? `${statusColor[values.statusDTO.type].colour};`
+        `strokeColor=red;fillColor=${statusColor[values.statusVO.type].colour
+          ? `${statusColor[values.statusVO.type].colour};`
           : '#E3E3E3;'}`,
       );
       cell.statusId = values.statusId;
       cell.nodeId = values.id;
       cell.status = values.type;
-      cell.des = values.statusDTO && values.statusDTO.description;
+      cell.des = values.statusVO && values.statusVO.description;
     } catch (e) {
       window.console.log(e);
     } finally {
@@ -347,21 +347,21 @@ class Graph extends Component {
               statusId,
               id,
               type: status,
-              statusDTO,
+              statusVO,
             } = item;
             // 根据状态名称计算节点宽度
-            const textWidth = (item.statusDTO
-              && item.statusDTO.name
-              && getByteLen(item.statusDTO.name)) || 0;
+            const textWidth = (item.statusVO
+              && item.statusVO.name
+              && getByteLen(item.statusVO.name)) || 0;
             const statusWidth = textWidth > width ? textWidth : width;
             const vet = graph.insertVertex(
               parent, `n${id}`,
-              (item.statusDTO && item.statusDTO.name) || '',
+              (item.statusVO && item.statusVO.name) || '',
               x, y, statusWidth, height,
               status === 'node_start'
                 ? 'shape=ellipse;fillColor=#FFB100;strokeColor=#FFF;'
-                : `shape=rectangle;fillColor=${statusDTO && statusDTO.type && statusColor[statusDTO.type].colour
-                  ? `${statusColor[statusDTO.type].colour};`
+                : `shape=rectangle;fillColor=${statusVO && statusVO.type && statusColor[statusVO.type].colour
+                  ? `${statusColor[statusVO.type].colour};`
                   : '#E3E3E3'};strokeColor=red;`,
             );
 
@@ -378,7 +378,7 @@ class Graph extends Component {
             vet.nodeId = id;
             vet.status = status;
             vet.allStatusTransformId = item.allStatusTransformId;
-            vet.des = item.statusDTO && item.statusDTO.description;
+            vet.des = item.statusVO && item.statusVO.description;
             this.setState({
               vertexes,
             });

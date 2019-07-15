@@ -83,9 +83,9 @@ class StateMachineSchemeList extends Component {
       dataIndex: 'project',
       key: 'project',
       render: (text, record) => (
-        record.projectDTOs && record.projectDTOs.length
+        record.projectVOS && record.projectVOS.length
           ? <div className="issue-table-ellipsis"><ul className={`${prefixCls}-table-ul`}>
-            {record.projectDTOs.map(
+            {record.projectVOS.map(
               project => (<li>{project ? project.name : ''}</li>),
             )}
           </ul></div>
@@ -107,16 +107,16 @@ class StateMachineSchemeList extends Component {
       width: 500,
       dataIndex: 'related',
       key: 'related',
-      render: (text, record) => record.configDTOs && record.configDTOs
-        .map(configDTO => (
-          <Fragment key={configDTO.id}>
+      render: (text, record) => record.configVOS && record.configVOS
+        .map(configVO => (
+          <Fragment key={configVO.id}>
             <div className={`${prefixCls}-table-related`}>
               <span className={`${prefixCls}-table-issueType`}>
                 <TypeTag
                   data={{
-                    colour: configDTO.issueTypeColour,
-                    name: configDTO.issueTypeName,
-                    icon: configDTO.issueTypeIcon,
+                    colour: configVO.issueTypeColour,
+                    name: configVO.issueTypeName,
+                    icon: configVO.issueTypeIcon,
                   }}
                   showName
                 />
@@ -126,7 +126,7 @@ class StateMachineSchemeList extends Component {
                 />
               </span>
               <span className={`${prefixCls}-table-stateMachine-content`}>
-                {configDTO.stateMachineName}
+                {configVO.stateMachineName}
               </span>
             </div>
           </Fragment>
