@@ -1,6 +1,8 @@
 package io.choerodon.issue.infra.utils;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
@@ -26,5 +28,26 @@ public class PageUtil {
         } else {
             return sort.toSql();
         }
+    }
+
+    public static Sort sortResetOrder(Sort sort, String mainTableAlias, Map<String, String> map) {
+        if (sort != null) {
+            Iterator<Sort.Order> iterator = sort.iterator();
+            while (iterator.hasNext()) {
+                boolean flag = false;
+                Sort.Order order = iterator.next();
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if (entry.getKey().equals(order.getProperty())) {
+                        order.setProperty(entry.getValue());
+                        flag = true;
+                    }
+                }
+                if (mainTableAlias != null && !flag) {
+                    //驼峰转下划线
+                    order.setProperty(mainTableAlias + "." + tk.mybatis.mapper.util.StringUtil.camelhumpToUnderline(order.getProperty()));
+                }
+            }
+        }
+        return sort;
     }
 }

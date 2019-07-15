@@ -22,14 +22,14 @@
     <!--</if>-->
     <!--</select>-->
 
-    <select id="queryByOrgId" resultType="io.choerodon.issue.domain.IssueType">
+    <select id="queryByOrgId" resultType="io.choerodon.issue.infra.dto.IssueTypeDTO">
         SELECT
         t.*
         FROM issue_type t
         WHERE t.organization_id = #{organizationId}
     </select>
 
-    <select id="queryBySchemeId" resultType="io.choerodon.issue.domain.IssueType">
+    <select id="queryBySchemeId" resultType="io.choerodon.issue.infra.dto.IssueTypeDTO">
         SELECT
         t.*,
         c.sequence
@@ -50,20 +50,20 @@
         it.id
         from issue_type it
         where it.organization_id = #{organizationId}
-        <if test="issueTypeSearchDTO.name != null">
-            AND it.name LIKE concat('%',#{issueTypeSearchDTO.name},'%')
+        <if test="issueTypeSearchVO.name != null">
+            AND it.name LIKE concat('%',#{issueTypeSearchVO.name},'%')
         </if>
-        <if test="issueTypeSearchDTO.description != null">
-            AND it.description LIKE concat('%',#{issueTypeSearchDTO.description},'%')
+        <if test="issueTypeSearchVO.description != null">
+            AND it.description LIKE concat('%',#{issueTypeSearchVO.description},'%')
         </if>
-        <if test="issueTypeSearchDTO.param != null">
-            AND (it.name LIKE concat('%',#{issueTypeSearchDTO.param},'%')
-            OR it.description LIKE concat('%',#{issueTypeSearchDTO.param},'%')
+        <if test="issueTypeSearchVO.param != null">
+            AND (it.name LIKE concat('%',#{issueTypeSearchVO.param},'%')
+            OR it.description LIKE concat('%',#{issueTypeSearchVO.param},'%')
             )
         </if>
     </select>
 
-    <resultMap id="issueTypeListMap" type="io.choerodon.issue.domain.IssueTypeWithInfo">
+    <resultMap id="issueTypeListMap" type="io.choerodon.issue.infra.dto.IssueTypeWithInfoDTO">
         <id property="id" column="it_id"/>
         <id property="name" column="it_name"/>
         <id property="description" column="it_description"/>
@@ -73,7 +73,7 @@
         <id property="initialize" column="it_is_initialize"/>
         <id property="objectVersionNumber" column="it_object_version_number"/>
         <collection property="issueTypeSchemeRelationList" autoMapping="true"
-                    ofType="io.choerodon.issue.domain.IssueTypeSchemeRelation">
+                    ofType="io.choerodon.issue.infra.dto.IssueTypeSchemeRelationDTO">
             <id property="issueTypeSchemeId" column="itscits_scheme_id"/>
             <id property="issueTypeSchemeName" column="itscits_name"/>
         </collection>

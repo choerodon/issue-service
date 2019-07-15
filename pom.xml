@@ -17,7 +17,7 @@
 
     <!--choerodon-starters dependency-->
     <properties>
-        <choerodon.starters.version>0.11.0.RELEASE</choerodon.starters.version>
+        <choerodon.starters.version>0.11.2.RELEASE</choerodon.starters.version>
         <choerodon.serviceBuild>true</choerodon.serviceBuild>
         <choerodon.mainClass>io.choerodon.issue.IssueServiceApplication</choerodon.mainClass>
     </properties>
@@ -148,6 +148,24 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-actuator</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+        <!--状态机-->
+        <dependency>
+            <groupId>org.springframework.statemachine</groupId>
+            <artifactId>spring-statemachine-core</artifactId>
+            <version>2.0.2.RELEASE</version>
+        </dependency>
+        <!-- feign -->
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-feign-replay</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+        <!--eureka-event-->
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-eureka-event</artifactId>
             <version>${choerodon.starters.version}</version>
         </dependency>
     </dependencies>

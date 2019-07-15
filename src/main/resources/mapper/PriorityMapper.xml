@@ -3,7 +3,7 @@
 
 <mapper namespace="io.choerodon.issue.infra.mapper.PriorityMapper">
 
-    <select id="fulltextSearch" resultType="io.choerodon.issue.domain.Priority">
+    <select id="fulltextSearch" resultType="io.choerodon.issue.infra.dto.PriorityDTO">
         SELECT P.*,
         P.is_enable as enable
         FROM priority P
@@ -33,7 +33,7 @@
       SELECT IFNULL(MAX(P.sequence),0) FROM priority P WHERE P.organization_id = #{organizationId}
     </select>
 
-    <update id="updateSequenceById" parameterType="io.choerodon.issue.domain.Priority">
+    <update id="updateSequenceById" parameterType="io.choerodon.issue.infra.dto.PriorityDTO">
         UPDATE priority SET sequence = #{priority.sequence}
         WHERE id= #{priority.id}
     </update>

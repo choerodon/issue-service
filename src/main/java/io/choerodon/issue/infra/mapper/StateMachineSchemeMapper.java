@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.domain.StateMachineScheme;
+import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.List;
  * @author peng.jiang@hand-china.com
  */
 @Component
-public interface StateMachineSchemeMapper extends Mapper<StateMachineScheme> {
+public interface StateMachineSchemeMapper extends Mapper<StateMachineSchemeDTO> {
 
     /**
      * 分页查询状态方案
@@ -20,21 +20,21 @@ public interface StateMachineSchemeMapper extends Mapper<StateMachineScheme> {
      * @param param  模糊查询参数
      * @return 方案列表
      */
-    List<StateMachineScheme> fulltextSearch(@Param("scheme") StateMachineScheme scheme, @Param("param") String param);
+    List<StateMachineSchemeDTO> fulltextSearch(@Param("scheme") StateMachineSchemeDTO scheme, @Param("param") String param);
 
     /**
      * 根据id列表查询，附带配置
      *
      * @return 方案列表
      */
-    List<StateMachineScheme> queryByIdsWithConfig(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
+    List<StateMachineSchemeDTO> queryByIdsWithConfig(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
 
     /**
      * 根据id列表查询
      *
      * @return 方案列表
      */
-    List<StateMachineScheme> queryByIds(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
+    List<StateMachineSchemeDTO> queryByIds(@Param("organizationId") Long organizationId, @Param("schemeIds") List<Long> schemeIds);
 
     /**
      * 查询出组织下所有方案
@@ -42,7 +42,7 @@ public interface StateMachineSchemeMapper extends Mapper<StateMachineScheme> {
      * @param organizationId
      * @return
      */
-    List<StateMachineScheme> queryByOrgId(@Param("organizationId") Long organizationId);
+    List<StateMachineSchemeDTO> queryByOrgId(@Param("organizationId") Long organizationId);
 
     /**
      * 更新发布进度

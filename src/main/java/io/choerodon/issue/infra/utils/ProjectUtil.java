@@ -1,8 +1,8 @@
 package io.choerodon.issue.infra.utils;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.issue.api.dto.ProjectDTO;
-import io.choerodon.issue.infra.feign.UserFeignClient;
+import io.choerodon.issue.infra.feign.IamFeignClient;
+import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +17,9 @@ import java.util.Map;
 @Component
 public class ProjectUtil {
     @Autowired
-    private UserFeignClient iamServiceFeign;
+    private IamFeignClient iamFeignClient;
 
-    protected static final Map<Long, ProjectDTO> map = new HashMap<>();
+    protected static final Map<Long, ProjectVO> map = new HashMap<>();
 
     public Long getOrganizationId(Long projectId) {
         return queryProject(projectId).getOrganizationId();
@@ -33,15 +33,15 @@ public class ProjectUtil {
         return queryProject(projectId).getName();
     }
 
-    private ProjectDTO queryProject(Long projectId) {
-        ProjectDTO projectDTO = map.get(projectId);
-        if (projectDTO != null) {
-            return projectDTO;
+    private ProjectVO queryProject(Long projectId) {
+        ProjectVO projectVO = map.get(projectId);
+        if (projectVO != null) {
+            return projectVO;
         } else {
-            projectDTO = iamServiceFeign.queryProject(projectId).getBody();
-            if (projectDTO != null) {
-                map.put(projectId, projectDTO);
-                return projectDTO;
+            projectVO = iamFeignClient.queryProject(projectId).getBody();
+            if (projectVO != null) {
+                map.put(projectId, projectVO);
+                return projectVO;
             } else {
                 throw new CommonException("error.queryProject.notFound");
             }

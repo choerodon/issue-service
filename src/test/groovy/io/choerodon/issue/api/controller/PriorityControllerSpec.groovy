@@ -1,8 +1,8 @@
 package io.choerodon.issue.api.controller
 
 import io.choerodon.issue.IntegrationTestConfiguration
-import io.choerodon.issue.api.dto.PriorityDTO
-import io.choerodon.issue.api.service.PriorityService
+import io.choerodon.issue.api.vo.PriorityVO
+import io.choerodon.issue.app.service.PriorityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -42,14 +42,14 @@ class PriorityControllerSpec extends Specification {
     Long organizationId = 1L
 
     @Shared
-    List<PriorityDTO> list = new ArrayList<>()
+    List<PriorityVO> list = new ArrayList<>()
 
     @Shared
     String baseUrl = '/v1/organizations/{organization_id}/priority'
 
     def "create"() {
         given: '准备工作'
-        PriorityDTO priorityDTO = new PriorityDTO()
+        PriorityVO priorityDTO = new PriorityVO()
         priorityDTO.setName(name)
         priorityDTO.setDescription(description)
         priorityDTO.setColour(colour)
@@ -57,8 +57,8 @@ class PriorityControllerSpec extends Specification {
         priorityDTO.setOrganizationId(organizationId)
 
         when: '创建优先级类型'
-        HttpEntity<PriorityDTO> httpEntity = new HttpEntity<>(priorityDTO)
-        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PriorityDTO, organizationId)
+        HttpEntity<PriorityVO> httpEntity = new HttpEntity<>(priorityDTO)
+        def entity = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, PriorityVO, organizationId)
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -90,7 +90,7 @@ class PriorityControllerSpec extends Specification {
 
     def "update"() {
         given: '准备工作'
-        PriorityDTO priorityDTO = list.get(0)
+        PriorityVO priorityDTO = list.get(0)
         priorityDTO.setName(name)
         priorityDTO.setDescription(description)
         priorityDTO.setColour(colour)
@@ -98,8 +98,8 @@ class PriorityControllerSpec extends Specification {
         priorityDTO.setOrganizationId(organizationId)
 
         when: '更新优先级类型'
-        HttpEntity<PriorityDTO> httpEntity = new HttpEntity<>(priorityDTO)
-        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, PriorityDTO, organizationId, priorityDTO.getId())
+        HttpEntity<PriorityVO> httpEntity = new HttpEntity<>(priorityDTO)
+        def entity = restTemplate.exchange(baseUrl + '/{id}', HttpMethod.PUT, httpEntity, PriorityVO, organizationId, priorityDTO.getId())
 
         then: '状态码为200，调用成功'
         def actRequest = false
@@ -142,7 +142,7 @@ class PriorityControllerSpec extends Specification {
             url = url + "&param=" + param
         }
         when: '展示优先级列表'
-        ParameterizedTypeReference<List<PriorityDTO>> typeRef = new ParameterizedTypeReference<List<PriorityDTO>>() {
+        ParameterizedTypeReference<List<PriorityVO>> typeRef = new ParameterizedTypeReference<List<PriorityVO>>() {
         }
         def entity = restTemplate.exchange(url, HttpMethod.GET, null, typeRef, organizationId)
 
@@ -209,18 +209,18 @@ class PriorityControllerSpec extends Specification {
         def url = baseUrl + "/sequence"
 
         when: '更新展示顺序'
-        List<PriorityDTO> reqList = new ArrayList<>()
+        List<PriorityVO> reqList = new ArrayList<>()
         reqList.add(list.get(0))
         reqList.add(list.get(2))
         reqList.add(list.get(1))
-        HttpEntity<List<PriorityDTO>> httpEntity = new HttpEntity(reqList)
-        ParameterizedTypeReference<List<PriorityDTO>> typeRef = new ParameterizedTypeReference<List<PriorityDTO>>() {
+        HttpEntity<List<PriorityVO>> httpEntity = new HttpEntity(reqList)
+        ParameterizedTypeReference<List<PriorityVO>> typeRef = new ParameterizedTypeReference<List<PriorityVO>>() {
         }
         def entity = restTemplate.exchange(url, HttpMethod.PUT, httpEntity, typeRef, organizationId)
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().value() == 200
-        List<PriorityDTO> e = entity.getBody()
+        List<PriorityVO> e = entity.getBody()
         e.get(0).getId() == 1
         e.get(1).getId() == 2
         e.get(2).getId() == 4
@@ -238,7 +238,7 @@ class PriorityControllerSpec extends Specification {
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().is2xxSuccessful()
-        Map<Long, PriorityDTO> priorityDTOMap = entity.body
+        Map<Long, PriorityVO> priorityDTOMap = entity.body
 
         expect: "期望值"
         priorityDTOMap.get("1") != null
@@ -249,11 +249,11 @@ class PriorityControllerSpec extends Specification {
         def url = baseUrl + "/default"
 
         when: '更新展示顺序'
-        def entity = restTemplate.getForEntity(url, PriorityDTO, organizationId)
+        def entity = restTemplate.getForEntity(url, PriorityVO, organizationId)
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().is2xxSuccessful()
-        PriorityDTO priorityDTO = entity.body
+        PriorityVO priorityDTO = entity.body
 
         expect: "期望值"
         priorityDTO != null
@@ -268,7 +268,7 @@ class PriorityControllerSpec extends Specification {
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().is2xxSuccessful()
-        List<PriorityDTO> priorityDTO = entity.body
+        List<PriorityVO> priorityDTO = entity.body
 
         expect: "期望值"
         priorityDTO.size() == 6
@@ -279,11 +279,11 @@ class PriorityControllerSpec extends Specification {
         def url = baseUrl + "/{id}"
 
         when: '更新展示顺序'
-        def entity = restTemplate.getForEntity(url, PriorityDTO, organizationId, 1L)
+        def entity = restTemplate.getForEntity(url, PriorityVO, organizationId, 1L)
 
         then: '状态码为200，调用成功'
         entity.getStatusCode().is2xxSuccessful()
-        PriorityDTO priorityDTO = entity.body
+        PriorityVO priorityDTO = entity.body
 
         expect: "期望值"
         priorityDTO != null

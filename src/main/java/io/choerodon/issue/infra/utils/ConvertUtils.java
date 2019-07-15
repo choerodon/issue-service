@@ -1,11 +1,11 @@
 package io.choerodon.issue.infra.utils;
 
-import io.choerodon.issue.api.dto.ProjectDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeConfigDTO;
-import io.choerodon.issue.api.dto.StateMachineSchemeDTO;
-import io.choerodon.issue.domain.ProjectConfig;
-import io.choerodon.issue.domain.StateMachineScheme;
-import io.choerodon.issue.domain.StateMachineSchemeConfig;
+import io.choerodon.issue.api.vo.StateMachineSchemeConfigVO;
+import io.choerodon.issue.api.vo.StateMachineSchemeVO;
+import io.choerodon.issue.infra.dto.ProjectConfigDTO;
+import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
+import io.choerodon.issue.infra.dto.StateMachineSchemeConfigDTO;
+import io.choerodon.issue.infra.feign.vo.ProjectVO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
@@ -21,34 +21,34 @@ public class ConvertUtils {
     }
 
 
-    public static StateMachineSchemeDTO convertStateMachineSchemeToDTO(final StateMachineScheme scheme, final Map<Long, ProjectDTO> projectMap) {
+    public static StateMachineSchemeVO convertStateMachineSchemeToVO(final StateMachineSchemeDTO scheme, final Map<Long, ProjectVO> projectMap) {
         ModelMapper modelMapper = new ModelMapper();
-        StateMachineSchemeDTO schemeDTO = modelMapper.map(scheme, StateMachineSchemeDTO.class);
-        List<StateMachineSchemeConfig> schemeConfigs = scheme.getSchemeConfigs();
+        StateMachineSchemeVO schemeVO = modelMapper.map(scheme, StateMachineSchemeVO.class);
+        List<StateMachineSchemeConfigDTO> schemeConfigs = scheme.getSchemeConfigs();
         if (null != schemeConfigs && !schemeConfigs.isEmpty()) {
-            List<StateMachineSchemeConfigDTO> schemeConfigDTOS = modelMapper.map(schemeConfigs, new TypeToken<List<StateMachineSchemeConfigDTO>>() {
+            List<StateMachineSchemeConfigVO> schemeConfigVOS = modelMapper.map(schemeConfigs, new TypeToken<List<StateMachineSchemeConfigVO>>() {
             }.getType());
-            schemeDTO.setConfigDTOs(schemeConfigDTOS);
+            schemeVO.setConfigVOS(schemeConfigVOS);
         }
-        List<ProjectConfig> projectConfigs = scheme.getProjectConfigs();
+        List<ProjectConfigDTO> projectConfigs = scheme.getProjectConfigs();
         if (null != projectConfigs && !projectConfigs.isEmpty()) {
-            List<ProjectDTO> projectDTOS = new ArrayList<>(projectConfigs.size());
-            for (ProjectConfig config : projectConfigs) {
-                ProjectDTO projectDTO = projectMap.get(config.getProjectId());
-                if (projectDTO != null) {
-                    projectDTOS.add(projectDTO);
+            List<ProjectVO> projectVOS = new ArrayList<>(projectConfigs.size());
+            for (ProjectConfigDTO config : projectConfigs) {
+                ProjectVO projectVO = projectMap.get(config.getProjectId());
+                if (projectVO != null) {
+                    projectVOS.add(projectVO);
                 }
             }
-            schemeDTO.setProjectDTOs(projectDTOS);
+            schemeVO.setProjectVOS(projectVOS);
         }
-        return schemeDTO;
+        return schemeVO;
     }
 
-    public static List<StateMachineSchemeDTO> convertStateMachineSchemesToDTOs(final List<StateMachineScheme> schemes, final Map<Long, ProjectDTO> projectMap) {
-        List<StateMachineSchemeDTO> list = new ArrayList<>(schemes.size());
-        for (StateMachineScheme scheme : schemes) {
-            StateMachineSchemeDTO schemeDTO = convertStateMachineSchemeToDTO(scheme, projectMap);
-            list.add(schemeDTO);
+    public static List<StateMachineSchemeVO> convertStateMachineSchemesToVOS(final List<StateMachineSchemeDTO> schemes, final Map<Long, ProjectVO> projectMap) {
+        List<StateMachineSchemeVO> list = new ArrayList<>(schemes.size());
+        for (StateMachineSchemeDTO scheme : schemes) {
+            StateMachineSchemeVO schemeVO = convertStateMachineSchemeToVO(scheme, projectMap);
+            list.add(schemeVO);
         }
         return list;
     }

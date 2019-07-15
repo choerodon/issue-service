@@ -2,10 +2,11 @@ package io.choerodon.issue
 
 import com.alibaba.fastjson.JSON
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.choerodon.issue.api.dto.payload.OrganizationCreateEventPayload
-import io.choerodon.issue.api.dto.payload.ProjectEvent
-import io.choerodon.issue.api.eventhandler.IssueEventHandler
 import io.choerodon.core.oauth.CustomUserDetails
+import io.choerodon.issue.api.config.MockConfiguration
+import io.choerodon.issue.api.vo.payload.OrganizationCreateEventPayload
+import io.choerodon.issue.api.vo.payload.ProjectEvent
+import io.choerodon.issue.app.eventhandler.IssueEventHandler
 import io.choerodon.issue.infra.enums.ProjectCategory
 import io.choerodon.issue.infra.mapper.ProjectConfigMapper
 import io.choerodon.liquibase.LiquibaseConfig
@@ -32,7 +33,6 @@ import spock.mock.DetachedMockFactory
 import javax.annotation.PostConstruct
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
-
 /**
  * Created by hailuoliu@choerodon.io on 2018/7/13.
  */
@@ -52,7 +52,8 @@ class IntegrationTestConfiguration {
     IssueEventHandler issueEventHandler
     @Autowired
     ProjectConfigMapper projectConfigMapper
-
+    @Autowired
+    MockConfiguration mockConfiguration
     @Autowired
     LiquibaseExecutor liquibaseExecutor
 
@@ -62,6 +63,7 @@ class IntegrationTestConfiguration {
     void init() {
         liquibaseExecutor.execute()
         setTestRestTemplateJWT()
+        mockConfiguration.sagaClient()
         OrganizationCreateEventPayload organizationEvent = new OrganizationCreateEventPayload()
         organizationEvent.id = 1
         issueEventHandler.handleOrgaizationCreateByConsumeSagaTask(JSON.toJSONString(organizationEvent))

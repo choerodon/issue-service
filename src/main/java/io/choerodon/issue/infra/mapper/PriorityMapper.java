@@ -1,6 +1,6 @@
 package io.choerodon.issue.infra.mapper;
 
-import io.choerodon.issue.domain.Priority;
+import io.choerodon.issue.infra.dto.PriorityDTO;
 import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.List;
  * @Date 2018/8/21
  */
 @Component
-public interface PriorityMapper extends Mapper<Priority> {
+public interface PriorityMapper extends Mapper<PriorityDTO> {
     /**
      * 查询优先级表
      *
@@ -21,7 +21,7 @@ public interface PriorityMapper extends Mapper<Priority> {
      * @param param    模糊查询参数
      * @return 优先级列表
      */
-    List<Priority> fulltextSearch(@Param("priority") Priority priority, @Param("param") String param);
+    List<PriorityDTO> fulltextSearch(@Param("priority") PriorityDTO priority, @Param("param") String param);
 
     /**
      * 得到下一个顺序号
@@ -37,7 +37,7 @@ public interface PriorityMapper extends Mapper<Priority> {
      * @param priority 优先级对象
      * @return 更新是否成功
      */
-    int updateSequenceById(@Param("priority") Priority priority);
+    int updateSequenceById(@Param("priority") PriorityDTO priority);
 
     /**
      * 取消默认优先级

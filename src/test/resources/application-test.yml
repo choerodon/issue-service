@@ -21,6 +21,8 @@ hystrix:
   stream:
     queue:
       enabled: false # 关闭hystrix stream，否则kafka报错
+  metrics:
+    enabled: false
 data:
   dir: src/main/resources
 eureka:
@@ -29,9 +31,16 @@ eureka:
 #logging:
 #  level:
 #    root: debug
-
-services:
-  attachment:
-    url: example.com
+choerodon:
+  saga:
+    consumer:
+      enabled: false # 是否启用消费端
+  eureka:
+    event:
+      max-cache-size: 300 # 存储的最大失败数量
+      retry-time: 5 # 自动重试次数
+      retry-interval: 3 # 自动重试间隔(秒)
+      skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, state-machine-service # 跳过的服务
+      target-services: agile-service # 发现的服务
 testScanIgnore:
   enabled: true

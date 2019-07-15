@@ -27,20 +27,20 @@
         its.id
         from issue_type_scheme its
         where its.organization_id = #{organizationId}
-        <if test="issueTypeSchemeSearchDTO.name != null">
-            AND its.name LIKE concat('%',#{issueTypeSchemeSearchDTO.name},'%')
+        <if test="issueTypeSchemeSearchVO.name != null">
+            AND its.name LIKE concat('%',#{issueTypeSchemeSearchVO.name},'%')
         </if>
-        <if test="issueTypeSchemeSearchDTO.description != null">
-            AND its.description LIKE concat('%',#{issueTypeSchemeSearchDTO.description},'%')
+        <if test="issueTypeSchemeSearchVO.description != null">
+            AND its.description LIKE concat('%',#{issueTypeSchemeSearchVO.description},'%')
         </if>
-        <if test="issueTypeSchemeSearchDTO.param != null">
-            AND ( its.name LIKE concat('%',#{issueTypeSchemeSearchDTO.param},'%')
-            OR its.description LIKE concat('%',#{issueTypeSchemeSearchDTO.param},'%')
+        <if test="issueTypeSchemeSearchVO.param != null">
+            AND ( its.name LIKE concat('%',#{issueTypeSchemeSearchVO.param},'%')
+            OR its.description LIKE concat('%',#{issueTypeSchemeSearchVO.param},'%')
             )
         </if>
     </select>
 
-    <resultMap id="issueTypeSchemeListMap" type="io.choerodon.issue.domain.IssueTypeSchemeWithInfo">
+    <resultMap id="issueTypeSchemeListMap" type="io.choerodon.issue.infra.dto.IssueTypeSchemeWithInfoDTO">
         <id property="id" column="its_id"/>
         <id property="name" column="its_name"/>
         <id property="description" column="its_description"/>
@@ -48,7 +48,7 @@
         <id property="defaultIssueTypeId" column="its_default_issue_type_id"/>
         <id property="organizationId" column="its_organization_id"/>
         <id property="objectVersionNumber" column="its_object_version_number"/>
-        <collection property="issueTypeWithInfoList" autoMapping="true" ofType="io.choerodon.issue.domain.IssueTypeWithInfo">
+        <collection property="issueTypeWithInfoList" autoMapping="true" ofType="io.choerodon.issue.infra.dto.IssueTypeWithInfoDTO">
             <id property="id" column="itr_issue_type_id"/>
             <id property="name" column="itr_issue_type_name"/>
             <id property="icon" column="itr_icon"/>
@@ -58,7 +58,7 @@
             <id property="typeCode" column="itr_type_code"/>
             <id property="initialize" column="itr_is_initialize"/>
         </collection>
-        <collection property="projectWithInfoList" autoMapping="true" ofType="io.choerodon.issue.domain.ProjectWithInfo">
+        <collection property="projectWithInfoList" autoMapping="true" ofType="io.choerodon.issue.infra.dto.ProjectWithInfoDTO">
             <id property="projectId" column="pci_project_id"/>
         </collection>
     </resultMap>

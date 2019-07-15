@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.validator;
 
-import io.choerodon.issue.api.dto.PriorityDTO;
+import io.choerodon.issue.api.vo.PriorityVO;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -13,18 +13,18 @@ import org.springframework.util.StringUtils;
 public class PriorityValidator {
 
 
-    public void createValidate(PriorityDTO priorityDTO) {
-        if (StringUtils.isEmpty(priorityDTO.getName())) {
+    public void createValidate(PriorityVO priorityVO) {
+        if (StringUtils.isEmpty(priorityVO.getName())) {
             throw new CommonException("error.priority.create.name.empty");
         }
-        if (StringUtils.isEmpty(priorityDTO.getColour())) {
+        if (StringUtils.isEmpty(priorityVO.getColour())) {
             throw new CommonException("error.priority.create.colour.empty");
         }
 
     }
 
-    public void updateValidate(PriorityDTO priorityDTO) {
-        if (priorityDTO.getName() != null && priorityDTO.getName().length() == 0) {
+    public void updateValidate(PriorityVO priorityVO) {
+        if (priorityVO.getName() != null && priorityVO.getName().length() == 0) {
             throw new CommonException("error.priority.update.name.empty");
         }
 
