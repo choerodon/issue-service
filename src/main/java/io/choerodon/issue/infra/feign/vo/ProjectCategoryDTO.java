@@ -4,7 +4,7 @@ package io.choerodon.issue.infra.feign.vo;
  * @author shinan.chen
  * @since 2019/6/28
  */
-public class ProjectCategoryVO {
+public class ProjectCategoryDTO {
     private Long id;
     private String name;
     private String description;

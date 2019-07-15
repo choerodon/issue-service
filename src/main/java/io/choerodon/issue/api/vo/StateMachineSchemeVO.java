@@ -1,6 +1,6 @@
 package io.choerodon.issue.api.vo;
 
-import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.ProjectDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class StateMachineSchemeVO {
     @ApiModelProperty(value = "发布的状态（doing/done）")
     private String deployStatus;
     @ApiModelProperty(value = "关联的项目列表")
-    private List<ProjectVO> projectVOS;
+    private List<ProjectDTO> projectVOS;
     @ApiModelProperty(value = "方案配置列表")
     private List<StateMachineSchemeConfigVO> configVOS;
     @ApiModelProperty(value = "方案配置列表（用于列表）")
@@ -78,11 +78,11 @@ public class StateMachineSchemeVO {
         this.objectVersionNumber = objectVersionNumber;
     }
 
-    public List<ProjectVO> getProjectVOS() {
+    public List<ProjectDTO> getProjectVOS() {
         return projectVOS;
     }
 
-    public void setProjectVOS(List<ProjectVO> projectVOS) {
+    public void setProjectVOS(List<ProjectDTO> projectVOS) {
         this.projectVOS = projectVOS;
     }
 

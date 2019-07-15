@@ -5,7 +5,7 @@ import io.choerodon.issue.api.vo.StateMachineSchemeVO;
 import io.choerodon.issue.infra.dto.ProjectConfigDTO;
 import io.choerodon.issue.infra.dto.StateMachineSchemeDTO;
 import io.choerodon.issue.infra.dto.StateMachineSchemeConfigDTO;
-import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.ProjectDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
@@ -21,7 +21,7 @@ public class ConvertUtils {
     }
 
 
-    public static StateMachineSchemeVO convertStateMachineSchemeToVO(final StateMachineSchemeDTO scheme, final Map<Long, ProjectVO> projectMap) {
+    public static StateMachineSchemeVO convertStateMachineSchemeToVO(final StateMachineSchemeDTO scheme, final Map<Long, ProjectDTO> projectMap) {
         ModelMapper modelMapper = new ModelMapper();
         StateMachineSchemeVO schemeVO = modelMapper.map(scheme, StateMachineSchemeVO.class);
         List<StateMachineSchemeConfigDTO> schemeConfigs = scheme.getSchemeConfigs();
@@ -32,9 +32,9 @@ public class ConvertUtils {
         }
         List<ProjectConfigDTO> projectConfigs = scheme.getProjectConfigs();
         if (null != projectConfigs && !projectConfigs.isEmpty()) {
-            List<ProjectVO> projectVOS = new ArrayList<>(projectConfigs.size());
+            List<ProjectDTO> projectVOS = new ArrayList<>(projectConfigs.size());
             for (ProjectConfigDTO config : projectConfigs) {
-                ProjectVO projectVO = projectMap.get(config.getProjectId());
+                ProjectDTO projectVO = projectMap.get(config.getProjectId());
                 if (projectVO != null) {
                     projectVOS.add(projectVO);
                 }
@@ -44,7 +44,7 @@ public class ConvertUtils {
         return schemeVO;
     }
 
-    public static List<StateMachineSchemeVO> convertStateMachineSchemesToVOS(final List<StateMachineSchemeDTO> schemes, final Map<Long, ProjectVO> projectMap) {
+    public static List<StateMachineSchemeVO> convertStateMachineSchemesToVOS(final List<StateMachineSchemeDTO> schemes, final Map<Long, ProjectDTO> projectMap) {
         List<StateMachineSchemeVO> list = new ArrayList<>(schemes.size());
         for (StateMachineSchemeDTO scheme : schemes) {
             StateMachineSchemeVO schemeVO = convertStateMachineSchemeToVO(scheme, projectMap);

@@ -8,7 +8,7 @@ import io.choerodon.issue.app.service.PriorityService;
 import io.choerodon.issue.infra.dto.PriorityDTO;
 import io.choerodon.issue.infra.feign.AgileFeignClient;
 import io.choerodon.issue.infra.feign.IamFeignClient;
-import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.ProjectDTO;
 import io.choerodon.issue.infra.mapper.PriorityMapper;
 import io.choerodon.mybatis.entity.Criteria;
 import org.modelmapper.ModelMapper;
@@ -246,8 +246,8 @@ public class PriorityServiceImpl implements PriorityService {
     @Override
     public Long checkDelete(Long organizationId, Long id) {
         //查询出组织下的所有项目
-        List<ProjectVO> projectVOS = iamFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
-        List<Long> projectIds = projectVOS.stream().map(ProjectVO::getId).collect(Collectors.toList());
+        List<ProjectDTO> projectVOS = iamFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
+        List<Long> projectIds = projectVOS.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
         if (projectIds == null || projectIds.isEmpty()) {
             count = 0L;
@@ -264,8 +264,8 @@ public class PriorityServiceImpl implements PriorityService {
         }
         checkLastPriority(organizationId, priorityId);
         PriorityDTO priority = priorityMapper.selectByPrimaryKey(priorityId);
-        List<ProjectVO> projectVOS = iamFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
-        List<Long> projectIds = projectVOS.stream().map(ProjectVO::getId).collect(Collectors.toList());
+        List<ProjectDTO> projectVOS = iamFeignClient.queryProjectsByOrgId(organizationId, 1, 0).getBody().getList();
+        List<Long> projectIds = projectVOS.stream().map(ProjectDTO::getId).collect(Collectors.toList());
         Long count;
         if (projectIds == null || projectIds.isEmpty()) {
             count = 0L;
