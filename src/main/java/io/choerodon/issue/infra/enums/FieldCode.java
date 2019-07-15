@@ -54,7 +54,7 @@ public class FieldCode {
         if (projectId != null) {
             IamFeignClient iamFeignClient = SpringBeanUtil.getBean(IamFeignClient.class);
             ProjectDTO project = iamFeignClient.queryProjectInfo(projectId).getBody();
-            if (project != null) {
+            if (project != null && project.getCategories() != null) {
                 List<String> categoryCodes = project.getCategories().stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList());
                 if (categoryCodes.contains(ProjectCategoryCode.PROGRAM)) {
                     //项目群
