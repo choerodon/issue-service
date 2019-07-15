@@ -46,7 +46,7 @@ class PageStore {
 
   @action initCurrentMenuType(data) {
     const { type, id, organizationId } = data;
-    this.apiGetway = `/foundation/v1/${type}s/${id}`;
+    this.apiGetway = `/issue/v1/${type}s/${id}`;
     this.orgId = organizationId;
   }
 

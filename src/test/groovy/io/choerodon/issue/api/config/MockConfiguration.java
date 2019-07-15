@@ -21,8 +21,8 @@ import io.choerodon.issue.infra.feign.IamFeignClient;
 import io.choerodon.issue.infra.feign.fallback.AgileFeignClientFallback;
 import io.choerodon.issue.infra.feign.fallback.CustomFeignClientAdaptorFallBack;
 import io.choerodon.issue.infra.feign.fallback.IamFeignClientFallback;
-import io.choerodon.issue.infra.feign.vo.ProjectCategoryVO;
-import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.ProjectCategoryDTO;
+import io.choerodon.issue.infra.feign.vo.ProjectDTO;
 import io.choerodon.issue.infra.feign.vo.UserVO;
 import io.choerodon.issue.infra.utils.ProjectUtil;
 import io.choerodon.issue.statemachine.fegin.InstanceFeignClient;
@@ -83,13 +83,13 @@ public class MockConfiguration {
     @Primary
     IamFeignClient iamFeignClient() {
         IamFeignClient iamFeignClient = Mockito.mock(IamFeignClientFallback.class);
-        ProjectVO projectVO = new ProjectVO();
+        ProjectDTO projectVO = new ProjectDTO();
         projectVO.setId(1L);
         projectVO.setName("test");
         projectVO.setOrganizationId(1L);
         Mockito.when(iamFeignClient.queryProject(Matchers.anyLong())).thenReturn(new ResponseEntity<>(projectVO, HttpStatus.OK));
-        PageInfo<ProjectVO> projectVOS = new PageInfo<>();
-        List<ProjectVO> projectVOList = new ArrayList<>(1);
+        PageInfo<ProjectDTO> projectVOS = new PageInfo<>();
+        List<ProjectDTO> projectVOList = new ArrayList<>(1);
         projectVOList.add(projectVO);
         projectVOS.setList(projectVOList);
         projectVOS.setPageSize(1);
@@ -99,9 +99,9 @@ public class MockConfiguration {
         user.setId(1L);
         user.setRealName("test");
         Mockito.when(iamFeignClient.listUsersByIds(ArgumentMatchers.anyObject(), ArgumentMatchers.anyBoolean())).thenReturn(new ResponseEntity<>(Arrays.asList(user), HttpStatus.OK));
-        ProjectVO project = new ProjectVO();
+        ProjectDTO project = new ProjectDTO();
         project.setId(1L);
-        ProjectCategoryVO category = new ProjectCategoryVO();
+        ProjectCategoryDTO category = new ProjectCategoryDTO();
         category.setCode(ProjectCategoryCode.PROGRAM);
         project.setCategories(Arrays.asList(category));
         Mockito.when(iamFeignClient.queryProjectInfo(ArgumentMatchers.anyLong())).thenReturn(new ResponseEntity<>(project, HttpStatus.OK));

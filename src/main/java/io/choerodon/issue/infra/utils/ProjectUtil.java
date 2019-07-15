@@ -2,7 +2,7 @@ package io.choerodon.issue.infra.utils;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.issue.infra.feign.IamFeignClient;
-import io.choerodon.issue.infra.feign.vo.ProjectVO;
+import io.choerodon.issue.infra.feign.vo.ProjectDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class ProjectUtil {
     @Autowired
     private IamFeignClient iamFeignClient;
 
-    protected static final Map<Long, ProjectVO> map = new HashMap<>();
+    protected static final Map<Long, ProjectDTO> map = new HashMap<>();
 
     public Long getOrganizationId(Long projectId) {
         return queryProject(projectId).getOrganizationId();
@@ -33,8 +33,8 @@ public class ProjectUtil {
         return queryProject(projectId).getName();
     }
 
-    private ProjectVO queryProject(Long projectId) {
-        ProjectVO projectVO = map.get(projectId);
+    private ProjectDTO queryProject(Long projectId) {
+        ProjectDTO projectVO = map.get(projectId);
         if (projectVO != null) {
             return projectVO;
         } else {

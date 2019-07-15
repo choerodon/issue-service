@@ -8,7 +8,7 @@ import java.util.List;
  * @author dinghuang123@gmail.com
  * @since 2018/5/30
  */
-public class ProjectVO {
+public class ProjectDTO {
 
     @ApiModelProperty(value = "项目主键id")
     private Long id;
@@ -23,7 +23,7 @@ public class ProjectVO {
     @ApiModelProperty(value = "项目类型（遗留旧字段，一对一）:AGILE(敏捷项目),PROGRAM(普通项目组),ANALYTICAL(分析型项目群)")
     private String category;
     @ApiModelProperty(value = "项目类型(非开源，一对多)")
-    private List<ProjectCategoryVO> categories;
+    private List<ProjectCategoryDTO> categories;
     @ApiModelProperty(value = "版本号")
     private Long objectVersionNumber;
 
@@ -35,11 +35,11 @@ public class ProjectVO {
         this.category = category;
     }
 
-    public List<ProjectCategoryVO> getCategories() {
+    public List<ProjectCategoryDTO> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<ProjectCategoryVO> categories) {
+    public void setCategories(List<ProjectCategoryDTO> categories) {
         this.categories = categories;
     }
 

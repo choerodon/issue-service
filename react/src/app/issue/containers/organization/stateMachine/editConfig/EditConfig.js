@@ -67,8 +67,8 @@ class EditConfig extends Component {
     return (
       [{
         title: <FormattedMessage id="stateMachine.state" />,
-        dataIndex: 'statusDTO',
-        key: 'statusDTO',
+        dataIndex: 'statusVO',
+        key: 'statusVO',
         width: 300,
         render: text => text && (
           <div className={`${prefixCls}-text-node`}>{text.name}</div>
@@ -86,7 +86,7 @@ class EditConfig extends Component {
                   {`${item.name}  >>>`} {
                     nodeData && nodeData.map(node => node.id === item.endNodeId && (
                       <div className={`${prefixCls}-text-node`} key={`${item.id}-${node.id}`}>
-                        {node.statusDTO && node.statusDTO.name}
+                        {node.statusVO && node.statusVO.name}
                       </div>
                     ))
                   }
@@ -148,7 +148,7 @@ class EditConfig extends Component {
     const figure = [];
     const { canvas } = this;
     const { width, height } = canvas.getBoundingClientRect();
-    const { startNodeDTO, name, endNodeDTO } = data;
+    const { startNodeVO, name, endNodeVO } = data;
     const { devicePixelRatio } = window;
     canvas.setAttribute('width', width * devicePixelRatio);
     canvas.setAttribute('height', height * devicePixelRatio);
@@ -170,28 +170,28 @@ class EditConfig extends Component {
     }
 
     const ctx = canvas.getContext('2d');
-    if (startNodeDTO) {
+    if (startNodeVO) {
       ctx.beginPath();
       ctx.fillStyle = '#FFB100';
       ctx.fillRect(recX, recY, recWidth, recHeight);
       ctx.fillStyle = '#ffffff';
       ctx.font = '25px Georgia';
       ctx.textAlign = 'center';
-      ctx.fillText(startNodeDTO.statusDTO && startNodeDTO.statusDTO.name ? startNodeDTO.statusDTO.name : '', recX + recWidth / 2, recY + recHeight / 2 + 5);
+      ctx.fillText(startNodeVO.statusVO && startNodeVO.statusVO.name ? startNodeVO.statusVO.name : '', recX + recWidth / 2, recY + recHeight / 2 + 5);
       ctx.stroke();
       figure.push({
         x: recX,
         y: recY,
         w: recWidth,
         h: recHeight,
-        id: startNodeDTO.id,
+        id: startNodeVO.id,
       });
       range.x = recX;
       range.y = recY;
       range.h = recHeight;
     }
 
-    const newX = startNodeDTO ? recWidth + lineWidth : 0;
+    const newX = startNodeVO ? recWidth + lineWidth : 0;
     ctx.beginPath();
     ctx.fillStyle = '#D8D8D8';
     ctx.fillRect(recX + newX, recY + recHeight / 4, recWidth * 2, recHeight / 2);
@@ -201,7 +201,7 @@ class EditConfig extends Component {
     ctx.fillText(data.name || 'sss', recX + newX + recWidth, recY + recHeight / 2 + 8);
     ctx.stroke();
 
-    if (startNodeDTO) {
+    if (startNodeVO) {
       ctx.beginPath();
       ctx.strokeStyle = '#ccc';
       ctx.moveTo(recX + recWidth, recY + recHeight - recHeight / 2);
@@ -215,21 +215,21 @@ class EditConfig extends Component {
       ctx.stroke();
     }
 
-    if (endNodeDTO) {
+    if (endNodeVO) {
       ctx.beginPath();
       ctx.fillStyle = '#4D90FE';
       ctx.fillRect(recX + newX + recWidth * 2 + lineWidth, recY, recWidth, recHeight);
       ctx.fillStyle = '#ffffff';
       ctx.font = '25px Georgia';
       ctx.textAlign = 'center';
-      ctx.fillText(endNodeDTO.statusDTO && endNodeDTO.statusDTO.name ? endNodeDTO.statusDTO.name : '', recX + newX + recWidth * 2 + lineWidth + recWidth / 2, recY + recHeight / 2 + 5);
+      ctx.fillText(endNodeVO.statusVO && endNodeVO.statusVO.name ? endNodeVO.statusVO.name : '', recX + newX + recWidth * 2 + lineWidth + recWidth / 2, recY + recHeight / 2 + 5);
       ctx.stroke();
       figure.push({
         x: recX + newX + recWidth * 2 + lineWidth,
         y: recY,
         w: recWidth,
         h: recHeight,
-        id: endNodeDTO.id,
+        id: endNodeVO.id,
       });
       range.w = recX + newX + recWidth * 2 + lineWidth + recWidth;
 
@@ -279,7 +279,7 @@ class EditConfig extends Component {
     const figure = [];
     const { canvas } = this;
     const { width, height } = canvas.getBoundingClientRect();
-    const { intoTransform, statusDTO, outTransform } = data;
+    const { intoTransform, statusVO, outTransform } = data;
     const { devicePixelRatio } = window;
     // 计算出物理像素
     canvas.setAttribute('width', width * devicePixelRatio);
@@ -355,7 +355,7 @@ class EditConfig extends Component {
     ctx.fillStyle = '#ffffff';
     ctx.font = '25px Georgia';
     ctx.textAlign = 'center';
-    ctx.fillText(data.statusDTO && data.statusDTO.name ? data.statusDTO.name : 'sss', newX + recWidth / 2, stateY + recHeight / 2 + 5);
+    ctx.fillText(data.statusVO && data.statusVO.name ? data.statusVO.name : 'sss', newX + recWidth / 2, stateY + recHeight / 2 + 5);
     ctx.stroke();
 
 
@@ -779,7 +779,7 @@ class EditConfig extends Component {
               <div className={`${prefixCls}-header-name`}>
                 {stateId ? <FormattedMessage id="stateMachine.state" /> : <FormattedMessage id="stateMachine.transfer" />}
                 :
-              {stateId ? targetData.statusDTO && targetData.statusDTO.name : targetData.name}
+              {stateId ? targetData.statusVO && targetData.statusVO.name : targetData.name}
                 {stateMachineData && stateMachineData.status === '2' && <span className={`${prefixCls}-header-name-state`}>草稿</span>}
               </div>
               <div className={`${prefixCls}-header-stateMachine`}>

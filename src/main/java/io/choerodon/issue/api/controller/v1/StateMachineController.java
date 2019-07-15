@@ -32,9 +32,6 @@ public class StateMachineController {
     private StateMachineService stateMachineService;
     @Autowired
     private StateMachineValidator stateMachineValidator;
-    @Autowired
-    private ProjectConfigService projectConfigService;
-
 
     @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "分页查询状态机列表")

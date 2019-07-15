@@ -118,8 +118,8 @@ class IssueTypeScreenSchemesEditTemplate extends Component {
       IssueTypeScreenSchemesStore.loadSchemeById(orgId, id).then((data) => {
         if (data) {
           this.setState({
-            associations: data.lineDTOS,
-            usedIssueTypes: data.lineDTOS.map(item => item.issueTypeId),
+            associations: data.lineVOS,
+            usedIssueTypes: data.lineVOS.map(item => item.issueTypeId),
           });
         }
       });
@@ -160,7 +160,7 @@ class IssueTypeScreenSchemesEditTemplate extends Component {
           spinning: true,
         });
         data.organizationId = orgId;
-        data.lineDTOS = associations;
+        data.lineVOS = associations;
         if (type === 'create') {
           try {
             await IssueTypeScreenSchemesStore.createScheme(orgId, data);

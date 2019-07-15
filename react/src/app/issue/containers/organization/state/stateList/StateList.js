@@ -426,7 +426,7 @@ class StateList extends Component {
                   >
                     <div style={{ display: 'inline-block' }}>
                       <div className="issue-state-block" style={{ backgroundColor: stage.colour }} />
-                      <span style={{ verticalAlign: 'text-top', width: '100%' }}>{stage.name}</span>
+                      <span style={{ verticalAlign: 'middle', width: '100%' }}>{stage.name}</span>
                     </div>
                   </Option>
                 ))}

@@ -88,15 +88,15 @@ class EditStateMachine extends Component {
     const { transferData, nodeData, enable } = this.state;
     const column = [{
       title: <FormattedMessage id="stateMachine.state" />,
-      dataIndex: 'statusDTO',
-      key: 'statusDTO',
+      dataIndex: 'statusVO',
+      key: 'statusVO',
       width: 300,
       render: (text, record) => text && (
         <div
           className={`${prefixCls}-text-node`}
           style={{
-            backgroundColor: record.statusDTO
-            && record.statusDTO.type && statusColor[record.statusDTO.type].colour,
+            backgroundColor: record.statusVO
+            && record.statusVO.type && statusColor[record.statusVO.type].colour,
           }}
         >{text.name}</div>
       ),
@@ -116,11 +116,11 @@ class EditStateMachine extends Component {
                       className={`${prefixCls}-text-node`}
                       key={`${item.id}-${node.id}`}
                       style={{
-                        backgroundColor: node.statusDTO
-                        && node.statusDTO.type && statusColor[node.statusDTO.type].colour,
+                        backgroundColor: node.statusVO
+                        && node.statusVO.type && statusColor[node.statusVO.type].colour,
                       }}
                     >
-                      {node.statusDTO && node.statusDTO.name}
+                      {node.statusVO && node.statusVO.name}
                     </div>
                   ))
                 }
@@ -274,13 +274,13 @@ class EditStateMachine extends Component {
                     }
                     {nodeData
                       && nodeData.length > 0
-                      && nodeData.map(dto => dto.statusDTO && (
+                      && nodeData.map(VO => VO.statusVO && (
                         <Option
-                          value={dto.statusDTO.id.toString()}
-                          key={dto.statusDTO.toString()}
+                          value={VO.statusVO.id.toString()}
+                          key={VO.statusVO.toString()}
                         >
-                          <div className="issue-state-machine-block" style={{ backgroundColor: dto.statusDTO.type ? statusColor[dto.statusDTO.type].colour : '#FFF' }} />
-                          <span id={dto.id} name={dto.statusDTO.name} style={{ display: 'inline-block', width: '100%' }}>{dto.statusDTO.name}</span>
+                          <div className="issue-state-machine-block" style={{ backgroundColor: VO.statusVO.type ? statusColor[VO.statusVO.type].colour : '#FFF' }} />
+                          <span id={VO.id} name={VO.statusVO.name} style={{ display: 'inline-block', width: '100%' }}>{VO.statusVO.name}</span>
                         </Option>
                       ))}
                   </Select>,
@@ -306,13 +306,13 @@ class EditStateMachine extends Component {
                   >
                     {nodeData
                       && nodeData.length > 0
-                      && nodeData.map(dto => dto.statusDTO && (
+                      && nodeData.map(VO => VO.statusVO && (
                         <Option
-                          value={dto.statusDTO.id.toString()}
-                          key={dto.statusDTO.toString()}
+                          value={VO.statusVO.id.toString()}
+                          key={VO.statusVO.toString()}
                         >
-                          <div className="issue-state-machine-block" style={{ backgroundColor: dto.statusDTO.type ? statusColor[dto.statusDTO.type].colour : '#FFF' }} />
-                          <span id={dto.statusDTO.id} name={dto.statusDTO.name} style={{ display: 'inline-block', width: '100%' }}>{dto.statusDTO.name}</span>
+                          <div className="issue-state-machine-block" style={{ backgroundColor: VO.statusVO.type ? statusColor[VO.statusVO.type].colour : '#FFF' }} />
+                          <span id={VO.statusVO.id} name={VO.statusVO.name} style={{ display: 'inline-block', width: '100%' }}>{VO.statusVO.name}</span>
                         </Option>
                       ))}
                   </Select>,
@@ -368,19 +368,19 @@ class EditStateMachine extends Component {
                   {/* > */}
                     {/* {nodeData && */}
                       {/* nodeData.length > 0 && */}
-                      {/* nodeData.map((dto) => { */}
-                        {/* if (dto.statusDTO) { */}
+                      {/* nodeData.map((VO) => { */}
+                        {/* if (VO.statusVO) { */}
                           {/* return ( */}
                             {/* <Option */}
-                              {/* value={dto.statusDTO.id.toString()} */}
-                              {/* key={dto.statusDTO.toString()} */}
+                              {/* value={VO.statusVO.id.toString()} */}
+                              {/* key={VO.statusVO.toString()} */}
                             {/* > */}
                               {/* <span */}
-                                {/* id={dto.statusDTO.id} */}
-                                {/* name={dto.statusDTO.name} */}
+                                {/* id={VO.statusVO.id} */}
+                                {/* name={VO.statusVO.name} */}
                                 {/* style={{ display: 'inline-block', width: '100%' }} */}
                               {/* > */}
-                                {/* {dto.statusDTO.name} */}
+                                {/* {VO.statusVO.name} */}
                               {/* </span> */}
                             {/* </Option> */}
                           {/* ); */}
@@ -507,7 +507,7 @@ class EditStateMachine extends Component {
                   >
                     <div style={{ display: 'inline-block' }}>
                       <div className="issue-state-machine-block" style={{ backgroundColor: stage.colour }} />
-                      <span style={{ verticalAlign: 'text-top', width: '100%' }}>{stage.name}</span>
+                      <span style={{ verticalAlign: 'middle', width: '100%' }}>{stage.name}</span>
                     </div>
                   </Option>
                 ))}
@@ -543,8 +543,8 @@ class EditStateMachine extends Component {
           if (data && data.failed) {
             Choerodon.prompt(data.message);
           } else {
-            const nodeData = data.nodeDTOs;
-            const transferData = data.transformDTOs;
+            const nodeData = data.nodeVOS;
+            const transferData = data.transformVOS;
             const { name, description, objectVersionNumber } = data;
             this.setState({
               stateMachineData: data,
@@ -565,8 +565,8 @@ class EditStateMachine extends Component {
           if (data && data.failed) {
             Choerodon.prompt(data.message);
           } else {
-            const nodeData = data.nodeDTOs;
-            const transferData = data.transformDTOs;
+            const nodeData = data.nodeVOS;
+            const transferData = data.transformVOS;
             const { name, description, objectVersionNumber } = data;
             this.setState({
               stateMachineData: data,
@@ -600,7 +600,7 @@ class EditStateMachine extends Component {
       } else {
         const stateList = _.differenceWith(data,
           nodeData,
-          (dataItem, nodeItem) => nodeItem.statusDTO && dataItem.id === nodeItem.statusDTO.id);
+          (dataItem, nodeItem) => nodeItem.statusVO && dataItem.id === nodeItem.statusVO.id);
         this.setState({
           stateList,
         });
@@ -1581,7 +1581,7 @@ class EditStateMachine extends Component {
                 style={{ marginBottom: 10 }}
                 error={error}
               >
-                <TextArea
+                <Input
                   size="small"
                   maxLength={20}
                   value={schemeName}
