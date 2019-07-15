@@ -1581,7 +1581,7 @@ class EditStateMachine extends Component {
                 style={{ marginBottom: 10 }}
                 error={error}
               >
-                <TextArea
+                <Input
                   size="small"
                   maxLength={20}
                   value={schemeName}
