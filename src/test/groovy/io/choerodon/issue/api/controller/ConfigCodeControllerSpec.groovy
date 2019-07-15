@@ -56,7 +56,7 @@ class ConfigCodeControllerSpec extends Specification {
     @Shared
     Long testOrganizationId = 2L
     @Shared
-    String baseUrl = '/v1/organizations/{organization_id}/config_codes'
+    String baseUrl = '/v1/organizations/{organization_id}/config_code'
     @Shared
     def statusList = []
     @Shared

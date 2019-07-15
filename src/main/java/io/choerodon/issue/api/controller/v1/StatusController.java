@@ -8,9 +8,10 @@ import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.base.BaseController;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.issue.api.vo.*;
-import io.choerodon.issue.app.service.StatusService;
 import io.choerodon.issue.api.validator.StateValidator;
+import io.choerodon.issue.api.vo.*;
+import io.choerodon.issue.app.service.ProjectConfigService;
+import io.choerodon.issue.app.service.StatusService;
 import io.choerodon.issue.infra.dto.StatusDTO;
 import io.choerodon.mybatis.annotation.SortDefault;
 import io.choerodon.swagger.annotation.CustomPageRequest;
@@ -39,17 +40,19 @@ public class StatusController extends BaseController {
     private StatusService statusService;
     @Autowired
     private StateValidator stateValidator;
+    @Autowired
+    private ProjectConfigService projectConfigService;
 
     @Permission(type = ResourceType.ORGANIZATION, roles = {InitRoleCode.ORGANIZATION_ADMINISTRATOR, InitRoleCode.ORGANIZATION_MEMBER})
     @ApiOperation(value = "分页查询状态列表")
     @CustomPageRequest
     @PostMapping("/organizations/{organization_id}/status/list")
     public ResponseEntity<PageInfo<StatusWithInfoVO>> queryStatusList(@ApiIgnore
-                                                                       @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                      @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                       @ApiParam(value = "组织id", required = true)
-                                                                       @PathVariable("organization_id") Long organizationId,
+                                                                      @PathVariable("organization_id") Long organizationId,
                                                                       @ApiParam(value = "status search dto", required = true)
-                                                                       @RequestBody StatusSearchVO statusSearchVO) {
+                                                                      @RequestBody StatusSearchVO statusSearchVO) {
         return Optional.ofNullable(statusService.queryStatusList(pageRequest, organizationId, statusSearchVO))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.statusList.get"));
@@ -142,7 +145,7 @@ public class StatusController extends BaseController {
     @ApiOperation(value = "根据ids批量查询状态")
     @PostMapping(value = "/status/batch")
     public ResponseEntity<Map<Long, StatusDTO>> batchStatusGet(@ApiParam(value = "状态ids", required = true)
-                                                            @RequestBody List<Long> ids) {
+                                                               @RequestBody List<Long> ids) {
         return Optional.ofNullable(statusService.batchStatusGet(ids))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.status.get"));

@@ -22,7 +22,7 @@ import java.util.Optional;
  * @author peng.jiang, dinghuang123@gmail.com
  */
 @RestController
-@RequestMapping(value = "/v1/organizations/{organization_id}/state_machine_transforms")
+@RequestMapping(value = "/v1/organizations/{organization_id}/state_machine_transform")
 public class StateMachineTransformController extends BaseController {
 
     @Autowired

@@ -298,7 +298,7 @@ class StateMachineSchemeStore {
   loadGraphData = (orgId, stateMachineId) => {
     this.setGraphLoading(true);
     axios
-      .get(`/issue/v1/organizations/${orgId}/state_machines/${stateMachineId}`)
+      .get(`/issue/v1/organizations/${orgId}/state_machine/${stateMachineId}`)
       .then((res) => {
         this.setGraphLoading(false);
         this.setNodeData(res.nodeVOS);
@@ -310,7 +310,7 @@ class StateMachineSchemeStore {
   };
 
   loadAllStateMachine = orgId => axios
-    .get(`/issue/v1/organizations/${orgId}/state_machines/query_all`)
+    .get(`/issue/v1/organizations/${orgId}/state_machine/query_all`)
     .then(
       action((res) => {
         this.setAllStateMachine(res);
