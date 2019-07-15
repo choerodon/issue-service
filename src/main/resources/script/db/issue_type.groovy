@@ -82,4 +82,9 @@ databaseChangeLog(logicalFilePath: 'issue_type.groovy') {
                     "from issue_type where type_code='issue_test'"
         }
     }
+    changeSet(id: '2019-07-15-fix-update-colour', author: 'shinan.chenX@gmail') {
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "update issue_type set colour = '#3D5AFE' where type_code = 'feature';"
+        }
+    }
 }
