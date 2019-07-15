@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/issue",
   "routeName": "issue",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "",
   "main": "./react/src/app/issue/containers/ISSUEIndex.js",
   "files": [
@@ -17,7 +17,7 @@
     "rxjs-compat": "^6.5.2"
   },
   "devDependencies": {
-    "@choerodon/boot": "0.18.x",
+    "@choerodon/boot": "0.19.x",
     "@choerodon/master": "0.18.x",
     "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
@@ -47,7 +47,7 @@
     }
   },
   "peerDependencies": {
-    "@choerodon/boot": "0.18.x",
+    "@choerodon/boot": "0.19.x",
     "@choerodon/master": "0.18.x"
   }
 }
