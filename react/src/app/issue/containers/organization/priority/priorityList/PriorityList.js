@@ -103,7 +103,7 @@ class PriorityList extends Component {
         key: 'des',
         width: 650,
         filters: [],
-        onFilter: (value, record) => record.description.toString().indexOf(value) !== -1,
+        onFilter: (value, record) => record.description && record.description.toString().indexOf(value) !== -1,
       },
       {
         title: <FormattedMessage id="priority.color" />,
