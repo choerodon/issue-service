@@ -32,7 +32,6 @@ const prefixCls = 'issue-state';
 
 const stageMap = getStageMap();
 const stageList = getStageList();
-
 @observer
 class StateList extends Component {
   constructor(props) {
@@ -41,6 +40,7 @@ class StateList extends Component {
     this.state = {
       page: 1,
       pageSize: 10,
+      initialTotal: 0,
       total: 0,
       show: false,
       submitting: false,
@@ -50,7 +50,13 @@ class StateList extends Component {
   }
 
   componentDidMount() {
-    this.loadState();
+    this.loadState({ 
+      page: undefined,
+      size: undefined, 
+      sort: undefined, 
+      param: undefined, 
+      isSetInitialTotal: true, 
+    });
   }
 
   getColumn = () => ([{
@@ -199,7 +205,9 @@ class StateList extends Component {
       if (data && data.failed) {
         Choerodon.prompt(data.message);
       } else {
-        this.loadState(page, pageSize, sorter, tableParam);
+        this.loadState({ 
+          page, size: pageSize, sort: sorter, param: tableParam, 
+        });
         this.setState({
           deleteVisible: false,
           deleteId: '',
@@ -216,14 +224,21 @@ class StateList extends Component {
     });
   };
 
-  loadState = (page = 1, size = 10, sort = { field: 'id', order: 'desc' }, param = {}) => {
+  loadState = ({ 
+    page = 1, size = 10, sort = { field: 'id', order: 'desc' }, param = {}, isSetInitialTotal = false, 
+  }) => {
     const { StateStore } = this.props;
     const orgId = AppState.currentMenuType.organizationId;
-    StateStore.loadStateList(orgId, page, size, sort, param).then((data) => {
+    StateStore.loadStateList(orgId, page, size, sort, param, isSetInitialTotal).then((data) => {
       this.setState({
         statesList: data.list,
         total: data.total,
       });
+      if (isSetInitialTotal) {
+        this.setState({
+          initialTotal: data.total,
+        });
+      }
     });
   };
 
@@ -248,7 +263,9 @@ class StateList extends Component {
                 // eslint-disable-next-line no-console
                 console.log(res.message);
               } else {
-                this.loadState(page, pageSize, sorter, tableParam);
+                this.loadState({ 
+                  page, size: pageSize, sort: sorter, param: tableParam, 
+                });
                 this.setState({
                   type: false,
                   show: false,
@@ -269,7 +286,9 @@ class StateList extends Component {
               if (res && res.failed) {
                 Choerodon.prompt(res.message);
               } else {
-                this.loadState(page, pageSize, sorter, tableParam);
+                this.loadState({
+                  page, size: pageSize, sort: sorter, param: tableParam, 
+                });
                 this.setState({ type: false, show: false, editState: {} });
               }
               this.setState({
@@ -285,7 +304,9 @@ class StateList extends Component {
     const {
       page, pageSize, sorter, tableParam,
     } = this.state;
-    this.loadState(page, pageSize, sorter, tableParam);
+    this.loadState({
+      page, size: pageSize, sort: sorter, param: tableParam, 
+    });
   };
 
 
@@ -326,8 +347,12 @@ class StateList extends Component {
       sorter: sorter.column ? sorter : undefined,
       tableParam: searchParam,
     });
-    this.loadState(pagination.current,
-      pagination.pageSize, sorter.column ? sorter : undefined, searchParam);
+    this.loadState({
+      page: pagination.current,
+      size: pagination.pageSize,
+      sort: sorter.column ? sorter : undefined,
+      param: searchParam,
+    });
   };
 
   checkName = async (rule, value, callback) => {
@@ -359,7 +384,7 @@ class StateList extends Component {
   render() {
     const { StateStore, intl, form } = this.props;
     const {
-      statesList = [], deleteName, editState, page, pageSize, total, show, submitting, type, deleteVisible,
+      statesList = [], deleteName, editState, page, pageSize, initialTotal, total, show, submitting, type, deleteVisible,
     } = this.state;
     const { getFieldDecorator } = form;
     const formContent = (
@@ -426,7 +451,7 @@ class StateList extends Component {
                   >
                     <div style={{ display: 'inline-block' }}>
                       <div className="issue-state-block" style={{ backgroundColor: stage.colour }} />
-                      <span style={{ verticalAlign: 'middle', width: '100%' }}>{stage.name}</span>
+                      <span style={{ verticalAlign: 'text-top', width: '100%' }}>{stage.name}</span>
                     </div>
                   </Option>
                 ))}
@@ -449,10 +474,11 @@ class StateList extends Component {
       defaultPageSize: pageSize,
       total,
     };
+
     return (
       <Page>
         <Header title={<FormattedMessage id="state.title" />}>
-          {statesList && statesList.length === 0
+          {!initialTotal
             ? (
               <Tooltip placement="bottom" title="请创建项目后再创建状态机">
                 <Button disabled>
