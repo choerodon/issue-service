@@ -208,11 +208,11 @@ public class StatusServiceImpl implements StatusService {
         StatusDTO select = new StatusDTO();
         select.setName(statusName);
         select.setOrganizationId(organizationId);
-        StatusDTO status = statusMapper.selectOne(select);
-        if (status == null) {
+        List<StatusDTO> list = statusMapper.select(select);
+        if (list.isEmpty()) {
             statusVO = create(organizationId, statusVO);
         } else {
-            statusVO = modelMapper.map(status, StatusVO.class);
+            statusVO = modelMapper.map(list.get(0), StatusVO.class);
         }
         //将状态加入状态机中，直接加到发布表中
         nodeService.createNodeAndTransformForAgile(organizationId, stateMachineId, statusVO);
