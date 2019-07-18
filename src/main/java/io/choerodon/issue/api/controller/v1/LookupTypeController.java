@@ -27,7 +27,7 @@ public class LookupTypeController {
     @Autowired
     private LookupTypeService lookupTypeService;
 
-    @Permission(type = ResourceType.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
     @ApiOperation("查询所有lookup type类型")
     @GetMapping
     public ResponseEntity<List<LookupTypeVO>> listLookupType(@ApiParam(value = "项目id", required = true)
