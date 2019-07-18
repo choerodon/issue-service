@@ -26,7 +26,7 @@ public class LookupValueController {
     @Autowired
     private LookupValueService lookupValueService;
 
-    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_MEMBER, InitRoleCode.PROJECT_OWNER})
+    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
     @ApiOperation("根据type code查询其下的value值")
     @GetMapping(value = "/{typeCode}")
     public ResponseEntity<LookupTypeWithValuesVO> queryLookupValueByCode(@ApiParam(value = "项目id", required = true)
