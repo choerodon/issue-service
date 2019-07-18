@@ -6,7 +6,7 @@ const config = {
   buildType: 'single',
   dashboard: {},
   resourcesLevel: ['site', 'origanization', 'project', 'user'],
-  port: 8080,
+  port: 9090,
 };
 
 module.exports = config;
