@@ -10,7 +10,7 @@ import StatusTag from '../../../../components/StatusTag/StatusTag';
 
 const { AppState } = stores;
 const { Sidebar } = Modal;
-
+const { Option } = Select;
 @observer
 class PublishSidebar extends Component {
   constructor(props, context) {
@@ -120,21 +120,21 @@ class PublishSidebar extends Component {
     key: 'issueType',
     width: 200,
     render: (text, record) => (
-        <Fragment>
-          <TypeTag
-            data={record.issueTypeVO}
-            showName
-          />
-          <span
-            style={{
-              display: 'inline-block',
-              verticalAlign: 'top',
-              marginLeft: '10px',
-            }}
-          >
-            {`(${record.issueCount})`}
-          </span>
-        </Fragment>
+      <Fragment>
+        <TypeTag
+          data={record.issueTypeVO}
+          showName
+        />
+        <span
+          style={{
+            display: 'inline-block',
+            verticalAlign: 'top',
+            marginLeft: '10px',
+          }}
+        >
+          {`(${record.issueCount})`}
+        </span>
+      </Fragment>
     ),
   }, {
     align: 'right',
@@ -199,7 +199,7 @@ class PublishSidebar extends Component {
         <Option value={data.id}>{data.name}</Option>
       )));
       list.push(record.statusChangeItems.map(data => (
-        <div style={{ height: 25 }}>
+        <div>
           <Select
             defaultValue={record.newStateMachine.statusVOS[0].id}
             style={{ width: 200 }}
