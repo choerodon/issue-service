@@ -37,6 +37,7 @@ init-local-database-csn.sh
 # frontend
 lib
 node_modules
+yarn.lock
 package-lock.json
 **/lib/dist/
 **/lib/assets/

@@ -1,5 +1,9 @@
-import { Content, Header, Page, stores } from '@choerodon/boot';
-import { Button, Card, Form, Icon, Input, message, Modal, Spin, Table, Tooltip, Checkbox } from 'choerodon-ui';
+import {
+ Content, Header, Page, stores 
+} from '@choerodon/boot';
+import {
+ Button, Card, Form, Icon, Input, message, Modal, Spin, Table, Tooltip, Checkbox 
+} from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -123,7 +127,7 @@ class PriorityCreate extends Component {
         onCancel={this.handleCreatingCancel}
         confirmLoading={loading}
       >
-        <Form className="issue-form">
+        <Form className="issue-form c7nagile-form">
           <FormItem
             label="name"
           >

@@ -1,13 +1,18 @@
 .issue-sidebar-form {
   max-width: 520px;
+
+  .c7n-form-item {
+    margin-bottom: 0.2rem;
+  }
 }
 
-.issue-region p + p {
+.issue-region p +p {
   margin-bottom: 0;
 }
 
 .issue-delete-content {
   margin-top: 8px;
+
   & span {
     font-size: 14px;
     color: #000;
@@ -35,4 +40,10 @@
 .issue-del-space {
   width: 24px;
   display: inline-block;
+}
+// 修改
+.c7nagile-form {
+  .c7n-form-item {
+    margin-bottom: 12px;
+  }
 }

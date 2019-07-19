@@ -194,7 +194,7 @@ class EditStateMachine extends Component {
     if (type === 'state') {
       return (
         <div className="issue-region">
-          <Form layout="vertical" className="issue-sidebar-form">
+          <Form layout="vertical" className="issue-sidebar-form c7nagile-form">
             <FormItem
               {...formItemLayout}
             >
@@ -232,7 +232,7 @@ class EditStateMachine extends Component {
     } else {
       return (
         <div className="issue-region">
-          <Form layout="vertical" className="issue-sidebar-form">
+          <Form layout="vertical" className="issue-sidebar-form c7nagile-form">
             <React.Fragment>
               <FormItem
                 {...formItemLayout}
@@ -447,7 +447,7 @@ class EditStateMachine extends Component {
     const { form, intl } = this.props;
     const { getFieldDecorator } = form;
     return (<div className="issue-region">
-      <Form layout="vertical" className="issue-sidebar-form">
+      <Form layout="vertical" className="issue-sidebar-form c7nagile-form">
         <FormItem
           {...formItemLayout}
         >

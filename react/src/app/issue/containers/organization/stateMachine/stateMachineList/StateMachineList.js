@@ -271,7 +271,7 @@ class StateMachineList extends Component {
     const { type, id: projectId, organizationId: orgId } = menu;
     const formContent = (
       <div className="issue-region">
-        <Form layout="vertical" className="issue-sidebar-form">
+        <Form layout="vertical" className="issue-sidebar-form c7nagile-form">
           <FormItem
             {...formItemLayout}
           >

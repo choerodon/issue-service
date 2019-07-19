@@ -137,7 +137,7 @@ class PriorityEdit extends Component {
         onCancel={this.handleEditingCancel}
         confirmLoading={loading}
       >
-        <Form className="form">
+        <Form className="form c7nagile-form">
           <FormItem
             label="name"
           >
@@ -211,7 +211,10 @@ class PriorityEdit extends Component {
               )(
                 <Checkbox
                   disabled={!!editingPriority.default || !editingPriority.enable}
-                >设置为默认优先级</Checkbox>,
+                >
+设置为默认优先级
+
+                </Checkbox>,
               )
             }
           </FormItem>

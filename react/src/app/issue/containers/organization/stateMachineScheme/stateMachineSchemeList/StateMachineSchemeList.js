@@ -84,11 +84,15 @@ class StateMachineSchemeList extends Component {
       key: 'project',
       render: (text, record) => (
         record.projectVOS && record.projectVOS.length
-          ? <div className="issue-table-ellipsis"><ul className={`${prefixCls}-table-ul`}>
-            {record.projectVOS.map(
-              project => (<li>{project ? project.name : ''}</li>),
-            )}
-          </ul></div>
+          ? (
+            <div className="issue-table-ellipsis">
+              <ul className={`${prefixCls}-table-ul`}>
+                {record.projectVOS.map(
+                  project => (<li>{project ? project.name : ''}</li>),
+                )}
+              </ul>
+            </div>
+          )          
           : <div>-</div>
       ),
     },
@@ -147,14 +151,16 @@ class StateMachineSchemeList extends Component {
             </Button>
           </Tooltip>
           {record.status === 'create'
-            ? <Tooltip
-              placement="bottom"
-              title={<FormattedMessage id="delete" />}
-            >
-              <Button size="small" shape="circle" onClick={this.handleDelete.bind(this, record.id, record.name)}>
-                <i className="icon icon-delete" />
-              </Button>
-            </Tooltip> : <div className="issue-del-space" />
+            ? (
+              <Tooltip
+                placement="bottom"
+                title={<FormattedMessage id="delete" />}
+              >
+                <Button size="small" shape="circle" onClick={this.handleDelete.bind(this, record.id, record.name)}>
+                  <i className="icon icon-delete" />
+                </Button>
+              </Tooltip>
+            ) : <div className="issue-del-space" />
           }
         </Fragment>
       ),
@@ -291,7 +297,7 @@ class StateMachineSchemeList extends Component {
     const { getFieldDecorator } = form;
     const formContent = (
       <div className="issue-region">
-        <Form layout="vertical" className="issue-sidebar-form">
+        <Form layout="vertical" className="issue-sidebar-form c7nagile-form">
           {this.state.type === 'create' && (
             <FormItem {...formItemLayout}>
               {getFieldDecorator('name', {
@@ -335,8 +341,8 @@ class StateMachineSchemeList extends Component {
       <Page>
         <Header title={<FormattedMessage id="stateMachineScheme.title" />}>
           {/* <Button onClick={() => this.showSideBar('create')}> */}
-            {/* <i className="icon-add icon" /> */}
-            {/* <FormattedMessage id="stateMachineScheme.create" /> */}
+          {/* <i className="icon-add icon" /> */}
+          {/* <FormattedMessage id="stateMachineScheme.create" /> */}
           {/* </Button> */}
           <Button onClick={this.refresh}>
             <i className="icon-refresh icon" />
@@ -389,11 +395,11 @@ class StateMachineSchemeList extends Component {
             title={<FormattedMessage id="stateMachineScheme.create" />}
             onOk={this.handleSubmit}
             visible={this.state.show}
-            okText={
+            okText={(
               <FormattedMessage
                 id={this.state.type === 'create' ? 'create' : 'save'}
               />
-            }
+)}
             cancelText={<FormattedMessage id="cancel" />}
             confirmLoading={this.state.submitting}
             onCancel={this.hideSidebar}

@@ -25,47 +25,49 @@ class ISSUEIndex extends React.Component {
     const langauge = AppState.currentLanguage;
     const IntlProviderAsync = asyncLocaleProvider(langauge, () => import(`../locale/${langauge}`));
     return (
-      <IntlProviderAsync>
-        <Switch>
-          <Route
-            path={`${match.url}/state-machine-schemes`}
-            component={StateMachineSchemeIndex}
-          />
-          <Route
-            path={`${match.url}/issue-type`}
-            component={IssueTypeIndex}
-          />
-          <Route
-            path={`${match.url}/issue-type-schemes`}
-            component={IssueTypeSchemeIndex}
-          />
-          <Route
-            path={`${match.url}/priorities`}
-            component={PriorityIndex}
-          />
-          <Route
-            path={`${match.url}/issue-type-screen-schemes`}
-            component={IssueTypeScreenSchemes}
-          />
-          <Route
-            path={`${match.url}/states`}
-            component={StateIndex}
-          />
-          <Route
-            path={`${match.url}/state-machines`}
-            component={StateMachineIndex}
-          />
-          <Route
-            path={`${match.url}/objectScheme`}
-            component={OBJECTSCHEMEINDEX}
-          />
-          <Route
-            path={`${match.url}/page`}
-            component={PAGEINDEX}
-          />
-          <Route path="*" component={nomatch} />
-        </Switch>
-      </IntlProviderAsync>
+      <div className="issue-service">
+        <IntlProviderAsync>
+          <Switch>
+            <Route
+              path={`${match.url}/state-machine-schemes`}
+              component={StateMachineSchemeIndex}
+            />
+            <Route
+              path={`${match.url}/issue-type`}
+              component={IssueTypeIndex}
+            />
+            <Route
+              path={`${match.url}/issue-type-schemes`}
+              component={IssueTypeSchemeIndex}
+            />
+            <Route
+              path={`${match.url}/priorities`}
+              component={PriorityIndex}
+            />
+            <Route
+              path={`${match.url}/issue-type-screen-schemes`}
+              component={IssueTypeScreenSchemes}
+            />
+            <Route
+              path={`${match.url}/states`}
+              component={StateIndex}
+            />
+            <Route
+              path={`${match.url}/state-machines`}
+              component={StateMachineIndex}
+            />
+            <Route
+              path={`${match.url}/objectScheme`}
+              component={OBJECTSCHEMEINDEX}
+            />
+            <Route
+              path={`${match.url}/page`}
+              component={PAGEINDEX}
+            />
+            <Route path="*" component={nomatch} />
+          </Switch>
+        </IntlProviderAsync>
+      </div>
     );
   }
 }

@@ -179,7 +179,7 @@ class IssueTypeCreate extends Component {
           <p className="issue-issueType-list-tip">
             <FormattedMessage id="issueType.createDes" />
           </p>
-          <Form layout="vertical" onSubmit={this.handleOk} className="c7n-sidebar-form">
+          <Form layout="vertical" onSubmit={this.handleOk} className="c7n-sidebar-form c7nagile-form">
             <FormItem
               {...formItemLayout}
               className="issue-sidebar-form"
@@ -242,7 +242,7 @@ class IssueTypeCreate extends Component {
                   )
                   : null
               }
-          </div>
+            </div>
           </Form>
         </div>
       </Sidebar>

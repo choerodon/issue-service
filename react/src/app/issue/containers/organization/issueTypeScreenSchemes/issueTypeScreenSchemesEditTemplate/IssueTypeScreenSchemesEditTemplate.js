@@ -43,7 +43,7 @@ class IssueTypeScreenSchemesEditTemplate extends Component {
     const {
       type, id, organizationId, name,
     } = menu;
-    return `/issue/issue-type-screen-schemes?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`
+    return `/issue/issue-type-screen-schemes?type=${type}&id=${id}&name=${encodeURIComponent(name)}&organizationId=${organizationId}`;
   };
 
   onAssociationChange = (data, key) => {
@@ -256,7 +256,7 @@ class IssueTypeScreenSchemesEditTemplate extends Component {
         <Spin spinning={spinning}>
           <Content>
             { this.renderTips() }
-            <Form className="scheme-form" onSubmit={this.handleSubmit}>
+            <Form className="scheme-form c7nagile-form" onSubmit={this.handleSubmit}>
               <FormItem
                 {...formItemLayout}
                 label="schemeName"
