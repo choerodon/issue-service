@@ -481,29 +481,31 @@ class EditStateMachineScheme extends Component {
       render: record => (
         record.issueTypeVOS && record.issueTypeVOS.length
         && record.issueTypeVOS[0].id && this.state.showStatus === 'draft'
-          ? <Fragment>
-            <Button
-              shape="circle"
-              size="small"
-              onClick={this.handleEditStateMachine.bind(
-                this,
-                record.stateMachineVO && record.stateMachineVO.id,
-              )}
-            >
-              <Icon type="mode_edit" />
-            </Button>
-            <Button
-              shape="circle"
-              size="small"
-              onClick={this.handleDelete.bind(
-                this,
-                record.stateMachineVO && record.stateMachineVO.id,
-              )}
-            >
-              <Icon type="delete" />
-            </Button>
-          </Fragment>
-) : null
+          ? (
+            <Fragment>
+              <Button
+                shape="circle"
+                size="small"
+                onClick={this.handleEditStateMachine.bind(
+                  this,
+                  record.stateMachineVO && record.stateMachineVO.id,
+                )}
+              >
+                <Icon type="mode_edit" />
+              </Button>
+              <Button
+                shape="circle"
+                size="small"
+                onClick={this.handleDelete.bind(
+                  this,
+                  record.stateMachineVO && record.stateMachineVO.id,
+                )}
+              >
+                <Icon type="delete" />
+              </Button>
+            </Fragment>
+          )
+          : null
       ),
     },
   ];
@@ -658,51 +660,55 @@ class EditStateMachineScheme extends Component {
         <Content>
           {getStateMachine.status === 'draft'
             ? (
-<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex' }}>
-                <Icon type="warning" style={{ color: '#FADB14', marginRight: 10 }} />
-                <Tips tips={[intl.formatMessage({ id: 'stateMachineScheme.tips' })]} />
-              </div>
-              {showStatus === 'draft'
-                ? <div>
-                  <Button
-                    disabled={getStateMachine.deployStatus === 'doing'}
-                    type="primary"
-                    onClick={this.handlePublish}
-                    funcType="raised"
-                    className="issue-options-btn"
-                  >
-                    {getStateMachine.deployStatus === 'doing'
-                      ? <FormattedMessage id="stateMachineScheme.announcing" />
-                      : <FormattedMessage id="stateMachineScheme.publish" />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex' }}>
+                  <Icon type="warning" style={{ color: '#FADB14', marginRight: 10 }} />
+                  <Tips tips={[intl.formatMessage({ id: 'stateMachineScheme.tips' })]} />
+                </div>
+                {showStatus === 'draft'
+                  ? (
+                    <div>
+                      <Button
+                        disabled={getStateMachine.deployStatus === 'doing'}
+                        type="primary"
+                        onClick={this.handlePublish}
+                        funcType="raised"
+                        className="issue-options-btn"
+                      >
+                        {getStateMachine.deployStatus === 'doing'
+                          ? <FormattedMessage id="stateMachineScheme.announcing" />
+                          : <FormattedMessage id="stateMachineScheme.publish" />
                     }
-                  </Button>
-                  <Button
-                    type="danger"
-                    onClick={this.handleDeleteDraft}
-                    funcType="raised"
-                    className="issue-options-btn"
-                  >
-                    <FormattedMessage id="stateMachineScheme.deleteDraft" />
-                  </Button>
-                  <Button
-                    onClick={() => this.handleShowChange(false)}
-                    funcType="raised"
-                  >
-                    <FormattedMessage id="stateMachineScheme.original" />
-                  </Button>
-                </div>
-                : <div>
-                  <Button
-                    onClick={() => this.handleShowChange(true)}
-                    funcType="raised"
-                  >
-                    <FormattedMessage id="stateMachineScheme.draft" />
-                  </Button>
-                </div>
+                      </Button>
+                      <Button
+                        type="danger"
+                        onClick={this.handleDeleteDraft}
+                        funcType="raised"
+                        className="issue-options-btn"
+                      >
+                        <FormattedMessage id="stateMachineScheme.deleteDraft" />
+                      </Button>
+                      <Button
+                        onClick={() => this.handleShowChange(false)}
+                        funcType="raised"
+                      >
+                        <FormattedMessage id="stateMachineScheme.original" />
+                      </Button>
+                    </div>
+                  )
+                  : (
+                    <div>
+                      <Button
+                        onClick={() => this.handleShowChange(true)}
+                        funcType="raised"
+                      >
+                        <FormattedMessage id="stateMachineScheme.draft" />
+                      </Button>
+                    </div>
+                  )
               }
-            </div>
-) : null
+              </div>
+            ) : null
           }
           <div style={{ width: 440 }}>
             <ReadAndEdit
@@ -739,15 +745,15 @@ class EditStateMachineScheme extends Component {
               readModeContent={(
                 description
                   ? (
-<div className="issue-scheme-description">
-                    {description}
-                  </div>
-)
+                    <div className="issue-scheme-description">
+                      {description}
+                    </div>
+                  )
                   : (
-<div style={{ opacity: 0.5 }}>
-                    {intl.formatMessage({ id: 'stateMachineScheme.des.none' })}
-                  </div>
-)
+                    <div style={{ opacity: 0.5 }}>
+                      {intl.formatMessage({ id: 'stateMachineScheme.des.none' })}
+                    </div>
+                  )
               )}
               style={{ marginBottom: 20 }}
             >
