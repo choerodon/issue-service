@@ -1,4 +1,6 @@
-import { Form, Modal, Select, Icon } from 'choerodon-ui';
+import {
+ Form, Modal, Select, Icon 
+} from 'choerodon-ui';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -87,7 +89,7 @@ class AssociationCreate extends Component {
         onOk={this.handleCreatingOk}
         onCancel={this.handleCreatingCancel}
       >
-        <Form className="issue-association-form">
+        <Form className="issue-association-form c7nagile-form">
           <FormItem
             {...formItemLayout}
           >

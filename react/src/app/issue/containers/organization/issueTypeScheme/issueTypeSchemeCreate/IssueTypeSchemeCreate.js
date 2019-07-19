@@ -206,7 +206,7 @@ class IssueTypeSchemeCreate extends Component {
           <p className="issue-issueTypeScheme-list-tip">
             <FormattedMessage id="issueTypeScheme.createDes" />
           </p>
-          <Form layout="vertical" className="c7n-sidebar-form">
+          <Form layout="vertical" className="c7n-sidebar-form c7nagile-form">
             <FormItem
               {...formItemLayout}
               className="issue-sidebar-form"

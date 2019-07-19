@@ -389,7 +389,7 @@ class StateList extends Component {
     const { getFieldDecorator } = form;
     const formContent = (
       <div className="issue-region">
-        <Form layout="vertical" className="issue-sidebar-form">
+        <Form layout="vertical" className="issue-sidebar-form c7nagile-form">
           <FormItem
             {...formItemLayout}
           >

@@ -292,7 +292,7 @@ class EditStateMachineScheme extends Component {
 
     return (
       <Fragment>
-        <Form>
+        <Form className="c7nagile-form">
           <FormItem {...formItemLayout} className="issue-sidebar-form">
             {getFieldDecorator('stateMachine', {
               initialValue: machineId || (allStateMachine.length ? '0' : null),
@@ -331,7 +331,7 @@ class EditStateMachineScheme extends Component {
                 edge: StateMachineSchemeStore.getTransferData,
               }
             }
-            height='calc(100vh - 300px)'
+            height="calc(100vh - 300px)"
           />
         </Spin>
       </Fragment>
@@ -392,7 +392,7 @@ class EditStateMachineScheme extends Component {
       }),
     };
     return (
-      <Form>
+      <Form className="c7nagile-form">
         <FormItem {...formItemLayout}>
           <Table
             dataSource={allIssueType}
@@ -502,7 +502,8 @@ class EditStateMachineScheme extends Component {
             >
               <Icon type="delete" />
             </Button>
-          </Fragment> : null
+          </Fragment>
+) : null
       ),
     },
   ];
@@ -656,7 +657,8 @@ class EditStateMachineScheme extends Component {
         </Header>
         <Content>
           {getStateMachine.status === 'draft'
-            ? <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            ? (
+<div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex' }}>
                 <Icon type="warning" style={{ color: '#FADB14', marginRight: 10 }} />
                 <Tips tips={[intl.formatMessage({ id: 'stateMachineScheme.tips' })]} />
@@ -699,7 +701,8 @@ class EditStateMachineScheme extends Component {
                   </Button>
                 </div>
               }
-            </div> : null
+            </div>
+) : null
           }
           <div style={{ width: 440 }}>
             <ReadAndEdit
@@ -735,12 +738,16 @@ class EditStateMachineScheme extends Component {
               onCancel={origin => this.resetScheme(origin, 'description')}
               readModeContent={(
                 description
-                  ? <div className="issue-scheme-description">
+                  ? (
+<div className="issue-scheme-description">
                     {description}
                   </div>
-                  : <div style={{ opacity: 0.5 }}>
+)
+                  : (
+<div style={{ opacity: 0.5 }}>
                     {intl.formatMessage({ id: 'stateMachineScheme.des.none' })}
                   </div>
+)
               )}
               style={{ marginBottom: 20 }}
             >
