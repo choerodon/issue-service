@@ -851,7 +851,7 @@ class EditStateMachine extends Component {
                       }
                       this.graph.refresh();
                       this.setState({
-                        selectedCell,
+                        selectedCell: false,
                         show: false,
                         nodeData: nodes,
                         isLoading: false,
@@ -860,6 +860,9 @@ class EditStateMachine extends Component {
                         stateName: false,
                         stateType: false,
                       });
+                      // 将新增加的状态改为另一个，会导致状态消失
+                      // 先全局刷新
+                      this.refresh();
                     }
                   });
               }
@@ -1448,15 +1451,6 @@ class EditStateMachine extends Component {
         <div className="graph-card-des"><FormattedMessage id="stateMachine.des" />: {selectedCell && selectedCell.des}</div>
         {selectedCell && selectedCell.edge ? (
           <React.Fragment>
-            {/* <div> */}
-              {/* <a><FormattedMessage id="stateMachine.condition" /></a> */}
-            {/* </div> */}
-            {/* <div> */}
-              {/* <a><FormattedMessage id="stateMachine.verification" /></a> */}
-            {/* </div> */}
-            {/* <div> */}
-              {/* <a><FormattedMessage id="stateMachine.processor" /></a> */}
-            {/* </div> */}
             <div className="graph-card-toolbar">
               <Button
                 className="graph-card-btn"
@@ -1589,32 +1583,6 @@ class EditStateMachine extends Component {
                   onPressEnter={() => this.updateScheme('name')}
                   autoize={{ minRows: 1, maxRows: 1 }}
                 />
-              </ReadAndEdit>
-              <ReadAndEdit
-                callback={this.changeRae}
-                thisType="description"
-                current={currentRae}
-                origin={description}
-                onOk={() => this.updateScheme('description')}
-                onCancel={origin => this.resetScheme(origin, 'description')}
-                readModeContent={(
-                  description
-                    ? <div className={`${prefixCls}-header-des`}>
-                      {description}
-                    </div>
-                    : <div style={{ opacity: 0.5 }}>
-                      {intl.formatMessage({ id: 'stateMachineScheme.des.none' })}
-                    </div>
-                )}
-              >
-              <TextArea
-                maxLength={44}
-                value={description}
-                size="small"
-                onChange={e => this.handleChange(e, 'description')}
-                onPressEnter={() => this.updateScheme('description')}
-                placeholder={intl.formatMessage({ id: 'stateMachineScheme.des' })}
-              />
               </ReadAndEdit>
             </div>
           </div>
